@@ -1,0 +1,297 @@
+{
+  "businessKey": "not-bad-stuff-demo",
+  "products": [
+    {
+      "demoId": "NBS-MATOWA-100",
+      "name": "Pomada Matowa",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055165",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "category": "Pomady",
+      "summaryEn": "Matte finish with medium-strong hold; intended for controlled, classic hairstyles.",
+      "scentPl": "winogronowy",
+      "sourceUrl": "https://notbadstuff.pl/produkt/pomada-matowa-do-wlosow-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null,
+      "id": "not-bad-stuff-demo:NBS-MATOWA-100",
+      "retailPriceGrosz": 6900
+    },
+    {
+      "demoId": "NBS-DRYMATT-100",
+      "name": "Pomada Dry Matt",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055035",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "category": "Pomady",
+      "summaryEn": "Strong hold with a dry matte finish and pronounced texture.",
+      "scentPl": "owoce leśne",
+      "sourceUrl": "https://notbadstuff.pl/produkt/pomada-dry-matt-do-wlosow-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null,
+      "id": "not-bad-stuff-demo:NBS-DRYMATT-100",
+      "retailPriceGrosz": 6900
+    },
+    {
+      "demoId": "NBS-CEMENT-100",
+      "name": "Pomada Cement",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055127",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "category": "Pomady",
+      "summaryEn": "Matte texturizing pomade for volume and airy, fluffy styles.",
+      "scentPl": "mango-marakuja",
+      "sourceUrl": "https://notbadstuff.pl/produkt/pomada-cement-do-wlosow-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null,
+      "id": "not-bad-stuff-demo:NBS-CEMENT-100",
+      "retailPriceGrosz": 6900
+    },
+    {
+      "demoId": "NBS-SOL-200",
+      "name": "Sól Morska",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055080",
+      "netContent": {
+        "value": 200,
+        "unit": "ml"
+      },
+      "category": "Lekka Stylizacja",
+      "summaryEn": "Texturizing spray with light hold and a matte finish; standalone styling or a base under pomade.",
+      "scentPl": null,
+      "sourceUrl": "https://notbadstuff.pl/produkt/sol-morska-do-wlosow-200ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null,
+      "id": "not-bad-stuff-demo:NBS-SOL-200",
+      "retailPriceGrosz": 4900
+    },
+    {
+      "demoId": "NBS-SAVAGE-50",
+      "name": "Olejek do brody | Savage",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055974",
+      "netContent": {
+        "value": 50,
+        "unit": "ml"
+      },
+      "category": "Broda zarost i golenie",
+      "summaryEn": "Beard-care product for medium and long beards; helps soften hair and ease combing.",
+      "scentPl": null,
+      "sourceUrl": "https://notbadstuff.pl/produkt/olejek-do-brody-savage-50ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null,
+      "id": "not-bad-stuff-demo:NBS-SAVAGE-50",
+      "retailPriceGrosz": 7800
+    },
+    {
+      "demoId": "NBS-MATTIFIER-100",
+      "name": "Mattifier",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055479",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "category": "Lekka Stylizacja",
+      "summaryEn": "Cream prestyler for blow-drying, natural volume and a matte finish; the brand advises against use on very fine, limp hair.",
+      "scentPl": null,
+      "sourceUrl": "https://notbadstuff.pl/produkt/notbad-mattifier-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null,
+      "id": "not-bad-stuff-demo:NBS-MATTIFIER-100",
+      "retailPriceGrosz": 7900
+    }
+  ],
+  "locations": [
+    {
+      "id": "not-bad-stuff-demo:hq",
+      "key": "hq",
+      "name": "HQ warehouse",
+      "kind": "HQ"
+    },
+    {
+      "id": "not-bad-stuff-demo:legnicka",
+      "key": "legnicka",
+      "name": "Legnicka",
+      "kind": "SALON"
+    },
+    {
+      "id": "not-bad-stuff-demo:lodzka",
+      "key": "lodzka",
+      "name": "Łódzka",
+      "kind": "SALON"
+    },
+    {
+      "id": "not-bad-stuff-demo:zakladowa",
+      "key": "zakladowa",
+      "name": "Zakładowa",
+      "kind": "SALON"
+    }
+  ],
+  "inventory": [
+    {
+      "locationKey": "hq",
+      "productDemoId": "NBS-MATOWA-100",
+      "onHand": 18,
+      "reserved": 0
+    },
+    {
+      "locationKey": "hq",
+      "productDemoId": "NBS-DRYMATT-100",
+      "onHand": 18,
+      "reserved": 0
+    },
+    {
+      "locationKey": "hq",
+      "productDemoId": "NBS-CEMENT-100",
+      "onHand": 18,
+      "reserved": 0
+    },
+    {
+      "locationKey": "hq",
+      "productDemoId": "NBS-SOL-200",
+      "onHand": 18,
+      "reserved": 0
+    },
+    {
+      "locationKey": "hq",
+      "productDemoId": "NBS-SAVAGE-50",
+      "onHand": 18,
+      "reserved": 0
+    },
+    {
+      "locationKey": "hq",
+      "productDemoId": "NBS-MATTIFIER-100",
+      "onHand": 18,
+      "reserved": 0
+    },
+    {
+      "locationKey": "legnicka",
+      "productDemoId": "NBS-MATOWA-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "legnicka",
+      "productDemoId": "NBS-DRYMATT-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "legnicka",
+      "productDemoId": "NBS-CEMENT-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "legnicka",
+      "productDemoId": "NBS-SOL-200",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "legnicka",
+      "productDemoId": "NBS-SAVAGE-50",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "legnicka",
+      "productDemoId": "NBS-MATTIFIER-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "lodzka",
+      "productDemoId": "NBS-MATOWA-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "lodzka",
+      "productDemoId": "NBS-DRYMATT-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "lodzka",
+      "productDemoId": "NBS-CEMENT-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "lodzka",
+      "productDemoId": "NBS-SOL-200",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "lodzka",
+      "productDemoId": "NBS-SAVAGE-50",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "lodzka",
+      "productDemoId": "NBS-MATTIFIER-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "zakladowa",
+      "productDemoId": "NBS-MATOWA-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "zakladowa",
+      "productDemoId": "NBS-DRYMATT-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "zakladowa",
+      "productDemoId": "NBS-CEMENT-100",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "zakladowa",
+      "productDemoId": "NBS-SOL-200",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "zakladowa",
+      "productDemoId": "NBS-SAVAGE-50",
+      "onHand": 2,
+      "reserved": 0
+    },
+    {
+      "locationKey": "zakladowa",
+      "productDemoId": "NBS-MATTIFIER-100",
+      "onHand": 2,
+      "reserved": 0
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "projectId": "REPLACE_WITH_PROJECT_ID",
+  "firebase": {"projectId":"REPLACE_WITH_PROJECT_ID","apiKey":"REPLACE_WITH_PUBLIC_WEB_API_KEY","appId":"REPLACE_WITH_WEB_APP_ID","authDomain":"REPLACE_WITH_AUTH_DOMAIN"},
+  "functionsRegion":"europe-west1",
+  "dataConnect":{"serviceId":"REPLACE_WITH_SERVICE_ID","location":"europe-west1","browserConnectorId":"browser"},
+  "hostingSiteId":"REPLACE_WITH_SITE_ID",
+  "appCheck":{"siteKey":"REPLACE_WITH_PUBLIC_SITE_KEY"},
+  "lowStockThreshold":2,
+  "replenishmentEnabled":false,"knowledgeEnabled":false,"replenishmentAiEnabled":false,"ragEnabled":false
+}

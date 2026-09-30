@@ -97,3 +97,7 @@ After agents implement the phases, ask them to demonstrate:
 - Multi-product drafts create independent requests; the golden stock lifecycle ends HQ16 / Legnicka4, and RAG answers cite reviewed PDF evidence.
 
 Keep the project available for rehearsal. After the event, review billed resources, especially the Cloud SQL instance; stopping application traffic does not by itself remove infrastructure charges. This guide does not authorize deleting any project or data.
+
+## First implementation increment
+
+Follow the [owner checklist](implementation/firebase-owner-checklist.md) for login, scoped inventory and Hosting. Storage and Gemini are configured in later increments.

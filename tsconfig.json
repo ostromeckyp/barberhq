@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","strict":true,"noEmit":true,"resolveJsonModule":true,"allowImportingTsExtensions":true,"skipLibCheck":true},"include":["scripts/**/*.ts","shared/**/*.ts","tests/**/*.ts","*.config.ts"],"exclude":["scripts/generated"]}
