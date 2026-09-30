@@ -45,3 +45,11 @@ The optimized emulator artifact passes its scan (27 files). Production settings 
 Known limits: only increment 1 is implemented; no requests, stock-changing user commands, RAG, PDFs or AI yet. Cloud SQL constraints/authorization, real Auth/App Check and preview/live login remain acceptance gates. Initial bundle is approximately 510 kB versus the scaffold's 500 kB warning threshold; the 1 MB hard limit passes.
 
 Final local verification before review: root 20/20, Angular 4/4, SQL/Auth emulator 2/2, Playwright 4/4 including AXE A/AA. Typecheck passed. Hosting emulator passed three SPA routes, cache/content headers and assets; port 5002 avoids an unrelated local listener on 5000. Local demo accounts were generated in an ignored mode-0600 file. No passwords/tokens appear in tracked files.
+
+## Review and resume point
+
+Independent whole-branch source/evidence review (`1e32ef7..d70b10a`) confirmed no Critical/Important issue. One minor test-coverage recommendation is deferred: directly hold an inventory response across sign-out (membership delay and completed-load sign-out are already covered). See [decisions and review](increment-1-decisions.md).
+
+The production CLI was also executed with the incomplete example config: it correctly rejected placeholders with exit 1 and cleared the stale build record. Local preview remains on `http://127.0.0.1:4200/login`, using the dedicated emulator configuration. Local account credentials are in ignored `config/demo-accounts.local.json`.
+
+Resume with the owner checklist and this handoff: register Web app/Auth users/App Check and provision the confirmed service/region, generate SDKs if settings differ, then perform schema/seed/cloud access verification and preview/live release. Do not start increment 2 on the assumption that cloud acceptance passed. Keep the plan's scratch ledger until these gates are resolved.
