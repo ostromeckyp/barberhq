@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=swap" rel="stylesheet"><style>body{margin:0;background:#f6f5f2}a{color:#171614}a:hover{color:#dc241f}input,button,textarea{font-family:inherit}@keyframes bhq-indet{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}@keyframes bhq-spin{to{transform:rotate(360deg)}}</style></helmet>
+<div ref="{{ rootRef }}" style="position:relative;min-height:{{ minH }};height:{{ rootH }};background:#f6f5f2;color:#171614;font-family:Archivo,system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden">
+
+<sc-if value="{{ isLogin }}">
+<div style="flex:1;display:grid;place-items:center;padding:32px 16px;background:#171614">
+<div style="width:100%;max-width:400px;background:#fff;border-radius:16px;padding:32px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;border-top:4px solid #dc241f">
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:10px"><span style="font:800 28px Archivo;letter-spacing:-.01em">BarberHQ</span><span style="font:600 11px 'IBM Plex Mono',monospace;height:22px;display:inline-flex;align-items:center;padding:0 7px;border:1px solid #cfc9bf;border-radius:6px;color:#57534c">DEMO</span></div>
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#57534c;letter-spacing:.06em">[ NOT BAD STUFF · INTERNAL ]</span>
+</div>
+<sc-if value="{{ loginChecking }}"><div style="display:flex;flex-direction:column;gap:14px;padding:12px 0">{{ bar }}<div style="font:15px Archivo;color:#3b3833">Signed in. Checking your access…</div></div></sc-if>
+<sc-if value="{{ loginNoAccess }}">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="border:1px solid #f2c9c5;background:#fdf3f2;border-radius:12px;padding:14px;display:flex;gap:10px"><span class="material-symbols-outlined" style="font-size:22px;color:#8c1d18">block</span><div><div style="font:700 15px Archivo;color:#8c1d18">No access assigned</div><div style="font:14px/1.45 Archivo;color:#3b3833;margin-top:4px">Your account isn't assigned to a salon or to HQ yet. Ask HQ to add you.</div></div></div>
+<button onClick="{{ logout }}" style="height:40px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Log out</button>
+</div>
+</sc-if>
+<sc-if value="{{ loginForm }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:18px">
+<div style="font:14px/1.5 Archivo;color:#3b3833">Sign in with your work account.</div>
+<sc-if value="{{ loginError }}"><div style="border:1px solid #f2c9c5;background:#fdf3f2;border-radius:12px;padding:12px 14px;display:flex;gap:8px;font:14px/1.45 Archivo;color:#8c1d18"><span class="material-symbols-outlined" style="font-size:20px">error</span><span>Couldn't sign in. Check your email and password, or try again.</span></div></sc-if>
+<div>
+<div style="position:relative;border:{{ emailBorder }};border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 14px">
+<span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:{{ emailLabel }}">Email</span>
+<input type="email" value="{{ email }}" onChange="{{ onEmail }}" disabled="{{ loginBusy }}" autocomplete="username" style="flex:1;min-width:0;border:none;outline:none;font:16px Archivo;background:transparent;color:#171614"></input>
+</div>
+<sc-if value="{{ emailInvalid }}"><div style="font:12px Archivo;color:#b3261e;padding:4px 16px 0">Enter a valid email address</div></sc-if>
+</div>
+<div>
+<div style="position:relative;border:{{ pwBorder }};border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 4px 0 14px">
+<span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:{{ pwLabel }}">Password</span>
+<input type="{{ pwType }}" value="{{ pw }}" onChange="{{ onPw }}" disabled="{{ loginBusy }}" autocomplete="current-password" style="flex:1;min-width:0;border:none;outline:none;font:16px Archivo;background:transparent;color:#171614"></input>
+<button onClick="{{ togglePw }}" aria-label="{{ pwToggleLabel }}" style="width:48px;height:48px;border:none;background:transparent;border-radius:24px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:22px;color:#3b3833">{{ pwIcon }}</span></button>
+</div>
+<sc-if value="{{ pwInvalid }}"><div style="font:12px Archivo;color:#b3261e;padding:4px 16px 0">Enter your password</div></sc-if>
+</div>
+<sc-if value="{{ loginBusy }}"><div style="display:flex;flex-direction:column;gap:10px">{{ bar }}<button disabled="{{ true }}" style="height:44px;border-radius:22px;border:none;background:#e3ded4;color:#8a857c;font:600 15px Archivo">Signing in…</button></div></sc-if>
+<sc-if value="{{ loginIdle }}" hint-placeholder-val="{{ true }}"><button onClick="{{ signIn }}" style="height:44px;border-radius:22px;border:none;background:#dc241f;color:#fff;font:600 15px Archivo;cursor:pointer" style-hover="background:#b81d19">Sign in</button></sc-if>
+</div>
+</sc-if>
+<div style="font:12px/1.5 Archivo;color:#6b665e;border-top:1px solid #ece9e3;padding-top:14px">Demo environment · synthetic stock and procedures.<br>Demo accounts: marta@legnicka.demo · kuba@zakladowa.demo · piotr@hq.demo</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isShell }}" hint-placeholder-val="{{ true }}">
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+<div style="height:60px;flex:none;background:#171614;color:#f6f5f2;display:flex;align-items:center;gap:14px;padding:0 20px;position:relative;z-index:4;border-bottom:3px solid #dc241f">
+<span style="font:800 19px Archivo;letter-spacing:-.01em">BarberHQ</span>
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#b9b4ab;letter-spacing:.04em">[ NOT BAD STUFF ]</span>
+<span style="font:600 11px 'IBM Plex Mono',monospace;height:22px;display:inline-flex;align-items:center;padding:0 7px;border:1px solid #5a564f;border-radius:6px;color:#e3ded4">DEMO</span>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;gap:8px;height:32px;box-sizing:border-box;padding:0 12px 0 8px;border:1px solid #4a4640;border-radius:8px"><span class="material-symbols-outlined" style="font-size:18px">{{ ctxIcon }}</span><span style="font:600 14px Archivo">{{ ctxPlace }}</span><span style="font:500 13px Archivo;color:#b9b4ab">· {{ roleLabel }}</span></div>
+<button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:10px;height:44px;padding:0 6px 0 4px;border:none;background:transparent;color:#f6f5f2;border-radius:22px;cursor:pointer" style-hover="background:#2a2825"><span style="width:34px;height:34px;border-radius:50%;background:#3a3732;display:grid;place-items:center;font:600 13px Archivo">{{ initials }}</span><span style="font:500 14px Archivo">{{ userName }}</span><span class="material-symbols-outlined" style="font-size:20px;color:#b9b4ab">expand_more</span></button>
+</div>
+</sc-if>
+<sc-if value="{{ compact }}">
+<div style="flex:none;position:relative;z-index:4">
+<div style="height:56px;background:#171614;color:#f6f5f2;display:flex;align-items:center;gap:6px;padding:0 8px 0 4px">
+<button onClick="{{ toggleNav }}" aria-label="Open menu" style="width:48px;height:48px;border:none;background:transparent;color:#f6f5f2;border-radius:24px;display:grid;place-items:center;cursor:pointer;padding:0"><span class="material-symbols-outlined" style="font-size:24px">menu</span></button>
+<span style="font:800 18px Archivo">BarberHQ</span>
+<span style="font:600 10px 'IBM Plex Mono',monospace;height:20px;display:inline-flex;align-items:center;padding:0 6px;border:1px solid #5a564f;border-radius:6px;color:#e3ded4;margin-left:4px">DEMO</span>
+<div style="flex:1"></div>
+<button onClick="{{ toggleMenu }}" aria-label="Account" style="width:48px;height:48px;border:none;background:transparent;border-radius:24px;display:grid;place-items:center;cursor:pointer;padding:0"><span style="width:32px;height:32px;border-radius:50%;background:#3a3732;color:#f6f5f2;display:grid;place-items:center;font:600 12px Archivo">{{ initials }}</span></button>
+</div>
+<div style="height:40px;background:#24221f;color:#f6f5f2;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:3px solid #dc241f"><span class="material-symbols-outlined" style="font-size:18px">{{ ctxIcon }}</span><span style="font:600 14px Archivo">{{ ctxPlace }}</span><span style="font:500 13px Archivo;color:#b9b4ab">· {{ roleLabel }}</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ menuOpen }}">
+<div style="position:absolute;right:16px;top:58px;z-index:20;background:#fff;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.15),0 1px 2px rgba(0,0,0,.2);padding:8px 0;min-width:260px">
+<div style="padding:8px 16px 12px;border-bottom:1px solid #ece9e3"><div style="font:600 14px Archivo">{{ userName }}</div><div style="font:13px Archivo;color:#57534c">{{ userEmail }}</div><div style="font:13px Archivo;color:#57534c">{{ ctxPlace }} · {{ roleLabel }}</div></div>
+<button onClick="{{ resetDemo }}" style="width:100%;height:48px;padding:0 16px;border:none;background:transparent;display:flex;align-items:center;gap:12px;font:15px Archivo;color:#171614;cursor:pointer;text-align:left" style-hover="background:#f3f1ed"><span class="material-symbols-outlined" style="font-size:20px">restart_alt</span>Reset demo data</button>
+<button onClick="{{ logout }}" style="width:100%;height:48px;padding:0 16px;border:none;background:transparent;display:flex;align-items:center;gap:12px;font:15px Archivo;color:#171614;cursor:pointer;text-align:left" style-hover="background:#f3f1ed"><span class="material-symbols-outlined" style="font-size:20px">logout</span>Log out</button>
+</div>
+</sc-if>
+
+<div style="flex:1;display:flex;min-height:0;position:relative">
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+<nav style="width:220px;flex:none;border-right:1px solid #dedad3;padding:16px 12px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+<sc-for list="{{ navItems }}" as="n" hint-placeholder-count="2"><button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 16px;border:none;border-radius:24px;background:{{ n.bg }};color:#171614;font:{{ n.font }};cursor:pointer;text-align:left" style-hover="background:#efe8e6"><span class="material-symbols-outlined" style="font-size:22px">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><span style="font:600 12px 'IBM Plex Mono',monospace;color:#57534c">{{ n.meta }}</span></button></sc-for>
+<div style="flex:1"></div>
+<div style="font:12px/1.45 Archivo;color:#6b665e;padding:0 16px">{{ navNote }}</div>
+</nav>
+</sc-if>
+<sc-if value="{{ drawerOpen }}">
+<div onClick="{{ toggleNav }}" style="position:absolute;inset:0;background:rgba(23,22,20,.45);z-index:10"></div>
+<nav style="position:absolute;left:0;top:0;bottom:0;width:280px;background:#f6f5f2;z-index:11;padding:16px 12px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box;border-radius:0 16px 16px 0">
+<sc-for list="{{ navItems }}" as="n" hint-placeholder-count="2"><button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;border:none;border-radius:28px;background:{{ n.bg }};color:#171614;font:{{ n.font }};cursor:pointer;text-align:left"><span class="material-symbols-outlined" style="font-size:22px">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><span style="font:600 12px 'IBM Plex Mono',monospace;color:#57534c">{{ n.meta }}</span></button></sc-for>
+<div style="flex:1"></div>
+<div style="font:12px/1.45 Archivo;color:#6b665e;padding:0 16px">{{ navNote }}</div>
+</nav>
+</sc-if>
+
+<main style="flex:1;min-width:0;min-height:0;overflow-y:auto;padding:{{ mainPad }};display:flex;flex-direction:column;gap:20px;box-sizing:border-box">
+
+<sc-if value="{{ isSalonView }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px">
+<div style="flex:1 1 240px"><div style="font:500 12px 'IBM Plex Mono',monospace;color:#57534c;letter-spacing:.06em">SALON · {{ salonUpper }}</div><h1 style="margin:4px 0 0;font:750 28px/1.1 Archivo;letter-spacing:-.01em">Stock &amp; requests</h1></div>
+<div style="display:flex;align-items:center;gap:6px;font:13px Archivo;color:#57534c"><span class="material-symbols-outlined" style="font-size:18px">schedule</span>Updated {{ updatedAt }}</div>
+<button onClick="{{ refresh }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;display:flex;align-items:center;gap:6px;color:#171614;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">refresh</span>Refresh</button>
+</div>
+<sc-if value="{{ isStale }}"><div style="border:1px solid #f0d49b;background:#fdf7ea;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span class="material-symbols-outlined" style="font-size:22px;color:#5c3700">sync_problem</span><div style="flex:1 1 260px"><div style="font:700 14px Archivo;color:#5c3700">Showing last known data from 10:42</div><div style="font:13.5px Archivo;color:#3b3833">Couldn't refresh. Quantities may have changed since then.</div></div><button onClick="{{ refresh }}" style="height:40px;padding:0 14px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#f6ecd6">Try again</button></div></sc-if>
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<div style="flex:1 1 460px;min-width:0;display:flex;flex-direction:column;gap:20px">
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font:700 16px Archivo">Active requests</span><span style="font:13px Archivo;color:#57534c">{{ activeCount }}</span></div>
+<sc-for list="{{ activeReqs }}" as="r" hint-placeholder-count="1">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;border:1px solid #ece9e3;border-radius:10px;padding:12px 14px">
+<div style="flex:1 1 220px;min-width:0"><div style="font:600 12px 'IBM Plex Mono',monospace;color:#57534c">{{ r.id }} · {{ r.time }}</div><div style="font:600 16px Archivo;margin-top:2px">{{ r.product }} <span style="font:600 16px 'IBM Plex Mono',monospace">× {{ r.qty }}</span></div></div>
+<dc-import name="StatusChip" status="{{ r.status }}" hint-size="160px,32px"></dc-import>
+<button onClick="{{ r.open }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Open</button>
+</div>
+</sc-for>
+<sc-if value="{{ noActive }}"><div style="display:flex;align-items:center;gap:12px;border:1px dashed #cfc9bf;border-radius:10px;padding:12px 14px"><span class="material-symbols-outlined" style="font-size:22px;color:#57534c">inbox</span><div><div style="font:600 14px Archivo">No active requests</div><div style="font:13px Archivo;color:#57534c">Requests you submit to HQ appear here with their status.</div></div></div></sc-if>
+</div>
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;overflow:hidden">
+<div style="display:flex;align-items:baseline;gap:10px;padding:16px 18px 12px"><span style="font:700 16px Archivo">Salon stock</span><span style="font:13px Archivo;color:#57534c">{{ salonName }} · 6 products</span></div>
+<sc-if value="{{ listLoading }}"><div>{{ bar }}<div style="padding:12px 18px;display:flex;flex-direction:column;gap:14px"><sc-for list="{{ skeleton }}" as="k" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:16px"><div style="flex:1;height:14px;border-radius:4px;background:#ece9e3;max-width:260px"></div><div style="width:28px;height:18px;border-radius:4px;background:#ece9e3;margin-left:auto"></div></div></sc-for><div style="font:13px Archivo;color:#57534c">Loading stock…</div></div></div></sc-if>
+<sc-if value="{{ listError }}"><div style="padding:20px 18px 24px;display:flex;gap:12px;align-items:flex-start;border-top:1px solid #ece9e3"><span class="material-symbols-outlined" style="font-size:24px;color:#8c1d18">error</span><div style="flex:1"><div style="font:700 15px Archivo">Couldn't load stock</div><div style="font:13.5px/1.45 Archivo;color:#3b3833;margin-top:2px">This is a connection problem, not empty stock. No quantities are shown until they load.</div><button onClick="{{ refresh }}" style="margin-top:10px;height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Retry</button></div></div></sc-if>
+<sc-if value="{{ listData }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 104px;align-items:center;height:40px;padding:0 18px;border-top:1px solid #ece9e3;border-bottom:1px solid #ece9e3;background:#faf9f7;font:600 12px Archivo;color:#57534c"><span>Product</span><span style="text-align:right">In salon</span><span></span></div>
+<sc-for list="{{ stockRows }}" as="p" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 104px;align-items:center;min-height:56px;box-sizing:border-box;padding:6px 18px;border-bottom:1px solid #ece9e3;background:{{ p.bg }}"><div style="min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px"><div style="min-width:0"><div style="font:600 15px Archivo">{{ p.name }}</div><div style="font:12.5px Archivo;color:#57534c">{{ p.size }}</div></div><sc-if value="{{ p.low }}"><span style="display:inline-flex;align-items:center;gap:6px;height:32px;box-sizing:border-box;padding:0 12px 0 8px;border-radius:8px;background:#fbefd6;color:#5c3700;font:500 14px Archivo;white-space:nowrap"><span class="material-symbols-outlined" style="font-size:18px">warning</span>Low stock</span></sc-if></div><div style="text-align:right;display:flex;align-items:baseline;justify-content:flex-end;gap:5px"><span style="font:600 22px 'IBM Plex Mono',monospace">{{ p.qty }}</span><span style="font:12px Archivo;color:#57534c">pcs</span></div><div style="text-align:right"><button onClick="{{ p.request }}" aria-label="Request {{ p.name }}" style="height:40px;padding:0 12px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Request</button></div></div></sc-for>
+</sc-if>
+</div>
+</div>
+<div style="flex:1 1 320px;max-width:420px;min-width:0">
+<dc-import name="OrderPanel" mode="{{ panel }}" salon="{{ salonName }}" has-active="{{ hasActive }}" salon-stock="{{ salonStock }}" hq-avail="{{ hqAvailMap }}" on-submitted="{{ onSubmitted }}" on-open-request="{{ openRequest }}" preselect="{{ preselect }}" preselect-key="{{ preselectKey }}" hint-size="100%,420px"></dc-import>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isRequestView }}">
+<div><button onClick="{{ backFromRequest }}" style="height:40px;padding:0 12px 0 8px;margin-left:-8px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:20px">arrow_back</span>{{ backLabel }}</button></div>
+<sc-if value="{{ reqNotFound }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:28px;display:flex;gap:14px;max-width:560px"><span class="material-symbols-outlined" style="font-size:28px;color:#57534c">lock</span><div><div style="font:700 18px Archivo">Request not available</div><div style="font:14px/1.5 Archivo;color:#3b3833;margin-top:4px">It doesn't exist, or your account can't open it.</div></div></div></sc-if>
+<sc-if value="{{ reqFound }}" hint-placeholder-val="{{ true }}">
+<sc-if value="{{ isConflict }}"><div style="border:1px solid #f0d49b;background:#fdf7ea;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span class="material-symbols-outlined" style="font-size:22px;color:#5c3700">sync_problem</span><div style="flex:1 1 260px"><div style="font:700 14px Archivo;color:#5c3700">Someone else updated this request</div><div style="font:13.5px Archivo;color:#3b3833">We loaded the current status. Check it before you act.</div></div></div></sc-if>
+<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px">
+<div style="flex:1 1 320px;min-width:0"><div style="font:600 13px 'IBM Plex Mono',monospace;color:#57534c">REQ-0412 · HQ → Legnicka</div><h1 style="margin:4px 0 0;font:750 28px/1.15 Archivo;letter-spacing:-.01em">Pomada Matowa 100 ml <span style="font:600 26px 'IBM Plex Mono',monospace">× 2</span></h1></div>
+<dc-import name="StatusChip" status="{{ reqStatus }}" hint-size="180px,32px"></dc-import>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<div style="flex:1 1 460px;min-width:0;display:flex;flex-direction:column;gap:20px">
+<div style="background:#fff;border:2px solid #171614;border-radius:12px;padding:18px;display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center">
+<div style="flex:1 1 260px;min-width:0"><div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#57534c">NEXT STEP</div><div style="font:700 18px/1.3 Archivo;margin-top:4px">{{ nextTitle }}</div><div style="font:14px/1.45 Archivo;color:#3b3833;margin-top:4px">{{ nextText }}</div></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<sc-if value="{{ actApprove }}"><button onClick="{{ openReject }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Reject…</button><button onClick="{{ openApprove }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;cursor:pointer" style-hover="background:#b81d19">Approve…</button></sc-if>
+<sc-if value="{{ actDispatch }}"><button onClick="{{ openDispatch }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#b81d19"><span class="material-symbols-outlined" style="font-size:18px">local_shipping</span>Confirm dispatch…</button></sc-if>
+<sc-if value="{{ actReceipt }}"><button onClick="{{ toProcedures }}" style="height:40px;padding:0 14px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Damaged or missing?</button><button onClick="{{ openReceipt }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#b81d19"><span class="material-symbols-outlined" style="font-size:18px">inventory</span>Confirm receipt…</button></sc-if>
+<sc-if value="{{ actDashboard }}"><button onClick="{{ goSalon }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Go to dashboard</button></sc-if>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+<div style="font:700 16px Archivo">Delivery</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #ece9e3;border-radius:10px">
+<sc-for list="{{ qtyCells }}" as="q" hint-placeholder-count="3"><div style="padding:12px 14px;border-right:1px solid #ece9e3"><div style="font:13px Archivo;color:#57534c">{{ q.label }}</div><div style="font:600 32px/1.1 'IBM Plex Mono',monospace;color:{{ q.color }}">{{ q.value }}</div><div style="font:12px Archivo;color:#57534c">{{ q.note }}</div></div></sc-for>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px">
+<div style="font:700 16px Archivo;margin-bottom:8px">Status history</div>
+<sc-for list="{{ timeline }}" as="t" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px">
+<div style="display:flex;flex-direction:column;align-items:center"><span class="material-symbols-outlined" style="font-size:24px;color:{{ t.iconColor }};font-variation-settings:'FILL' {{ t.fill }}">{{ t.icon }}</span><div style="flex:1;width:2px;min-height:14px;background:{{ t.line }}"></div></div>
+<div style="padding:1px 0 16px"><div style="font:600 15px Archivo;color:{{ t.color }}">{{ t.label }}</div><div style="font:13px Archivo;color:#57534c;margin-top:2px">{{ t.meta }}</div></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="flex:1 1 280px;max-width:400px;min-width:0;background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px">
+<div style="font:700 16px Archivo">Stock · Pomada Matowa</div>
+<div style="font:12.5px Archivo;color:#57534c;margin-bottom:6px">{{ stockScope }}</div>
+<sc-for list="{{ stockSummary }}" as="k" hint-placeholder-count="4"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-height:44px;border-bottom:1px solid #ece9e3"><div><div style="font:500 14px Archivo">{{ k.label }}</div><div style="font:12px Archivo;color:#57534c">{{ k.hint }}</div></div><span style="font:600 22px 'IBM Plex Mono',monospace">{{ k.value }}</span></div></sc-for>
+</div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isHQView }}">
+<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px">
+<div style="flex:1 1 240px"><div style="font:500 12px 'IBM Plex Mono',monospace;color:#57534c;letter-spacing:.06em">HQ · WAREHOUSE</div><h1 style="margin:4px 0 0;font:750 28px/1.1 Archivo;letter-spacing:-.01em">Request queue</h1></div>
+<div style="display:flex;align-items:center;gap:6px;font:13px Archivo;color:#57534c"><span class="material-symbols-outlined" style="font-size:18px">schedule</span>Updated {{ updatedAt }}</div>
+<button onClick="{{ refreshHQ }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;display:flex;align-items:center;gap:6px;color:#171614;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">refresh</span>Refresh</button>
+</div>
+<sc-if value="{{ hqLoading }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;overflow:hidden">{{ bar }}<div style="padding:18px;font:14px Archivo;color:#57534c">Loading requests…</div></div></sc-if>
+<sc-if value="{{ hqError }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:20px 18px;display:flex;gap:12px"><span class="material-symbols-outlined" style="font-size:24px;color:#8c1d18">error</span><div><div style="font:700 15px Archivo">Couldn't load the queue</div><div style="font:13.5px Archivo;color:#3b3833;margin-top:2px">This doesn't mean the queue is empty.</div><button onClick="{{ refreshHQ }}" style="margin-top:10px;height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer">Retry</button></div></div></sc-if>
+<sc-if value="{{ hqAllEmpty }}"><div style="background:#fff;border:1px dashed #cfc9bf;border-radius:12px;padding:28px 20px;display:flex;gap:14px;align-items:center"><span class="material-symbols-outlined" style="font-size:28px;color:#57534c">task_alt</span><div><div style="font:700 16px Archivo">Queue is clear</div><div style="font:14px Archivo;color:#3b3833">No requests are waiting for approval or dispatch.</div></div></div></sc-if>
+<sc-if value="{{ hqData }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:20px">
+<sc-for list="{{ hqSections }}" as="sec" hint-placeholder-count="2">
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #ece9e3"><span class="material-symbols-outlined" style="font-size:20px">{{ sec.icon }}</span><span style="font:700 16px Archivo">{{ sec.title }}</span><span style="font:600 13px 'IBM Plex Mono',monospace;color:#57534c">{{ sec.count }}</span></div>
+<sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="1">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding:12px 18px;border-bottom:1px solid #ece9e3">
+<div style="flex:1 1 260px;min-width:0"><div style="font:600 12px 'IBM Plex Mono',monospace;color:#57534c">{{ r.id }} · {{ r.time }}</div><div style="font:600 16px Archivo;margin-top:2px">{{ r.product }} <span style="font:600 16px 'IBM Plex Mono',monospace">× {{ r.qty }}</span></div><div style="font:13px Archivo;color:#3b3833;display:flex;align-items:center;gap:4px;margin-top:2px"><span class="material-symbols-outlined" style="font-size:16px">storefront</span>To {{ r.salon }}</div></div>
+<div style="min-width:120px"><div style="font:12px Archivo;color:#57534c">{{ r.stockLabel }}</div><div style="font:600 18px 'IBM Plex Mono',monospace">{{ r.stock }}</div></div>
+<dc-import name="StatusChip" status="{{ r.status }}" hint-size="180px,32px"></dc-import>
+<button onClick="{{ r.open }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Open request</button>
+</div>
+</sc-for>
+<sc-if value="{{ sec.empty }}"><div style="padding:16px 18px;display:flex;align-items:center;gap:10px;font:14px Archivo;color:#57534c"><span class="material-symbols-outlined" style="font-size:20px">inbox</span>{{ sec.emptyText }}</div></sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isProcView }}">
+<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px"><div style="flex:1 1 320px;min-width:0"><div style="font:500 12px 'IBM Plex Mono',monospace;color:#57534c;letter-spacing:.06em">PROCEDURES · {{ salonUpper }}</div><h1 style="margin:4px 0 0;font:750 28px/1.1 Archivo;letter-spacing:-.01em">{{ procTitle }}</h1><div style="font:14px/1.5 Archivo;color:#3b3833;margin-top:6px;max-width:680px">{{ procDesc }}</div></div>
+<sc-if value="{{ canManageDocs }}"><button onClick="{{ openUpload }}" style="height:40px;padding:0 20px 0 16px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#b81d19"><span class="material-symbols-outlined" style="font-size:20px">upload_file</span>Add document</button></sc-if></div>
+<sc-if value="{{ procShowTabs }}" hint-placeholder-val="{{ true }}"><div role="tablist" style="display:flex;border-bottom:1px solid #e2ded6;margin-top:-4px"><sc-for list="{{ procTabs }}" as="tb" hint-placeholder-count="2"><button role="tab" onClick="{{ tb.go }}" style="height:48px;padding:0 20px;border:none;background:transparent;font:600 14px Archivo;color:{{ tb.color }};border-bottom:3px solid {{ tb.line }};display:flex;align-items:center;gap:6px;cursor:pointer"><span class="material-symbols-outlined" style="font-size:20px">{{ tb.icon }}</span>{{ tb.label }}</button></sc-for></div></sc-if>
+<sc-if value="{{ procDocsTab }}">
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 18px;flex-wrap:wrap"><span style="font:700 16px Archivo">Documents</span><span style="font:600 13px 'IBM Plex Mono',monospace;color:#57534c">{{ docCount }}</span><div style="flex:1"></div><span style="display:inline-flex;align-items:center;gap:6px;font:13px Archivo;color:#57534c"><span class="material-symbols-outlined" style="font-size:18px">{{ docsNoteIcon }}</span>{{ docsNote }}</span></div>
+<sc-for list="{{ docs }}" as="d" hint-placeholder-count="4">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding:12px 18px;border-top:1px solid #ece9e3">
+<div style="display:flex;gap:12px;align-items:flex-start;flex:1 1 300px;min-width:0"><span class="material-symbols-outlined" style="font-size:24px;color:#dc241f;margin-top:1px">picture_as_pdf</span><div style="min-width:0"><div style="font:600 15px Archivo">{{ d.title }}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><sc-if value="{{ d.isPublic }}"><span style="display:inline-flex;align-items:center;gap:4px;height:28px;box-sizing:border-box;padding:0 10px 0 6px;border-radius:8px;border:1px solid #cfc9bf;color:#3b3833;font:500 12.5px Archivo"><span class="material-symbols-outlined" style="font-size:16px">public</span>Public product info · unofficial summary</span></sc-if><sc-if value="{{ d.superseded }}"><span style="display:inline-flex;align-items:center;gap:4px;height:28px;box-sizing:border-box;padding:0 10px 0 6px;border-radius:8px;background:#e3ded4;font:500 12.5px Archivo"><span class="material-symbols-outlined" style="font-size:16px">history</span>Superseded</span></sc-if></div></div></div>
+<div style="display:flex;gap:20px;font:13px Archivo;color:#57534c"><div style="width:52px"><div>Version</div><div style="font:600 14px 'IBM Plex Mono',monospace;color:#171614">{{ d.version }}</div></div><div style="width:44px"><div>Pages</div><div style="font:600 14px 'IBM Plex Mono',monospace;color:#171614">{{ d.pages }}</div></div><div style="width:96px"><div>Updated</div><div style="font:500 13px Archivo;color:#171614">{{ d.updated }}</div></div></div>
+<div style="display:flex;gap:4px;align-items:center"><button onClick="{{ d.open }}" style="height:40px;padding:0 16px 0 12px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">visibility</span>Open</button><sc-if value="{{ canManageDocs }}"><button onClick="{{ d.del }}" aria-label="Delete {{ d.title }} {{ d.version }}" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:22px">delete</span></button></sc-if></div>
+</div>
+</sc-for>
+<sc-if value="{{ docsEmpty }}"><div style="padding:24px 18px;border-top:1px solid #ece9e3;display:flex;gap:12px;align-items:center"><span class="material-symbols-outlined" style="font-size:26px;color:#57534c">folder_off</span><div><div style="font:700 15px Archivo">No documents yet</div><div style="font:13.5px Archivo;color:#3b3833">{{ docsEmptyText }}</div></div></div></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ procAssistantTab }}" hint-placeholder-val="{{ true }}">
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+<div style="position:relative;border:1px solid #8f897f;border-radius:6px;padding:12px 12px 8px">
+<span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:#57534c">Your question</span>
+<textarea value="{{ question }}" onChange="{{ onQuestion }}" disabled="{{ procBusy }}" rows="2" placeholder="Describe what happened" style="width:100%;box-sizing:border-box;border:none;outline:none;resize:none;font:15px/1.4 Archivo;color:#171614;background:transparent;padding:0"></textarea>
+</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<button onClick="{{ useQExample }}" style="display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:4px 12px 4px 8px;border-radius:8px;border:1px solid #cfc9bf;background:transparent;font:500 13px/1.3 Archivo;color:#3b3833;cursor:pointer;text-align:left" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">format_quote</span>Otrzymaliśmy pęknięty słoik Pomady Matowej. Co powinniśmy zrobić?</button>
+<div style="flex:1"></div>
+<sc-if value="{{ procBusy }}"><button disabled="{{ true }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#e3ded4;color:#8a857c;font:600 14px Archivo;display:flex;align-items:center;gap:8px">{{ spinner }}Searching…</button></sc-if>
+<sc-if value="{{ procIdle }}" hint-placeholder-val="{{ true }}"><button onClick="{{ ask }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#b81d19"><span class="material-symbols-outlined" style="font-size:18px">search</span>Ask</button></sc-if>
+</div>
+</div>
+<sc-if value="{{ procInitial }}"><div style="display:flex;gap:10px;font:14px/1.5 Archivo;color:#57534c;padding:0 4px"><span class="material-symbols-outlined" style="font-size:20px">info</span>Ask about a delivery problem. Each step of the answer links to the document, version and page it came from. A new question replaces the current answer.</div></sc-if>
+<sc-if value="{{ procSearching }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;overflow:hidden">{{ bar }}<div style="padding:16px 18px;font:14px Archivo;color:#3b3833">Searching procedure documents…</div></div></sc-if>
+<sc-if value="{{ procClarify }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px"><div style="display:flex;gap:8px"><span class="material-symbols-outlined" style="font-size:20px">help</span><div style="font:700 16px Archivo">Is the product damaged, or missing from the delivery?</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ clarifyDamaged }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid #cfc9bf;background:transparent;font:500 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Damaged</button><button onClick="{{ clarifyMissing }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid #cfc9bf;background:transparent;font:500 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Missing</button></div></div></sc-if>
+<sc-if value="{{ procNoSources }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:20px 18px;display:flex;gap:12px"><span class="material-symbols-outlined" style="font-size:26px;color:#57534c">search_off</span><div><div style="font:700 16px Archivo">Not enough information in the documents</div><div style="font:14px/1.5 Archivo;color:#3b3833;margin-top:4px;max-width:620px">No procedure covers this question, so no answer was generated. Try rephrasing, or ask HQ directly.</div></div></div></sc-if>
+<sc-if value="{{ procError }}"><div style="border:1px solid #f2c9c5;background:#fdf3f2;border-radius:12px;padding:16px 18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span class="material-symbols-outlined" style="font-size:24px;color:#8c1d18">error</span><div style="flex:1 1 260px"><div style="font:700 15px Archivo;color:#8c1d18">Couldn't get an answer — the request timed out</div><div style="font:13.5px Archivo;color:#3b3833;margin-top:2px">Your question is kept above.</div></div><button onClick="{{ ask }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:#fff;font:600 14px Archivo;color:#171614;cursor:pointer">Try again</button></div></sc-if>
+<sc-if value="{{ procChanged }}"><div style="border:1px solid #f0d49b;background:#fdf7ea;border-radius:12px;padding:16px 18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span class="material-symbols-outlined" style="font-size:24px;color:#5c3700">update</span><div style="flex:1 1 260px"><div style="font:700 15px Archivo;color:#5c3700">A source document changed while answering</div><div style="font:13.5px Archivo;color:#3b3833;margin-top:2px">This answer wasn't shown because it may be out of date. Ask again to use the current version.</div></div><button onClick="{{ ask }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:#fff;font:600 14px Archivo;color:#171614;cursor:pointer">Ask again</button></div></sc-if>
+<sc-if value="{{ procAnswer }}">
+<div style="background:#171614;color:#f6f5f2;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:0"><span class="material-symbols-outlined" style="font-size:22px;color:#ff8a80">science</span><span style="font:600 14.5px/1.4 Archivo">Synthetic demo procedure — not an actual Not Bad Stuff policy.</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<div style="flex:1 1 460px;min-width:0;background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px">
+<div><div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#57534c">QUESTION · ZAKŁADOWA</div><div style="font:15px/1.45 Archivo;margin-top:4px">{{ askedQuestion }}</div></div>
+<div style="font:700 18px Archivo">What to do</div>
+<sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start">
+<span style="width:28px;height:28px;border-radius:50%;background:#171614;color:#fff;display:grid;place-items:center;font:600 13px 'IBM Plex Mono',monospace">{{ s.n }}</span>
+<div style="display:flex;flex-direction:column;gap:6px;padding-top:3px"><div style="font:15px/1.45 Archivo">{{ s.text }}</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#5c3700;background:#fbefd6;padding:2px 6px;border-radius:4px">PLACEHOLDER TEXT</span><button onClick="{{ s.cite }}" style="height:28px;padding:0 10px 0 6px;border-radius:8px;border:1px solid #cfc9bf;background:{{ s.citeBg }};font:500 12.5px Archivo;color:#171614;display:inline-flex;align-items:center;gap:4px;cursor:pointer"><span class="material-symbols-outlined" style="font-size:16px">link</span>[{{ s.src }}] {{ s.section }} · Page 2</button></div></div>
+</div>
+</sc-for>
+<div style="font:12.5px/1.45 Archivo;color:#57534c;border-top:1px solid #ece9e3;padding-top:12px">Based only on the sources listed. Guidance only: nothing was filed, reserved or changed in stock.</div>
+</div>
+<div style="flex:1 1 300px;max-width:420px;min-width:0;display:flex;flex-direction:column;gap:10px">
+<div style="font:700 16px Archivo">Sources <span style="font:600 13px 'IBM Plex Mono',monospace;color:#57534c">2</span></div>
+<sc-for list="{{ sources }}" as="src" hint-placeholder-count="2">
+<div style="background:#fff;border:{{ src.border }};border-radius:12px;overflow:hidden">
+<button onClick="{{ src.toggle }}" style="width:100%;min-height:64px;padding:12px 14px;border:none;background:transparent;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;color:#171614"><span style="width:26px;height:26px;border-radius:6px;border:1px solid #171614;display:grid;place-items:center;font:600 12px 'IBM Plex Mono',monospace;flex:none">{{ src.n }}</span><span style="flex:1;min-width:0"><span style="display:block;font:600 14.5px Archivo">{{ src.title }}</span><span style="display:block;font:12.5px Archivo;color:#57534c;margin-top:2px">{{ src.version }} · {{ src.section }} · Page 2</span></span><span class="material-symbols-outlined" style="font-size:22px">{{ src.chev }}</span></button>
+<sc-if value="{{ src.open }}">
+<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;gap:6px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:8px;border:1px solid #cfc9bf;font:500 12.5px Archivo">{{ src.version }}</span></div>
+<div style="background:#faf9f7;border:1px solid #ece9e3;border-radius:8px;padding:12px;font:13px/1.55 'IBM Plex Mono',monospace;color:#3b3833">{{ src.excerpt }}</div>
+<div style="font:12px Archivo;color:#57534c">Excerpt · {{ src.section }} · Page 2</div>
+<div><button onClick="{{ src.openPdf }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">picture_as_pdf</span>Open PDF at page 2</button></div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isPdfView }}">
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+<button onClick="{{ backToAnswer }}" style="height:40px;padding:0 12px 0 8px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;display:inline-flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:20px">arrow_back</span>{{ pdfBackLabel }}</button>
+<div style="flex:1 1 240px;min-width:0"><div style="font:700 15px Archivo">Damaged delivery procedure</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"><span style="display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;border:1px solid #cfc9bf;font:500 12px Archivo">v1.2</span><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 4px;border-radius:6px;background:#f6dcda;font:500 12px Archivo"><span class="material-symbols-outlined" style="font-size:15px">bookmark</span>Cited: page 2</span><sc-if value="{{ pdfSuperseded }}"><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 4px;border-radius:6px;background:#e3ded4;font:500 12px Archivo"><span class="material-symbols-outlined" style="font-size:15px">history</span>Superseded</span></sc-if></div></div>
+<div style="display:flex;align-items:center;gap:2px">
+<button onClick="{{ prevPage }}" aria-label="Previous page" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0;color:{{ prevColor }}" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:22px">chevron_left</span></button>
+<span style="font:600 13px 'IBM Plex Mono',monospace;padding:0 6px;white-space:nowrap">Page {{ pdfPage }} of 3</span>
+<button onClick="{{ nextPage }}" aria-label="Next page" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0;color:{{ nextColor }}" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:22px">chevron_right</span></button>
+<span style="width:1px;height:24px;background:#e2ded6;margin:0 6px"></span>
+<button onClick="{{ zoomOut }}" aria-label="Zoom out" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:22px">zoom_out</span></button>
+<span style="font:600 13px 'IBM Plex Mono',monospace;min-width:44px;text-align:center">{{ zoom }}%</span>
+<button onClick="{{ zoomIn }}" aria-label="Zoom in" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:22px">zoom_in</span></button>
+</div>
+<a href="docs/damaged-delivery-v1.2.pdf" download="damaged-delivery-v1.2.pdf" style="height:40px;padding:0 16px 0 12px;box-sizing:border-box;border-radius:20px;border:1px solid #bdb7ad;font:600 14px Archivo;color:#171614;display:inline-flex;align-items:center;gap:6px;text-decoration:none" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">download</span>Download</a>
+</div>
+<div style="background:#171614;color:#f6f5f2;border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:20px;color:#ff8a80">science</span><span style="font:600 14px Archivo">Synthetic demo procedure — not an actual Not Bad Stuff policy.</span></div>
+<sc-if value="{{ pdfSuperseded }}"><div style="border:1px solid #d9d4cb;background:#fff;border-radius:12px;padding:12px 16px;display:flex;gap:10px;font:14px/1.45 Archivo"><span class="material-symbols-outlined" style="font-size:20px">history</span><span><b>Superseded.</b> A newer version exists. You're viewing v1.2 because the answer cites it.</span></div></sc-if>
+<sc-if value="{{ pdfInvalidPage }}"><div style="border:1px solid #f0d49b;background:#fdf7ea;border-radius:12px;padding:12px 16px;display:flex;gap:10px;font:14px/1.45 Archivo;color:#3b3833"><span class="material-symbols-outlined" style="font-size:20px;color:#5c3700">warning</span><span>Page 14 isn't in this version (3 pages). Showing page 1 — use the page controls to navigate.</span></div></sc-if>
+<sc-if value="{{ pdfLoading }}"><div style="background:#e5e1da;border-radius:12px;min-height:420px;display:grid;place-items:center"><div style="display:flex;align-items:center;gap:10px;font:14px Archivo;color:#3b3833">{{ spinner }}Loading document…</div></div></sc-if>
+<sc-if value="{{ pdfError }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:24px;display:flex;gap:12px"><span class="material-symbols-outlined" style="font-size:26px;color:#8c1d18">error</span><div><div style="font:700 16px Archivo">Couldn't load the document</div><div style="font:14px Archivo;color:#3b3833;margin-top:4px">Check your connection and try again.</div><button onClick="{{ retryPdf }}" style="margin-top:10px;height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer">Retry</button></div></div></sc-if>
+<sc-if value="{{ pdfRenderError }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:24px;display:flex;gap:12px"><span class="material-symbols-outlined" style="font-size:26px;color:#57534c">broken_image</span><div><div style="font:700 16px Archivo">Can't display this PDF here</div><div style="font:14px Archivo;color:#3b3833;margin-top:4px">The file loaded but couldn't be rendered. Download it to open the cited page.</div><a href="docs/damaged-delivery-v1.2.pdf" download="damaged-delivery-v1.2.pdf" style="margin-top:10px;height:40px;padding:0 16px;border-radius:20px;background:#dc241f;color:#fff;font:600 14px Archivo;display:inline-flex;align-items:center;text-decoration:none">Download PDF</a></div></div></sc-if>
+<sc-if value="{{ pdfNoAccess }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:24px;display:flex;gap:12px"><span class="material-symbols-outlined" style="font-size:26px;color:#57534c">lock</span><div><div style="font:700 16px Archivo">You no longer have access to this document</div><div style="font:14px Archivo;color:#3b3833;margin-top:4px">It may have been removed by HQ. Ask HQ if you still need it.</div></div></div></sc-if>
+<sc-if value="{{ pdfReady }}" hint-placeholder-val="{{ true }}">
+<div style="background:#e5e1da;border-radius:12px;padding:28px 16px;display:flex;justify-content:center;overflow:auto">
+<div style="width:{{ pageW }};max-width:100%;aspect-ratio:1/1.414;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:7% 8%;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;flex:none">
+<div style="display:flex;justify-content:space-between;font:500 10.5px 'IBM Plex Mono',monospace;color:#6b665e"><span>Damaged delivery procedure · v1.2</span><span>SYNTHETIC DEMO</span></div>
+<div style="font:700 17px Archivo">{{ pageHeading }}</div>
+<div style="height:70px;background:repeating-linear-gradient(0deg,#ece9e3 0 8px,transparent 8px 16px)"></div>
+<sc-if value="{{ isCitedPage }}"><div style="position:relative;border:2px solid #dc241f;background:rgba(220,36,31,.06);border-radius:4px;padding:14px 10px 10px;display:flex;flex-direction:column;gap:6px"><span style="position:absolute;top:-11px;left:8px;background:#dc241f;color:#fff;font:600 10.5px 'IBM Plex Mono',monospace;padding:2px 6px;border-radius:3px">CITED · {{ citedSection }}</span><div style="font:600 13px Archivo">{{ citedTitle }}</div><div style="font:12px 'IBM Plex Mono',monospace;color:#57534c">[Placeholder excerpt — exact wording to be supplied]</div><div style="height:40px;background:repeating-linear-gradient(0deg,#d9d4cb 0 8px,transparent 8px 16px)"></div></div></sc-if>
+<div style="height:120px;background:repeating-linear-gradient(0deg,#ece9e3 0 8px,transparent 8px 16px)"></div>
+<div style="flex:1"></div>
+<div style="font:500 10.5px 'IBM Plex Mono',monospace;color:#6b665e;text-align:center">Page {{ pdfPage }} of 3 · rendered from docs/damaged-delivery-v1.2.pdf (pdf.js in build)</div>
+</div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isNotFound }}"><div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;padding:28px;display:flex;gap:14px;max-width:560px"><span class="material-symbols-outlined" style="font-size:28px;color:#57534c">explore_off</span><div><div style="font:700 18px Archivo">Page not found</div><div style="font:14px/1.5 Archivo;color:#3b3833;margin-top:4px">This address doesn't match any screen.</div><button onClick="{{ goHome }}" style="margin-top:12px;height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer">Go to start</button></div></div></sc-if>
+
+</main>
+</div>
+</sc-if>
+
+<sc-if value="{{ dialogOpen }}">
+<div style="position:absolute;inset:0;background:rgba(23,22,20,.5);z-index:30;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
+<div style="width:100%;max-width:520px"><dc-import name="RequestDialog" kind="{{ dialog }}" phase="{{ dialogPhase }}" mismatch="{{ mismatch }}" qty="{{ two }}" salon="Legnicka" hq-stock="{{ hqStock }}" reserved="{{ hqReserved }}" hq-available="{{ hqAvailable }}" leg-stock="{{ legStock }}" on-confirm="{{ onDialogConfirm }}" on-cancel="{{ onDialogCancel }}" on-procedures="{{ toProcedures }}" hint-size="100%,420px"></dc-import></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ uploadOpen }}">
+<div style="position:absolute;inset:0;background:rgba(23,22,20,.5);z-index:33;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
+<div role="dialog" aria-label="Add procedure document" style="width:100%;max-width:560px;max-height:100%;overflow:auto;background:#fff;border-radius:28px;box-sizing:border-box;box-shadow:0 8px 28px rgba(0,0,0,.22)">
+<sc-if value="{{ uploading }}"><div style="height:4px;background:#e3ded4"><div style="width:64%;height:100%;background:#dc241f"></div></div></sc-if>
+<div style="padding:24px 24px 0;display:flex;flex-direction:column;gap:16px">
+<div><div style="font:700 22px Archivo">Add procedure document</div><div style="font:14px/1.45 Archivo;color:#3b3833;margin-top:6px">PDF only. Once processed, salons can open it and the assistant can cite it.</div></div>
+<sc-if value="{{ noFile }}" hint-placeholder-val="{{ true }}"><div style="border:2px dashed #cfc9bf;border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><span class="material-symbols-outlined" style="font-size:32px;color:#57534c">upload_file</span><div style="font:600 15px Archivo">Drop a PDF here</div><div style="font:13px Archivo;color:#57534c">or</div><button onClick="{{ pickFile }}" style="height:40px;padding:0 16px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Choose file</button></div></sc-if>
+<sc-if value="{{ hasFile }}"><div style="border:1px solid #e2ded6;border-radius:12px;padding:10px 6px 10px 14px;display:flex;align-items:center;gap:12px"><span class="material-symbols-outlined" style="font-size:26px;color:#dc241f">picture_as_pdf</span><div style="flex:1;min-width:0"><div style="font:600 13.5px 'IBM Plex Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">damaged-delivery-v1.3.pdf</div><div style="font:12.5px Archivo;color:#57534c">3 pages · 212 KB</div></div><button onClick="{{ removeFile }}" disabled="{{ uploading }}" aria-label="Remove file" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:20px">close</span></button></div></sc-if>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:16px">
+<div style="position:relative;border:1px solid #8f897f;border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 14px;font:15px Archivo;color:{{ upValueColor }}"><span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:#57534c">Title</span>{{ upTitle }}</div>
+<div style="position:relative;border:1px solid #8f897f;border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 14px;font:600 15px 'IBM Plex Mono',monospace;color:{{ upValueColor }}"><span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:#57534c">Version</span>{{ upVersion }}</div>
+</div>
+<div style="position:relative;border:1px solid #8f897f;border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 8px 0 14px;font:15px Archivo"><span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:#57534c">Origin label</span><span style="flex:1">Synthetic demo document</span><span class="material-symbols-outlined" style="font-size:24px">arrow_drop_down</span></div>
+<div><div style="position:relative;border:1px solid #8f897f;border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 8px 0 14px;font:15px Archivo;color:{{ upValueColor }}"><span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:#57534c">Replaces (optional)</span><span style="flex:1">{{ upReplaces }}</span><span class="material-symbols-outlined" style="font-size:24px;color:#171614">arrow_drop_down</span></div><div style="font:12px Archivo;color:#57534c;padding:4px 16px 0">The replaced version stays available and is marked Superseded.</div></div>
+<sc-if value="{{ uploading }}"><div style="font:13.5px Archivo;color:#3b3833">Uploading… 64%. Closing this dialog won't cancel the upload.</div></sc-if>
+<sc-if value="{{ uploadError }}"><div style="border:1px solid #f2c9c5;background:#fdf3f2;border-radius:12px;padding:12px 14px;display:flex;gap:8px;font:14px/1.45 Archivo;color:#8c1d18"><span class="material-symbols-outlined" style="font-size:20px">error</span>Upload failed. Nothing was added — try again.</div></sc-if>
+</div>
+<div style="display:flex;justify-content:flex-end;gap:8px;padding:20px 24px 24px">
+<button onClick="{{ closeDocDialog }}" style="height:40px;padding:0 14px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">{{ upCancel }}</button>
+<sc-if value="{{ canUpload }}"><button onClick="{{ doUpload }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;cursor:pointer" style-hover="background:#b81d19">{{ upBtn }}</button></sc-if>
+<sc-if value="{{ cannotUpload }}" hint-placeholder-val="{{ true }}"><button disabled="{{ true }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#e3ded4;color:#8a857c;font:600 14px Archivo;display:flex;align-items:center;gap:8px">{{ upSpinner }}{{ upBtnDisabled }}</button></sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ deleteOpen }}">
+<div style="position:absolute;inset:0;background:rgba(23,22,20,.5);z-index:33;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
+<div role="alertdialog" style="width:100%;max-width:460px;background:#fff;border-radius:28px;padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 28px rgba(0,0,0,.22)">
+<div style="font:700 22px Archivo">Delete document?</div>
+<div style="display:flex;gap:10px;align-items:center;border:1px solid #e2ded6;border-radius:12px;padding:10px 14px"><span class="material-symbols-outlined" style="font-size:24px;color:#dc241f">picture_as_pdf</span><div><div style="font:600 14.5px Archivo">{{ delTitle }}</div><div style="font:600 12.5px 'IBM Plex Mono',monospace;color:#57534c">{{ delVersion }}</div></div></div>
+<div style="font:14px/1.5 Archivo;color:#3b3833">Salons lose access to this file and the assistant stops citing it. Answers already shown will list it as unavailable.</div>
+<div style="display:flex;justify-content:flex-end;gap:8px"><button onClick="{{ closeDocDialog }}" style="height:40px;padding:0 14px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Cancel</button><button onClick="{{ confirmDelete }}" style="height:40px;padding:0 20px 0 16px;border-radius:20px;border:none;background:#171614;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#34312d"><span class="material-symbols-outlined" style="font-size:18px">delete</span>Delete</button></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ expired }}">
+<div style="position:absolute;inset:0;background:rgba(23,22,20,.5);z-index:31;display:flex;align-items:center;justify-content:center;padding:16px">
+<div role="alertdialog" style="width:100%;max-width:420px;background:#fff;border-radius:28px;padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px"><span class="material-symbols-outlined" style="font-size:26px">lock_clock</span><div style="font:700 22px Archivo">Session expired</div><div style="font:14px/1.5 Archivo;color:#3b3833">Sign in again to continue. Unsubmitted drafts are cleared.</div><div style="display:flex;justify-content:flex-end"><button onClick="{{ logout }}" style="height:40px;padding:0 20px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;cursor:pointer">Sign in</button></div></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasSnack }}">
+<div role="status" style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:40;background:#2f2d2a;color:#f6f5f2;border-radius:4px;min-height:48px;padding:6px 8px 6px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 8px rgba(0,0,0,.25);font:14px Archivo;max-width:calc(100% - 32px);box-sizing:border-box"><span>{{ snack }}</span><button onClick="{{ closeSnack }}" style="height:36px;padding:0 10px;border:none;background:transparent;color:#ff8a80;font:600 14px Archivo;cursor:pointer">Dismiss</button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;view&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;login&quot;,&quot;salon&quot;,&quot;request&quot;,&quot;hq&quot;,&quot;procedures&quot;,&quot;pdf&quot;,&quot;notFound&quot;],&quot;default&quot;:&quot;login&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Screen&quot;},&quot;user&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;marta&quot;,&quot;kuba&quot;,&quot;piotr&quot;],&quot;default&quot;:&quot;marta&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Screen&quot;},&quot;stage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;start&quot;,&quot;submitted&quot;,&quot;approved&quot;,&quot;dispatched&quot;,&quot;received&quot;,&quot;rejected&quot;],&quot;default&quot;:&quot;start&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scenario&quot;},&quot;panel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;initial&quot;,&quot;manualEmpty&quot;,&quot;manualAc&quot;,&quot;manual&quot;,&quot;manualInvalid&quot;,&quot;manualHigh&quot;,&quot;thinking&quot;,&quot;proposal&quot;,&quot;batch&quot;,&quot;clarify&quot;,&quot;insufficient&quot;,&quot;existing&quot;,&quot;aiDown&quot;,&quot;sending&quot;,&quot;unknown&quot;,&quot;sent&quot;,&quot;sentBatch&quot;],&quot;default&quot;:&quot;initial&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;lowThreshold&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:0,&quot;max&quot;:10,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;States&quot;},&quot;list&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;data&quot;,&quot;loading&quot;,&quot;error&quot;,&quot;stale&quot;],&quot;default&quot;:&quot;data&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;proc&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;initial&quot;,&quot;searching&quot;,&quot;answer&quot;,&quot;clarify&quot;,&quot;noSources&quot;,&quot;error&quot;,&quot;changed&quot;],&quot;default&quot;:&quot;initial&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;procTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;assistant&quot;,&quot;docs&quot;],&quot;default&quot;:&quot;assistant&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;docDialog&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;upload&quot;,&quot;uploadFilled&quot;,&quot;uploading&quot;,&quot;uploadError&quot;,&quot;delete&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;docsEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;},&quot;pdf&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ready&quot;,&quot;loading&quot;,&quot;error&quot;,&quot;renderError&quot;,&quot;noAccess&quot;,&quot;superseded&quot;,&quot;invalidPage&quot;],&quot;default&quot;:&quot;ready&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;login&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;initial&quot;,&quot;invalid&quot;,&quot;loading&quot;,&quot;error&quot;,&quot;checking&quot;,&quot;noAccess&quot;],&quot;default&quot;:&quot;initial&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;hqState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;data&quot;,&quot;loading&quot;,&quot;error&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;data&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;reqState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ready&quot;,&quot;conflict&quot;,&quot;notFound&quot;],&quot;default&quot;:&quot;ready&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;dialog&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;approve&quot;,&quot;reject&quot;,&quot;dispatch&quot;,&quot;receipt&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;dialogPhase&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ready&quot;,&quot;sending&quot;,&quot;error&quot;],&quot;default&quot;:&quot;ready&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;States&quot;},&quot;mismatch&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;},&quot;sessionExpired&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;},&quot;persist&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Screen&quot;},&quot;minHeight&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Screen&quot;},&quot;fixedHeight&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Screen&quot;},&quot;srcOpen&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;},&quot;question&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;snack&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;navOpen&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const KEY = 'barberhq-demo-v1';
+const DOCS = [
+  { id: 'dd12', title: 'Damaged delivery procedure', version: 'v1.2', pages: 3, updated: '12 Sep 2026', origin: 'synthetic', file: true },
+  { id: 'rd20', title: 'Receiving deliveries checklist', version: 'v2.0', pages: 2, updated: '3 Sep 2026', origin: 'synthetic' },
+  { id: 'pm1', title: 'Pomada Matowa — product guide', version: 'v1', pages: 1, updated: '28 Aug 2026', origin: 'public' },
+  { id: 'dd11', title: 'Damaged delivery procedure', version: 'v1.1', pages: 3, updated: '2 Jun 2026', origin: 'synthetic', superseded: true }
+];
+const Q_EX = 'Otrzymaliśmy pęknięty słoik Pomady Matowej. Co powinniśmy zrobić?';
+const USERS = {
+  marta: { name: 'Marta K.', initials: 'MK', role: 'salon', roleLabel: 'Salon staff', place: 'Legnicka', email: 'marta@legnicka.demo' },
+  kuba: { name: 'Kuba S.', initials: 'KS', role: 'salon', roleLabel: 'Salon staff', place: 'Zakładowa', email: 'kuba@zakladowa.demo' },
+  piotr: { name: 'Piotr W.', initials: 'PW', role: 'hq', roleLabel: 'HQ warehouse', place: 'HQ', email: 'piotr@hq.demo' }
+};
+const PRODUCTS = [['matowa', 'Pomada Matowa', '100 ml'], ['drymatt', 'Pomada Dry Matt', '100 ml'], ['cement', 'Pomada Cement', '100 ml'], ['sol', 'Sól Morska', '200 ml'], ['savage', 'Olejek do brody Savage', '50 ml'], ['mattifier', 'Mattifier', '100 ml']];
+const STOCK = { 'Legnicka': { matowa: 2, drymatt: 6, cement: 5, sol: 8, savage: 4, mattifier: 5 }, 'Zakładowa': { matowa: 3, drymatt: 4, cement: 6, sol: 5, savage: 2, mattifier: 3 } };
+const HQ_AVAIL = { matowa: 18, drymatt: 24, cement: 1, sol: 28, savage: 12, mattifier: 9 };
+const ST = { start: [18, 0, 0, 2], submitted: [18, 0, 0, 2], approved: [18, 2, 0, 2], dispatched: [16, 0, 2, 2], received: [16, 0, 0, 4], rejected: [18, 0, 0, 2] };
+const IDX = { start: 0, submitted: 1, approved: 2, dispatched: 3, received: 4, rejected: 1 };
+const STATUS = { submitted: 'pending', approved: 'approved', dispatched: 'dispatched', received: 'received', rejected: 'rejected' };
+const STEPS = [
+  { text: 'Set the damaged item and its packaging aside.', src: 1, section: '§2.1' },
+  { text: 'Record what arrived: photos of the damage and of the delivery label.', src: 1, section: '§2.1' },
+  { text: 'Report the damage to HQ through the channel named in the procedure.', src: 2, section: '§2.3' },
+  { text: "Don't confirm receipt for the affected delivery until HQ responds.", src: 2, section: '§2.3' }
+];
+const SOURCES = [
+  { title: 'Damaged delivery procedure', version: 'v1.2', section: '§2.1 Receiving damaged goods', excerpt: '[Placeholder excerpt — exact text of §2.1 will be inserted from the synthetic PDF after extraction.]' },
+  { title: 'Damaged delivery procedure', version: 'v1.2', section: '§2.3 Reporting to HQ', excerpt: '[Placeholder excerpt — exact text of §2.3 will be inserted from the synthetic PDF after extraction.]' }
+];
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = this.init();
+  init() {
+    const p = this.props;
+    const s = { view: p.view || 'login', user: p.user || null, stage: p.stage || 'start', panel: p.panel || 'initial', dialog: p.dialog || null, dialogPhase: p.dialogPhase || 'ready', mismatch: !!p.mismatch, proc: p.proc || 'initial', srcOpen: p.srcOpen ?? 0, login: p.login || 'initial', list: p.list || 'data', reqState: p.reqState || 'ready', pdf: p.pdf || 'ready', hqState: p.hqState || 'data', expired: !!p.sessionExpired, navOpen: !!p.navOpen, menuOpen: false, compact: false, email: p.email || '', pw: '', showPw: false, question: p.question || (p.proc && p.proc !== 'initial' ? Q_EX : ''), asked: '', snack: p.snack || null, zoom: 100, procTab: p.procTab || 'assistant', extraReqs: [], docs: p.docsEmpty ? [] : DOCS.slice(), docDialog: p.docDialog || null, delTarget: DOCS[0], pdfOpen: !!p.pdfOpen, preselect: null, preselectKey: 0 };
+    s.pdfPage = p.pdf === 'invalidPage' ? 1 : 2;
+    if (p.login === 'invalid') { s.email = 'marta@legnicka'; }
+    if (p.login && ['loading', 'error'].includes(p.login)) { s.email = 'marta@legnicka.demo'; s.pw = 'demo-pass'; }
+    s.asked = s.question;
+    if (this.persist() && typeof localStorage !== 'undefined') { try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v) Object.assign(s, v); } catch (e) {} }
+    if (s.view !== 'login' && !s.user) s.user = 'marta';
+    return s;
+  }
+  persist() { return this.props.persist ?? !this.props.view; }
+  componentDidMount() {
+    const el = this.rootRef.current;
+    if (el && window.ResizeObserver) { this.ro = new ResizeObserver(([e]) => { const c = e.contentRect.width < 760; if (c !== this.state.compact) this.setState({ compact: c }); }); this.ro.observe(el); }
+  }
+  componentDidUpdate() {
+    if (this.persist()) { const { view, user, stage, question, asked, proc, srcOpen, extraReqs } = this.state; try { localStorage.setItem(KEY, JSON.stringify({ view, user, stage, question, asked, proc: proc === 'searching' ? 'initial' : proc, srcOpen, extraReqs })); } catch (e) {} }
+  }
+  componentWillUnmount() { this.ro && this.ro.disconnect(); (this.timers || []).forEach(clearTimeout); clearTimeout(this.snackT); }
+  later(fn, ms) { (this.timers = this.timers || []).push(setTimeout(fn, ms)); }
+  toast(msg) { this.setState({ snack: msg }); clearTimeout(this.snackT); this.snackT = setTimeout(() => this.setState({ snack: null }), 4500); }
+  go = view => this.setState({ view, navOpen: false, menuOpen: false });
+  signIn = () => {
+    const { email, pw } = this.state;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim()) || !pw) { this.setState({ login: 'invalid' }); return; }
+    this.setState({ login: 'loading' });
+    this.later(() => {
+      const e = email.trim().toLowerCase();
+      const u = Object.keys(USERS).find(k => USERS[k].email === e);
+      if (!u && !/^new@/.test(e)) { this.setState({ login: 'error' }); return; }
+      this.setState({ login: 'checking' });
+      this.later(() => {
+        if (!u) { this.setState({ login: 'noAccess' }); return; }
+        this.setState({ login: 'initial', user: u, view: USERS[u].role === 'hq' ? 'hq' : 'salon', pw: '', panel: 'initial' });
+      }, 900);
+    }, 900);
+  };
+  logout = () => this.setState({ view: 'login', user: null, login: 'initial', menuOpen: false, navOpen: false, expired: false, dialog: null, email: '', pw: '' });
+  ask = () => {
+    const q = this.state.question.trim();
+    if (!q) return;
+    this.setState({ proc: 'searching', asked: q });
+    this.later(() => {
+      const s = q.toLowerCase();
+      let r = 'noSources';
+      if (/pęk|pek|uszk|damag|crack|rozbit|stłuc/.test(s)) r = 'answer';
+      else if (/dostaw|delivery|paczk/.test(s)) r = 'clarify';
+      this.setState({ proc: r, srcOpen: 0 });
+    }, 1400);
+  };
+  onDialogConfirm = () => {
+    const k = this.state.dialog;
+    this.setState({ dialogPhase: 'sending' });
+    this.later(() => {
+      const next = { approve: 'approved', reject: 'rejected', dispatch: 'dispatched', receipt: 'received' }[k];
+      const msg = { approve: 'Approved · 2 pcs reserved at HQ', reject: 'Request rejected', dispatch: 'Dispatch confirmed · 2 pcs in transit', receipt: 'Receipt confirmed · Legnicka stock 2 → 4' }[k];
+      this.setState({ stage: next, dialog: null, dialogPhase: 'ready' });
+      this.toast(msg);
+    }, 1000);
+  };
+  renderVals() {
+    const s = this.state, u = USERS[s.user] || USERS.marta, isHQ = u.role === 'hq', compact = s.compact;
+    const [hqStock, hqRes, transit, leg] = ST[s.stage] || ST.start;
+    const idx = IDX[s.stage] || 0, rejected = s.stage === 'rejected';
+    const active = ['submitted', 'approved', 'dispatched'].includes(s.stage);
+    const salonName = isHQ ? 'Legnicka' : u.place;
+    const stockMap = { ...(STOCK[salonName] || STOCK['Legnicka']) };
+    if (salonName === 'Legnicka') stockMap.matowa = leg;
+    const hqAvailMap = { ...HQ_AVAIL, matowa: hqStock - hqRes };
+    const spinner = React.createElement('span', { style: { width: 16, height: 16, borderRadius: '50%', border: '2px solid currentColor', borderTopColor: 'transparent', display: 'inline-block', animation: 'bhq-spin .8s linear infinite', flex: 'none' } });
+    const bar = React.createElement('div', { style: { height: 4, background: '#e3ded4', overflow: 'hidden' } }, React.createElement('div', { style: { width: '40%', height: '100%', background: '#dc241f', animation: 'bhq-indet 1.2s ease-in-out infinite' } }));
+    const req = { id: 'REQ-0412', time: 'Today 10:41', product: 'Pomada Matowa 100 ml', qty: 2, salon: 'Legnicka', status: STATUS[s.stage] || 'pending', open: () => this.setState({ view: 'request', reqState: 'ready' }) };
+    const nav = isHQ ? [{ key: 'hq', label: 'Request queue', icon: 'inbox', meta: s.stage === 'submitted' || s.stage === 'approved' ? '2' : '1' }, { key: 'procedures', label: 'Procedure docs', icon: 'folder_open', meta: '' }] : [{ key: 'salon', label: 'Dashboard', icon: 'dashboard', meta: active && salonName === 'Legnicka' ? '1' : '' }, { key: 'procedures', label: 'Procedures', icon: 'menu_book', meta: '' }];
+    const curKey = s.view === 'request' ? (isHQ ? 'hq' : 'salon') : s.view === 'pdf' ? 'procedures' : s.view;
+    // next step
+    let nextTitle = '', nextText = '';
+    const acts = { actApprove: false, actDispatch: false, actReceipt: false, actDashboard: false };
+    if (s.stage === 'received') { nextTitle = 'Completed'; nextText = 'Ordered 2 · Dispatched 2 · Received 2. No further action.'; }
+    else if (rejected) { nextTitle = isHQ ? 'Rejected' : 'Rejected by HQ'; nextText = isHQ ? 'Nothing was reserved or shipped.' : 'Start a new request from the dashboard if you still need this product.'; acts.actDashboard = !isHQ; }
+    else if (isHQ) {
+      if (s.stage === 'dispatched') { nextTitle = 'Waiting for Legnicka to confirm receipt'; nextText = '2 pcs are in transit.'; }
+      else if (s.stage === 'approved') { nextTitle = 'Ready to dispatch'; nextText = 'Confirm only once the parcel has left HQ.'; acts.actDispatch = true; }
+      else { nextTitle = 'Review and decide'; nextText = `HQ available ${hqStock - hqRes} — enough for 2 pcs. Approving reserves them.`; acts.actApprove = true; }
+    } else {
+      if (s.stage === 'dispatched') { nextTitle = 'On its way — confirm receipt'; nextText = 'Check you received 2 pcs and none are damaged.'; acts.actReceipt = true; }
+      else if (s.stage === 'approved') { nextTitle = 'Approved — waiting for dispatch'; nextText = '2 pcs are reserved for Legnicka at HQ.'; }
+      else { nextTitle = 'Waiting for HQ approval'; nextText = 'HQ checks availability, then approves or rejects. Nothing is reserved yet.'; }
+    }
+    const tl = [
+      { label: 'Submitted', meta: 'Marta K. · Legnicka · Today 10:41', done: idx >= 1 },
+      rejected ? { label: 'Rejected', meta: 'Piotr W. · HQ · Today 10:58', done: true, bad: true } : { label: 'Approved · 2 pcs reserved', meta: 'Piotr W. · HQ · Today 10:58', done: idx >= 2 },
+      ...(rejected ? [] : [{ label: 'Dispatched · 2 pcs', meta: 'Piotr W. · HQ · Today 11:20', done: idx >= 3 }, { label: 'Received · 2 pcs undamaged', meta: 'Marta K. · Legnicka · Today 14:05', done: idx >= 4 }])
+    ];
+    const timeline = tl.map((t, i) => ({ label: t.label, meta: t.done ? t.meta : 'Pending', icon: t.bad ? 'cancel' : t.done ? 'check_circle' : 'radio_button_unchecked', fill: t.done ? 1 : 0, iconColor: t.bad ? '#8c1d18' : t.done ? '#171614' : '#9a948a', color: t.done ? '#171614' : '#57534c', line: i === tl.length - 1 ? 'transparent' : (tl[i + 1].done ? '#171614' : '#d9d4cb') }));
+    const cell = (label, v, on) => ({ label, value: on ? v : '—', note: on ? 'pcs' : 'Pending', color: on ? '#171614' : '#9a948a' });
+    const qtyCells = [cell('Ordered', 2, idx >= 1), cell('Dispatched', 2, idx >= 3 && !rejected), cell('Received', 2, idx >= 4)];
+    const stockSummary = isHQ ? [
+      { label: 'HQ stock', hint: 'On the shelf', value: hqStock }, { label: 'Reserved at HQ', hint: 'Approved, not yet shipped', value: hqRes },
+      { label: 'HQ available', hint: 'Stock − reserved', value: hqStock - hqRes }, { label: 'In transit', hint: 'Dispatched, not received', value: transit }, { label: 'Legnicka stock', hint: 'In salon', value: leg }
+    ] : [{ label: 'In transit to Legnicka', hint: 'Dispatched, not received', value: transit }, { label: 'Legnicka stock', hint: 'In salon', value: leg }];
+    const ready = [...(s.stage === 'approved' ? [req] : []), { id: 'REQ-0409', time: 'Today 09:12', product: 'Sól Morska 200 ml', qty: 3, salon: 'Łódzka', status: 'approved', open: () => this.toast('Demo: only REQ-0412 is modelled in detail.') }];
+    const extras = (s.extraReqs || []).map(x => ({ id: x.id, time: 'Today 10:41', product: x.product, qty: x.qty, salon: 'Legnicka', status: 'pending', open: () => this.toast('Demo: only REQ-0412 is modelled in detail.') }));
+    const awaiting = [...(s.stage === 'submitted' ? [req] : []), ...extras];
+    const hqEmpty = s.hqState === 'empty';
+    const withStock = (rows, label, fn) => rows.map(r => ({ ...r, stockLabel: label, stock: fn(r) }));
+    const hqSections = [
+      { title: 'Awaiting approval', icon: 'hourglass_top', rows: withStock(awaiting, 'HQ available', r => r.id === 'REQ-0412' ? hqStock - hqRes : 0), emptyText: 'Nothing awaiting approval.' },
+      { title: 'Ready to dispatch', icon: 'local_shipping', rows: withStock(ready, 'Reserved', r => r.qty), emptyText: 'Nothing ready to dispatch.' }
+    ].map(x => ({ ...x, count: x.rows.length, empty: x.rows.length === 0 }));
+    const v = s.view, shell = v !== 'login';
+    const login = s.login;
+    return {
+      rootRef: this.rootRef, minH: this.props.minHeight ? this.props.minHeight + 'px' : '100vh', rootH: !this.props.minHeight ? '100vh' : this.props.fixedHeight ? this.props.minHeight + 'px' : 'auto', bar, spinner,
+      isLogin: v === 'login', isShell: shell, wide: shell && !compact, compact: shell && compact,
+      loginChecking: login === 'checking', loginNoAccess: login === 'noAccess', loginForm: !['checking', 'noAccess'].includes(login),
+      loginError: login === 'error', loginBusy: login === 'loading', loginIdle: login !== 'loading',
+      email: s.email, onEmail: e => this.setState({ email: e.target.value }), pw: s.pw, onPw: e => this.setState({ pw: e.target.value }),
+      emailInvalid: login === 'invalid' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.email.trim()), pwInvalid: login === 'invalid' && !s.pw,
+      emailBorder: login === 'invalid' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.email.trim()) ? '2px solid #b3261e' : '1px solid #8f897f',
+      emailLabel: login === 'invalid' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.email.trim()) ? '#b3261e' : '#57534c',
+      pwBorder: login === 'invalid' && !s.pw ? '2px solid #b3261e' : '1px solid #8f897f', pwLabel: login === 'invalid' && !s.pw ? '#b3261e' : '#57534c',
+      pwType: s.showPw ? 'text' : 'password', pwIcon: s.showPw ? 'visibility_off' : 'visibility', pwToggleLabel: s.showPw ? 'Hide password' : 'Show password',
+      togglePw: () => this.setState(x => ({ showPw: !x.showPw })), signIn: this.signIn, logout: this.logout,
+      ctxIcon: isHQ ? 'warehouse' : 'storefront', ctxPlace: u.place, roleLabel: u.roleLabel, initials: u.initials, userName: u.name, userEmail: u.email,
+      toggleMenu: () => this.setState(x => ({ menuOpen: !x.menuOpen })), menuOpen: s.menuOpen && shell,
+      resetDemo: () => { this.setState({ stage: 'start', extraReqs: [], panel: 'initial', proc: 'initial', question: '', asked: '', menuOpen: false, view: isHQ ? 'hq' : 'salon' }); this.toast('Demo data reset'); },
+      toggleNav: () => this.setState(x => ({ navOpen: !x.navOpen })), drawerOpen: shell && compact && s.navOpen,
+      navItems: nav.map(n => ({ ...n, bg: n.key === curKey ? '#f6dcda' : 'transparent', font: n.key === curKey ? '600 14px Archivo' : '500 14px Archivo', go: () => this.go(n.key) })),
+      navNote: isHQ ? 'HQ warehouse account.' : `Your account is assigned to ${u.place} only.`,
+      mainPad: compact ? '16px' : '24px 28px',
+      isSalonView: v === 'salon', salonUpper: (isHQ ? 'HQ' : u.place).toUpperCase(), salonName, updatedAt: '10:42',
+      refresh: () => { this.setState({ list: 'loading' }); this.later(() => this.setState({ list: 'data' }), 800); },
+      isStale: s.list === 'stale', listLoading: s.list === 'loading', listError: s.list === 'error', listData: s.list === 'data' || s.list === 'stale',
+      skeleton: [1, 2, 3, 4, 5, 6],
+      stockRows: PRODUCTS.map(([id, name, size]) => ({ name, size, qty: stockMap[id], low: stockMap[id] <= (this.props.lowThreshold ?? 2), bg: stockMap[id] <= (this.props.lowThreshold ?? 2) ? '#fffbf3' : '#fff', request: () => this.setState(x => ({ preselect: id, preselectKey: (x.preselectKey || 0) + 1 })) })),
+      preselect: s.preselect, preselectKey: s.preselectKey,
+      activeReqs: salonName === 'Legnicka' && !isHQ ? [...(active ? [req] : []), ...extras] : [], activeCount: salonName === 'Legnicka' ? (active ? 1 : 0) + extras.length : 0, noActive: !(salonName === 'Legnicka' && (active || extras.length)),
+      panel: s.panel, hasActive: active, salonStock: stockMap, hqAvailMap,
+      onSubmitted: list => { const hasM = list.some(x => x.id === 'matowa'); const more = list.filter(x => x.id !== 'matowa').map(x => ({ id: x.reqId, product: x.name, qty: x.qty })); this.setState(st => ({ stage: hasM ? 'submitted' : st.stage, extraReqs: [...(st.extraReqs || []), ...more] })); this.toast(list.length === 1 ? `Request ${list[0].reqId} submitted · Pending approval` : `${list.length} requests submitted · Pending approval`); },
+      openRequest: id => (id && id !== 'REQ-0412') ? this.toast('Demo: only REQ-0412 is modelled in detail.') : this.setState({ view: 'request', reqState: 'ready' }),
+      isRequestView: v === 'request', reqNotFound: s.reqState === 'notFound', reqFound: s.reqState !== 'notFound', isConflict: s.reqState === 'conflict',
+      backLabel: isHQ ? 'Request queue' : 'Dashboard', backFromRequest: () => this.go(isHQ ? 'hq' : 'salon'),
+      reqStatus: STATUS[s.stage] || 'pending', nextTitle, nextText, ...acts, qtyCells, timeline, stockSummary,
+      stockScope: isHQ ? 'Full view · HQ role' : 'Your salon · Salon staff role',
+      openApprove: () => this.setState({ dialog: 'approve', dialogPhase: 'ready' }), openReject: () => this.setState({ dialog: 'reject', dialogPhase: 'ready' }),
+      openDispatch: () => this.setState({ dialog: 'dispatch', dialogPhase: 'ready' }), openReceipt: () => this.setState({ dialog: 'receipt', dialogPhase: 'ready', mismatch: false }),
+      goSalon: () => this.go('salon'), toProcedures: () => this.setState({ dialog: null, view: 'procedures' }),
+      isHQView: v === 'hq', hqLoading: s.hqState === 'loading', hqError: s.hqState === 'error', hqAllEmpty: hqEmpty, hqData: s.hqState === 'data',
+      refreshHQ: () => { this.setState({ hqState: 'loading' }); this.later(() => this.setState({ hqState: 'data' }), 800); }, hqSections,
+      isProcView: v === 'procedures', question: s.question, onQuestion: e => this.setState({ question: e.target.value }), useQExample: () => this.setState({ question: Q_EX }),
+      procBusy: s.proc === 'searching', procIdle: s.proc !== 'searching', ask: this.ask, askedQuestion: s.asked || s.question,
+      procInitial: s.proc === 'initial', procSearching: s.proc === 'searching', procClarify: s.proc === 'clarify', procNoSources: s.proc === 'noSources', procError: s.proc === 'error', procChanged: s.proc === 'changed', procAnswer: s.proc === 'answer',
+      clarifyDamaged: () => this.setState({ proc: 'answer', srcOpen: 0 }), clarifyMissing: () => this.setState({ proc: 'noSources' }),
+      steps: STEPS.map((st, i) => ({ ...st, n: i + 1, citeBg: s.srcOpen === st.src - 1 ? '#f6dcda' : 'transparent', cite: () => this.setState({ srcOpen: st.src - 1 }) })),
+      sources: SOURCES.map((src, i) => ({ ...src, n: i + 1, open: s.srcOpen === i, chev: s.srcOpen === i ? 'expand_less' : 'expand_more', border: s.srcOpen === i ? '2px solid #171614' : '1px solid #e2ded6', toggle: () => this.setState(x => ({ srcOpen: x.srcOpen === i ? -1 : i })), openPdf: () => this.setState({ view: 'pdf', srcOpen: i, pdf: 'ready', pdfPage: 2, pdfFrom: 'answer' }) })),
+      isPdfView: v === 'pdf', backToAnswer: () => this.setState({ view: 'procedures', procTab: s.pdfFrom === 'docs' ? 'docs' : s.procTab }),
+      zoom: s.zoom, zoomIn: () => this.setState(x => ({ zoom: Math.min(200, x.zoom + 25) })), zoomOut: () => this.setState(x => ({ zoom: Math.max(50, x.zoom - 25) })),
+      pageW: Math.round(520 * s.zoom / 100) + 'px',
+      pdfLoading: s.pdf === 'loading', pdfError: s.pdf === 'error', pdfRenderError: s.pdf === 'renderError', pdfNoAccess: s.pdf === 'noAccess',
+      pdfSuperseded: s.pdf === 'superseded', pdfInvalidPage: s.pdf === 'invalidPage', pdfReady: ['ready', 'superseded', 'invalidPage'].includes(s.pdf),
+      retryPdf: () => { this.setState({ pdf: 'loading' }); this.later(() => this.setState({ pdf: 'ready' }), 800); },
+      procTitle: isHQ ? 'Procedure documents' : 'Procedures',
+      procDesc: isHQ ? 'Add and remove the PDFs salons can open and the assistant can cite.' : "Ask the assistant or open a document. Guidance only — nothing here changes stock, files claims or grants replacements.",
+      canManageDocs: isHQ, procShowTabs: !isHQ, procDocsTab: isHQ || s.procTab === 'docs', procAssistantTab: !isHQ && s.procTab !== 'docs',
+      procTabs: [['assistant', 'Assistant', 'auto_awesome'], ['docs', 'Documents', 'folder_open']].map(([k, label, icon]) => ({ label, icon, color: s.procTab === k ? '#171614' : '#57534c', line: s.procTab === k ? '#dc241f' : 'transparent', go: () => this.setState({ procTab: k }) })),
+      docCount: s.docs.length, docsEmpty: s.docs.length === 0, docsEmptyText: isHQ ? 'Add the first PDF to make it available to salons.' : 'HQ hasn\'t published any procedures yet.',
+      docsNote: isHQ ? 'You can add and delete' : 'View only · HQ manages documents', docsNoteIcon: isHQ ? 'edit_document' : 'visibility',
+      docs: s.docs.map(d => ({ ...d, superseded: !!d.superseded, isPublic: d.origin === 'public', originLabel: d.origin === 'public' ? 'Public product info · unofficial summary' : 'Synthetic demo document', originIcon: d.origin === 'public' ? 'public' : 'science', originBg: d.origin === 'public' ? 'transparent' : '#fbefd6', originLine: d.origin === 'public' ? '#cfc9bf' : '#fbefd6', originFg: d.origin === 'public' ? '#3b3833' : '#5c3700',
+        open: () => d.file ? this.setState({ view: 'pdf', pdf: d.superseded ? 'superseded' : 'ready', pdfPage: 1, pdfFrom: 'docs' }) : this.toast('Demo: only “Damaged delivery procedure v1.2” has a file.'),
+        del: () => this.setState({ docDialog: 'delete', delTarget: d }) })),
+      openUpload: () => this.setState({ docDialog: 'upload' }),
+      uploadOpen: ['upload', 'uploadFilled', 'uploading', 'uploadError'].includes(s.docDialog), deleteOpen: s.docDialog === 'delete',
+      noFile: s.docDialog === 'upload', hasFile: ['uploadFilled', 'uploading', 'uploadError'].includes(s.docDialog), uploading: s.docDialog === 'uploading', uploadError: s.docDialog === 'uploadError',
+      upTitle: s.docDialog === 'upload' ? 'Document title' : 'Damaged delivery procedure', upVersion: s.docDialog === 'upload' ? 'e.g. v1.3' : 'v1.3',
+      upReplaces: s.docDialog === 'upload' ? 'None' : 'Damaged delivery procedure · v1.2', upValueColor: s.docDialog === 'upload' ? '#8a857c' : '#171614',
+      pickFile: () => this.setState({ docDialog: 'uploadFilled' }), removeFile: () => this.setState({ docDialog: 'upload' }),
+      canUpload: ['uploadFilled', 'uploadError'].includes(s.docDialog), cannotUpload: ['upload', 'uploading'].includes(s.docDialog),
+      upBtn: s.docDialog === 'uploadError' ? 'Try again' : 'Upload', upBtnDisabled: s.docDialog === 'uploading' ? 'Uploading…' : 'Upload', upSpinner: s.docDialog === 'uploading' ? spinner : null,
+      upCancel: s.docDialog === 'uploading' ? 'Close' : 'Cancel',
+      doUpload: () => { this.setState({ docDialog: 'uploading' }); this.later(() => { this.setState(x => ({ docDialog: null, docs: [{ id: 'dd13', title: 'Damaged delivery procedure', version: 'v1.3', pages: 3, updated: 'Today', origin: 'synthetic', file: true }, ...x.docs.map(d => d.id === 'dd12' ? { ...d, superseded: true } : d)] })); this.toast('Document added · v1.2 marked Superseded'); }, 1500); },
+      closeDocDialog: () => this.setState({ docDialog: null }),
+      delTitle: s.delTarget ? s.delTarget.title : '', delVersion: s.delTarget ? s.delTarget.version : '',
+      confirmDelete: () => { const t = s.delTarget; this.setState(x => ({ docDialog: null, docs: x.docs.filter(d => d.id !== t.id) })); this.toast('Document deleted'); },
+      pdfPage: s.pdfPage, prevPage: () => this.setState(x => ({ pdfPage: Math.max(1, x.pdfPage - 1) })), nextPage: () => this.setState(x => ({ pdfPage: Math.min(3, x.pdfPage + 1) })),
+      prevColor: s.pdfPage > 1 ? '#171614' : '#b9b4ab', nextColor: s.pdfPage < 3 ? '#171614' : '#b9b4ab',
+      pageHeading: { 1: '1  Scope', 2: '2  Handling a damaged delivery', 3: '3  Document history' }[s.pdfPage], isCitedPage: s.pdfPage === 2,
+      citedSection: (SOURCES[s.srcOpen] || SOURCES[0]).section.split(' ')[0], citedTitle: (SOURCES[s.srcOpen] || SOURCES[0]).section,
+      pdfBackLabel: s.pdfFrom === 'docs' ? 'Back to documents' : 'Back to answer',
+      isNotFound: v === 'notFound', goHome: () => this.go(isHQ ? 'hq' : 'salon'),
+      dialogOpen: !!s.dialog && shell, dialog: s.dialog, dialogPhase: s.dialogPhase, mismatch: s.mismatch, two: 2,
+      hqStock, hqReserved: hqRes, hqAvailable: hqStock - hqRes, legStock: leg,
+      onDialogConfirm: this.onDialogConfirm, onDialogCancel: () => this.setState({ dialog: null, dialogPhase: 'ready' }),
+      expired: s.expired, hasSnack: !!s.snack, snack: s.snack, closeSnack: () => this.setState({ snack: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

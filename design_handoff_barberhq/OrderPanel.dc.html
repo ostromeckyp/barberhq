@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=swap" rel="stylesheet"><style>@keyframes bhq-indet{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}@keyframes bhq-spin{to{transform:rotate(360deg)}}</style></helmet>
+<div style="background:#fff;border:1px solid #e2ded6;border-radius:12px;display:flex;flex-direction:column;font-family:Archivo,system-ui,sans-serif;color:#171614;position:relative">
+<div style="padding:16px 18px 0;display:flex;align-items:baseline;gap:8px"><span style="font:700 16px Archivo">New request</span><span style="font:13px Archivo;color:#57534c">HQ → {{ salon }}</span></div>
+
+<sc-if value="{{ isSent }}">
+<div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;border-top:1px solid #ece9e3;margin-top:12px">
+<div style="display:flex;align-items:center;gap:8px;font:700 16px Archivo"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1;color:#1f4d23">check_circle</span>{{ sentTitle }}</div>
+<div style="display:flex;flex-direction:column;border:1px solid #ece9e3;border-radius:10px">
+<sc-for list="{{ sentItems }}" as="r" hint-placeholder-count="1"><div style="display:flex;align-items:center;gap:8px;min-height:48px;padding:4px 6px 4px 12px;border-bottom:1px solid #ece9e3"><div style="flex:1;min-width:0"><div style="font:600 12px 'IBM Plex Mono',monospace;color:#57534c">{{ r.reqId }}</div><div style="font:600 14px Archivo">{{ r.name }} <span style="font-family:'IBM Plex Mono',monospace">× {{ r.qty }}</span></div></div><button onClick="{{ r.open }}" style="height:40px;padding:0 12px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Open</button></div></sc-for>
+</div>
+<div style="font:13.5px/1.45 Archivo;color:#3b3833">Each one is Pending approval. HQ reviews availability next — nothing is reserved yet.</div>
+<div><button onClick="{{ reset }}" style="height:40px;padding:0 18px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;color:#171614;font:600 14px Archivo;cursor:pointer" style-hover="background:#efece6">New request</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isUnknown }}">
+<div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;border-top:1px solid #ece9e3;margin-top:12px">
+<div style="display:flex;align-items:center;gap:10px;font:700 16px Archivo">{{ spinner }}Checking request status…</div>
+<div style="font:14px/1.45 Archivo;color:#3b3833">The connection dropped before HQ answered. Your requests may already be saved, so we're checking before anything is sent again.</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ checkStatus }}" style="height:40px;padding:0 18px;border-radius:20px;border:1px solid #bdb7ad;background:transparent;color:#171614;font:600 14px Archivo;cursor:pointer" style-hover="background:#efece6">Check again</button><button onClick="{{ checkStatus }}" style="height:40px;padding:0 14px;border-radius:20px;border:none;background:transparent;color:#171614;font:600 14px Archivo;cursor:pointer" style-hover="background:#efece6">Retry same requests</button></div>
+<div style="font:12.5px/1.45 Archivo;color:#57534c">Retrying reuses the same requests — it can't create duplicates.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showInputs }}" hint-placeholder-val="{{ true }}">
+<sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+<div role="tablist" style="display:flex;border-bottom:1px solid #ece9e3;margin-top:8px">
+<button role="tab" onClick="{{ tabA }}" style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;gap:6px;border:none;background:transparent;cursor:pointer;font:600 14px Archivo;color:{{ aColor }};border-bottom:3px solid {{ aLine }}"><span class="material-symbols-outlined" style="font-size:18px">auto_awesome</span>Assistant</button>
+<button role="tab" onClick="{{ tabM }}" style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;gap:6px;border:none;background:transparent;cursor:pointer;font:600 14px Archivo;color:{{ mColor }};border-bottom:3px solid {{ mLine }}"><span class="material-symbols-outlined" style="font-size:18px">list_alt</span>Manual</button>
+</div>
+</sc-if>
+<sc-if value="{{ noTabs }}"><div style="height:8px;border-bottom:1px solid #ece9e3"></div></sc-if>
+
+<sc-if value="{{ tabAssistant }}" hint-placeholder-val="{{ true }}">
+<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+<div style="position:relative;border:1px solid #8f897f;border-radius:6px;padding:12px 12px 8px">
+<span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:#57534c">What do you need?</span>
+<textarea value="{{ text }}" onChange="{{ onText }}" disabled="{{ busy }}" rows="2" placeholder="One or more products with quantities" style="width:100%;box-sizing:border-box;border:none;outline:none;resize:none;font:15px/1.4 Archivo;color:#171614;background:transparent;padding:0"></textarea>
+</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<button onClick="{{ useExample }}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:8px;border:1px solid #cfc9bf;background:transparent;font:500 13px Archivo;color:#3b3833;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">format_quote</span>Example</button>
+<button onClick="{{ useBatchExample }}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:8px;border:1px solid #cfc9bf;background:transparent;font:500 13px Archivo;color:#3b3833;cursor:pointer" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">format_list_bulleted</span>Several products</button>
+<div style="flex:1"></div>
+<sc-if value="{{ isThinking }}"><button disabled="{{ true }}" style="height:40px;padding:0 18px;border-radius:20px;border:none;background:#e3ded4;color:#8a857c;font:600 14px Archivo;display:flex;align-items:center;gap:8px">{{ spinner }}Preparing…</button></sc-if>
+<sc-if value="{{ notThinking }}" hint-placeholder-val="{{ true }}"><button onClick="{{ prepare }}" disabled="{{ busy }}" style="height:40px;padding:0 18px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#b81d19"><span class="material-symbols-outlined" style="font-size:18px">auto_awesome</span>Prepare request</button></sc-if>
+</div>
+<sc-if value="{{ isThinking }}"><div style="display:flex;flex-direction:column;gap:8px">{{ bar }}<span style="font:14px Archivo;color:#3b3833">Preparing request…</span></div></sc-if>
+<sc-if value="{{ isAiDown }}"><div style="border:1px solid #f2c9c5;background:#fdf3f2;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;gap:8px;align-items:center;color:#8c1d18;font:700 14.5px Archivo"><span class="material-symbols-outlined" style="font-size:20px">cloud_off</span>Assistant unavailable</div><div style="font:13.5px/1.45 Archivo;color:#3b3833">It didn't respond in time. Your text is kept — add the products with the manual form instead.</div><div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap"><button onClick="{{ prepare }}" style="height:40px;padding:0 14px;border-radius:20px;border:none;background:transparent;font:600 14px Archivo;color:#171614;cursor:pointer" style-hover="background:#f5e4e2">Try again</button><button onClick="{{ tabM }}" style="height:40px;padding:0 18px;border-radius:20px;border:none;background:#171614;color:#fff;font:600 14px Archivo;cursor:pointer">Use manual form</button></div></div></sc-if>
+<sc-if value="{{ isNoMatch }}"><div style="display:flex;gap:8px;font:13.5px/1.45 Archivo;color:#3b3833"><span class="material-symbols-outlined" style="font-size:18px">search_off</span>No products recognised in your text. Name the product, or use the manual form.</div></sc-if>
+<sc-if value="{{ assistantHint }}" hint-placeholder-val="{{ true }}"><div style="font:12.5px/1.45 Archivo;color:#57534c;display:flex;gap:8px"><span class="material-symbols-outlined" style="font-size:18px">info</span>Describe one or several products. The assistant only fills the list below — you check it and submit.</div></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabManual }}">
+<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+<div style="position:relative">
+<div style="position:relative;border:{{ pfBorder }};border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 4px 0 12px;gap:8px">
+<span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:{{ pfLabel }}">Product</span>
+<span class="material-symbols-outlined" style="font-size:20px;color:#57534c">search</span>
+<input value="{{ query }}" onChange="{{ onQuery }}" onFocus="{{ openAc }}" placeholder="Type to search, e.g. Matowa" disabled="{{ busy }}" style="flex:1;min-width:0;border:none;outline:none;font:15px Archivo;color:#171614;background:transparent"></input>
+<button onClick="{{ toggleAc }}" aria-label="Show products" style="width:40px;height:40px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:24px">{{ acIcon }}</span></button>
+</div>
+<sc-if value="{{ acOpen }}">
+<div role="listbox" style="position:absolute;left:0;right:0;top:60px;z-index:5;background:#fff;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.15),0 1px 2px rgba(0,0,0,.2);padding:8px 0;max-height:300px;overflow:auto">
+<sc-for list="{{ acItems }}" as="o" hint-placeholder-count="6"><button role="option" onClick="{{ o.onPick }}" style="width:100%;min-height:52px;padding:6px 16px;border:none;background:{{ o.bg }};text-align:left;display:flex;align-items:center;gap:12px;cursor:pointer;color:#171614" style-hover="background:#f3f1ed"><span style="flex:1;min-width:0"><span style="display:block;font:15px Archivo">{{ o.name }}</span><span style="display:block;font:12px 'IBM Plex Mono',monospace;color:#57534c">In salon {{ o.salon }} · HQ available {{ o.hq }}</span></span><span style="font:500 12px Archivo;color:#57534c">{{ o.inList }}</span></button></sc-for>
+<sc-if value="{{ acEmpty }}"><div style="padding:12px 16px;font:14px Archivo;color:#57534c">No product matches “{{ query }}”</div></sc-if>
+</div>
+</sc-if>
+</div>
+<div style="display:flex;gap:8px;align-items:flex-start">
+<div style="flex:1;min-width:0">
+<div style="position:relative;border:{{ qfBorder }};border-radius:6px;height:56px;box-sizing:border-box;display:flex;align-items:center;padding:0 12px 0 14px;gap:6px">
+<span style="position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font:12px Archivo;color:{{ qfLabel }}">Quantity</span>
+<input type="number" min="1" step="1" inputmode="numeric" value="{{ qtyInput }}" onChange="{{ onQty }}" disabled="{{ busy }}" style="flex:1;min-width:0;border:none;outline:none;font:600 18px 'IBM Plex Mono',monospace;color:#171614;background:transparent"></input>
+<span style="font:13px Archivo;color:#57534c">pcs</span>
+</div>
+<div style="font:12px Archivo;color:{{ qfHelpColor }};padding:4px 16px 0">{{ qfHelp }}</div>
+</div>
+<sc-if value="{{ canAdd }}"><button onClick="{{ addLine }}" style="height:56px;padding:0 18px 0 14px;border-radius:28px;border:none;background:#171614;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer;flex:none" style-hover="background:#34312d"><span class="material-symbols-outlined" style="font-size:20px">add</span>Add</button></sc-if>
+<sc-if value="{{ cannotAdd }}" hint-placeholder-val="{{ true }}"><button disabled="{{ true }}" style="height:56px;padding:0 18px 0 14px;border-radius:28px;border:none;background:#e3ded4;color:#8a857c;font:600 14px Archivo;display:flex;align-items:center;gap:6px;flex:none"><span class="material-symbols-outlined" style="font-size:20px">add</span>Add</button></sc-if>
+</div>
+<sc-if value="{{ merged }}"><div style="display:flex;gap:8px;font:13px Archivo;color:#3b3833"><span class="material-symbols-outlined" style="font-size:18px">merge</span>Already on the list — quantity added to that line.</div></sc-if>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ showDraft }}" hint-placeholder-val="{{ true }}">
+<div style="border-top:1px solid #ece9e3;background:#faf9f7;border-radius:0 0 12px 12px">
+<div style="display:flex;align-items:center;gap:8px;padding:12px 10px 8px 18px"><span style="font:700 14px Archivo">Request list</span><span style="font:600 12px 'IBM Plex Mono',monospace;color:#57534c">{{ listSummary }}</span><div style="flex:1"></div><sc-if value="{{ hasLines }}"><button onClick="{{ clearAll }}" disabled="{{ busy }}" style="height:36px;padding:0 10px;border-radius:18px;border:none;background:transparent;font:600 13px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Clear</button></sc-if></div>
+<sc-if value="{{ noLines }}" hint-placeholder-val="{{ true }}"><div style="margin:0 18px 14px;border:1px dashed #cfc9bf;border-radius:10px;padding:14px;font:13.5px/1.45 Archivo;color:#57534c;background:#fff">No products yet. Describe them to the assistant, or add them manually — you can mix both.</div></sc-if>
+<div style="display:flex;flex-direction:column;gap:8px;padding:0 12px">
+<sc-for list="{{ lines }}" as="l" hint-placeholder-count="1">
+<div style="background:#fff;border:1px solid {{ l.border }};border-radius:10px;padding:10px 6px 10px 12px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<span class="material-symbols-outlined" title="{{ l.srcLabel }}" style="font-size:16px;color:#57534c;margin-top:2px">{{ l.srcIcon }}</span>
+<div style="flex:1;min-width:0"><div style="font:600 14.5px/1.3 Archivo">{{ l.name }}</div><div style="font:12px Archivo;color:#57534c">{{ l.srcLabel }}</div></div>
+<button onClick="{{ l.remove }}" disabled="{{ busyFlag }}" aria-label="Remove {{ l.name }}" style="width:40px;height:40px;margin:-8px 0 -8px;border:none;background:transparent;border-radius:20px;display:grid;place-items:center;cursor:pointer;padding:0;flex:none" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:20px">close</span></button>
+</div>
+<sc-if value="{{ l.hasChoice }}"><div style="display:flex;flex-direction:column;gap:6px;padding-right:6px"><div style="font:13px Archivo;color:#5c3700;display:flex;gap:6px;align-items:center"><span class="material-symbols-outlined" style="font-size:18px">help</span>Several products match — pick one. Qty {{ l.qty }}.</div><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ l.choices }}" as="c" hint-placeholder-count="3"><button onClick="{{ c.onPick }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid #cfc9bf;background:#fff;font:500 13px Archivo;color:#171614;cursor:pointer;white-space:nowrap" style-hover="background:#efece6">{{ c.name }}</button></sc-for></div></div></sc-if>
+<sc-if value="{{ l.resolved }}">
+<div style="display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;padding-right:6px">
+<div style="display:flex;align-items:center;border:1px solid #cfc9bf;border-radius:20px;height:40px;box-sizing:border-box"><button onClick="{{ l.dec }}" disabled="{{ busyFlag }}" aria-label="Decrease" style="width:38px;height:38px;border:none;background:transparent;border-radius:19px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">remove</span></button><span style="font:600 16px 'IBM Plex Mono',monospace;min-width:26px;text-align:center">{{ l.qty }}</span><button onClick="{{ l.inc }}" disabled="{{ busyFlag }}" aria-label="Increase" style="width:38px;height:38px;border:none;background:transparent;border-radius:19px;display:grid;place-items:center;cursor:pointer;padding:0" style-hover="background:#efece6"><span class="material-symbols-outlined" style="font-size:18px">add</span></button></div>
+<div style="font:12.5px Archivo;color:{{ l.hqColor }}">HQ <b style="font:600 13px 'IBM Plex Mono',monospace">{{ l.hq }}</b></div>
+<div style="font:12.5px Archivo;color:#57534c">Salon <b style="font:600 13px 'IBM Plex Mono',monospace;color:#171614">{{ l.now }} → {{ l.after }}</b></div>
+</div>
+</sc-if>
+<sc-if value="{{ l.over }}"><div style="display:flex;gap:6px;font:12.5px/1.4 Archivo;color:#5c3700;padding-right:6px"><span class="material-symbols-outlined" style="font-size:17px">warning</span>HQ has {{ l.hq }} available. You can still submit — HQ decides. Nothing is swapped automatically.</div></sc-if>
+<sc-if value="{{ l.existing }}"><div style="display:flex;gap:6px;align-items:center;font:12.5px/1.4 Archivo;color:#3b3833;padding-right:6px;flex-wrap:wrap"><span class="material-symbols-outlined" style="font-size:17px">info</span><span style="flex:1 1 180px">Already requested as <b style="font-family:'IBM Plex Mono',monospace">{{ reqId }}</b> · won't be submitted again.</span><button onClick="{{ openExisting }}" style="height:32px;padding:0 10px;border-radius:16px;border:none;background:transparent;font:600 13px Archivo;color:#171614;cursor:pointer" style-hover="background:#efece6">Open</button></div></sc-if>
+</div>
+</sc-for>
+</div>
+<div style="padding:12px 18px 16px;display:flex;flex-direction:column;gap:10px">
+<sc-if value="{{ hasLines }}"><div style="display:flex;gap:8px;font:12.5px/1.45 Archivo;color:#3b3833"><span class="material-symbols-outlined" style="font-size:17px">lock_open</span><span>No stock reserved yet. Each product becomes its own request; HQ approves and ships each one.</span></div></sc-if>
+<div style="display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+<span style="font:12.5px Archivo;color:#57534c;flex:1 1 140px">{{ blockedReason }}</span>
+<sc-if value="{{ canSubmit }}"><button onClick="{{ submit }}" style="height:40px;padding:0 18px;border-radius:20px;border:none;background:#dc241f;color:#fff;font:600 14px Archivo;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#b81d19"><span class="material-symbols-outlined" style="font-size:18px">send</span>{{ submitLabel }}</button></sc-if>
+<sc-if value="{{ cannotSubmit }}" hint-placeholder-val="{{ true }}"><button disabled="{{ true }}" style="height:40px;padding:0 18px;border-radius:20px;border:none;background:#e3ded4;color:#8a857c;font:600 14px Archivo;display:flex;align-items:center;gap:8px">{{ sendSpinner }}{{ disabledLabel }}</button></sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:400,&quot;height&quot;:640},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;initial&quot;,&quot;manualEmpty&quot;,&quot;manualAc&quot;,&quot;manual&quot;,&quot;manualInvalid&quot;,&quot;manualHigh&quot;,&quot;thinking&quot;,&quot;proposal&quot;,&quot;batch&quot;,&quot;clarify&quot;,&quot;insufficient&quot;,&quot;existing&quot;,&quot;aiDown&quot;,&quot;sending&quot;,&quot;unknown&quot;,&quot;sent&quot;,&quot;sentBatch&quot;],&quot;default&quot;:&quot;initial&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;ai&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;salon&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Legnicka&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;hasActive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;reqId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;REQ-0412&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;preselect&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;preselectKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;salonStock&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string,number&gt;&quot;},&quot;hqAvail&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string,number&gt;&quot;},&quot;onSubmitted&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(r:{reqId:string,id:string,name:string,qty:number}[])=&gt;void&quot;},&quot;onOpenRequest&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(reqId:string)=&gt;void&quot;}}">
+const PRODUCTS = [
+  { id: 'matowa', name: 'Pomada Matowa 100 ml', hq: 18, salon: 2 },
+  { id: 'drymatt', name: 'Pomada Dry Matt 100 ml', hq: 24, salon: 6 },
+  { id: 'cement', name: 'Pomada Cement 100 ml', hq: 1, salon: 5 },
+  { id: 'sol', name: 'Sól Morska 200 ml', hq: 28, salon: 8 },
+  { id: 'savage', name: 'Olejek do brody Savage 50 ml', hq: 12, salon: 4 },
+  { id: 'mattifier', name: 'Mattifier 100 ml', hq: 9, salon: 5 }
+];
+const EXAMPLE = 'Potrzebujemy dwóch sztuk Pomady Matowej 100 ml';
+const EXAMPLE_BATCH = '2 Pomady Matowe, 3 Sól Morska i 1 olejek Savage';
+const CLARIFY_TEXT = 'Potrzebujemy dwóch pomad matowych i trzech Soli Morskiej';
+const WORDS = [['jedn', 1], ['dw', 2], ['trz', 3], ['czter', 4], ['pięć', 5], ['piec', 5]];
+const AMBIG = ['matowa', 'drymatt', 'cement'];
+function parseQty(s) {
+  s = s.replace(/\d+\s*ml/g, '');
+  const d = s.match(/(\d+)/);
+  if (d) return +d[1];
+  for (const [k, v] of WORDS) if (new RegExp('(^|\\s)' + k).test(s)) return v;
+  return null;
+}
+function matchProduct(s) {
+  if (/cement/.test(s)) return 'cement';
+  if (/dry/.test(s)) return 'drymatt';
+  if (/matowych/.test(s)) return null;
+  if (/matow/.test(s)) return 'matowa';
+  if (/s[óo]l/.test(s)) return 'sol';
+  if (/savage|olej/.test(s)) return 'savage';
+  if (/mattifier/.test(s)) return 'mattifier';
+  if (/pomad/.test(s)) return null;
+  return undefined;
+}
+function parse(text) {
+  const segs = text.toLowerCase().split(/,|;|\n|\s+i\s+|\s+oraz\s+|\s+and\s+/).map(x => x.trim()).filter(Boolean);
+  const out = [];
+  for (const g of segs) { const id = matchProduct(g); if (id === undefined) continue; out.push({ id, qty: parseQty(g) || 1, src: 'ai' }); }
+  return out;
+}
+let K = 0;
+const L = (id, qty, src) => ({ key: ++K, id, qty, src: src || 'ai' });
+class Component extends DCLogic {
+  state = this.fromMode(this.props.mode || 'initial');
+  fromMode(m) {
+    const b = { tab: m.startsWith('manual') ? 'manual' : 'assistant', mode: 'idle', text: '', lines: [], query: '', product: null, qtyInput: '1', acOpen: false, merged: false, sent: [] };
+    const batch = () => [L('matowa', 2), L('sol', 3), L('savage', 1)];
+    switch (m) {
+      case 'manualAc': b.query = 'pomada'; b.acOpen = true; break;
+      case 'manual': b.lines = [L('matowa', 2, 'manual'), L('sol', 3, 'manual'), L('savage', 1, 'manual')]; break;
+      case 'manualInvalid': b.product = 'matowa'; b.query = 'Pomada Matowa 100 ml'; b.qtyInput = '0'; b.lines = [L('sol', 3, 'manual')]; break;
+      case 'manualHigh': b.lines = [L('cement', 3, 'manual')]; break;
+      case 'thinking': b.text = EXAMPLE_BATCH; b.mode = 'thinking'; break;
+      case 'proposal': b.text = EXAMPLE; b.lines = [L('matowa', 2)]; break;
+      case 'batch': b.text = EXAMPLE_BATCH; b.lines = batch(); break;
+      case 'clarify': b.text = CLARIFY_TEXT; b.lines = [L(null, 2), L('sol', 3)]; break;
+      case 'insufficient': b.text = 'Potrzebujemy trzech sztuk Pomady Cement 100 ml'; b.lines = [L('cement', 3)]; break;
+      case 'existing': b.text = EXAMPLE_BATCH; b.lines = batch(); break;
+      case 'aiDown': b.text = EXAMPLE; b.mode = 'aiDown'; break;
+      case 'sending': b.text = EXAMPLE; b.lines = [L('matowa', 2)]; b.mode = 'sending'; break;
+      case 'unknown': b.lines = [L('matowa', 2)]; b.mode = 'unknown'; break;
+      case 'sent': b.mode = 'sent'; b.sent = [{ reqId: 'REQ-0412', id: 'matowa', qty: 2 }]; break;
+      case 'sentBatch': b.mode = 'sent'; b.sent = [{ reqId: 'REQ-0412', id: 'matowa', qty: 2 }, { reqId: 'REQ-0413', id: 'sol', qty: 3 }, { reqId: 'REQ-0414', id: 'savage', qty: 1 }]; break;
+    }
+    return b;
+  }
+  componentDidUpdate(pp) {
+    if (pp.mode !== this.props.mode) this.setState(this.fromMode(this.props.mode || 'initial'));
+    if (this.props.preselectKey && pp.preselectKey !== this.props.preselectKey && this.props.preselect) {
+      const P = this.prod(this.props.preselect);
+      this.setState({ tab: 'manual', mode: this.state.mode === 'sent' ? 'idle' : this.state.mode, sent: [], product: P.id, query: P.name, qtyInput: '1', acOpen: false, merged: false });
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.t); }
+  prod(id) { return PRODUCTS.find(p => p.id === id); }
+  hq(id) { const m = this.props.hqAvail; return m && m[id] != null ? m[id] : this.prod(id).hq; }
+  stock(id) { const m = this.props.salonStock; return m && m[id] != null ? m[id] : this.prod(id).salon; }
+  isExisting(id) { return id === 'matowa' && !!this.props.hasActive; }
+  later(fn, ms) { clearTimeout(this.t); this.t = setTimeout(fn, ms); }
+  mergeLines(lines, add) {
+    const out = lines.map(l => ({ ...l }));
+    let merged = false;
+    for (const a of add) {
+      const hit = a.id && out.find(l => l.id === a.id);
+      if (hit) { hit.qty += a.qty; merged = true; } else out.push(L(a.id, a.qty, a.src));
+    }
+    return { lines: out, merged };
+  }
+  prepare = () => {
+    const t = this.state.text.trim();
+    if (!t) return;
+    this.setState({ mode: 'thinking' });
+    this.later(() => {
+      const found = parse(t);
+      if (!found.length) { this.setState({ mode: 'noMatch' }); return; }
+      this.setState(st => ({ mode: 'idle', lines: this.mergeLines(st.lines, found).lines }));
+    }, 1300);
+  };
+  addLine = () => {
+    const { product, qtyInput } = this.state;
+    const q = +qtyInput;
+    if (!product || !/^\d+$/.test(qtyInput) || q < 1) return;
+    this.setState(st => { const r = this.mergeLines(st.lines, [{ id: product, qty: q, src: 'manual' }]); return { lines: r.lines, merged: r.merged, product: null, query: '', qtyInput: '1', acOpen: false }; });
+  };
+  submit = () => {
+    const valid = this.state.lines.filter(l => l.id && !this.isExisting(l.id));
+    this.setState({ mode: 'sending' });
+    this.later(() => {
+      let n = 413;
+      const sent = valid.map(l => ({ reqId: l.id === 'matowa' ? 'REQ-0412' : 'REQ-0' + (n++), id: l.id, qty: l.qty }));
+      this.setState({ mode: 'sent', sent, lines: [] });
+      this.props.onSubmitted && this.props.onSubmitted(sent.map(x => ({ ...x, name: this.prod(x.id).name })));
+    }, 1200);
+  };
+  renderVals() {
+    const s = this.state, ai = this.props.ai ?? true, isA = ai && s.tab === 'assistant';
+    const busy = s.mode === 'thinking' || s.mode === 'sending';
+    const sending = s.mode === 'sending';
+    const spin = React.createElement('span', { style: { width: 16, height: 16, borderRadius: '50%', border: '2px solid currentColor', borderTopColor: 'transparent', display: 'inline-block', animation: 'bhq-spin .8s linear infinite', flex: 'none' } });
+    const bar = React.createElement('div', { style: { height: 4, background: '#e3ded4', borderRadius: 2, overflow: 'hidden' } }, React.createElement('div', { style: { width: '40%', height: '100%', background: '#dc241f', animation: 'bhq-indet 1.2s ease-in-out infinite' } }));
+    const upd = (key, fn) => this.setState(st => ({ lines: st.lines.map(l => l.key === key ? fn(l) : l) }));
+    const lines = s.lines.map(l => {
+      const P = l.id ? this.prod(l.id) : null;
+      const hq = P ? this.hq(P.id) : 0, now = P ? this.stock(P.id) : 0;
+      const over = !!P && l.qty > hq, existing = !!P && this.isExisting(P.id);
+      return {
+        key: l.key, name: P ? P.name : 'Which pomade?', qty: l.qty, hq, now, after: now + l.qty,
+        srcIcon: l.src === 'ai' ? 'auto_awesome' : 'edit', srcLabel: l.src === 'ai' ? 'From assistant' : 'Added manually',
+        hasChoice: !P, resolved: !!P && !existing, over: over && !existing, existing, hqColor: over ? '#5c3700' : '#57534c',
+        border: !P ? '#f0d49b' : existing ? '#d9d4cb' : '#e2ded6',
+        choices: AMBIG.map(id => ({ name: this.prod(id).name.replace(' 100 ml', ''), onPick: () => upd(l.key, x => ({ ...x, id })) })),
+        inc: () => upd(l.key, x => ({ ...x, qty: Math.min(99, x.qty + 1) })), dec: () => upd(l.key, x => ({ ...x, qty: Math.max(1, x.qty - 1) })),
+        remove: () => this.setState(st => ({ lines: st.lines.filter(x => x.key !== l.key) }))
+      };
+    });
+    const valid = s.lines.filter(l => l.id && !this.isExisting(l.id));
+    const pcs = valid.reduce((a, l) => a + l.qty, 0);
+    const choose = s.lines.filter(l => !l.id).length;
+    const canSubmit = valid.length > 0 && choose === 0 && !busy;
+    const qtyEmpty = s.qtyInput === '';
+    const qtyInvalid = !qtyEmpty && (!/^\d+$/.test(s.qtyInput) || +s.qtyInput < 1);
+    const PS = s.product ? this.prod(s.product) : null;
+    const acList = (PS && PS.name === s.query) ? PRODUCTS : PRODUCTS.filter(p => !s.query || p.name.toLowerCase().includes(s.query.toLowerCase()));
+    return {
+      salon: this.props.salon || 'Legnicka', reqId: this.props.reqId || 'REQ-0412', spinner: spin, bar, busy, busyFlag: sending,
+      isSent: s.mode === 'sent', isUnknown: s.mode === 'unknown', showInputs: s.mode !== 'sent' && s.mode !== 'unknown', showDraft: s.mode !== 'sent' && s.mode !== 'unknown',
+      sentTitle: s.sent.length === 1 ? 'Request submitted' : `${s.sent.length} requests submitted`,
+      sentItems: s.sent.map(x => ({ ...x, name: this.prod(x.id).name, open: () => this.props.onOpenRequest && this.props.onOpenRequest(x.reqId) })),
+      reset: () => this.setState(this.fromMode('initial')),
+      checkStatus: () => { this.setState({ mode: 'unknown' }); this.later(() => this.submit(), 900); },
+      showTabs: ai, noTabs: !ai, tabAssistant: isA, tabManual: !isA,
+      aColor: isA ? '#171614' : '#57534c', aLine: isA ? '#dc241f' : 'transparent', mColor: !isA ? '#171614' : '#57534c', mLine: !isA ? '#dc241f' : 'transparent',
+      tabA: () => this.setState({ tab: 'assistant', acOpen: false }), tabM: () => this.setState(st => ({ tab: 'manual', mode: st.mode === 'aiDown' || st.mode === 'noMatch' ? 'idle' : st.mode })),
+      text: s.text, onText: e => this.setState({ text: e.target.value }), useExample: () => this.setState({ text: EXAMPLE }), useBatchExample: () => this.setState({ text: EXAMPLE_BATCH }),
+      prepare: this.prepare, isThinking: s.mode === 'thinking', notThinking: s.mode !== 'thinking', isAiDown: s.mode === 'aiDown', isNoMatch: s.mode === 'noMatch',
+      assistantHint: s.mode === 'idle' && s.lines.length === 0,
+      query: s.query, onQuery: e => this.setState({ query: e.target.value, acOpen: true, product: null, merged: false }),
+      openAc: () => this.setState({ acOpen: true }), toggleAc: () => this.setState(st => ({ acOpen: !st.acOpen })), acOpen: s.acOpen, acIcon: s.acOpen ? 'arrow_drop_up' : 'arrow_drop_down', acEmpty: acList.length === 0,
+      acItems: acList.map(p => ({ name: p.name, hq: this.hq(p.id), salon: this.stock(p.id), inList: s.lines.some(l => l.id === p.id) ? 'On list' : '', bg: s.product === p.id ? '#f6dcda' : 'transparent', onPick: () => this.setState({ product: p.id, query: p.name, acOpen: false, merged: false }) })),
+      pfBorder: s.acOpen ? '2px solid #dc241f' : '1px solid #8f897f', pfLabel: s.acOpen ? '#dc241f' : '#57534c',
+      qtyInput: s.qtyInput, onQty: e => this.setState({ qtyInput: e.target.value }),
+      qfBorder: qtyInvalid ? '2px solid #b3261e' : '1px solid #8f897f', qfLabel: qtyInvalid ? '#b3261e' : '#57534c',
+      qfHelp: qtyInvalid ? 'Enter a whole number greater than 0' : 'Whole pieces', qfHelpColor: qtyInvalid ? '#b3261e' : '#57534c',
+      canAdd: !!s.product && !qtyInvalid && !qtyEmpty && !busy, cannotAdd: !(!!s.product && !qtyInvalid && !qtyEmpty && !busy), addLine: this.addLine, merged: s.merged,
+      lines, hasLines: s.lines.length > 0, noLines: s.lines.length === 0,
+      listSummary: s.lines.length ? `${valid.length} ${valid.length === 1 ? 'product' : 'products'} · ${pcs} pcs` : '',
+      clearAll: () => this.setState({ lines: [], merged: false }), openExisting: () => this.props.onOpenRequest && this.props.onOpenRequest(this.props.reqId || 'REQ-0412'),
+      canSubmit, cannotSubmit: !canSubmit, submit: this.submit,
+      submitLabel: valid.length === 1 ? 'Submit request' : `Submit ${valid.length} requests`,
+      disabledLabel: sending ? (valid.length === 1 ? 'Submitting…' : `Submitting ${valid.length}…`) : (valid.length > 1 ? `Submit ${valid.length} requests` : 'Submit request'),
+      sendSpinner: sending ? spin : null,
+      blockedReason: sending ? '' : choose ? `Pick a product for ${choose === 1 ? '1 line' : choose + ' lines'} first` : (s.lines.length && !valid.length ? 'Nothing new to submit' : '')
+    };
+  }
+}
+</script>
+</body>
+</html>

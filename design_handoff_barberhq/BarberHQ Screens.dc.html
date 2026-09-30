@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>body{margin:0;background:#e9e7e2;font-family:Archivo,system-ui,sans-serif;color:#171614}html{scroll-behavior:smooth}a{color:#171614}a:hover{color:#dc241f}.dv-turn{padding:36px 40px 40px;border-bottom:1px solid rgba(0,0,0,.1);scroll-margin-top:0}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 22px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#dc241f;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:750 20px/1.2 Archivo,system-ui,sans-serif;color:#171614}.dv-sub{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.07em;color:#57534c;margin:36px 0 16px;text-transform:uppercase;scroll-margin-top:12px;border-top:1px solid rgba(0,0,0,.1);padding-top:16px}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.35 system-ui,sans-serif;color:rgba(0,0,0,.62)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}.dv-opt:target .dv-oid{background:#dc241f;color:#fff}.dv-map{font:11.5px/1.5 system-ui,sans-serif;color:#3b3833;max-width:100%}.dv-map b{font-weight:600}.nv a{display:flex;gap:8px;align-items:baseline;padding:6px 10px;border-radius:6px;text-decoration:none;font:13px/1.3 Archivo,system-ui,sans-serif;color:#3b3833}.nv a:hover{background:#e9e4dc;color:#171614}.nv a span{font:600 10.5px 'IBM Plex Mono',monospace;color:#8a857c;min-width:32px}.nv h4{margin:18px 10px 6px;font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#dc241f}</style></helmet>
+<div style="display:grid;grid-template-columns:260px minmax(0,1fr);align-items:start;min-height:100vh">
+
+<nav class="nv" aria-label="All views" style="position:sticky;top:0;height:100vh;overflow-y:auto;box-sizing:border-box;padding:20px 12px 32px;background:#f6f5f2;border-right:1px solid #dedad3">
+<div style="padding:0 10px 14px;display:flex;flex-direction:column;gap:2px;border-bottom:3px solid #dc241f"><span style="font:800 18px Archivo">BarberHQ</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:#57534c">Screen board · all views</span></div>
+<h4>OVERVIEW</h4>
+<a href="#t0"><span>—</span>Direction &amp; links</a>
+<a href="BarberApp.dc.html"><span>↗</span>Live prototype</a>
+<h4>SHARED</h4>
+<a href="#v1"><span>V1</span>Login</a>
+<a href="#g-shared-states"><span>S18</span>Login &amp; shell states</a>
+<h4>BARBER SHOP · SALON STAFF</h4>
+<a href="#v2"><span>V2</span>Dashboard · no requests</a>
+<a href="#v3"><span>V3</span>Dashboard · AI proposal</a>
+<a href="#v15"><span>V15</span>Dashboard · batch via assistant</a>
+<a href="#v10"><span>V10</span>Dashboard · manual batch</a>
+<a href="#v6"><span>V6</span>Request · receipt</a>
+<a href="#v8"><span>V8</span>Procedures · cited answer</a>
+<a href="#v11"><span>V11</span>Procedures · documents</a>
+<a href="#v9"><span>V9</span>PDF viewer · cited page</a>
+<a href="#g-manual"><span>P2</span>Manual batch states</a>
+<a href="#g-panel"><span>P</span>Assistant panel states</a>
+<a href="#g-salon-dialogs"><span>D6</span>Receipt dialogs</a>
+<a href="#g-salon-states"><span>S</span>Page states</a>
+<a href="#g-salon-mobile"><span>M</span>Mobile</a>
+<h4>HQ · WAREHOUSE</h4>
+<a href="#v5"><span>V5</span>Request queue</a>
+<a href="#v4"><span>V4</span>Request · pending approval</a>
+<a href="#v7"><span>V7</span>Request · completed 2/2/2</a>
+<a href="#v12"><span>V12</span>Procedure docs · manage</a>
+<a href="#v13"><span>V13</span>Add document</a>
+<a href="#v14"><span>V14</span>Delete document</a>
+<a href="#g-hq-dialogs"><span>D1</span>Approve · reject · dispatch</a>
+<a href="#g-hq-states"><span>S</span>Page states</a>
+<a href="#g-hq-mobile"><span>M5</span>Mobile</a>
+</nav>
+
+<div style="min-width:0;overflow-x:auto">
+<section class="dv-turn" id="t0">
+<div class="dv-thd"><a class="dv-tid" href="#t0">0</a><span class="dv-tname">Overview</span></div>
+<div style="max-width:1280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;font:13px/1.55 Archivo;color:#3b3833">
+<div><div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;margin-bottom:6px;color:#171614">DIRECTION</div>Layout from option 1a with the proposal card from 1b. A “Low stock” chip marks products at or below 2 pcs in the salon (a single threshold, adjustable in the prototype via lowThreshold). Accent #dc241f marks primary actions, active navigation and tabs, focus and progress. Errors use a darker red and always carry an icon.</div>
+<div><div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;margin-bottom:6px;color:#171614">ROLES</div><b>Barber shop:</b> dashboard, manual or assistant request, receipt, procedures (assistant and documents, view only). <b>HQ:</b> request queue, approve and dispatch, procedure documents (add and delete).</div>
+<div><div style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;margin-bottom:6px;color:#171614">LINKS</div><a href="BarberApp.dc.html">Live prototype</a>: sign in as marta@legnicka.demo, piotr@hq.demo or kuba@zakladowa.demo (any password). Handoff notes: <a href="BarberHQ Handoff.md">BarberHQ Handoff.md</a>. Demo PDF: <a href="docs/damaged-delivery-v1.2.pdf">damaged-delivery-v1.2.pdf</a> (3 pages; cited sections are on page 2).</div>
+</div>
+</section>
+
+<section class="dv-turn" id="g-shared">
+<div class="dv-thd"><a class="dv-tid" href="#g-shared">A</a><span class="dv-tname">Shared</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="v1"><div class="dv-olabel"><a class="dv-oid" href="#v1">V1</a>Login · no role yet · Initial · 1280 · /login</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="login" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-card, mat-form-field outline + matInput, matSuffix icon button, mat-error, mat-flat-button, mat-progress-bar. <b>Custom:</b> none.</div></div>
+</div>
+<div class="dv-sub" id="g-shared-states">Login &amp; shell states · 1280 at 50%</div>
+<div class="dv-opts">
+<div class="dv-opt" id="s18"><div class="dv-olabel"><a class="dv-oid" href="#s18">S18</a>Login · invalid input</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="login" login="invalid" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s19"><div class="dv-olabel"><a class="dv-oid" href="#s19">S19</a>Login · signing in</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="login" login="loading" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s20"><div class="dv-olabel"><a class="dv-oid" href="#s20">S20</a>Login · error</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="login" login="error" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s21"><div class="dv-olabel"><a class="dv-oid" href="#s21">S21</a>Login · checking access</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="login" login="checking" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s22"><div class="dv-olabel"><a class="dv-oid" href="#s22">S22</a>Login · no access assigned</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="login" login="noAccess" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s23"><div class="dv-olabel"><a class="dv-oid" href="#s23">S23</a>Shell · session expired</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="salon" user="marta" session-expired="{{ true }}" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s24"><div class="dv-olabel"><a class="dv-oid" href="#s24">S24</a>Shell · unknown route</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="notFound" user="marta" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="g-salon">
+<div class="dv-thd"><a class="dv-tid" href="#g-salon">B</a><span class="dv-tname">Barber shop · salon staff</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="v2"><div class="dv-olabel"><a class="dv-oid" href="#v2">V2</a>Dashboard · Legnicka · No active requests, Matowa 2 in salon · 1280 · /salons/legnicka</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="salon" user="marta" stage="start" panel="initial" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-toolbar, mat-sidenav + mat-nav-list, mat-menu, mat-table (row text button “Request”), mat-tab-group, mat-form-field textarea, mat-chip, mat-stroked/flat-button. <b>Custom:</b> ActiveRequestRow, EmptyState, OrderPanel.</div></div>
+<div class="dv-opt" id="v3"><div class="dv-olabel"><a class="dv-oid" href="#v3">V3</a>Dashboard · Legnicka · Assistant proposal: 2 × Matowa, HQ available 18 · 1280</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="salon" user="marta" stage="start" panel="proposal" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-card, mat-chip, mat-icon-button (qty), mat-stroked-button (Edit), mat-flat-button (Submit request). <b>Custom:</b> OrderProposal.</div></div>
+<div class="dv-opt" id="v15"><div class="dv-olabel"><a class="dv-oid" href="#v15">V15</a>Dashboard · Legnicka · Batch from assistant: “2 Pomady Matowe, 3 Sól Morska i 1 olejek Savage” → 3 lines · 1280</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="salon" user="marta" stage="start" panel="batch" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,900px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-tab-group, mat-form-field textarea, mat-chip, mat-list (request list), mat-icon-button (− / + / remove), mat-flat-button. <b>Custom:</b> RequestList + RequestLine (shared by Assistant and Manual; lines are tagged “From assistant” or “Added manually”). Submitting creates one request per product.</div></div>
+<div class="dv-opt" id="v10"><div class="dv-olabel"><a class="dv-oid" href="#v10">V10</a>Dashboard · Legnicka · Manual batch (no AI): 3 products on the list · 1280</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="salon" user="marta" stage="start" panel="manual" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-tab-group, mat-form-field + matInput + mat-autocomplete (product), matInput type=number + mat-icon-button (− / +), mat-hint / mat-error, mat-button (Clear), mat-flat-button. <b>Custom:</b> RequestList + RequestLine (qty stepper, HQ available, salon now → after). “Add” puts the product on the list and merges duplicates. The “Request” button in each stock row opens this tab with the product filled in.</div></div>
+<div class="dv-opt" id="v6"><div class="dv-olabel"><a class="dv-oid" href="#v6">V6</a>Request · Legnicka · Dispatched + receipt dialog · 1280 · /requests/REQ-0412</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="request" user="marta" stage="dispatched" dialog="receipt" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-dialog, mat-form-field, mat-checkbox, mat-button / mat-flat-button. <b>Custom:</b> NextStepCard, DeliveryQuantities, StatusTimeline, impact row.</div></div>
+<div class="dv-opt" id="v8"><div class="dv-olabel"><a class="dv-oid" href="#v8">V8</a>Procedures · Zakładowa · Assistant tab · answer + expanded source · 1280 · /procedures</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="procedures" user="kuba" proc="answer" src-open="{{ 0 }}" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,900px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-tab-group (Assistant / Documents), mat-form-field textarea, mat-chip, mat-expansion-panel, mat-flat/stroked-button. <b>Custom:</b> SyntheticLabel, CitedAnswer, SourceExcerpt.</div></div>
+<div class="dv-opt" id="v11"><div class="dv-olabel"><a class="dv-oid" href="#v11">V11</a>Procedures · Zakładowa · Documents tab · view only · 1280 · /procedures?tab=documents</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="procedures" user="kuba" proc-tab="docs" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-tab-group, mat-list (or mat-table ≥ 900px), mat-chip (Superseded; “Public product info” only on public guides), mat-stroked-button (Open). <b>Custom:</b> DocumentRow. No add or delete controls for salon staff.</div></div>
+<div class="dv-opt" id="v9"><div class="dv-olabel"><a class="dv-oid" href="#v9">V9</a>PDF viewer · Zakładowa · opened at cited page 2 · 1280 · /procedures/sources/:versionId?page=2</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="pdf" user="kuba" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,1100px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-button (back), mat-icon-button (page, zoom), mat-stroked-button (Download), mat-chip (version, cited page, Superseded). <b>Custom:</b> PdfViewer: pdf.js canvas with the cited-region overlay.</div></div>
+</div>
+
+<div class="dv-sub" id="g-manual">Manual batch · OrderPanel manual tab states (380 px)</div>
+<div class="dv-opts">
+<div class="dv-opt" id="p12"><div class="dv-olabel"><a class="dv-oid" href="#p12">P12</a>Empty</div><div style="width:380px"><dc-import name="OrderPanel" mode="manualEmpty" hint-size="380px,420px"></dc-import></div></div>
+<div class="dv-opt" id="p13"><div class="dv-olabel"><a class="dv-oid" href="#p13">P13</a>Autocomplete open</div><div style="width:380px;min-height:560px"><dc-import name="OrderPanel" mode="manualAc" hint-size="380px,420px"></dc-import></div></div>
+<div class="dv-opt" id="p2"><div class="dv-olabel"><a class="dv-oid" href="#p2">P2</a>3 products on list · ready</div><div style="width:380px"><dc-import name="OrderPanel" mode="manual" hint-size="380px,560px"></dc-import></div></div>
+<div class="dv-opt" id="p14"><div class="dv-olabel"><a class="dv-oid" href="#p14">P14</a>Invalid quantity</div><div style="width:380px"><dc-import name="OrderPanel" mode="manualInvalid" hint-size="380px,560px"></dc-import></div></div>
+<div class="dv-opt" id="p15"><div class="dv-olabel"><a class="dv-oid" href="#p15">P15</a>Line over HQ stock (not blocking)</div><div style="width:380px"><dc-import name="OrderPanel" mode="manualHigh" hint-size="380px,600px"></dc-import></div></div>
+<div class="dv-opt" id="p16"><div class="dv-olabel"><a class="dv-oid" href="#p16">P16</a>Phase 4 · AI not live (no tabs)</div><div style="width:380px"><dc-import name="OrderPanel" mode="manualEmpty" ai="{{ false }}" hint-size="380px,400px"></dc-import></div></div>
+</div>
+
+<div class="dv-sub" id="g-panel">Assistant panel states (380 px)</div>
+<div class="dv-opts">
+<div class="dv-opt" id="p1"><div class="dv-olabel"><a class="dv-oid" href="#p1">P1</a>Initial</div><div style="width:380px"><dc-import name="OrderPanel" mode="initial" hint-size="380px,300px"></dc-import></div></div>
+<div class="dv-opt" id="p3"><div class="dv-olabel"><a class="dv-oid" href="#p3">P3</a>Preparing</div><div style="width:380px"><dc-import name="OrderPanel" mode="thinking" hint-size="380px,300px"></dc-import></div></div>
+<div class="dv-opt" id="p4"><div class="dv-olabel"><a class="dv-oid" href="#p4">P4</a>One line needs a product pick</div><div style="width:380px"><dc-import name="OrderPanel" mode="clarify" hint-size="380px,420px"></dc-import></div></div>
+<div class="dv-opt" id="p5"><div class="dv-olabel"><a class="dv-oid" href="#p5">P5</a>Proposal · 1 product (demo)</div><div style="width:380px"><dc-import name="OrderPanel" mode="proposal" hint-size="380px,480px"></dc-import></div></div>
+<div class="dv-opt" id="p17"><div class="dv-olabel"><a class="dv-oid" href="#p17">P17</a>Proposal · 3 products</div><div style="width:380px"><dc-import name="OrderPanel" mode="batch" hint-size="380px,640px"></dc-import></div></div>
+<div class="dv-opt" id="p6"><div class="dv-olabel"><a class="dv-oid" href="#p6">P6</a>Not enough at HQ</div><div style="width:380px"><dc-import name="OrderPanel" mode="insufficient" hint-size="380px,480px"></dc-import></div></div>
+<div class="dv-opt" id="p7"><div class="dv-olabel"><a class="dv-oid" href="#p7">P7</a>One line already requested</div><div style="width:380px"><dc-import name="OrderPanel" mode="existing" has-active="{{ true }}" hint-size="380px,380px"></dc-import></div></div>
+<div class="dv-opt" id="p8"><div class="dv-olabel"><a class="dv-oid" href="#p8">P8</a>AI unavailable / timeout</div><div style="width:380px"><dc-import name="OrderPanel" mode="aiDown" hint-size="380px,380px"></dc-import></div></div>
+<div class="dv-opt" id="p9"><div class="dv-olabel"><a class="dv-oid" href="#p9">P9</a>Submitting</div><div style="width:380px"><dc-import name="OrderPanel" mode="sending" hint-size="380px,480px"></dc-import></div></div>
+<div class="dv-opt" id="p10"><div class="dv-olabel"><a class="dv-oid" href="#p10">P10</a>Unknown result</div><div style="width:380px"><dc-import name="OrderPanel" mode="unknown" hint-size="380px,320px"></dc-import></div></div>
+<div class="dv-opt" id="p11"><div class="dv-olabel"><a class="dv-oid" href="#p11">P11</a>Submitted · 1</div><div style="width:380px"><dc-import name="OrderPanel" mode="sent" hint-size="380px,300px"></dc-import></div></div>
+<div class="dv-opt" id="p18"><div class="dv-olabel"><a class="dv-oid" href="#p18">P18</a>Submitted · 3 requests</div><div style="width:380px"><dc-import name="OrderPanel" mode="sentBatch" hint-size="380px,420px"></dc-import></div></div>
+</div>
+
+<div class="dv-sub" id="g-salon-dialogs">Receipt dialogs (mat-dialog)</div>
+<div class="dv-opts">
+<div class="dv-opt" id="d6"><div class="dv-olabel"><a class="dv-oid" href="#d6">D6</a>Receipt · ready</div><div style="width:520px"><dc-import name="RequestDialog" kind="receipt" phase="ready" hint-size="520px,480px"></dc-import></div></div>
+<div class="dv-opt" id="d7"><div class="dv-olabel"><a class="dv-oid" href="#d7">D7</a>Receipt · wrong quantity or damage (blocked)</div><div style="width:520px"><dc-import name="RequestDialog" kind="receipt" phase="ready" mismatch="{{ true }}" hint-size="520px,560px"></dc-import></div></div>
+<div class="dv-opt" id="d8"><div class="dv-olabel"><a class="dv-oid" href="#d8">D8</a>Receipt · sending</div><div style="width:520px"><dc-import name="RequestDialog" kind="receipt" phase="sending" hint-size="520px,500px"></dc-import></div></div>
+</div>
+
+<div class="dv-sub" id="g-salon-states">Page states · 1280 at 50%</div>
+<div class="dv-opts">
+<div class="dv-opt" id="s1"><div class="dv-olabel"><a class="dv-oid" href="#s1">S1</a>Dashboard · stale data</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="salon" user="marta" list="stale" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s2"><div class="dv-olabel"><a class="dv-oid" href="#s2">S2</a>Dashboard · loading</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="salon" user="marta" list="loading" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s3"><div class="dv-olabel"><a class="dv-oid" href="#s3">S3</a>Dashboard · load error (not empty stock)</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="salon" user="marta" list="error" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s4"><div class="dv-olabel"><a class="dv-oid" href="#s4">S4</a>Dashboard · after receipt (Matowa 4)</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="salon" user="marta" stage="received" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s6"><div class="dv-olabel"><a class="dv-oid" href="#s6">S6</a>Request · not found / no access</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="request" user="kuba" req-state="notFound" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s7"><div class="dv-olabel"><a class="dv-oid" href="#s7">S7</a>Request · rejected</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="request" user="marta" stage="rejected" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s10"><div class="dv-olabel"><a class="dv-oid" href="#s10">S10</a>Procedures · not enough in documents</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="kuba" proc="noSources" question="Jak długo mamy na zgłoszenie reklamacji?" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s11"><div class="dv-olabel"><a class="dv-oid" href="#s11">S11</a>Procedures · clarifying question</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="kuba" proc="clarify" question="Mamy problem z dostawą Pomady Matowej." persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s12"><div class="dv-olabel"><a class="dv-oid" href="#s12">S12</a>Procedures · timeout</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="kuba" proc="error" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s13"><div class="dv-olabel"><a class="dv-oid" href="#s13">S13</a>Procedures · source changed mid-answer</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="kuba" proc="changed" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s14"><div class="dv-olabel"><a class="dv-oid" href="#s14">S14</a>PDF · superseded version</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="pdf" user="kuba" pdf="superseded" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s15"><div class="dv-olabel"><a class="dv-oid" href="#s15">S15</a>PDF · invalid page number</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="pdf" user="kuba" pdf="invalidPage" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s16"><div class="dv-olabel"><a class="dv-oid" href="#s16">S16</a>PDF · render error (download)</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="pdf" user="kuba" pdf="renderError" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s17"><div class="dv-olabel"><a class="dv-oid" href="#s17">S17</a>PDF · access withdrawn</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="pdf" user="kuba" pdf="noAccess" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+</div>
+
+<div class="dv-sub" id="g-salon-mobile">Mobile · 390</div>
+<div class="dv-opts">
+<div class="dv-opt" id="m1"><div class="dv-olabel"><a class="dv-oid" href="#m1">M1</a>Dashboard · active request</div><div class="dv-card" style="width:390px"><dc-import name="BarberApp" view="salon" user="marta" stage="submitted" persist="{{ false }}" min-height="{{ 844 }}" hint-size="390px,844px"></dc-import></div></div>
+<div class="dv-opt" id="m6"><div class="dv-olabel"><a class="dv-oid" href="#m6">M6</a>Dashboard · manual order</div><div class="dv-card" style="width:390px"><dc-import name="BarberApp" view="salon" user="marta" panel="manual" persist="{{ false }}" min-height="{{ 844 }}" hint-size="390px,1200px"></dc-import></div></div>
+<div class="dv-opt" id="m2"><div class="dv-olabel"><a class="dv-oid" href="#m2">M2</a>Navigation drawer</div><div class="dv-card" style="width:390px;height:844px"><dc-import name="BarberApp" view="salon" user="marta" nav-open="{{ true }}" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 844 }}" hint-size="390px,844px"></dc-import></div></div>
+<div class="dv-opt" id="m3"><div class="dv-olabel"><a class="dv-oid" href="#m3">M3</a>Receipt dialog</div><div class="dv-card" style="width:390px;height:844px"><dc-import name="BarberApp" view="request" user="marta" stage="dispatched" dialog="receipt" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 844 }}" hint-size="390px,844px"></dc-import></div></div>
+<div class="dv-opt" id="m4"><div class="dv-olabel"><a class="dv-oid" href="#m4">M4</a>Cited answer, sources below</div><div class="dv-card" style="width:390px"><dc-import name="BarberApp" view="procedures" user="kuba" proc="answer" persist="{{ false }}" min-height="{{ 844 }}" hint-size="390px,1400px"></dc-import></div></div>
+<div class="dv-opt" id="m7"><div class="dv-olabel"><a class="dv-oid" href="#m7">M7</a>Documents · view only</div><div class="dv-card" style="width:390px"><dc-import name="BarberApp" view="procedures" user="kuba" proc-tab="docs" persist="{{ false }}" min-height="{{ 844 }}" hint-size="390px,844px"></dc-import></div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="g-hq">
+<div class="dv-thd"><a class="dv-tid" href="#g-hq">C</a><span class="dv-tname">HQ · warehouse</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="v5"><div class="dv-olabel"><a class="dv-oid" href="#v5">V5</a>Request queue · 1 awaiting approval, 1 ready to dispatch (different requests) · 1280 · /hq</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="hq" user="piotr" stage="submitted" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-card per section, mat-list rows (or mat-table ≥ 900px), mat-chip, mat-stroked-button, mat-progress-bar. <b>Custom:</b> QueueRow, EmptyState. No bulk approve and no analytics.</div></div>
+<div class="dv-opt" id="v4"><div class="dv-olabel"><a class="dv-oid" href="#v4">V4</a>Request REQ-0412 · Pending approval · 1280 · /requests/REQ-0412</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="request" user="piotr" stage="submitted" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,900px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-button, mat-chip, mat-flat/stroked-button, mat-dialog. <b>Custom:</b> NextStepCard, DeliveryQuantities, StatusTimeline, StockSummary (all rows for HQ).</div></div>
+<div class="dv-opt" id="v7"><div class="dv-olabel"><a class="dv-oid" href="#v7">V7</a>Request · Completed 2/2/2 · HQ 16 · Legnicka 4 · In transit 0 · 1280</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="request" user="piotr" stage="received" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,900px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-chip, mat-button. <b>Custom:</b> DeliveryQuantities, StatusTimeline, StockSummary.</div></div>
+<div class="dv-opt" id="v12"><div class="dv-olabel"><a class="dv-oid" href="#v12">V12</a>Procedure docs · manage (add / delete) · 1280 · /procedures</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="procedures" user="piotr" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-flat-button (Add document), mat-list / mat-table, mat-chip, mat-stroked-button (Open), mat-icon-button (Delete, with aria-label). <b>Custom:</b> DocumentRow (same component as V11, with manage actions).</div></div>
+<div class="dv-opt" id="v13"><div class="dv-olabel"><a class="dv-oid" href="#v13">V13</a>Add document dialog · file chosen · 1280</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="procedures" user="piotr" doc-dialog="uploadFilled" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-dialog, mat-form-field (Title, Version), mat-select (Origin label, Replaces), mat-hint, mat-progress-bar (determinate), mat-button / mat-flat-button. <b>Custom:</b> PdfDropZone (hidden input type=file, accept=.pdf), SelectedFileRow.</div></div>
+<div class="dv-opt" id="v14"><div class="dv-olabel"><a class="dv-oid" href="#v14">V14</a>Delete document dialog · 1280</div><div class="dv-card" style="width:1280px"><dc-import name="BarberApp" view="procedures" user="piotr" doc-dialog="delete" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div><div class="dv-map" style="width:1280px"><b>Material:</b> mat-dialog (role alertdialog), mat-button, mat-flat-button. <b>Custom:</b> none.</div></div>
+</div>
+
+<div class="dv-sub" id="g-hq-dialogs">Approve · reject · dispatch dialogs (mat-dialog)</div>
+<div class="dv-opts">
+<div class="dv-opt" id="d1"><div class="dv-olabel"><a class="dv-oid" href="#d1">D1</a>Approve · ready</div><div style="width:520px"><dc-import name="RequestDialog" kind="approve" phase="ready" hint-size="520px,460px"></dc-import></div></div>
+<div class="dv-opt" id="d2"><div class="dv-olabel"><a class="dv-oid" href="#d2">D2</a>Approve · sending</div><div style="width:520px"><dc-import name="RequestDialog" kind="approve" phase="sending" hint-size="520px,480px"></dc-import></div></div>
+<div class="dv-opt" id="d3"><div class="dv-olabel"><a class="dv-oid" href="#d3">D3</a>Approve · error</div><div style="width:520px"><dc-import name="RequestDialog" kind="approve" phase="error" hint-size="520px,500px"></dc-import></div></div>
+<div class="dv-opt" id="d4"><div class="dv-olabel"><a class="dv-oid" href="#d4">D4</a>Reject · ready</div><div style="width:520px"><dc-import name="RequestDialog" kind="reject" phase="ready" hint-size="520px,380px"></dc-import></div></div>
+<div class="dv-opt" id="d5"><div class="dv-olabel"><a class="dv-oid" href="#d5">D5</a>Dispatch · ready (HQ 18, reserved 2)</div><div style="width:520px"><dc-import name="RequestDialog" kind="dispatch" phase="ready" hq-stock="{{ 18 }}" reserved="{{ 2 }}" hq-available="{{ 16 }}" hint-size="520px,480px"></dc-import></div></div>
+</div>
+
+<div class="dv-sub" id="g-hq-states">Page states · 1280 at 50%</div>
+<div class="dv-opts">
+<div class="dv-opt" id="s8"><div class="dv-olabel"><a class="dv-oid" href="#s8">S8</a>Queue · after approval (awaiting empty)</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="hq" user="piotr" stage="approved" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s9"><div class="dv-olabel"><a class="dv-oid" href="#s9">S9</a>Queue · all empty</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="hq" user="piotr" hq-state="empty" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s5"><div class="dv-olabel"><a class="dv-oid" href="#s5">S5</a>Request · changed by someone else</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="request" user="piotr" stage="approved" req-state="conflict" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s25"><div class="dv-olabel"><a class="dv-oid" href="#s25">S25</a>Add document · uploading</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="piotr" doc-dialog="uploading" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s26"><div class="dv-olabel"><a class="dv-oid" href="#s26">S26</a>Add document · upload error</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="piotr" doc-dialog="uploadError" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s27"><div class="dv-olabel"><a class="dv-oid" href="#s27">S27</a>Add document · no file yet</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="piotr" doc-dialog="upload" persist="{{ false }}" fixed-height="{{ true }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+<div class="dv-opt" id="s28"><div class="dv-olabel"><a class="dv-oid" href="#s28">S28</a>Procedure docs · empty library</div><div class="dv-card" style="width:640px;height:400px"><div style="width:1280px;transform:scale(.5);transform-origin:0 0"><dc-import name="BarberApp" view="procedures" user="piotr" docs-empty="{{ true }}" persist="{{ false }}" min-height="{{ 800 }}" hint-size="1280px,800px"></dc-import></div></div></div>
+</div>
+
+<div class="dv-sub" id="g-hq-mobile">Mobile · 390</div>
+<div class="dv-opts">
+<div class="dv-opt" id="m5"><div class="dv-olabel"><a class="dv-oid" href="#m5">M5</a>Request queue</div><div class="dv-card" style="width:390px"><dc-import name="BarberApp" view="hq" user="piotr" stage="submitted" persist="{{ false }}" min-height="{{ 844 }}" hint-size="390px,844px"></dc-import></div></div>
+<div class="dv-opt" id="m8"><div class="dv-olabel"><a class="dv-oid" href="#m8">M8</a>Procedure docs · manage</div><div class="dv-card" style="width:390px"><dc-import name="BarberApp" view="procedures" user="piotr" persist="{{ false }}" min-height="{{ 844 }}" hint-size="390px,844px"></dc-import></div></div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+</body>
+</html>

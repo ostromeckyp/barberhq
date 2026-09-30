@@ -1,0 +1,156 @@
+{
+  "brand": "Not Bad Stuff",
+  "sourceSite": "https://notbadstuff.pl/",
+  "observedOn": "2026-09-22",
+  "collectionMethod": "Chrome browser; public product detail pages",
+  "status": "research snapshot, not a live inventory feed",
+  "salons": {
+    "source": "user confirmation",
+    "names": [
+      "Legnicka",
+      "Łódzka",
+      "Zakładowa"
+    ]
+  },
+  "notes": [
+    "demoId values are invented local identifiers, not official SKUs.",
+    "sourceCode preserves the website KOD field as a string; barcode format has not been independently verified.",
+    "Prices are displayed public retail prices in PLN, not B2B or transfer prices.",
+    "Sizes are net contents in ml, not package dimensions or shipping weights.",
+    "Stock levels, transfer pack sizes and internal policies are not established by the catalog."
+  ],
+  "products": [
+    {
+      "demoId": "NBS-MATOWA-100",
+      "name": "Pomada Matowa",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055165",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "displayedRetailPrice": {
+        "amount": 69,
+        "currency": "PLN"
+      },
+      "category": "Pomady",
+      "summaryEn": "Matte finish with medium-strong hold; intended for controlled, classic hairstyles.",
+      "scentPl": "winogronowy",
+      "sourceUrl": "https://notbadstuff.pl/produkt/pomada-matowa-do-wlosow-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null
+    },
+    {
+      "demoId": "NBS-DRYMATT-100",
+      "name": "Pomada Dry Matt",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055035",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "displayedRetailPrice": {
+        "amount": 69,
+        "currency": "PLN"
+      },
+      "category": "Pomady",
+      "summaryEn": "Strong hold with a dry matte finish and pronounced texture.",
+      "scentPl": "owoce leśne",
+      "sourceUrl": "https://notbadstuff.pl/produkt/pomada-dry-matt-do-wlosow-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null
+    },
+    {
+      "demoId": "NBS-CEMENT-100",
+      "name": "Pomada Cement",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055127",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "displayedRetailPrice": {
+        "amount": 69,
+        "currency": "PLN"
+      },
+      "category": "Pomady",
+      "summaryEn": "Matte texturizing pomade for volume and airy, fluffy styles.",
+      "scentPl": "mango-marakuja",
+      "sourceUrl": "https://notbadstuff.pl/produkt/pomada-cement-do-wlosow-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null
+    },
+    {
+      "demoId": "NBS-SOL-200",
+      "name": "Sól Morska",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055080",
+      "netContent": {
+        "value": 200,
+        "unit": "ml"
+      },
+      "displayedRetailPrice": {
+        "amount": 49,
+        "currency": "PLN"
+      },
+      "category": "Lekka Stylizacja",
+      "summaryEn": "Texturizing spray with light hold and a matte finish; standalone styling or a base under pomade.",
+      "scentPl": null,
+      "sourceUrl": "https://notbadstuff.pl/produkt/sol-morska-do-wlosow-200ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null
+    },
+    {
+      "demoId": "NBS-SAVAGE-50",
+      "name": "Olejek do brody | Savage",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055974",
+      "netContent": {
+        "value": 50,
+        "unit": "ml"
+      },
+      "displayedRetailPrice": {
+        "amount": 78,
+        "currency": "PLN"
+      },
+      "category": "Broda zarost i golenie",
+      "summaryEn": "Beard-care product for medium and long beards; helps soften hair and ease combing.",
+      "scentPl": null,
+      "sourceUrl": "https://notbadstuff.pl/produkt/olejek-do-brody-savage-50ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null
+    },
+    {
+      "demoId": "NBS-MATTIFIER-100",
+      "name": "Mattifier",
+      "brand": "Not Bad Stuff",
+      "sourceCode": "5905191055479",
+      "netContent": {
+        "value": 100,
+        "unit": "ml"
+      },
+      "displayedRetailPrice": {
+        "amount": 79,
+        "currency": "PLN"
+      },
+      "category": "Lekka Stylizacja",
+      "summaryEn": "Cream prestyler for blow-drying, natural volume and a matte finish; the brand advises against use on very fine, limp hair.",
+      "scentPl": null,
+      "sourceUrl": "https://notbadstuff.pl/produkt/notbad-mattifier-100ml",
+      "observedOn": "2026-09-22",
+      "transferPackSize": null,
+      "packageDimensionsMm": null,
+      "shippingWeightGrams": null
+    }
+  ]
+}
