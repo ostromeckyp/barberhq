@@ -47,12 +47,28 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/app/core/public-config.ts",
+                  "with": "src/app/core/public-config.generated.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "emulator": {
+              "optimization": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/app/core/public-config.ts",
+                  "with": "src/app/core/public-config.emulator.generated.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -65,6 +81,9 @@
             },
             "development": {
               "buildTarget": "barberhq:build:development"
+            },
+            "emulator": {
+              "buildTarget": "barberhq:build:emulator"
             }
           },
           "defaultConfiguration": "development"

@@ -1,0 +1,24 @@
+{
+  "projectId": "demo-barberhq",
+  "firebase": {
+    "projectId": "demo-barberhq",
+    "apiKey": "emulator-only",
+    "appId": "emulator-only",
+    "authDomain": "localhost"
+  },
+  "functionsRegion": "europe-west1",
+  "dataConnect": {
+    "serviceId": "barberhq",
+    "location": "europe-west1",
+    "browserConnectorId": "browser"
+  },
+  "hostingSiteId": "demo-barberhq",
+  "appCheck": {
+    "siteKey": "emulator-only"
+  },
+  "lowStockThreshold": 2,
+  "replenishmentEnabled": false,
+  "knowledgeEnabled": false,
+  "replenishmentAiEnabled": false,
+  "ragEnabled": false
+}

@@ -1,6 +1,6 @@
 # DevFest demo: BarberHQ
 
-Planning and research only. No application has been implemented or deployed.
+Increment 1 is implemented and verified locally: Angular login and scoped inventory. No cloud deployment has been performed. [Local run / Hosting guide](docs/implementation/deployment-runbook.md) · [current handoff](docs/implementation/handoffs/increment-1.md).
 
 **Confirmed demo: two use cases for Not Bad Stuff.**
 
@@ -11,7 +11,7 @@ The business outcomes are a completed stock movement and access to relevant oper
 
 Start with the [master project specification](.claude/specs/barberhq-master.md) for the purpose, component relationships and links to each implementation phase.
 
-**Implementation planning:** the user approved five working increments. The [delivery design](docs/superpowers/specs/2026-09-29-barberhq-delivery-design.md) is accepted for planning. The [master execution index and seven detailed plans](docs/superpowers/plans/2026-09-29-barberhq-execution-index.md) are ready for review and execution-method selection. They preserve the existing phase requirements.
+**Implementation planning:** the user approved five working increments. The [delivery design](docs/superpowers/specs/2026-09-29-barberhq-delivery-design.md) is accepted for planning. The [master execution index and seven detailed plans](docs/superpowers/plans/2026-09-29-barberhq-execution-index.md) are being executed in Native mode, starting with increment 1 in the existing DevFest folder. They preserve the existing phase requirements.
 
 ## Deliverables
 
@@ -39,10 +39,16 @@ For implementation, read the master specification and delivery design first, the
 - Use SQL Connect's vector search to match the supplied abstract. Firestore Vector is a documented alternative, not a second required database.
 - Seeded fictional stock and policies; no carrier booking, WhatsApp integration, production scheduling, or claims of measured business savings.
 
-## Before implementation
+## Before live business use
 
 Replenishment is confirmed as the demo. Validate the remaining operational rules with the business owner. In particular: are stock counts trustworthy, who confirms dispatch/receipt, and which approved procedures will replace the synthetic corpus? Individual-unit transfers are the chosen demo assumption. SQL Connect/pgvector is the implementation baseline; requiring Firestore would be an explicit change. The documents use explicit demo assumptions until those answers are available.
 
 Research checked on **22 September 2026** using Context7 and official Firebase/Genkit documentation. Feasibility is documentation-based; deployment, model availability, and concurrency behavior still need the small validation steps listed in the research.
 
-The phased handoffs and owner setup guide were added on **27 September 2026**. Canonical PDF generation, cloud setup, ingestion and app implementation remain future work; reuse the existing six-product snapshot without another scrape. On **29 September 2026**, the Claude Design handoff and its intentional product extensions were incorporated into the specs. Its sample PDF remains a design reference pending phase-01 review.
+The phased handoffs and owner setup guide were added on **27 September 2026**. Canonical PDF generation, cloud setup, ingestion and later application increments remain future work; reuse the existing six-product snapshot without another scrape. On **29 September 2026**, the Claude Design handoff and its intentional product extensions were incorporated into the specs. Its sample PDF remains a design reference pending phase-01 review.
+
+## Local implementation
+
+`web/` contains the Angular SPA; `dataconnect/` owns schema and generated GraphQL operations; `scripts/` prepares fixtures, seeds safely and checks builds; `shared/contracts/` contains browser-safe types.
+
+Follow the [runbook](docs/implementation/deployment-runbook.md) for clean installs, emulator startup, generated private local accounts and verification commands. The [owner checklist](docs/implementation/firebase-owner-checklist.md) describes the missing cloud prerequisites. Replenishment commands, PDFs and RAG are later increments.

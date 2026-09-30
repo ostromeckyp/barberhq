@@ -1,4 +1,58 @@
 {
-  "dataconnect": {"source":"dataconnect"},
-  "emulators": {"dataconnect":{"host":"127.0.0.1","port":9399},"auth":{"host":"127.0.0.1","port":9099},"ui":{"enabled":false},"singleProjectMode":true}
+  "dataconnect": {
+    "source": "dataconnect"
+  },
+  "emulators": {
+    "dataconnect": {
+      "host": "127.0.0.1",
+      "port": 9399
+    },
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true,
+    "hosting": {
+      "host": "127.0.0.1",
+      "port": 5002
+    }
+  },
+  "hosting": {
+    "site": "notbad-6be95",
+    "public": "web/dist/barberhq/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.map",
+      "**/*.pdf"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          }
+        ]
+      }
+    ],
+    "predeploy": [
+      "node --import tsx scripts/checks/release.ts"
+    ]
+  }
 }

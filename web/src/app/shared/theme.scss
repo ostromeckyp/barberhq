@@ -1,0 +1,31 @@
+@use '@angular/material' as mat;
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$red-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: (
+        brand-family: 'Archivo Variable',
+        plain-family: 'Archivo Variable',
+      ),
+      density: 0,
+    )
+  );
+  @include mat.theme-overrides(
+    (
+      primary: #dc241f,
+      on-primary: #ffffff,
+      primary-container: #f6dcda,
+      on-primary-container: #8c1d18,
+      surface: #ffffff,
+      on-surface: #171614,
+      surface-container: #f6f5f2,
+      on-surface-variant: #57534c,
+      outline: #8f897f,
+      outline-variant: #e2ded6,
+      error: #b3261e,
+    )
+  );
+}

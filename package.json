@@ -11,9 +11,15 @@
     "typecheck": "tsc --noEmit",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "seed": "node --import tsx scripts/seed/cli.ts",
-    "generate:sdk": "firebase dataconnect:sdk:generate --project notbad-6be95"
+    "generate:sdk": "firebase dataconnect:sdk:generate --project notbad-6be95",
+    "check:hosting": "node --import tsx scripts/checks/hosting.ts",
+    "configure:emulators": "node --import tsx scripts/config/build-web.ts --config config/emulator.example.json --project demo-barberhq --emulator --configure-only",
+    "build:emulator": "node --import tsx scripts/config/build-web.ts --config config/emulator.example.json --project demo-barberhq --emulator",
+    "build:production": "node --import tsx scripts/config/build-web.ts",
+    "demo:local": "node --import tsx scripts/dev/demo.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.63.0",
     "@types/node": "26.6.3",
     "firebase-tools": "15.32.0",

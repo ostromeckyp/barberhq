@@ -6,7 +6,7 @@ The app is being prepared locally. Owner project: `notbad-6be95`. Read access ve
 2. Register a Web app and copy its public Firebase configuration. Do not send passwords or service-account keys.
 3. Enable Authentication → Email/Password. Prepare one HQ and three salon accounts (Legnicka, Łódzka, Zakładowa). Record UIDs in a local ignored file, not committed documents.
 4. Choose a compatible European location before provisioning SQL Connect/Data Connect and Cloud SQL. Record service ID, location, instance and database. The agent supplies schema and connector code; do not create tables manually.
-5. Prepare classic Hosting (not App Hosting). Record site ID. Add actual development/live domains to Auth settings where required.
+5. Classic Hosting site `notbad-6be95` already exists (read-only discovery). Confirm this is the intended demo destination. Add actual development/live domains to Auth settings where required.
 6. Register the Web app in App Check using reCAPTCHA Enterprise. Record the public site key. Keep any local debug token private; do not disable enforcement to pass cloud checks.
 
 Storage, embeddings and Gemini are later checkpoints and do not block the first inventory screen.
