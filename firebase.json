@@ -1,0 +1,4 @@
+{
+  "dataconnect": {"source":"dataconnect"},
+  "emulators": {"dataconnect":{"host":"127.0.0.1","port":9399},"auth":{"host":"127.0.0.1","port":9099},"ui":{"enabled":false},"singleProjectMode":true}
+}

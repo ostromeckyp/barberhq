@@ -1,0 +1,8 @@
+connectorId: browser
+generate:
+  javascriptSdk:
+    outputDir: ../../web/src/app/core/generated
+    package: '@barberhq/browser'
+  adminNodeSdk:
+    outputDir: ../../scripts/generated/browser
+    package: '@barberhq/browser-admin'

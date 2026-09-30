@@ -1,0 +1,47 @@
+type Business @table(key: "id") {
+  id: String!
+  name: String!
+}
+enum MemberRole { HQ SALON }
+enum LocationKind { HQ SALON }
+type Membership @table(key: "uid") {
+  uid: String!
+  business: Business!
+  role: MemberRole!
+}
+type Location @table(key: "id") @unique(fields: ["business", "key"]) {
+  id: String!
+  business: Business!
+  key: String!
+  name: String!
+  kind: LocationKind!
+}
+type SalonAccess @table(key: ["membership", "location"]) {
+  membership: Membership!
+  location: Location!
+}
+type Product @table(key: "id") @unique(fields: ["business", "demoId"]) {
+  id: String!
+  business: Business!
+  demoId: String!
+  name: String!
+  brand: String!
+  category: String!
+  summaryEn: String!
+  scentPl: String
+  sourceCode: String!
+  netContentMl: Int!
+  retailPriceGrosz: Int!
+  sourceUrl: String!
+  observedOn: Date!
+  transferPackSize: Int
+  packageDimensionsMm: Any
+  shippingWeightGrams: Int
+}
+type Inventory @table(key: ["location", "product"]) {
+  location: Location!
+  product: Product!
+  onHand: Int!
+  reserved: Int! @default(value: 0)
+  version: Int! @default(value: 1)
+}

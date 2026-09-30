@@ -1,0 +1,28 @@
+query ReadSeedState($businessId: String!) @auth(level: NO_ACCESS) {
+  business(id: $businessId) { id name }
+  locations(where: {businessId: {eq: $businessId}}, limit: 100) { id key }
+  products(where: {businessId: {eq: $businessId}}, limit: 100) { id demoId }
+  inventories(where: {location: {businessId: {eq: $businessId}}}, limit: 1000) { locationId productId onHand reserved version }
+}
+query ReadMembership($uid: String!) @auth(level: NO_ACCESS) {
+  membership(key: {uid: $uid}) { uid businessId role }
+}
+mutation UpsertBusiness($id: String!, $name: String!) @auth(level: NO_ACCESS) {
+  business_upsert(data: {id: $id, name: $name})
+}
+mutation UpsertLocation($id: String!, $businessId: String!, $key: String!, $name: String!, $kind: LocationKind!) @auth(level: NO_ACCESS) {
+  location_upsert(data: {id: $id, businessId: $businessId, key: $key, name: $name, kind: $kind})
+}
+mutation UpsertProduct($id: String!, $businessId: String!, $demoId: String!, $name: String!, $brand: String!, $category: String!, $summaryEn: String!, $scentPl: String, $sourceCode: String!, $netContentMl: Int!, $retailPriceGrosz: Int!, $sourceUrl: String!, $observedOn: Date!) @auth(level: NO_ACCESS) {
+  product_upsert(data: {id:$id, businessId:$businessId, demoId:$demoId, name:$name, brand:$brand, category:$category, summaryEn:$summaryEn, scentPl:$scentPl, sourceCode:$sourceCode, netContentMl:$netContentMl, retailPriceGrosz:$retailPriceGrosz, sourceUrl:$sourceUrl, observedOn:$observedOn})
+}
+mutation InsertInventory($locationId: String!, $productId: String!, $onHand: Int!) @auth(level: NO_ACCESS) {
+  inventory_insert(data: {locationId:$locationId, productId:$productId, onHand:$onHand, reserved:0, version:1})
+}
+mutation UpsertMembership($uid: String!, $businessId: String!, $role: MemberRole!) @auth(level: NO_ACCESS) @transaction {
+  membership_upsert(data: {uid:$uid, businessId:$businessId, role:$role})
+  salonAccess_deleteMany(where: {membershipUid:{eq:$uid}})
+}
+mutation UpsertSalonAccess($uid: String!, $locationId: String!) @auth(level: NO_ACCESS) {
+  salonAccess_upsert(data: {membershipUid:$uid, locationId:$locationId})
+}

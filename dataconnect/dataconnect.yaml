@@ -1,0 +1,13 @@
+# Proposed local identifiers; owner must confirm region/instance before cloud deployment.
+specVersion: v1
+serviceId: barberhq
+location: europe-west1
+schemaValidation: COMPATIBLE
+schema:
+  source: ./schema
+  datasource:
+    postgresql:
+      database: barberhq
+      cloudSql:
+        instanceId: barberhq
+connectorDirs: [./browser, ./server]

@@ -17,3 +17,5 @@ playwright-report/
 test-results/
 web/src/app/core/public-config.generated.ts
 .dataconnect/
+
+pglite-debug.log*

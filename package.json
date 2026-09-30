@@ -8,7 +8,10 @@
     "test:web": "node scripts/checks/web-test.mjs",
     "test:e2e": "playwright test",
     "prepare:data": "node --import tsx scripts/prepare-data/cli.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "seed": "node --import tsx scripts/seed/cli.ts",
+    "generate:sdk": "firebase dataconnect:sdk:generate --project notbad-6be95"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
@@ -19,6 +22,9 @@
     "vitest": "5.0.2"
   },
   "dependencies": {
+    "@barberhq/browser": "file:web/src/app/core/generated",
+    "@barberhq/browser-admin": "file:scripts/generated/browser",
+    "@barberhq/server": "file:scripts/generated/server",
     "firebase": "12.19.0",
     "firebase-admin": "14.5.0",
     "zod": "4.6.5"
