@@ -6,11 +6,18 @@
   </header>
   @if (facade.submission.pending()) {
     <div class="warning" role="status">
-      There are saved requests to reconcile. Their quantities are frozen until the result is known.
+      Saved requests for {{ facade.savedSalonName() }} have a result to reconcile. Their quantities
+      are frozen until it is known.
     </div>
-    <button mat-flat-button (click)="facade.resume()" [disabled]="facade.submission.busy()">
-      {{ facade.submission.busy() ? 'Checking…' : 'Reconcile saved requests' }}
-    </button>
+    @if (facade.pendingElsewhere()) {
+      <a mat-stroked-button [routerLink]="['/salons', facade.submission.savedSalonId()]"
+        >Open {{ facade.savedSalonName() }} to reconcile</a
+      >
+    } @else {
+      <button mat-flat-button (click)="facade.resume()" [disabled]="facade.submission.busy()">
+        {{ facade.submission.busy() ? 'Checking…' : 'Reconcile saved requests' }}
+      </button>
+    }
   }
   <fieldset [disabled]="facade.locked()">
     <legend class="sr-only">Add a product</legend>
@@ -91,7 +98,7 @@
     <p class="error" role="alert">{{ facade.submission.error() }}</p>
   }
   <div aria-live="polite">
-    @for (row of facade.submission.rows(); track row.lineId) {
+    @for (row of facade.results(); track row.lineId) {
       <p>
         {{ row.payload.quantity }} pcs · {{ row.status }}
         @if (row.requestId) {

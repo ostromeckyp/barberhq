@@ -15,6 +15,8 @@ export class SubmissionService {
   private readonly storage = inject(PendingSubmissionStore);
   private readonly working = signal(false);
   private readonly unresolved = signal(false);
+  private readonly savedSalon = signal<string | undefined>(undefined);
+  readonly savedSalonId = this.savedSalon.asReadonly();
   private readonly outcomes = signal<SubmissionRow[]>([]);
   readonly busy = this.working.asReadonly();
   readonly pending = this.unresolved.asReadonly();
@@ -24,13 +26,17 @@ export class SubmissionService {
     effect(() => {
       const state = this.session.state();
       untracked(() => {
-        if (state.status === 'LOADING') return;
+        if (state.status === 'LOADING' || state.status === 'ERROR') return;
         const pending = this.storage.load();
         if (state.status !== 'READY' || (pending && !this.owns(pending))) {
           this.storage.clear();
           this.unresolved.set(false);
+          this.savedSalon.set(undefined);
           this.outcomes.set([]);
-        } else this.unresolved.set(!!pending?.rows.length);
+        } else {
+          this.unresolved.set(!!pending?.rows.length);
+          this.savedSalon.set(pending?.salonId);
+        }
       });
     });
   }
@@ -78,18 +84,20 @@ export class SubmissionService {
     }
     return this.run(batch);
   }
-  async resume(): Promise<SubmissionRow[]> {
-    if (this.busy()) return this.rows();
+  async resume(salonId: string): Promise<SubmissionRow[]> {
+    if (this.busy() || this.session.state().status !== 'READY') return this.rows();
     const batch = this.storage.load();
-    if (!batch) return this.rows();
+    if (!batch || batch.salonId !== salonId) return this.rows();
     if (!this.owns(batch)) {
       this.storage.clear();
       this.unresolved.set(false);
+      this.savedSalon.set(undefined);
       return [];
     }
     return this.run(batch);
   }
   private async run(batch: PendingSubmission): Promise<SubmissionRow[]> {
+    this.savedSalon.set(batch.salonId);
     this.working.set(true);
     this.unresolved.set(true);
     this.error.set('');
@@ -132,7 +140,11 @@ export class SubmissionService {
       );
     } finally {
       this.working.set(false);
-      this.unresolved.set(this.owns(batch) && batch.rows.length > 0);
+      const status = this.session.state().status;
+      const retain =
+        batch.rows.length > 0 && (this.owns(batch) || status === 'ERROR' || status === 'LOADING');
+      this.unresolved.set(retain);
+      this.savedSalon.set(retain ? batch.salonId : undefined);
     }
     return this.rows();
   }

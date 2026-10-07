@@ -12,7 +12,7 @@
 
 **Spec:** [Approved delivery design](../specs/2026-09-29-barberhq-delivery-design.md), increment 2; original phase 2 stock requirements and phase 4 replenishment UI; approved extensions §1 and §3.
 
-**Status:** Ready for user review; execution not authorized by this file. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
+**Status:** User-authorized local implementation and independent review completed on 7 October 2026. Cloud acceptance remains BLOCKED; see the [increment 2 handoff](../../implementation/handoffs/increment-2.md). Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
 
 ## Global Constraints
 

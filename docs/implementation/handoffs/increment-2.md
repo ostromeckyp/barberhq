@@ -17,7 +17,11 @@ Local Auth + SQL Connect (PostgreSQL) + Functions emulators exercised by integra
 
 Browser coverage: golden flow, blocked damaged/partial receipt, three-product batch interrupted after the first server commit and recovered after reload with the same key, active product exclusion, stale approval requiring review, rejection reason, plus existing foundation tests. Accessibility checked with Axe; detail layout checked at 1280/360/320px.
 
-Final counts and review findings are recorded after the final verification pass below.
+Final verification (7 October 2026): root unit tests **28/28**, Angular tests **21/21**, Auth/SQL integration **12/12**, Playwright **9/9**. Root typecheck, Functions build and optimized emulator build passed. An isolated copy of the deployable Functions directory loaded all five callable exports after installing production dependencies, without parent project sources.
+
+One independent review found two important recovery issues; both were reproduced before fixing and verified after: transient membership-read errors now preserve unresolved keys/rows, and a saved basket can only resume from its original salon page. The UI names that salon and provides a return link. No additional reviewer findings were deferred. Build still warns that the initial bundle is ~542 kB versus the 500 kB warning budget; it remains below the configured error limit.
+
+The completed code is on `codex/foundation`; no merge, push or cloud deployment was performed. User-staged skills and local settings were preserved.
 
 ## Local run
 
@@ -61,3 +65,14 @@ Replace `--dry-run` with `--apply` only when ready; apply also prints its dry-ru
 ## Remaining cloud gate
 
 Provision/verify Auth, SQL Connect/Cloud SQL, Functions IAM and App Check; configure the real web application; deploy approved schema/connectors/functions and Hosting; rerun cloud concurrency, auth, App Check and browser checks against the explicit project. Only then mark this increment READY. No billing resources or cloud deployments were created by this increment.
+
+## Implementation decisions and limits
+
+- Continued in the existing user-selected workspace and retained the accepted facade/data-access/UI layout. This requires explicit path staging to preserve unrelated changes.
+- Implemented locally despite missing cloud prerequisites; emulator results do not establish deployed Cloud SQL/App Check behavior.
+- The repository derives actor scope from verified UID instead of accepting an externally constructed actor object; each SQL transaction rechecks authorization.
+- Unused server context branches use empty ID sentinels because nullable key inputs were rejected at runtime. Public IDs must remain nonempty.
+- Added ActionKey for semantic retry aliases; one small SQL table and an extra transactional write prevent conflicting reuse of a replay key.
+- Reset requires an operator declaration of quiescence; concurrent writes are unsupported during rehearsal reset.
+- Combined the already accepted uncommitted Angular refactor and replenishment implementation into one scoped implementation commit, followed by the review-fix commit; this increases the first diff size but preserves connected interfaces.
+- Deployed concurrency/App Check, concurrent reset and future AI/PDF were outside the review's evidence/scope. Cloud verification remains mandatory; reset stays quiescent-only; PDF/RAG follow in their own increments.

@@ -97,8 +97,12 @@ test("two_units_move_once; damaged_receipt_is_blocked; accessible responsive lif
   for (const width of [1280, 360, 320]) {
     await salon.setViewportSize({ width, height: 900 });
     if (width < 760) {
-      await expect(salon.getByRole('navigation', {name:'Main navigation'})).toBeHidden();
-      await expect.poll(async()=> (await salon.locator('main').boundingBox())!.width).toBeGreaterThanOrEqual(width - 1);
+      await expect(
+        salon.getByRole("navigation", { name: "Main navigation" }),
+      ).toBeHidden();
+      await expect
+        .poll(async () => (await salon.locator("main").boundingBox())!.width)
+        .toBeGreaterThanOrEqual(width - 1);
     }
     expect(
       await salon.evaluate(
@@ -242,4 +246,52 @@ test("stale_approval_requires_review_and_rejection_requires_reason", async ({
     .click();
   await expect(dialog).toBeHidden();
   await expect(page.getByText("Please verify the salon count.")).toBeVisible();
+});
+test("saved_batch_links_back_to_its_salon_before_reconciliation", async ({
+  page,
+}) => {
+  await h.operator.executeGraphql(
+    "mutation($uid:String!,$id:String!){salonAccess_upsert(data:{membershipUid:$uid,locationId:$id})}",
+    { variables: { uid: h.users.legnicka, id: `${h.businessId}:lodzka` } },
+  );
+  await login(page, "legnicka");
+  await expect(
+    page.getByRole("heading", { name: "Legnicka", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "Request Olejek do brody | Savage",
+      exact: true,
+    })
+    .click();
+  await page.getByRole("button", { name: "Add to list", exact: true }).click();
+  let lost = false;
+  await page.route("**/europe-west1/submitRequest", async (route) => {
+    if (route.request().method() === "POST" && !lost) {
+      lost = true;
+      await route.fetch();
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await page
+    .getByRole("button", { name: "Submit requests", exact: true })
+    .click();
+  await expect(page.getByText("2 pcs · UNKNOWN")).toBeVisible();
+  await page.goto(`/salons/${encodeURIComponent(h.businessId + ":lodzka")}`);
+  await expect(
+    page.getByRole("heading", { name: "Łódzka", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Reconcile saved requests", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "Open Legnicka to reconcile", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Legnicka", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Reconcile saved requests", exact: true })
+    .click();
+  await expect(page.getByText("2 pcs · CREATED")).toBeVisible();
 });

@@ -1,4 +1,4 @@
-import {TestBed} from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { expect, it } from 'vitest';
 import { validPending, PENDING_STORAGE, PendingSubmissionStore } from './pending-submission.store';
 it('rejects_untrusted_restored_payloads_and_duplicate_products', () => {
@@ -26,7 +26,21 @@ it('rejects_untrusted_restored_payloads_and_duplicate_products', () => {
   ).toBe(false);
   expect(validPending({ ...batch, rows: [{ ...row, status: 'CREATED' }] })).toBe(false);
 });
-it('unavailable_browser_storage_does_not_crash_the_page',()=>{
- TestBed.configureTestingModule({providers:[{provide:PENDING_STORAGE,useValue:{getItem(){throw new Error('Denied');},removeItem(){throw new Error('Denied');}}}]});
- expect(()=>TestBed.inject(PendingSubmissionStore).load()).not.toThrow();
+it('unavailable_browser_storage_does_not_crash_the_page', () => {
+  TestBed.configureTestingModule({
+    providers: [
+      {
+        provide: PENDING_STORAGE,
+        useValue: {
+          getItem() {
+            throw new Error('Denied');
+          },
+          removeItem() {
+            throw new Error('Denied');
+          },
+        },
+      },
+    ],
+  });
+  expect(() => TestBed.inject(PendingSubmissionStore).load()).not.toThrow();
 });

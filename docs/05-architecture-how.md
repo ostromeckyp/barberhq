@@ -138,7 +138,8 @@ All domain keys include or are checked against `businessId`; never allow a cross
 | `ActiveRequest` | Unique business/salon/product slot referencing the current open request |
 | `Transfer` | Unique request reference; warehouse/destination/product/quantity; dispatch and receipt quantities/times |
 | `StockMovement` | Unique transfer/movement-type; `DISPATCH` or `RECEIPT`, quantity, actor/time |
-| `ActionReceipt` | Unique business/actor/idempotency-key and unique request/action; payload hash and committed result |
+| `ActionReceipt` | Unique original business/actor/idempotency-key and unique request/action; payload hash and immutable committed result |
+| `ActionKey` | Unique business/actor/idempotency-key, including semantic retry aliases; binds payload hash to the original ActionReceipt |
 | `KnowledgeDocument` | Stable business/document ID; pointer to active version and publication revision |
 | `KnowledgeVersion` | Unique document/version; title, status, language, synthetic flag, bucket/object path and generation, PDF SHA-256, content type, byte size, page count, parser version, extraction hash, ingestion state, processing error/attempt, revokedAt, revision and reviewedBy/At/coverage |
 | `KnowledgePage` | Unique version/physical-page number; extracted page text, optional printed page label, extraction quality/review state, PDF view box, user unit and intrinsic rotation |

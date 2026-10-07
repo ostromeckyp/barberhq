@@ -40,6 +40,17 @@ export class OrderFacade {
   readonly requests = computed(() => (this.active.hasValue() ? this.active.value() : []));
   readonly loading = this.active.isLoading;
   readonly error = computed(() => !!this.active.error());
+  readonly pendingElsewhere = computed(
+    () => !!this.submission.savedSalonId() && this.submission.savedSalonId() !== this.salonId(),
+  );
+  readonly savedSalonName = computed(
+    () =>
+      this.session.salons().find((s) => s.id === this.submission.savedSalonId())?.name ??
+      'saved salon',
+  );
+  readonly results = computed(() =>
+    this.submission.rows().filter((row) => row.payload.salonId === this.salonId()),
+  );
   readonly locked = computed(() => this.submission.busy() || this.submission.pending());
   readonly canSubmit = computed(
     () =>
@@ -98,7 +109,7 @@ export class OrderFacade {
     this.reconcile();
   }
   async resume() {
-    await this.submission.resume();
+    await this.submission.resume(this.salonId()!);
     this.reconcile();
   }
   private reconcile() {

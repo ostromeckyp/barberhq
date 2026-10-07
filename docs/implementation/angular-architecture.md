@@ -83,3 +83,5 @@ Replenishment should add its own feature facade and data-access adapter, reusing
 - `features/hq-queue/feature`: paged authoritative queue, divided into pending, reserved and other requests.
 
 Drafts stay in memory. Only explicitly submitted, unresolved rows are stored in sessionStorage, with user/business/salon scope and immutable action keys. Confirmed rows are removed; logout clears pending storage. SQL remains the authority for authorization and quantities.
+
+Recovery after a transient session ERROR preserves the frozen batch while blocking sends. `SubmissionService.resume(salonId)` requires the current page to match the saved salon; the order facade exposes its name and a navigation link when another salon is open.
