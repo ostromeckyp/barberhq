@@ -45,3 +45,7 @@ Rehearsal evidence (7 October): full Auth/PostgreSQL backup exported before code
 Cloud `notbad-6be95` uses the same explicit targeting rules and refuses emulator configuration. No cloud deployment or data mutation is authorized merely by running export/verify. Real Cloud SQL verification remains a release gate.
 
 Rollback was also rehearsed: the isolated service was restarted with the original schema and full emulator export. A fresh business export matched the original backup checksum after normalizing only the export timestamp, including all original records and balances.
+
+### Salon settings defaults
+
+After importing request items, run the ordinary business seed against the same explicit target to insert missing `SalonSettings` rows (threshold 2, version 1). This step preserves existing settings and inventory. Verify one row per salon before reopening clients. Reset preserves settings. Missing rows are setup errors, never client defaults.

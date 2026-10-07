@@ -1,5 +1,6 @@
 query ReadSeedState($businessId: String!) @auth(level: NO_ACCESS) {
   business(id: $businessId) { id name }
+  salonSettings:salonSettingss(where:{salon:{businessId:{eq:$businessId}}},limit:100){salonId lowStockThreshold version updatedAt}
   locations(where: {businessId: {eq: $businessId}}, limit: 100) { id key }
   products(where: {businessId: {eq: $businessId}}, limit: 100) { id demoId }
   inventories(where: {location: {businessId: {eq: $businessId}}}, limit: 1000) { locationId productId onHand reserved version }
@@ -50,4 +51,8 @@ mutation ResetDemoStock($businessId:String!, $productIds:[String!]!) @auth(level
   requests: replenishmentRequest_deleteMany(where:{businessId:{eq:$businessId}})
   hq: inventory_updateMany(where:{location:{businessId:{eq:$businessId},key:{eq:"hq"}},productId:{in:$productIds}},data:{onHand:18,reserved:0,version_update:{inc:1}}) @check(expr:"this == 6",message:"Unexpected demo inventory; reset rolled back")
   salons: inventory_updateMany(where:{location:{businessId:{eq:$businessId},key:{in:["legnicka","lodzka","zakladowa"]}},productId:{in:$productIds}},data:{onHand:2,reserved:0,version_update:{inc:1}}) @check(expr:"this == 18",message:"Unexpected demo inventory; reset rolled back")
+}
+
+mutation InsertSalonSettings($salonId:String!) @auth(level:NO_ACCESS) {
+ salonSettings_insert(data:{salonId:$salonId,lowStockThreshold:2,version:1})
 }

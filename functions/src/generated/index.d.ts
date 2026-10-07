@@ -160,6 +160,14 @@ export interface InsertInventoryVariables {
   onHand: number;
 }
 
+export interface InsertSalonSettingsData {
+  salonSettings_insert: SalonSettings_Key;
+}
+
+export interface InsertSalonSettingsVariables {
+  salonId: string;
+}
+
 export interface Inventory_Key {
   locationId: string;
   productId: string;
@@ -232,6 +240,12 @@ export interface ReadSeedStateData {
     id: string;
     name: string;
   } & Business_Key;
+  salonSettings: ({
+    salonId: string;
+    lowStockThreshold: number;
+    version: number;
+    updatedAt: TimestampString;
+  } & SalonSettings_Key)[];
   locations: ({
     id: string;
     key: string;
@@ -350,6 +364,11 @@ export interface SalonAccess_Key {
   membershipUid: string;
   locationId: string;
   __typename?: 'SalonAccess_Key';
+}
+
+export interface SalonSettings_Key {
+  salonId: string;
+  __typename?: 'SalonSettings_Key';
 }
 
 export interface StockContextData {
@@ -600,6 +619,11 @@ export function readResetCounts(vars: ReadResetCountsVariables, options?: Operat
 export function resetDemoStock(dc: DataConnect, vars: ResetDemoStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetDemoStockData>>;
 /** Generated Node Admin SDK operation action function for the 'ResetDemoStock' Mutation. Allow users to pass in custom DataConnect instances. */
 export function resetDemoStock(vars: ResetDemoStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetDemoStockData>>;
+
+/** Generated Node Admin SDK operation action function for the 'InsertSalonSettings' Mutation. Allow users to execute without passing in DataConnect. */
+export function insertSalonSettings(dc: DataConnect, vars: InsertSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertSalonSettingsData>>;
+/** Generated Node Admin SDK operation action function for the 'InsertSalonSettings' Mutation. Allow users to pass in custom DataConnect instances. */
+export function insertSalonSettings(vars: InsertSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertSalonSettingsData>>;
 
 /** Generated Node Admin SDK operation action function for the 'StockContext' Query. Allow users to execute without passing in DataConnect. */
 export function stockContext(dc: DataConnect, vars: StockContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StockContextData>>;

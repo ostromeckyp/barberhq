@@ -1,4 +1,4 @@
-import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, ExecuteQueryOptions } from 'firebase/data-connect';
+import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, ExecuteQueryOptions, MutationRef, MutationPromise } from 'firebase/data-connect';
 
 export const connectorConfig: ConnectorConfig;
 
@@ -149,6 +149,19 @@ export interface GetSalonInventoryVariables {
   salonId: string;
   limit?: number;
   offset?: number;
+}
+
+export interface GetSalonSettingsData {
+  settings?: {
+    salonId: string;
+    lowStockThreshold: number;
+    version: number;
+    updatedAt: TimestampString;
+  } & SalonSettings_Key;
+}
+
+export interface GetSalonSettingsVariables {
+  salonId: string;
 }
 
 export interface Inventory_Key {
@@ -319,6 +332,29 @@ export interface SalonAccess_Key {
   __typename?: 'SalonAccess_Key';
 }
 
+export interface SalonSettings_Key {
+  salonId: string;
+  __typename?: 'SalonSettings_Key';
+}
+
+export interface SaveSalonSettingsData {
+  changed: number;
+  result?: {
+    settings?: {
+      salonId: string;
+      lowStockThreshold: number;
+      version: number;
+      updatedAt: TimestampString;
+    } & SalonSettings_Key;
+  };
+}
+
+export interface SaveSalonSettingsVariables {
+  salonId: string;
+  lowStockThreshold: number;
+  expectedVersion: number;
+}
+
 export interface StockMovement_Key {
   transferItemRequestItemId: string;
   type: MovementType;
@@ -370,6 +406,30 @@ export const getSalonInventoryRef: GetSalonInventoryRef;
 
 export function getSalonInventory(vars: GetSalonInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonInventoryData, GetSalonInventoryVariables>;
 export function getSalonInventory(dc: DataConnect, vars: GetSalonInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonInventoryData, GetSalonInventoryVariables>;
+
+interface GetSalonSettingsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSalonSettingsVariables): QueryRef<GetSalonSettingsData, GetSalonSettingsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetSalonSettingsVariables): QueryRef<GetSalonSettingsData, GetSalonSettingsVariables>;
+  operationName: string;
+}
+export const getSalonSettingsRef: GetSalonSettingsRef;
+
+export function getSalonSettings(vars: GetSalonSettingsVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonSettingsData, GetSalonSettingsVariables>;
+export function getSalonSettings(dc: DataConnect, vars: GetSalonSettingsVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonSettingsData, GetSalonSettingsVariables>;
+
+interface SaveSalonSettingsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SaveSalonSettingsVariables): MutationRef<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SaveSalonSettingsVariables): MutationRef<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+  operationName: string;
+}
+export const saveSalonSettingsRef: SaveSalonSettingsRef;
+
+export function saveSalonSettings(vars: SaveSalonSettingsVariables): MutationPromise<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+export function saveSalonSettings(dc: DataConnect, vars: SaveSalonSettingsVariables): MutationPromise<SaveSalonSettingsData, SaveSalonSettingsVariables>;
 
 interface ListActiveRequestsRef {
   /* Allow users to create refs without passing in DataConnect */

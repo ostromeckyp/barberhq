@@ -146,6 +146,19 @@ export interface GetSalonInventoryVariables {
   offset?: number;
 }
 
+export interface GetSalonSettingsData {
+  settings?: {
+    salonId: string;
+    lowStockThreshold: number;
+    version: number;
+    updatedAt: TimestampString;
+  } & SalonSettings_Key;
+}
+
+export interface GetSalonSettingsVariables {
+  salonId: string;
+}
+
 export interface Inventory_Key {
   locationId: string;
   productId: string;
@@ -314,6 +327,29 @@ export interface SalonAccess_Key {
   __typename?: 'SalonAccess_Key';
 }
 
+export interface SalonSettings_Key {
+  salonId: string;
+  __typename?: 'SalonSettings_Key';
+}
+
+export interface SaveSalonSettingsData {
+  changed: number;
+  result?: {
+    settings?: {
+      salonId: string;
+      lowStockThreshold: number;
+      version: number;
+      updatedAt: TimestampString;
+    } & SalonSettings_Key;
+  };
+}
+
+export interface SaveSalonSettingsVariables {
+  salonId: string;
+  lowStockThreshold: number;
+  expectedVersion: number;
+}
+
 export interface StockMovement_Key {
   transferItemRequestItemId: string;
   type: MovementType;
@@ -344,6 +380,16 @@ export function listProducts(vars?: ListProductsVariables, options?: OperationOp
 export function getSalonInventory(dc: DataConnect, vars: GetSalonInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonInventoryData>>;
 /** Generated Node Admin SDK operation action function for the 'GetSalonInventory' Query. Allow users to pass in custom DataConnect instances. */
 export function getSalonInventory(vars: GetSalonInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonInventoryData>>;
+
+/** Generated Node Admin SDK operation action function for the 'GetSalonSettings' Query. Allow users to execute without passing in DataConnect. */
+export function getSalonSettings(dc: DataConnect, vars: GetSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonSettingsData>>;
+/** Generated Node Admin SDK operation action function for the 'GetSalonSettings' Query. Allow users to pass in custom DataConnect instances. */
+export function getSalonSettings(vars: GetSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonSettingsData>>;
+
+/** Generated Node Admin SDK operation action function for the 'SaveSalonSettings' Mutation. Allow users to execute without passing in DataConnect. */
+export function saveSalonSettings(dc: DataConnect, vars: SaveSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveSalonSettingsData>>;
+/** Generated Node Admin SDK operation action function for the 'SaveSalonSettings' Mutation. Allow users to pass in custom DataConnect instances. */
+export function saveSalonSettings(vars: SaveSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveSalonSettingsData>>;
 
 /** Generated Node Admin SDK operation action function for the 'ListActiveRequests' Query. Allow users to execute without passing in DataConnect. */
 export function listActiveRequests(dc: DataConnect, vars: ListActiveRequestsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListActiveRequestsData>>;

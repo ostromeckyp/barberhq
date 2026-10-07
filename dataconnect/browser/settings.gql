@@ -1,0 +1,18 @@
+query GetSalonSettings($salonId:String!) @auth(level:USER) {
+ membership(key:{uid_expr:"auth.uid"}) @redact @check(expr:"this != null && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a,a.locationId == vars.salonId)) && this.business.locations_on_business.size() == 1",message:"FORBIDDEN") {
+  role salonAccesses_on_membership {locationId}
+  business {locations_on_business(where:{id:{eq:$salonId},kind:{eq:SALON}},limit:1){id}}
+ }
+ settings:salonSettings(key:{salonId:$salonId}) @check(expr:"this != null",message:"SETUP_REQUIRED") {salonId lowStockThreshold version updatedAt}
+}
+mutation SaveSalonSettings($salonId:String!,$lowStockThreshold:Int!,$expectedVersion:Int!) @auth(level:USER) @transaction {
+ query @redact {
+  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a,a.locationId == vars.salonId)) && this.business.locations_on_business.size() == 1",message:"FORBIDDEN") {
+   role salonAccesses_on_membership {locationId}
+   business {locations_on_business(where:{id:{eq:$salonId},kind:{eq:SALON}},limit:1){id}}
+  }
+  salonSettings(key:{salonId:$salonId}) @check(expr:"this != null && vars.lowStockThreshold >= 0 && vars.lowStockThreshold <= 2147483647 && vars.expectedVersion >= 1 && vars.expectedVersion < 2147483647",message:"SETUP_OR_VALIDATION_ERROR"){salonId}
+ }
+ changed:salonSettings_updateMany(where:{salonId:{eq:$salonId},version:{eq:$expectedVersion}},data:{lowStockThreshold:$lowStockThreshold,version_update:{inc:1},updatedAt_expr:"request.time"}) @check(expr:"this == 1",message:"STALE_STATE")
+ result:query {settings:salonSettings(key:{salonId:$salonId}){salonId lowStockThreshold version updatedAt}}
+}

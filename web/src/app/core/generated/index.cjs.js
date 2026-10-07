@@ -1,4 +1,4 @@
-const { queryRef, executeQuery, validateArgsWithOptions, validateArgs } = require('firebase/data-connect');
+const { queryRef, executeQuery, validateArgsWithOptions, mutationRef, executeMutation, validateArgs } = require('firebase/data-connect');
 
 const MemberRole = {
   HQ: "HQ",
@@ -70,6 +70,35 @@ exports.getSalonInventory = function getSalonInventory(dcOrVars, varsOrOptions, 
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getSalonInventoryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getSalonSettingsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetSalonSettings', inputVars);
+}
+getSalonSettingsRef.operationName = 'GetSalonSettings';
+exports.getSalonSettingsRef = getSalonSettingsRef;
+
+exports.getSalonSettings = function getSalonSettings(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getSalonSettingsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const saveSalonSettingsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SaveSalonSettings', inputVars);
+}
+saveSalonSettingsRef.operationName = 'SaveSalonSettings';
+exports.saveSalonSettingsRef = saveSalonSettingsRef;
+
+exports.saveSalonSettings = function saveSalonSettings(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(saveSalonSettingsRef(dcInstance, inputVars));
 }
 ;
 

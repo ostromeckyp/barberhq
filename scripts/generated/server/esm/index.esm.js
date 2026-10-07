@@ -97,6 +97,12 @@ export function resetDemoStock(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeMutation('ResetDemoStock', inputVars, inputOpts);
 }
 
+export function insertSalonSettings(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('InsertSalonSettings', inputVars, inputOpts);
+}
+
 export function stockContext(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);

@@ -122,6 +122,12 @@ export async function seedRecords(
       businessId,
       kind: l.kind === "HQ" ? sdk.LocationKind.HQ : sdk.LocationKind.SALON,
     });
+  // Insert defaults only. A racing seed may conflict but never overwrites an edit.
+  for (const l of seed.locations.filter((l) => l.kind === "SALON")) {
+    const salonId = remap(l.id);
+    if (!current.salonSettings.some((s) => s.salonId === salonId))
+      await sdk.insertSalonSettings(dc, { salonId });
+  }
   for (const p of seed.products) {
     const {
       netContent,

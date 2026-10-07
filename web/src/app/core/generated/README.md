@@ -11,11 +11,13 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetMyMembership*](#getmymembership)
   - [*ListProducts*](#listproducts)
   - [*GetSalonInventory*](#getsaloninventory)
+  - [*GetSalonSettings*](#getsalonsettings)
   - [*ListActiveRequests*](#listactiverequests)
   - [*ListHQQueue*](#listhqqueue)
   - [*GetRequestDetail*](#getrequestdetail)
   - [*ListSalonRequests*](#listsalonrequests)
 - [**Mutations**](#mutations)
+  - [*SaveSalonSettings*](#savesalonsettings)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `browser`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -444,6 +446,120 @@ console.log(data.membership);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.membership);
+});
+```
+
+## GetSalonSettings
+You can execute the `GetSalonSettings` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+getSalonSettings(vars: GetSalonSettingsVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonSettingsData, GetSalonSettingsVariables>;
+
+interface GetSalonSettingsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSalonSettingsVariables): QueryRef<GetSalonSettingsData, GetSalonSettingsVariables>;
+}
+export const getSalonSettingsRef: GetSalonSettingsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getSalonSettings(dc: DataConnect, vars: GetSalonSettingsVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonSettingsData, GetSalonSettingsVariables>;
+
+interface GetSalonSettingsRef {
+  ...
+  (dc: DataConnect, vars: GetSalonSettingsVariables): QueryRef<GetSalonSettingsData, GetSalonSettingsVariables>;
+}
+export const getSalonSettingsRef: GetSalonSettingsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getSalonSettingsRef:
+```typescript
+const name = getSalonSettingsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetSalonSettings` query requires an argument of type `GetSalonSettingsVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetSalonSettingsVariables {
+  salonId: string;
+}
+```
+### Return Type
+Recall that executing the `GetSalonSettings` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetSalonSettingsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetSalonSettingsData {
+  settings?: {
+    salonId: string;
+    lowStockThreshold: number;
+    version: number;
+    updatedAt: TimestampString;
+  } & SalonSettings_Key;
+}
+```
+### Using `GetSalonSettings`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getSalonSettings, GetSalonSettingsVariables } from '@barberhq/browser';
+
+// The `GetSalonSettings` query requires an argument of type `GetSalonSettingsVariables`:
+const getSalonSettingsVars: GetSalonSettingsVariables = {
+  salonId: ..., 
+};
+
+// Call the `getSalonSettings()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getSalonSettings(getSalonSettingsVars);
+// Variables can be defined inline as well.
+const { data } = await getSalonSettings({ salonId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getSalonSettings(dataConnect, getSalonSettingsVars);
+
+console.log(data.settings);
+
+// Or, you can use the `Promise` API.
+getSalonSettings(getSalonSettingsVars).then((response) => {
+  const data = response.data;
+  console.log(data.settings);
+});
+```
+
+### Using `GetSalonSettings`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getSalonSettingsRef, GetSalonSettingsVariables } from '@barberhq/browser';
+
+// The `GetSalonSettings` query requires an argument of type `GetSalonSettingsVariables`:
+const getSalonSettingsVars: GetSalonSettingsVariables = {
+  salonId: ..., 
+};
+
+// Call the `getSalonSettingsRef()` function to get a reference to the query.
+const ref = getSalonSettingsRef(getSalonSettingsVars);
+// Variables can be defined inline as well.
+const ref = getSalonSettingsRef({ salonId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getSalonSettingsRef(dataConnect, getSalonSettingsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.settings);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.settings);
 });
 ```
 
@@ -1013,7 +1129,143 @@ executeQuery(ref).then((response) => {
 
 # Mutations
 
-No mutations were generated for the `browser` connector.
+There are two ways to execute a Data Connect Mutation using the generated Web SDK:
+- Using a Mutation Reference function, which returns a `MutationRef`
+  - The `MutationRef` can be used as an argument to `executeMutation()`, which will execute the Mutation and return a `MutationPromise`
+- Using an action shortcut function, which returns a `MutationPromise`
+  - Calling the action shortcut function will execute the Mutation and return a `MutationPromise`
 
-If you want to learn more about how to use mutations in Data Connect, you can follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#using-mutations).
+The following is true for both the action shortcut function and the `MutationRef` function:
+- The `MutationPromise` returned will resolve to the result of the Mutation once it has finished executing
+- If the Mutation accepts arguments, both the action shortcut function and the `MutationRef` function accept a single argument: an object that contains all the required variables (and the optional variables) for the Mutation
+- Both functions can be called with or without passing in a `DataConnect` instance as an argument. If no `DataConnect` argument is passed in, then the generated SDK will call `getDataConnect(connectorConfig)` behind the scenes for you.
+
+Below are examples of how to use the `browser` connector's generated functions to execute each mutation. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#using-mutations).
+
+## SaveSalonSettings
+You can execute the `SaveSalonSettings` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+saveSalonSettings(vars: SaveSalonSettingsVariables): MutationPromise<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+
+interface SaveSalonSettingsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SaveSalonSettingsVariables): MutationRef<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+}
+export const saveSalonSettingsRef: SaveSalonSettingsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+saveSalonSettings(dc: DataConnect, vars: SaveSalonSettingsVariables): MutationPromise<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+
+interface SaveSalonSettingsRef {
+  ...
+  (dc: DataConnect, vars: SaveSalonSettingsVariables): MutationRef<SaveSalonSettingsData, SaveSalonSettingsVariables>;
+}
+export const saveSalonSettingsRef: SaveSalonSettingsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the saveSalonSettingsRef:
+```typescript
+const name = saveSalonSettingsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SaveSalonSettings` mutation requires an argument of type `SaveSalonSettingsVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SaveSalonSettingsVariables {
+  salonId: string;
+  lowStockThreshold: number;
+  expectedVersion: number;
+}
+```
+### Return Type
+Recall that executing the `SaveSalonSettings` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SaveSalonSettingsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SaveSalonSettingsData {
+  changed: number;
+  result?: {
+    settings?: {
+      salonId: string;
+      lowStockThreshold: number;
+      version: number;
+      updatedAt: TimestampString;
+    } & SalonSettings_Key;
+  };
+}
+```
+### Using `SaveSalonSettings`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, saveSalonSettings, SaveSalonSettingsVariables } from '@barberhq/browser';
+
+// The `SaveSalonSettings` mutation requires an argument of type `SaveSalonSettingsVariables`:
+const saveSalonSettingsVars: SaveSalonSettingsVariables = {
+  salonId: ..., 
+  lowStockThreshold: ..., 
+  expectedVersion: ..., 
+};
+
+// Call the `saveSalonSettings()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await saveSalonSettings(saveSalonSettingsVars);
+// Variables can be defined inline as well.
+const { data } = await saveSalonSettings({ salonId: ..., lowStockThreshold: ..., expectedVersion: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await saveSalonSettings(dataConnect, saveSalonSettingsVars);
+
+console.log(data.changed);
+console.log(data.result);
+
+// Or, you can use the `Promise` API.
+saveSalonSettings(saveSalonSettingsVars).then((response) => {
+  const data = response.data;
+  console.log(data.changed);
+  console.log(data.result);
+});
+```
+
+### Using `SaveSalonSettings`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, saveSalonSettingsRef, SaveSalonSettingsVariables } from '@barberhq/browser';
+
+// The `SaveSalonSettings` mutation requires an argument of type `SaveSalonSettingsVariables`:
+const saveSalonSettingsVars: SaveSalonSettingsVariables = {
+  salonId: ..., 
+  lowStockThreshold: ..., 
+  expectedVersion: ..., 
+};
+
+// Call the `saveSalonSettingsRef()` function to get a reference to the mutation.
+const ref = saveSalonSettingsRef(saveSalonSettingsVars);
+// Variables can be defined inline as well.
+const ref = saveSalonSettingsRef({ salonId: ..., lowStockThreshold: ..., expectedVersion: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = saveSalonSettingsRef(dataConnect, saveSalonSettingsVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.changed);
+console.log(data.result);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.changed);
+  console.log(data.result);
+});
+```
 
