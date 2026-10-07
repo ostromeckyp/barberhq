@@ -22,6 +22,15 @@ export const routes: Routes = [
     canActivate: [accessGuard],
     children: [
       {
+        path: 'salons/:salonId/requests',
+        title: 'Requests · BarberHQ',
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/salon-requests/feature/salon-requests.component').then(
+            (m) => m.SalonRequestsComponent,
+          ),
+      },
+      {
         path: 'salons/:salonId',
         title: 'Salon inventory · BarberHQ',
         canActivate: [accessGuard],

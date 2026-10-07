@@ -152,7 +152,10 @@ it('clears_completed_result_when_ready_identity_changes_directly', async () => {
   TestBed.tick();
   await h.service.submit('salon', [line('a')]);
   expect(h.service.outcome()?.status).toBe('CREATED');
-  h.state.set({status: 'READY', membership: {userId:'new', businessId:'b',role:'SALON',salonIds:['salon']}});
+  h.state.set({
+    status: 'READY',
+    membership: { userId: 'new', businessId: 'b', role: 'SALON', salonIds: ['salon'] },
+  });
   TestBed.tick();
   expect(h.service.outcome()).toBeUndefined();
   expect(h.service.submittedItems()).toEqual([]);

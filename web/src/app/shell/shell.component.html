@@ -6,8 +6,21 @@
     </button>
   }
   <a class="brand" [routerLink]="facade.home()"><app-brand [inverse]="true" /></a
-  ><span class="toolbar-space"></span
-  ><span class="context">{{ facade.context() }} · {{ facade.role() }}</span
+  ><span class="toolbar-space"></span>
+  @if (facade.salons().length > 1) {
+    <mat-select
+      class="salon-select"
+      aria-label="Select salon"
+      [value]="facade.selectedSalonId()"
+      placeholder="Select salon"
+      (selectionChange)="facade.salonContext.switchSalon($event.value)"
+    >
+      @for (salon of facade.salons(); track salon.id) {
+        <mat-option [value]="salon.id">{{ salon.name }}</mat-option>
+      }
+    </mat-select>
+  }
+  <span class="context">{{ facade.context() }} · {{ facade.role() }}</span
   ><button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Account menu">
     <mat-icon>account_circle</mat-icon>
   </button>
@@ -36,13 +49,21 @@
           ><mat-icon matListItemIcon>warehouse</mat-icon>HQ overview</a
         >
       }
-      @for (salon of facade.salons(); track salon.id) {
+      @if (facade.navSalonId(); as salonId) {
         <a
           mat-list-item
-          [routerLink]="['/salons', salon.id]"
+          [routerLink]="['/salons', salonId]"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>dashboard</mat-icon>Dashboard</a
+        >
+        <a
+          mat-list-item
+          [routerLink]="['/salons', salonId, 'requests']"
           routerLinkActive="active"
           (click)="closeDrawer()"
-          ><mat-icon matListItemIcon>storefront</mat-icon>{{ salon.name }}</a
+          ><mat-icon matListItemIcon>receipt_long</mat-icon>Requests</a
         >
       }
     </mat-nav-list>

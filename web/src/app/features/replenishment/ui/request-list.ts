@@ -1,3 +1,4 @@
+import type { RequestListContext } from '../../../core/request-navigation';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -22,6 +23,7 @@ import type { RequestSummary } from '../../../../../../shared/contracts/stock';
         ><app-status-chip [state]="request.state" /><a
           mat-stroked-button
           [routerLink]="['/requests', request.id]"
+          [state]="{ listContext: context() }"
           >Open request</a
         >
       </article>
@@ -69,5 +71,6 @@ import type { RequestSummary } from '../../../../../../shared/contracts/stock';
   ],
 })
 export class RequestList {
+  readonly context = input<RequestListContext>();
   readonly requests = input.required<RequestSummary[]>();
 }

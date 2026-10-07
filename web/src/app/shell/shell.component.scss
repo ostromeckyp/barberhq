@@ -116,3 +116,21 @@ main {
 .toolbar mat-icon {
   color: var(--surface);
 }
+
+.salon-select {
+  max-width: 150px;
+  min-width: 100px;
+  --mat-select-enabled-trigger-text-color: var(--surface);
+  --mat-select-enabled-arrow-color: var(--surface);
+  --mat-select-placeholder-text-color: var(--surface);
+  font-size: 14px;
+}
+@media (max-width: 400px) {
+  .toolbar .brand {
+    max-width: 95px;
+    overflow: hidden;
+  }
+  .salon-select {
+    max-width: 110px;
+  }
+}

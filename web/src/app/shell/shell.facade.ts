@@ -2,6 +2,7 @@ import { Service, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, PRIMARY_OUTLET, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
+import { SalonContext } from '../core/salon-context';
 import { SessionFacade } from '../features/auth/feature/session.facade';
 
 @Service({ autoProvided: false })
@@ -9,13 +10,7 @@ export class ShellFacade {
   private readonly session = inject(SessionFacade);
   private readonly router = inject(Router);
   private readonly failure = signal('');
-  private readonly url = toSignal(
-    this.router.events.pipe(
-      filter((e) => e instanceof NavigationEnd),
-      map((e) => e.urlAfterRedirects),
-    ),
-    { initialValue: this.router.url },
-  );
+  readonly salonContext = inject(SalonContext);
   readonly salons = this.session.salons;
   readonly ready = computed(() => this.session.state().status === 'READY');
   readonly isHq = computed(() => {
@@ -24,14 +19,13 @@ export class ShellFacade {
   });
   readonly home = computed(() => this.router.parseUrl(this.session.home()));
   readonly role = computed(() => (this.isHq() ? 'HQ team' : 'Salon staff'));
-  readonly context = computed(() => {
-    const segments = this.router.parseUrl(this.url()).root.children[PRIMARY_OUTLET]?.segments;
-    const id = segments?.[0]?.path === 'salons' ? segments[1]?.path : undefined;
-    return (
-      this.salons().find((s) => s.id === id)?.name ??
-      (this.isHq() ? 'HQ' : (this.salons()[0]?.name ?? 'Salon'))
-    );
-  });
+  readonly selectedSalonId = this.salonContext.salonId;
+  readonly navSalonId = computed(() => this.selectedSalonId() ?? this.salons()[0]?.id);
+  readonly context = computed(
+    () =>
+      this.salons().find((s) => s.id === this.selectedSalonId())?.name ??
+      (this.router.url.startsWith('/requests/') ? 'Loading salon…' : this.isHq() ? 'HQ' : 'Salon'),
+  );
   readonly signOutError = this.failure.asReadonly();
   constructor() {
     effect(() => {

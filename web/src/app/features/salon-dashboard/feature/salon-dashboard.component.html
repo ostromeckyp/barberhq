@@ -59,15 +59,4 @@
   </div>
 }
 
-@if (order) {
-  <section class="requests-section">
-    <h2>Active requests</h2>
-    @if (order.error()) {
-      <p role="alert">
-        Requests unavailable. <button mat-button (click)="order.refresh()">Retry</button>
-      </p>
-    } @else {
-      <app-request-list [requests]="order.requests()" />
-    }
-  </section>
-}
+<a mat-stroked-button [routerLink]="['/salons', context.salonId(), 'requests']">View requests</a>

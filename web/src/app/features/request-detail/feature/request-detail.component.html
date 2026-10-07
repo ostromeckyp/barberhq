@@ -1,3 +1,6 @@
+@if (facade.back()) {
+  <button mat-button (click)="facade.goBack()">← Back to requests</button>
+}
 <app-page-header
   eyebrow="REPLENISHMENT REQUEST"
   [title]="facade.request() ? 'Request ' + facade.request()!.id.slice(0, 8) : 'Request details'"

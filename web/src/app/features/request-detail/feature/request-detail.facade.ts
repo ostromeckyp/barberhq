@@ -1,5 +1,8 @@
-import { Service, inject, computed, resource, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Service, inject, computed, resource, signal, effect } from '@angular/core';
+import { Location } from '@angular/common';
+import { SalonContext } from '../../../core/salon-context';
+import { parseListContext, requestReturnContext } from '../../../core/request-navigation';
+import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
@@ -9,6 +12,12 @@ import { RequestActions } from './request-actions';
 import type { TransitionType } from './action-input';
 @Service({ autoProvided: false })
 export class RequestDetailFacade {
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
+  private readonly context = inject(SalonContext);
+  private readonly candidate = parseListContext(
+    (this.location.getState() as { listContext?: unknown })?.listContext,
+  );
   private readonly api = inject(ReplenishmentApi);
   private readonly session = inject(SessionFacade);
   private readonly activity = inject(BrowserActivity);
@@ -21,12 +30,37 @@ export class RequestDetailFacade {
       const s = this.session.state(),
         id = this.id();
       return s.status === 'READY' && id
-        ? { id, uid: s.membership.userId, tick: this.activity.refreshTick() }
+        ? {
+            id,
+            uid: s.membership.userId,
+            businessId: s.membership.businessId,
+            tick: this.activity.refreshTick(),
+          }
         : undefined;
     },
     loader: ({ params }) => this.api.getRequest(params.id),
   });
   readonly request = computed(() => (this.record.hasValue() ? this.record.value() : undefined));
+  readonly back = computed(() => {
+    const r = this.request(),
+      s = this.session.state();
+    if (!r || s.status !== 'READY' || !s.membership.salonIds.includes(r.salonId)) return undefined;
+    return requestReturnContext(r, s.membership, this.candidate);
+  });
+  constructor() {
+    effect(() => {
+      const r = this.request();
+      if (r) this.context.setDetailSalon(r.id, r.salonId);
+    });
+  }
+  goBack() {
+    const c = this.back();
+    if (c)
+      void this.router.navigate(c.kind === 'HQ' ? ['/hq'] : ['/salons', c.salonId, 'requests'], {
+        queryParams:
+          c.kind === 'HQ' ? { offset: c.offset } : { filter: c.filter, offset: c.offset },
+      });
+  }
   readonly loading = this.record.isLoading;
   readonly error = computed(() => !!this.record.error());
   readonly message = signal('');
@@ -51,7 +85,9 @@ export class RequestDetailFacade {
   async act(type: TransitionType) {
     const r = this.request();
     if (!r || !this.availableActions().includes(type)) return;
+    const identity = this.session.state();
     const outcome = await this.actions.open(r, type);
+    if (this.id() !== r.id || this.session.state() !== identity) return;
     if (outcome) {
       this.message.set(
         outcome.error ??

@@ -1,4 +1,7 @@
-import { Service, inject, computed, resource, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { pageOffset } from '../../../core/request-navigation';
+import { Service, inject, computed, resource } from '@angular/core';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
@@ -7,12 +10,20 @@ export class HqQueueFacade {
   private readonly api = inject(ReplenishmentApi);
   private readonly session = inject(SessionFacade);
   private readonly activity = inject(BrowserActivity);
-  readonly offset = signal(0);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly query = toSignal(this.route.queryParamMap);
+  readonly offset = computed(() => pageOffset(this.query()?.get('offset')));
   private readonly page = resource({
     params: () => {
       const s = this.session.state();
       return s.status === 'READY' && s.membership.role === 'HQ'
-        ? { uid: s.membership.userId, offset: this.offset(), tick: this.activity.refreshTick() }
+        ? {
+            uid: s.membership.userId,
+            businessId: s.membership.businessId,
+            offset: this.offset(),
+            tick: this.activity.refreshTick(),
+          }
         : undefined;
     },
     loader: ({ params }) => this.api.listHQQueue({ offset: params.offset, limit: 50 }),
@@ -30,9 +41,12 @@ export class HqQueueFacade {
     this.page.reload();
   }
   next() {
-    if (this.hasNext()) this.offset.update((v) => v + 50);
+    if (this.hasNext()) this.go(this.offset() + 50);
+  }
+  private go(offset: number) {
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { offset } });
   }
   previous() {
-    this.offset.update((v) => Math.max(0, v - 50));
+    this.go(Math.max(0, this.offset() - 50));
   }
 }

@@ -29,18 +29,27 @@ import { HqQueueFacade } from './hq-queue.facade';
       <h2>
         Pending approval <span>{{ facade.pending().length }}</span>
       </h2>
-      <app-request-list [requests]="facade.pending()" />
+      <app-request-list
+        [context]="{ kind: 'HQ', offset: facade.offset() }"
+        [requests]="facade.pending()"
+      />
     </section>
     <section>
       <h2>
         Ready to dispatch <span>{{ facade.reserved().length }}</span>
       </h2>
-      <app-request-list [requests]="facade.reserved()" />
+      <app-request-list
+        [context]="{ kind: 'HQ', offset: facade.offset() }"
+        [requests]="facade.reserved()"
+      />
     </section>
     @if (facade.other().length) {
       <section>
         <h2>Dispatched and completed</h2>
-        <app-request-list [requests]="facade.other()" />
+        <app-request-list
+          [context]="{ kind: 'HQ', offset: facade.offset() }"
+          [requests]="facade.other()"
+        />
       </section>
     }
     <nav aria-label="Queue pages">

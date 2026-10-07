@@ -7,6 +7,7 @@ import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { ShellFacade } from './shell.facade';
 import { Brand } from '../shared/ui/brand/brand';
@@ -24,6 +25,7 @@ import { Brand } from '../shared/ui/brand/brand';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatSelectModule,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',

@@ -37,9 +37,11 @@ export class SubmissionService {
       untracked(() => {
         if (state.status === 'LOADING' || state.status === 'ERROR') return;
         const stored = this.storage.load();
-        if (state.status !== 'READY' ||
+        if (
+          state.status !== 'READY' ||
           (this.resultOwner !== undefined && this.resultOwner !== this.identity()) ||
-          (stored.kind === 'PENDING' && !this.owns(stored.value))) {
+          (stored.kind === 'PENDING' && !this.owns(stored.value))
+        ) {
           this.epoch++;
           this.resultOwner = undefined;
           this.result.set(undefined);
@@ -58,7 +60,12 @@ export class SubmissionService {
   private identity(): string | undefined {
     const s = this.session.state();
     return s.status === 'READY'
-      ? JSON.stringify([s.membership.userId, s.membership.businessId, s.membership.role, [...s.membership.salonIds].sort()])
+      ? JSON.stringify([
+          s.membership.userId,
+          s.membership.businessId,
+          s.membership.role,
+          [...s.membership.salonIds].sort(),
+        ])
       : undefined;
   }
   private owns(p: PendingSubmission): boolean {
