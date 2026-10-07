@@ -1,0 +1,12 @@
+specVersion: v1
+serviceId: whole-request-proof
+location: europe-west1
+schemaValidation: COMPATIBLE
+schema:
+  source: ./schema
+  datasource:
+    postgresql:
+      database: proof
+      cloudSql:
+        instanceId: proof
+connectorDirs: [./server]

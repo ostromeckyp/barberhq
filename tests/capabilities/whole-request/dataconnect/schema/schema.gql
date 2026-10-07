@@ -1,0 +1,20 @@
+type ProbeInventory @table(key: "id") {
+  id: String!
+  onHand: Int!
+  reserved: Int!
+  version: Int!
+}
+type ProbeRequest @table(key: "id") {
+  id: String!
+  state: String!
+  revision: Int!
+}
+type ProbeItem @table(key: ["request", "product"]) {
+  request: ProbeRequest!
+  product: ProbeInventory!
+  quantity: Int!
+}
+type ProbeAudit @table(key: "id") {
+  id: String!
+  request: ProbeRequest!
+}
