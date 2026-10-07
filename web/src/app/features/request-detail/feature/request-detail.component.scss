@@ -1,0 +1,76 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: 20px;
+  align-items: start;
+}
+.card {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+h2 {
+  font-size: 16px;
+  margin: 20px 0 12px;
+}
+.card h2:first-child {
+  margin-top: 0;
+}
+.figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.figures > div {
+  color: var(--muted);
+  font-size: 13px;
+}
+.figures strong {
+  display: block;
+  color: var(--ink);
+  font: 32px var(--font-mono);
+  margin-top: 8px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+}
+dt {
+  font-size: 14px;
+}
+dd {
+  margin: 0;
+  font: 22px var(--font-mono);
+}
+p {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.muted,
+li p {
+  color: var(--muted);
+  font-size: 13px;
+}
+li {
+  padding: 8px 0;
+}
+.message {
+  padding: 16px;
+  background: var(--warning-background);
+  color: var(--warning-text);
+  border-radius: 8px;
+}
+@media (max-width: 950px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

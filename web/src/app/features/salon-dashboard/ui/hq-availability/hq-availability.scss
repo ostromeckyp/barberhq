@@ -1,0 +1,43 @@
+@use '../../../../shared/styles/surfaces' as surfaces;
+@include surfaces.inventory-card;
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+h2 mat-icon {
+  color: var(--muted);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+dl {
+  margin: 0;
+  padding: 0 20px;
+}
+dl > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--divider);
+}
+dt {
+  font-size: 14px;
+}
+dd {
+  margin: 0;
+  text-align: right;
+}
+dd strong {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+}
+small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}

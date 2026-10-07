@@ -86,3 +86,7 @@ npx firebase hosting:clone notbad-6be95:foundation notbad-6be95:live --project n
 Record the actual Hosting version ID and URL alongside `{projectId,siteId,buildHash,configHash}` from the build record in the increment handoff. Repeat the smoke/login/read checks on live. The existing site's registered default URL is `https://notbad-6be95.web.app`; it is not evidence that BarberHQ is deployed there.
 
 Official reference: [Firebase Hosting releases and versions](https://firebase.google.com/docs/hosting/manage-hosting-resources). Rollback selects the recorded previous Hosting version; it does not roll back SQL. No previous BarberHQ release exists yet.
+
+## Increment 2 local startup
+
+Use `npm --prefix functions ci` once, then `npm run start:emulators` (Auth, SQL Connect, Functions). Keep that terminal running; run `npm run demo:local` and `npm run start:local` in a second terminal. See [increment 2 handoff](handoffs/increment-2.md) for reset and verification. Older auth/dataconnect-only commands above support the foundation only and cannot execute replenishment actions.

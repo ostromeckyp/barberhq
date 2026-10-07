@@ -1,3 +1,4 @@
+@use './styles/tokens';
 @use '@angular/material' as mat;
 html {
   @include mat.theme(
@@ -15,17 +16,43 @@ html {
   );
   @include mat.theme-overrides(
     (
-      primary: #dc241f,
+      primary: tokens.$brand,
       on-primary: #ffffff,
       primary-container: #f6dcda,
       on-primary-container: #8c1d18,
-      surface: #ffffff,
-      on-surface: #171614,
-      surface-container: #f6f5f2,
-      on-surface-variant: #57534c,
+      surface: tokens.$surface,
+      on-surface: tokens.$ink,
+      surface-container: tokens.$background,
+      on-surface-variant: tokens.$muted,
       outline: #8f897f,
-      outline-variant: #e2ded6,
+      outline-variant: tokens.$border,
       error: #b3261e,
     )
   );
+}
+
+html {
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: 6px,
+    )
+  );
+  @include mat.button-overrides(
+    (
+      filled-container-height: 40px,
+      outlined-container-height: 40px,
+      text-container-height: 40px,
+    )
+  );
+}
+@media (max-width: 759px) {
+  html {
+    @include mat.button-overrides(
+      (
+        filled-container-height: 48px,
+        outlined-container-height: 48px,
+        text-container-height: 48px,
+      )
+    );
+  }
 }

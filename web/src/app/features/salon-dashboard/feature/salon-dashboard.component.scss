@@ -1,0 +1,14 @@
+.inventory-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 24px;
+  align-items: start;
+}
+mat-progress-bar {
+  margin-bottom: 16px;
+}
+@media (max-width: 1199px) {
+  .inventory-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

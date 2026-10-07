@@ -1,0 +1,88 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.panel {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+h2 {
+  font-size: 18px;
+  margin: 6px 0;
+}
+p,
+footer {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.eyebrow {
+  font: 12px var(--font-mono);
+  color: var(--brand);
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 20px 0 0;
+  min-width: 0;
+}
+mat-form-field {
+  width: 100%;
+  min-width: 0;
+}
+.add-row,
+.line-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.add-row mat-form-field {
+  flex: 1;
+}
+.add-row button {
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+.draft-line {
+  padding: 16px 0;
+  border-top: 1px solid var(--divider);
+}
+strong,
+small {
+  display: block;
+}
+small {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 12px;
+}
+.line-controls mat-form-field {
+  flex: 1;
+}
+.warning {
+  background: var(--warning-background);
+  color: var(--warning-text);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+.error {
+  color: #8c1d18;
+}
+footer {
+  border-top: 1px solid var(--divider);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.sr-only {
+  position: absolute;
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+a {
+  color: var(--brand);
+}

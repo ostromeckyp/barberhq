@@ -1,0 +1,73 @@
+<app-page-header
+  eyebrow="SALON INVENTORY"
+  [title]="facade.name()"
+  description="What’s on your shelf. What’s available at HQ."
+>
+  <button
+    mat-stroked-button
+    (click)="order ? order.refresh() : facade.refresh()"
+    [disabled]="facade.loading()"
+  >
+    <mat-icon>refresh</mat-icon>Refresh
+  </button>
+</app-page-header>
+@if (facade.stale()) {
+  <app-stale-banner
+    message="These are the last loaded quantities. Refresh before making a decision."
+  >
+    <button
+      mat-button
+      (click)="order ? order.refresh() : facade.refresh()"
+      [disabled]="facade.loading()"
+    >
+      Retry
+    </button>
+  </app-stale-banner>
+}
+@if (facade.loading()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Loading inventory" />
+}
+@if (facade.error() && !facade.rows().length) {
+  <app-empty-state
+    title="Inventory is unavailable"
+    message="We couldn’t load your quantities. Try again when you’re connected."
+    icon="error"
+  >
+    <button mat-flat-button (click)="order ? order.refresh() : facade.refresh()">Retry</button>
+  </app-empty-state>
+} @else if (!facade.loading() && !facade.rows().length) {
+  <app-empty-state
+    title="No stock records yet"
+    message="Ask HQ to set up inventory for this salon. Missing stock is not zero stock."
+  />
+} @else if (facade.rows().length) {
+  <div class="inventory-layout" [attr.aria-busy]="facade.loading()">
+    <app-stock-table
+      [rows]="facade.rows()"
+      [threshold]="facade.threshold"
+      [updated]="facade.updated()"
+      [requestEnabled]="!!order?.staff()"
+      (requestProduct)="order?.select($event)"
+    />
+    <div>
+      @if (order?.staff()) {
+        <app-order-panel />
+      } @else {
+        <app-hq-availability [rows]="facade.rows()" />
+      }
+    </div>
+  </div>
+}
+
+@if (order) {
+  <section class="requests-section">
+    <h2>Active requests</h2>
+    @if (order.error()) {
+      <p role="alert">
+        Requests unavailable. <button mat-button (click)="order.refresh()">Retry</button>
+      </p>
+    } @else {
+      <app-request-list [requests]="order.requests()" />
+    }
+  </section>
+}

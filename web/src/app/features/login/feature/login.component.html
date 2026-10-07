@@ -1,0 +1,49 @@
+<main class="login-page">
+  <mat-card class="login-card"
+    ><mat-card-content
+      ><app-brand [large]="true" />
+      <p class="eyebrow">[ NOT BAD STUFF · INTERNAL ]</p>
+      <h1>Sign in with your work account.</h1>
+      <form (submit)="signIn($event)">
+        <mat-form-field appearance="outline" floatLabel="always" hideRequiredMarker
+          ><mat-label>Email address</mat-label
+          ><input matInput type="email" autocomplete="username" [formField]="fields.email" />
+          @if (fields.email().invalid() && fields.email().touched()) {
+            <mat-error>Enter a valid email address.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="always" hideRequiredMarker
+          ><mat-label>Password</mat-label
+          ><input
+            matInput
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="current-password"
+            [formField]="fields.password"
+          /><button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="showPassword.set(!showPassword())"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+          >
+            <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon></button
+          ><mat-error>Password is required.</mat-error></mat-form-field
+        >
+        @if (facade.error()) {
+          <p class="error-message" role="alert"><mat-icon>error</mat-icon>{{ facade.error() }}</p>
+        }
+        <button mat-flat-button type="submit" [disabled]="facade.busy()">
+          {{
+            facade.checkingAccess() ? 'Checking access…' : facade.busy() ? 'Signing in…' : 'Sign in'
+          }}
+        </button>
+        @if (facade.busy()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Signing in" />
+        }
+      </form>
+      <footer class="login-help">
+        Demo environment · synthetic inventory.<br />Access is managed by your HQ team.
+      </footer></mat-card-content
+    ></mat-card
+  >
+</main>

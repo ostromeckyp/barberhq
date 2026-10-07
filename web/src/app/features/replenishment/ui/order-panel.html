@@ -1,0 +1,106 @@
+<section class="panel" aria-labelledby="order-title">
+  <header>
+    <span class="eyebrow">REPLENISHMENT</span>
+    <h2 id="order-title">Request products</h2>
+    <p>Build your list. HQ approves each product separately.</p>
+  </header>
+  @if (facade.submission.pending()) {
+    <div class="warning" role="status">
+      There are saved requests to reconcile. Their quantities are frozen until the result is known.
+    </div>
+    <button mat-flat-button (click)="facade.resume()" [disabled]="facade.submission.busy()">
+      {{ facade.submission.busy() ? 'Checking…' : 'Reconcile saved requests' }}
+    </button>
+  }
+  <fieldset [disabled]="facade.locked()">
+    <legend class="sr-only">Add a product</legend>
+    <mat-form-field appearance="outline"
+      ><mat-label>Product</mat-label
+      ><mat-select [formField]="fields.productId">
+        @for (row of facade.inventory.rows(); track row.productId) {
+          <mat-option [value]="row.productId" [disabled]="!!facade.activeFor(row.productId)"
+            >{{ row.productName
+            }}{{ facade.activeFor(row.productId) ? ' · already requested' : '' }}</mat-option
+          >
+        }
+      </mat-select></mat-form-field
+    >
+    <div class="add-row">
+      <mat-form-field appearance="outline"
+        ><mat-label>Quantity</mat-label
+        ><input matInput type="number" step="1" [formField]="fields.quantity" /></mat-form-field
+      ><button
+        mat-stroked-button
+        (click)="facade.add()"
+        [disabled]="facade.locked() || fields().invalid()"
+      >
+        Add to list
+      </button>
+    </div>
+  </fieldset>
+  @if (facade.notice()) {
+    <p role="status">{{ facade.notice() }}</p>
+  }
+  @for (line of facade.draft.lines(); track line.lineId) {
+    <article class="draft-line">
+      @if (line.status === 'READY') {
+        <strong>{{ line.productName }}</strong
+        ><small>{{ line.origin === 'manual' ? 'Added manually' : 'From assistant' }}</small>
+        <div class="line-controls">
+          <mat-form-field appearance="outline"
+            ><mat-label>Units for {{ line.productName }}</mat-label
+            ><input
+              matInput
+              type="number"
+              min="1"
+              max="99"
+              step="1"
+              [value]="line.quantity"
+              (input)="quantity($event, line.lineId)"
+              [disabled]="facade.locked()" /></mat-form-field
+          ><button
+            mat-icon-button
+            [attr.aria-label]="'Remove ' + line.productName"
+            (click)="facade.draft.remove(line.lineId)"
+            [disabled]="facade.locked()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <p>
+          HQ available: <b>{{ line.hqAvailable }}</b> · Salon: {{ line.salonOnHand }} →
+          {{ line.salonOnHand + line.quantity }} after full receipt
+        </p>
+        @if (line.quantity > line.hqAvailable) {
+          <p class="warning">More than HQ currently has. You can still send this request.</p>
+        }
+        @if (line.quantity < 1 || line.quantity > 99 || line.quantity % 1 !== 0) {
+          <p class="error" role="alert">Enter a whole number from 1 to 99.</p>
+        }
+      } @else {
+        <p>{{ line.originalWording }} — {{ line.reason }}</p>
+      }
+    </article>
+  } @empty {
+    <p class="muted">Your request list is empty.</p>
+  }
+  <button mat-flat-button (click)="facade.submit()" [disabled]="!facade.canSubmit()">
+    {{ facade.submission.busy() ? 'Submitting…' : 'Submit requests' }}
+  </button>
+  @if (facade.submission.error()) {
+    <p class="error" role="alert">{{ facade.submission.error() }}</p>
+  }
+  <div aria-live="polite">
+    @for (row of facade.submission.rows(); track row.lineId) {
+      <p>
+        {{ row.payload.quantity }} pcs · {{ row.status }}
+        @if (row.requestId) {
+          <a [routerLink]="['/requests', row.requestId]">Open request</a>
+        } @else if (row.errorCode) {
+          <span>{{ row.errorCode }}</span>
+        }
+      </p>
+    }
+  </div>
+  <footer>No stock moves until HQ dispatches and you confirm receipt.</footer>
+</section>

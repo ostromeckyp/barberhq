@@ -14,9 +14,13 @@
     "generate:sdk": "firebase dataconnect:sdk:generate --project notbad-6be95",
     "check:hosting": "node --import tsx scripts/checks/hosting.ts",
     "configure:emulators": "node --import tsx scripts/config/build-web.ts --config config/emulator.example.json --project demo-barberhq --emulator --configure-only",
+    "start:emulators": "npm --prefix functions run build && firebase emulators:start --only auth,dataconnect,functions --project demo-barberhq",
     "build:emulator": "node --import tsx scripts/config/build-web.ts --config config/emulator.example.json --project demo-barberhq --emulator",
     "build:production": "node --import tsx scripts/config/build-web.ts",
-    "demo:local": "node --import tsx scripts/dev/demo.ts"
+    "demo:local": "node --import tsx scripts/dev/demo.ts",
+    "start:local": "npm --prefix web run start:emulator",
+    "build:functions": "npm --prefix functions run build",
+    "demo:reset": "node --import tsx scripts/seed/reset.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

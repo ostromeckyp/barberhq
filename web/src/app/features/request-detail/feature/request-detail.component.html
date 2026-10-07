@@ -1,0 +1,99 @@
+<app-page-header
+  eyebrow="REPLENISHMENT REQUEST"
+  [title]="facade.request()?.productName ?? 'Request details'"
+  [description]="facade.request()?.salonName ?? ''"
+  ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
+    Refresh
+  </button></app-page-header
+>
+@if (facade.loading()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Loading request" />
+}
+@if (facade.message()) {
+  <p role="status" class="message">{{ facade.message() }}</p>
+}
+@if (facade.error()) {
+  <section class="card">
+    <h2>Request unavailable</h2>
+    <p>It may be unavailable or outside your access. Try refreshing.</p>
+    <button mat-button (click)="facade.refresh()">Retry</button>
+  </section>
+}
+@if (facade.request(); as request) {
+  <div class="layout">
+    <div>
+      <section class="card">
+        <app-status-chip [state]="request.state" />
+        <h2>Delivery quantities</h2>
+        <div class="figures">
+          <div>
+            Ordered<strong>{{ request.quantity }}</strong>
+          </div>
+          <div>
+            Dispatched<strong>{{ request.dispatchedQuantity }}</strong>
+          </div>
+          <div>
+            Received<strong>{{ request.receivedQuantity }}</strong>
+          </div>
+        </div>
+        <h2>Next step</h2>
+        @switch (request.state) {
+          @case ('PENDING_APPROVAL') {
+            <p>HQ reviews availability before reserving stock.</p>
+          }
+          @case ('RESERVED') {
+            <p>Stock is reserved. HQ can now pack and dispatch it.</p>
+          }
+          @case ('DISPATCHED') {
+            <p>Confirm receipt only when all products have arrived intact.</p>
+          }
+          @case ('RECEIVED') {
+            <p>Delivery complete. The products are now in salon stock.</p>
+          }
+          @case ('REJECTED') {
+            <p>This request was rejected. You can prepare a new request from salon inventory.</p>
+          }
+        }
+        <div class="actions">
+          @for (action of facade.availableActions(); track action) {
+            <button mat-stroked-button (click)="facade.act(action)" [disabled]="facade.loading()">
+              {{ labels[action] }}
+            </button>
+          }
+        </div>
+      </section>
+      <section class="card">
+        <h2>Timeline</h2>
+        <ol>
+          @for (event of request.timeline; track event.state) {
+            <li>
+              <strong>{{ statuses[event.state].label }}</strong>
+              <p>
+                {{ event.actorLabel }} · {{ event.at | date: 'd MMM, HH:mm' }}
+                @if (event.reason) {
+                  <br />{{ event.reason }}
+                }
+              </p>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
+    <aside class="card">
+      <h2>Stock now</h2>
+      <dl>
+        <dt>HQ on hand</dt>
+        <dd data-testid="hq-on-hand">{{ request.stock.hqOnHand }}</dd>
+        <dt>HQ reserved</dt>
+        <dd>{{ request.stock.hqReserved }}</dd>
+        <dt>HQ available</dt>
+        <dd>{{ request.stock.hqAvailable }}</dd>
+        <dt>In transit · this request</dt>
+        <dd data-testid="in-transit">{{ facade.transit() }}</dd>
+        <dt>{{ request.salonName }} on hand</dt>
+        <dd data-testid="salon-on-hand">{{ request.stock.salonOnHand }}</dd>
+      </dl>
+      <p class="muted">Synthetic demo quantities. Refreshed from the database.</p>
+    </aside>
+  </div>
+}

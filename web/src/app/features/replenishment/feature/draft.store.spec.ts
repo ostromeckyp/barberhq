@@ -1,0 +1,41 @@
+import { expect, it } from 'vitest';
+import { DraftStore } from './draft.store';
+import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft';
+const line = (quantity: number, origin: 'manual' | 'assistant' = 'manual'): ReadyDraftLine => ({
+  status: 'READY',
+  lineId: '1',
+  productId: 'p1',
+  productName: 'Matowa',
+  quantity,
+  origin,
+  hqAvailable: 0,
+  salonOnHand: 2,
+  hqInventoryVersion: 1,
+  salonInventoryVersion: 1,
+});
+it('overflow_is_editable_and_retains_origin', () => {
+  const store = new DraftStore();
+  store.add(line(98));
+  store.add({ ...line(2, 'assistant'), lineId: '2' });
+  expect(store.lines()[0]).toMatchObject({ quantity: 100, origin: 'manual' });
+  expect(store.canSubmit()).toBe(false);
+  store.editQuantity('1', 3);
+  expect(store.canSubmit()).toBe(true); // shortage warns, does not block
+});
+it('clarification_blocks_and_six_distinct_products_is_the_limit', () => {
+  const store = new DraftStore();
+  store.merge([
+    {
+      status: 'NEEDS_CLARIFICATION',
+      lineId: 'x',
+      originalWording: 'pomade',
+      reason: 'Choose',
+      origin: 'assistant',
+      candidates: [],
+    },
+  ]);
+  expect(store.canSubmit()).toBe(false);
+  store.remove('x');
+  for (let i = 0; i < 7; i++) store.add({ ...line(1), lineId: String(i), productId: String(i) });
+  expect(store.lines()).toHaveLength(6);
+});

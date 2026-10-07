@@ -2,6 +2,26 @@
 
 Status: **IN PROGRESS; cloud checks BLOCKED pending owner setup**.
 
+## Angular refactor — 30 September 2026
+
+The current working tree follows [Angular architecture and customization](../angular-architecture.md). Feature facades own session/login/inventory/access/shell behavior; Firebase adapters and pure DTO mapping live in data-access folders. A local shared UI library and shared tokens make presentation reusable. The salon page now composes presentation components and reads its facade rather than issuing SDK calls or coordinating async state itself.
+
+Signals guidance was checked through the installed Angular MCP and local skill references. Inventory uses resource/computed/linkedSignal with a scope-bound last-known snapshot. Six facade tests cover initial errors, refresh recovery, delayed responses, sign-out, salon changes and offline refresh; two mapper tests cover quantities and missing records. This addresses the previously deferred inventory-response-after-sign-out coverage.
+
+Visual refinements were compared with the rendered Claude prototype: dark login/toolbar, BarberHQ/DEMO brand, outlined form fields, compact two-column salon stock, Material low-stock chip, mobile role context. HQ availability remains visible in a read-only side card for the current increment; ordering/RAG controls are not implemented.
+
+The new failed-refresh browser test initially failed: Data Connect's default `PREFER_CACHE` policy returned cached data without a server request. Inventory and membership reads now explicitly use `SERVER_ONLY`; the facade alone owns deliberate stale-display fallback. The same test then passed. Brand navigation also now uses a UrlTree, avoiding double-encoding salon IDs.
+
+Final checks for this refactor:
+
+- Angular: **12/12**; root suite: **20/20**; root typecheck: passed.
+- Playwright: **5/5**, including real emulator login, stock quantities, error/retry, stale-read recovery, sign-out, brand navigation, keyboard navigation and 320px overflow. AXE A/AA passed on desktop inventory, mobile login and mobile inventory.
+- Optimized emulator build and Hosting artifact scan: passed, 28 public files; SHA-256 `4be4f6eef92afc06962bb9af9c6e714eb18c8823c274d0c06612202303ecb1ec`.
+- Initial bundle: **516.76 kB**, above the existing 500 kB warning threshold, below the 1 MB failure limit. No threshold was raised.
+- Inspected final desktop and mobile screenshots under ignored `artifacts/`. No cloud deploy or stock-changing operation was added.
+
+The local MCP configuration had duplicate `angular-cli` table names; the Firebase entry now has its own name. User-staged skill files were preserved and no commit was made during this refactor. Earlier evidence below records the pre-refactor implementation; use the linked architecture document for current paths.
+
 ## Local foundation
 
 - Angular CLI scaffold, SPA, no SSR. Material/CDK and Firebase installed.

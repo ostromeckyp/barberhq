@@ -65,7 +65,7 @@ SQL Connect exposes deployed operations and generated SDKs, supports transaction
 
 ## 3. Angular structure and state
 
-There is no Angular project or installed project version in this workspace. Select the current stable compatible package set when implementation starts, then pin it. Use standalone feature components, signals for local state and computed presentation values, and Angular routing. Signals are appropriate for tracking UI state and derived values. [Angular signals](https://angular.dev/guide/signals)
+The first increment is implemented in `web/`, with Angular/CLI 22.2.0 and Material/CDK 22.2.1 pinned. The [current Angular architecture](implementation/angular-architecture.md) owns the implemented directory layout and facade contracts. Use standalone feature components, signals for local state and computed presentation values, and Angular routing. Signals are appropriate for tracking UI state and derived values. [Angular signals](https://angular.dev/guide/signals)
 
 | Route | Responsibility |
 |---|---|
@@ -76,7 +76,7 @@ There is no Angular project or installed project version in this workspace. Sele
 | `/procedures?tab=documents` | Salon read-only library; HQ upload/review/replace/delete |
 | `/procedures/sources/:versionId?page=N&chunk=CHUNK_ID` | Authorized original-PDF viewer opening the cited page and highlighting extracted rectangles; chunk optional for library browsing |
 
-Use small services: `SessionService` for Auth and membership, `StockApi` for generated reads/callable stock commands, `AssistantApi` for the two flows, and `KnowledgeApi` for library/document commands and PDF access. Feature components own loading/error/form state; no global state framework is needed. Use signal forms if supported by the chosen stable Angular version.
+Use feature facades for functionality: the root `SessionFacade` owns Auth/membership; page-scoped facades own async loading/error state, derived selectors and commands. Components own form/presentation state and delegate actions. `data-access/` services isolate generated SDK calls and DTO mapping; `ui/` components only render inputs and emit intentions. The implemented inventory facade uses `resource`, `computed` and a scope-bound `linkedSignal` snapshot. Future stock, assistant and knowledge APIs follow the same boundaries. Use Angular Signal Forms; no global state framework is needed.
 
 The server is authoritative. After a successful stock command, reload the request detail and affected inventory views. Do not optimistically subtract stock. On reconnect/window focus, refresh visible records. The HQ screen has a Refresh action; no realtime subscriptions are needed for the stage demo.
 

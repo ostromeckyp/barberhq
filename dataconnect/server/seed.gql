@@ -26,3 +26,24 @@ mutation UpsertMembership($uid: String!, $businessId: String!, $role: MemberRole
 mutation UpsertSalonAccess($uid: String!, $locationId: String!) @auth(level: NO_ACCESS) {
   salonAccess_upsert(data: {membershipUid:$uid, locationId:$locationId})
 }
+
+query ReadResetCounts($businessId:String!) @auth(level:NO_ACCESS) {
+  requests: replenishmentRequests(where:{businessId:{eq:$businessId}}){_count}
+  active: activeRequests(where:{businessId:{eq:$businessId}}){_count}
+  transfers(where:{businessId:{eq:$businessId}}){_count}
+  movements: stockMovements(where:{businessId:{eq:$businessId}}){_count}
+  receipts: actionReceipts(where:{businessId:{eq:$businessId}}){_count}
+  keys: actionKeys(where:{businessId:{eq:$businessId}}){_count}
+  inventories(where:{location:{businessId:{eq:$businessId}}}){_count}
+}
+# Operator only. Caller validates an explicit demo target and quiescent confirmation.
+mutation ResetDemoStock($businessId:String!, $productIds:[String!]!) @auth(level:NO_ACCESS) @transaction {
+  keys: actionKey_deleteMany(where:{businessId:{eq:$businessId}})
+  receipts: actionReceipt_deleteMany(where:{businessId:{eq:$businessId}})
+  movements: stockMovement_deleteMany(where:{businessId:{eq:$businessId}})
+  transfers: transfer_deleteMany(where:{businessId:{eq:$businessId}})
+  active: activeRequest_deleteMany(where:{businessId:{eq:$businessId}})
+  requests: replenishmentRequest_deleteMany(where:{businessId:{eq:$businessId}})
+  hq: inventory_updateMany(where:{location:{businessId:{eq:$businessId},key:{eq:"hq"}},productId:{in:$productIds}},data:{onHand:18,reserved:0,version_update:{inc:1}}) @check(expr:"this == 6",message:"Unexpected demo inventory; reset rolled back")
+  salons: inventory_updateMany(where:{location:{businessId:{eq:$businessId},key:{in:["legnicka","lodzka","zakladowa"]}},productId:{in:$productIds}},data:{onHand:2,reserved:0,version_update:{inc:1}}) @check(expr:"this == 18",message:"Unexpected demo inventory; reset rolled back")
+}

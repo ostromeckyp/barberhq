@@ -10,6 +10,27 @@ export const MemberRole = {
   SALON: "SALON",
 }
 
+export const MovementType = {
+  DISPATCH: "DISPATCH",
+  RECEIPT: "RECEIPT",
+}
+
+export const RequestState = {
+  PENDING_APPROVAL: "PENDING_APPROVAL",
+  RESERVED: "RESERVED",
+  DISPATCHED: "DISPATCHED",
+  RECEIVED: "RECEIVED",
+  REJECTED: "REJECTED",
+}
+
+export const StockActionType = {
+  SUBMIT: "SUBMIT",
+  APPROVE: "APPROVE",
+  REJECT: "REJECT",
+  DISPATCH: "DISPATCH",
+  RECEIVE: "RECEIVE",
+}
+
 export const connectorConfig = {
   connector: 'server',
   serviceId: 'barberhq',
@@ -62,5 +83,59 @@ export function upsertSalonAccess(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeMutation('UpsertSalonAccess', inputVars, inputOpts);
+}
+
+export function readResetCounts(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ReadResetCounts', inputVars, inputOpts);
+}
+
+export function resetDemoStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('ResetDemoStock', inputVars, inputOpts);
+}
+
+export function stockContext(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('StockContext', inputVars, inputOpts);
+}
+
+export function submitStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('SubmitStock', inputVars, inputOpts);
+}
+
+export function approveStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('ApproveStock', inputVars, inputOpts);
+}
+
+export function rejectStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('RejectStock', inputVars, inputOpts);
+}
+
+export function dispatchStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('DispatchStock', inputVars, inputOpts);
+}
+
+export function receiveStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('ReceiveStock', inputVars, inputOpts);
+}
+
+export function bindReplayKey(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('BindReplayKey', inputVars, inputOpts);
 }
 

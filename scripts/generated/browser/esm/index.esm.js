@@ -5,6 +5,11 @@ export const MemberRole = {
   SALON: "SALON",
 }
 
+export const MovementType = {
+  DISPATCH: "DISPATCH",
+  RECEIPT: "RECEIPT",
+}
+
 export const connectorConfig = {
   connector: 'browser',
   serviceId: 'barberhq',
@@ -27,5 +32,23 @@ export function getSalonInventory(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeQuery('GetSalonInventory', inputVars, inputOpts);
+}
+
+export function listActiveRequests(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ListActiveRequests', inputVars, inputOpts);
+}
+
+export function listHqQueue(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, false);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ListHQQueue', inputVars, inputOpts);
+}
+
+export function getRequestDetail(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('GetRequestDetail', inputVars, inputOpts);
 }
 

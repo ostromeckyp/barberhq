@@ -1,0 +1,34 @@
+query ListActiveRequests($salonId:String!, $limit:Int! = 50, $offset:Int! = 0) @auth(level:USER) {
+  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))",message:"FORBIDDEN") {
+    role @redact
+    salonAccesses_on_membership @redact { locationId }
+    business {
+      requests: replenishmentRequests_on_business(where:{salonId:{eq:$salonId},state:{in:[PENDING_APPROVAL,RESERVED,DISPATCHED]}},orderBy:[{createdAt:DESC},{id:ASC}],limit:$limit,offset:$offset) {
+        id salonId productId quantity state revision createdAt product { name } salon { name }
+      }
+    }
+  }
+}
+query ListHQQueue($limit:Int! = 50, $offset:Int! = 0) @auth(level:USER) {
+  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0",message:"FORBIDDEN") {
+    role @redact
+    business {
+      requests: replenishmentRequests_on_business(orderBy:[{createdAt:DESC},{id:ASC}],limit:$limit,offset:$offset) {
+        id salonId productId quantity state revision createdAt product { name } salon { name }
+      }
+    }
+  }
+}
+query GetRequestDetail($requestId:String!) @auth(level:USER) {
+  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && this.business.requests.size() == 1 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == this.business.requests[0].salonId))",message:"FORBIDDEN") {
+    role @redact
+    salonAccesses_on_membership @redact { locationId }
+    business {
+      requests: replenishmentRequests_on_business(where:{id:{eq:$requestId}},limit:1) {
+        id salonId productId quantity state revision createdAt product { name } salon { name }
+        transfer: transfer_on_request { dispatchedQuantity receivedQuantity }
+        timeline: actionReceipts_on_request(orderBy:{revision:ASC},limit:10) { state createdAt action reason }
+      }
+    }
+  }
+}

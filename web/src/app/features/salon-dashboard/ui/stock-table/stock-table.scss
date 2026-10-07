@@ -1,0 +1,80 @@
+@use '../../../../shared/styles/surfaces' as surfaces;
+@include surfaces.inventory-card;
+table {
+  width: 100%;
+  table-layout: fixed;
+  background: var(--surface);
+}
+.mat-column-product {
+  width: 76%;
+}
+.mat-column-salon {
+  width: 24%;
+}
+.mat-mdc-header-cell {
+  background: var(--table-header);
+  color: var(--muted);
+  font-size: 12px;
+}
+td,
+th {
+  padding: 8px 20px;
+  border-bottom-color: var(--divider);
+}
+tr {
+  height: 56px;
+}
+td strong {
+  display: block;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.product-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.stock-value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.quantity {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 500;
+  min-width: 28px;
+}
+.low {
+  background: var(--warning-row);
+}
+@media (max-width: 500px) {
+  td,
+  th {
+    padding: 12px;
+  }
+  .stock-value {
+    gap: 4px;
+  }
+}
+
+.mat-column-salon {
+  text-align: right;
+}
+.stock-value small {
+  margin: 0;
+}
+@media (max-width: 500px) {
+  .product-summary {
+    gap: 6px;
+  }
+}

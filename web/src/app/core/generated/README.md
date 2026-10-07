@@ -11,6 +11,9 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetMyMembership*](#getmymembership)
   - [*ListProducts*](#listproducts)
   - [*GetSalonInventory*](#getsaloninventory)
+  - [*ListActiveRequests*](#listactiverequests)
+  - [*ListHQQueue*](#listhqqueue)
+  - [*GetRequestDetail*](#getrequestdetail)
 - [**Mutations**](#mutations)
 
 # Accessing the connector
@@ -429,6 +432,410 @@ const ref = getSalonInventoryRef({ salonId: ..., limit: ..., offset: ..., });
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = getSalonInventoryRef(dataConnect, getSalonInventoryVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+## ListActiveRequests
+You can execute the `ListActiveRequests` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+listActiveRequests(vars: ListActiveRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListActiveRequestsData, ListActiveRequestsVariables>;
+
+interface ListActiveRequestsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListActiveRequestsVariables): QueryRef<ListActiveRequestsData, ListActiveRequestsVariables>;
+}
+export const listActiveRequestsRef: ListActiveRequestsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listActiveRequests(dc: DataConnect, vars: ListActiveRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListActiveRequestsData, ListActiveRequestsVariables>;
+
+interface ListActiveRequestsRef {
+  ...
+  (dc: DataConnect, vars: ListActiveRequestsVariables): QueryRef<ListActiveRequestsData, ListActiveRequestsVariables>;
+}
+export const listActiveRequestsRef: ListActiveRequestsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listActiveRequestsRef:
+```typescript
+const name = listActiveRequestsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListActiveRequests` query requires an argument of type `ListActiveRequestsVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ListActiveRequestsVariables {
+  salonId: string;
+  limit?: number;
+  offset?: number;
+}
+```
+### Return Type
+Recall that executing the `ListActiveRequests` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListActiveRequestsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListActiveRequestsData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+```
+### Using `ListActiveRequests`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listActiveRequests, ListActiveRequestsVariables } from '@barberhq/browser';
+
+// The `ListActiveRequests` query requires an argument of type `ListActiveRequestsVariables`:
+const listActiveRequestsVars: ListActiveRequestsVariables = {
+  salonId: ..., 
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listActiveRequests()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listActiveRequests(listActiveRequestsVars);
+// Variables can be defined inline as well.
+const { data } = await listActiveRequests({ salonId: ..., limit: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listActiveRequests(dataConnect, listActiveRequestsVars);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+listActiveRequests(listActiveRequestsVars).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `ListActiveRequests`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listActiveRequestsRef, ListActiveRequestsVariables } from '@barberhq/browser';
+
+// The `ListActiveRequests` query requires an argument of type `ListActiveRequestsVariables`:
+const listActiveRequestsVars: ListActiveRequestsVariables = {
+  salonId: ..., 
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listActiveRequestsRef()` function to get a reference to the query.
+const ref = listActiveRequestsRef(listActiveRequestsVars);
+// Variables can be defined inline as well.
+const ref = listActiveRequestsRef({ salonId: ..., limit: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listActiveRequestsRef(dataConnect, listActiveRequestsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+## ListHQQueue
+You can execute the `ListHQQueue` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+listHqQueue(vars?: ListHqQueueVariables, options?: ExecuteQueryOptions): QueryPromise<ListHqQueueData, ListHqQueueVariables>;
+
+interface ListHqQueueRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars?: ListHqQueueVariables): QueryRef<ListHqQueueData, ListHqQueueVariables>;
+}
+export const listHqQueueRef: ListHqQueueRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listHqQueue(dc: DataConnect, vars?: ListHqQueueVariables, options?: ExecuteQueryOptions): QueryPromise<ListHqQueueData, ListHqQueueVariables>;
+
+interface ListHqQueueRef {
+  ...
+  (dc: DataConnect, vars?: ListHqQueueVariables): QueryRef<ListHqQueueData, ListHqQueueVariables>;
+}
+export const listHqQueueRef: ListHqQueueRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listHqQueueRef:
+```typescript
+const name = listHqQueueRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListHQQueue` query has an optional argument of type `ListHqQueueVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ListHqQueueVariables {
+  limit?: number;
+  offset?: number;
+}
+```
+### Return Type
+Recall that executing the `ListHQQueue` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListHqQueueData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListHqQueueData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+```
+### Using `ListHQQueue`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listHqQueue, ListHqQueueVariables } from '@barberhq/browser';
+
+// The `ListHQQueue` query has an optional argument of type `ListHqQueueVariables`:
+const listHqQueueVars: ListHqQueueVariables = {
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listHqQueue()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listHqQueue(listHqQueueVars);
+// Variables can be defined inline as well.
+const { data } = await listHqQueue({ limit: ..., offset: ..., });
+// Since all variables are optional for this query, you can omit the `ListHqQueueVariables` argument.
+const { data } = await listHqQueue();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listHqQueue(dataConnect, listHqQueueVars);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+listHqQueue(listHqQueueVars).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `ListHQQueue`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listHqQueueRef, ListHqQueueVariables } from '@barberhq/browser';
+
+// The `ListHQQueue` query has an optional argument of type `ListHqQueueVariables`:
+const listHqQueueVars: ListHqQueueVariables = {
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listHqQueueRef()` function to get a reference to the query.
+const ref = listHqQueueRef(listHqQueueVars);
+// Variables can be defined inline as well.
+const ref = listHqQueueRef({ limit: ..., offset: ..., });
+// Since all variables are optional for this query, you can omit the `ListHqQueueVariables` argument.
+const ref = listHqQueueRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listHqQueueRef(dataConnect, listHqQueueVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+## GetRequestDetail
+You can execute the `GetRequestDetail` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+getRequestDetail(vars: GetRequestDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetRequestDetailData, GetRequestDetailVariables>;
+
+interface GetRequestDetailRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRequestDetailVariables): QueryRef<GetRequestDetailData, GetRequestDetailVariables>;
+}
+export const getRequestDetailRef: GetRequestDetailRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getRequestDetail(dc: DataConnect, vars: GetRequestDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetRequestDetailData, GetRequestDetailVariables>;
+
+interface GetRequestDetailRef {
+  ...
+  (dc: DataConnect, vars: GetRequestDetailVariables): QueryRef<GetRequestDetailData, GetRequestDetailVariables>;
+}
+export const getRequestDetailRef: GetRequestDetailRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getRequestDetailRef:
+```typescript
+const name = getRequestDetailRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetRequestDetail` query requires an argument of type `GetRequestDetailVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetRequestDetailVariables {
+  requestId: string;
+}
+```
+### Return Type
+Recall that executing the `GetRequestDetail` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetRequestDetailData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetRequestDetailData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+        transfer?: {
+          dispatchedQuantity: number;
+          receivedQuantity: number;
+        };
+        timeline: ({
+          state: RequestState;
+          createdAt: TimestampString;
+          action: StockActionType;
+          reason?: string | null;
+        })[];
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+```
+### Using `GetRequestDetail`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getRequestDetail, GetRequestDetailVariables } from '@barberhq/browser';
+
+// The `GetRequestDetail` query requires an argument of type `GetRequestDetailVariables`:
+const getRequestDetailVars: GetRequestDetailVariables = {
+  requestId: ..., 
+};
+
+// Call the `getRequestDetail()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getRequestDetail(getRequestDetailVars);
+// Variables can be defined inline as well.
+const { data } = await getRequestDetail({ requestId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getRequestDetail(dataConnect, getRequestDetailVars);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+getRequestDetail(getRequestDetailVars).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `GetRequestDetail`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getRequestDetailRef, GetRequestDetailVariables } from '@barberhq/browser';
+
+// The `GetRequestDetail` query requires an argument of type `GetRequestDetailVariables`:
+const getRequestDetailVars: GetRequestDetailVariables = {
+  requestId: ..., 
+};
+
+// Call the `getRequestDetailRef()` function to get a reference to the query.
+const ref = getRequestDetailRef(getRequestDetailVars);
+// Variables can be defined inline as well.
+const ref = getRequestDetailRef({ requestId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getRequestDetailRef(dataConnect, getRequestDetailVars);
 
 // Call `executeQuery()` on the reference to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.

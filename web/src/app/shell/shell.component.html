@@ -1,0 +1,61 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+<mat-toolbar class="toolbar">
+  @if (mobile()?.matches) {
+    <button mat-icon-button aria-label="Open navigation" (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+  <a class="brand" [routerLink]="facade.home()"><app-brand [inverse]="true" /></a
+  ><span class="toolbar-space"></span
+  ><span class="context">{{ facade.context() }} · {{ facade.role() }}</span
+  ><button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Account menu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu"
+    ><button mat-menu-item (click)="facade.signOut()">
+      <mat-icon>logout</mat-icon>Sign out
+    </button></mat-menu
+  ></mat-toolbar
+>
+@if (mobile()?.matches) {
+  <div class="mobile-context">
+    {{ facade.context() }} <span>{{ facade.role() }}</span>
+  </div>
+}
+<mat-sidenav-container
+  ><mat-sidenav
+    #drawer
+    [mode]="mobile()?.matches ? 'over' : 'side'"
+    [opened]="!mobile()?.matches"
+    [style.width.px]="mobile()?.matches ? 280 : 220"
+  >
+    <div class="nav-label">WORKSPACE</div>
+    <mat-nav-list aria-label="Main navigation">
+      @if (facade.isHq()) {
+        <a mat-list-item routerLink="/hq" routerLinkActive="active" (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>warehouse</mat-icon>HQ overview</a
+        >
+      }
+      @for (salon of facade.salons(); track salon.id) {
+        <a
+          mat-list-item
+          [routerLink]="['/salons', salon.id]"
+          routerLinkActive="active"
+          (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>storefront</mat-icon>{{ salon.name }}</a
+        >
+      }
+    </mat-nav-list>
+    <div class="nav-footer">NOT BAD STUFF<br /><span>Demo workspace</span></div></mat-sidenav
+  >
+  <mat-sidenav-content
+    ><main id="main-content" tabindex="-1">
+      @if (facade.ready()) {
+        <router-outlet />
+      }
+      @if (facade.signOutError()) {
+        <p class="error-message" role="alert">{{ facade.signOutError() }}</p>
+      }
+    </main></mat-sidenav-content
+  ></mat-sidenav-container
+>

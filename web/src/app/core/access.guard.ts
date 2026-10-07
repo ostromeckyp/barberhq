@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
 import { Router, type CanActivateFn } from '@angular/router';
-import { SessionService } from './session.service';
+import { SessionFacade } from '../features/auth/feature/session.facade';
 export const accessGuard: CanActivateFn = async (route, state) => {
-  const session = inject(SessionService),
+  const session = inject(SessionFacade),
     router = inject(Router);
   const current = await session.resolved();
   if (current.status === 'SIGNED_OUT')

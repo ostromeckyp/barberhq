@@ -22,3 +22,5 @@ pglite-debug.log*
 
 web/src/app/core/public-config.*.generated.ts
 .firebase/
+functions/lib/
+functions-debug.log*

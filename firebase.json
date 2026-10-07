@@ -18,6 +18,10 @@
     "hosting": {
       "host": "127.0.0.1",
       "port": 5002
+    },
+    "functions": {
+      "host": "127.0.0.1",
+      "port": 5001
     }
   },
   "hosting": {
@@ -54,5 +58,20 @@
     "predeploy": [
       "node --import tsx scripts/checks/release.ts"
     ]
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "stock",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "**/*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }

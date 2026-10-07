@@ -1,14 +1,16 @@
 # Implementation phases
 
-**Updated 29 September 2026 · specifications only. No phase has been implemented.**
+**Updated 30 September 2026 · increment 1 implemented and verified locally; cloud acceptance remains blocked on owner setup.**
 
-## Approved delivery approach — implementation plans under review
+See [current evidence](handoffs/increment-1.md) and [Angular architecture / customization](angular-architecture.md).
+
+## Approved delivery approach
 
 The user approved five working increments: login/live inventory, manual replenishment, PDF knowledge/library, the two AI flows, and final rehearsal. The [incremental delivery design](../superpowers/specs/2026-09-29-barberhq-delivery-design.md) consolidates the approved sections and was accepted for planning through the explicit writing-plans request.
 
 Use that design for execution sequencing. The original phases below remain requirement packages and coverage checkpoints, not a mandate to finish complete technical layers in numeric order. In particular, structured seed/memberships and the first Hosting release move into increment 1; document ingestion does not block the first inventory screen. No original acceptance criterion is removed.
 
-The [execution index and seven detailed plans](../superpowers/plans/2026-09-29-barberhq-execution-index.md) are written and awaiting review and execution-method selection. Do not use the legacy whole-phase prompt below to start implementation under the new approach. Future reports use `handoffs/increment-<id>.md` and map evidence back to original phase criteria.
+The [execution index and seven detailed plans](../superpowers/plans/2026-09-29-barberhq-execution-index.md) are being executed in the approved Native mode. Do not use the legacy whole-phase prompt below to start implementation under the new approach. Future reports use `handoffs/increment-<id>.md` and map evidence back to original phase criteria.
 
 Start with the [master project specification](../../.claude/specs/barberhq-master.md) to understand how the pieces fit together. Build BarberHQ in small, verifiable increments. Each agent receives the shared contract, one phase specification and the completed prerequisite handoff reports. The full architecture is a reference for named sections, not mandatory context for every task.
 
@@ -67,3 +69,5 @@ Every completion report must contain: status (`READY` or `BLOCKED`), implemented
 - After 7: both scenarios fit the existing 20-minute presentation.
 
 These phase specs refine the [application requirements](../../.claude/specs/barberhq-replenishment-assistant.md) and [architecture](../05-architecture-how.md). If a concrete feasibility check requires a contract change, record it and update dependent specs before continuing. Do not silently weaken the stock or authorization guarantees.
+
+Current local increment: [manual replenishment handoff](handoffs/increment-2.md). Cloud acceptance remains blocked; do not label local emulator evidence as deployed proof.

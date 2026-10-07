@@ -123,6 +123,10 @@ export async function createCloudHarness(testName: string) {
     throw e;
   }
   return {
+    operator: dc,
+    businessId,
+    users,
+    browserClient: (role: Role) => clients.get(role)!,
     loginCredentials: (role: Role) => credentials.get(role)!,
     legnickaId: `${businessId}:legnicka`,
     client: (role: Role) => ({

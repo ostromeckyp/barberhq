@@ -1,19 +1,20 @@
 import { inject } from '@angular/core';
 import { Routes, Router } from '@angular/router';
-import { SessionService } from './core/session.service';
+import { SessionFacade } from './features/auth/feature/session.facade';
 import { accessGuard } from './core/access.guard';
 export const routes: Routes = [
   {
     path: 'login',
     title: 'Sign in · BarberHQ',
-    loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent),
+    loadComponent: () =>
+      import('./features/login/feature/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'no-access',
     title: 'Access · BarberHQ',
     data: { kind: 'no-access' },
     loadComponent: () =>
-      import('./shared/status-page.component').then((m) => m.StatusPageComponent),
+      import('./features/access/feature/status-page.component').then((m) => m.StatusPageComponent),
   },
   {
     path: '',
@@ -25,7 +26,7 @@ export const routes: Routes = [
         title: 'Salon inventory · BarberHQ',
         canActivate: [accessGuard],
         loadComponent: () =>
-          import('./features/salon-dashboard/salon-dashboard.component').then(
+          import('./features/salon-dashboard/feature/salon-dashboard.component').then(
             (m) => m.SalonDashboardComponent,
           ),
       },
@@ -35,14 +36,25 @@ export const routes: Routes = [
         data: { kind: 'hq' },
         canActivate: [accessGuard],
         loadComponent: () =>
-          import('./shared/status-page.component').then((m) => m.StatusPageComponent),
+          import('./features/hq-queue/feature/hq-queue.component').then((m) => m.HqQueueComponent),
+      },
+      {
+        path: 'requests/:requestId',
+        title: 'Request · BarberHQ',
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/request-detail/feature/request-detail.component').then(
+            (m) => m.RequestDetailComponent,
+          ),
       },
       {
         path: '',
         pathMatch: 'full',
-        canActivate: [() => inject(Router).parseUrl(inject(SessionService).home())],
+        canActivate: [() => inject(Router).parseUrl(inject(SessionFacade).home())],
         loadComponent: () =>
-          import('./shared/status-page.component').then((m) => m.StatusPageComponent),
+          import('./features/access/feature/status-page.component').then(
+            (m) => m.StatusPageComponent,
+          ),
       },
     ],
   },
@@ -51,6 +63,6 @@ export const routes: Routes = [
     title: 'Page not found · BarberHQ',
     data: { kind: 'not-found' },
     loadComponent: () =>
-      import('./shared/status-page.component').then((m) => m.StatusPageComponent),
+      import('./features/access/feature/status-page.component').then((m) => m.StatusPageComponent),
   },
 ];

@@ -73,3 +73,9 @@ Contrast the business outcomes: **complete a stock movement** and **find the rel
 - [ ] Ten rehearsals record correctness/latency; no numerical savings are claimed without pilot evidence.
 - [ ] A successful local recording is ready and readable on the projector.
 - [ ] Both scenarios finish within six minutes; the whole talk is twenty minutes excluding Q&A.
+
+## Implemented manual replenishment rehearsal
+
+See [increment 2 handoff](implementation/handoffs/increment-2.md) for startup, test and guarded reset commands. Use separate browser profiles for HQ and Legnicka. Request 2 Pomada Matowa; HQ approves and dispatches; Legnicka confirms exactly 2 intact units. End state: HQ16, Legnicka4, transit0. The procedures/RAG scenario remains a later increment.
+
+Reset is an operator CLI action, never a staff menu. Close user sessions first; ordinary `demo:local` preserves stock and does not reset completed transfers.

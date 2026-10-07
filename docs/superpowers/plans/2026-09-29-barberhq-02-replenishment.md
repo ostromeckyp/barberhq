@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Frontend structure update (30 September):** follow [Angular architecture](../../implementation/angular-architecture.md). Page components delegate to scoped facades; SDK calls live in feature data-access services. Historical foundation paths are superseded there.
+
 **Goal:** Complete the deployed two-unit flow and safe multi-product submission without AI.
 
 **Architecture:** Explicit callable commands invoke guarded SQL transactions; Angular reloads authoritative records after success. One local basket produces independent single-product requests.
@@ -81,7 +83,7 @@ Race two requests of quantity 2 against HQ on-hand 3 in isolated fixtures: exact
 **Files:**
 - Create: `web/src/app/features/salon-dashboard/draft.store.ts`, `order-panel.component.ts`, `order-proposal.component.ts` in that feature directory.
 - Create: `web/src/app/core/submission.service.ts`, `web/src/app/core/pending-submission.store.ts`, `shared/contracts/draft.ts`.
-- Modify: `web/src/app/core/stock-api.ts`, `web/src/app/features/salon-dashboard/salon-dashboard.component.ts`.
+- Modify: `web/src/app/features/salon-dashboard/data-access/inventory-api.ts`, `web/src/app/features/salon-dashboard/feature/salon-dashboard.component.ts`.
 - Test: `web/src/app/features/salon-dashboard/draft.store.spec.ts`, `web/src/app/core/submission.service.spec.ts`.
 
 **Interfaces:**
@@ -114,12 +116,12 @@ Use a fake callable adapter whose first call commits then rejects as transport-u
 - Create: `web/src/app/features/hq-queue/hq-queue.component.ts`, `queue-row.component.ts` in that directory.
 - Create: `web/src/app/features/request-detail/request-detail.component.ts`, `request-action-dialog.component.ts`, `status-timeline.component.ts`, `delivery-quantities.component.ts` in that directory.
 - Create: `web/src/app/shared/status-chip.component.ts`, `web/src/app/shared/low-stock.component.ts`.
-- Modify: `web/src/app/app.routes.ts`, `web/src/app/shell/shell.component.ts`, `web/src/app/core/stock-api.ts`.
+- Modify: `web/src/app/app.routes.ts`, `web/src/app/shell/shell.component.ts`, `web/src/app/features/salon-dashboard/data-access/inventory-api.ts`.
 - Test: `tests/e2e/replenishment.spec.ts`, `web/src/app/features/request-detail/request-action-dialog.component.spec.ts`.
 
 **Interfaces:**
 - Consumes: RequestDetail, CommandResult, expected request/HQ versions.
-- Produces `StockApi.getRequest(requestId:string):Promise<RequestDetail>`, `listHQQueue(page:PageInput):Promise<Page<RequestSummary>>`, `runAction(action:StockAction):Promise<CommandResult>`.
+- Produces a replenishment data-access service with `getRequest(requestId:string):Promise<RequestDetail>`, `listHQQueue(page:PageInput):Promise<Page<RequestSummary>>`, `runAction(action:StockAction):Promise<CommandResult>`, consumed through a feature facade. Keep inventory reads in `InventoryApi`.
 - Reuse the same dialog/action service from detail and queue; no second approval implementation.
 
 - [ ] **Step 1: Write the behavioral checks.** Tests `two_units_move_once`, `damaged_receipt_is_blocked`, `stale_approval_requires_review`:

@@ -13,7 +13,31 @@ export enum MemberRole {
   SALON = "SALON",
 };
 
+export enum MovementType {
+  DISPATCH = "DISPATCH",
+  RECEIPT = "RECEIPT",
+};
 
+
+
+export interface ActionKey_Key {
+  businessId: string;
+  actorUid: string;
+  idempotencyKey: string;
+  __typename?: 'ActionKey_Key';
+}
+
+export interface ActionReceipt_Key {
+  id: string;
+  __typename?: 'ActionReceipt_Key';
+}
+
+export interface ActiveRequest_Key {
+  businessId: string;
+  salonId: string;
+  productId: string;
+  __typename?: 'ActiveRequest_Key';
+}
 
 export interface Business_Key {
   id: string;
@@ -42,6 +66,42 @@ export interface GetMyMembershipData {
       } & Location_Key)[];
     };
   } & Membership_Key;
+}
+
+export interface GetRequestDetailData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+        transfer?: {
+          dispatchedQuantity: number;
+          receivedQuantity: number;
+        };
+        timeline: ({
+          state: RequestState;
+          createdAt: TimestampString;
+          action: StockActionType;
+          reason?: string | null;
+        })[];
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface GetRequestDetailVariables {
+  requestId: string;
 }
 
 export interface GetSalonInventoryData {
@@ -86,6 +146,61 @@ export interface Inventory_Key {
   __typename?: 'Inventory_Key';
 }
 
+export interface ListActiveRequestsData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface ListActiveRequestsVariables {
+  salonId: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ListHqQueueData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface ListHqQueueVariables {
+  limit?: number;
+  offset?: number;
+}
+
 export interface ListProductsData {
   membership?: {
     business: {
@@ -127,10 +242,26 @@ export interface Product_Key {
   __typename?: 'Product_Key';
 }
 
+export interface ReplenishmentRequest_Key {
+  id: string;
+  __typename?: 'ReplenishmentRequest_Key';
+}
+
 export interface SalonAccess_Key {
   membershipUid: string;
   locationId: string;
   __typename?: 'SalonAccess_Key';
+}
+
+export interface StockMovement_Key {
+  transferRequestId: string;
+  type: MovementType;
+  __typename?: 'StockMovement_Key';
+}
+
+export interface Transfer_Key {
+  requestId: string;
+  __typename?: 'Transfer_Key';
 }
 
 interface GetMyMembershipRef {
@@ -168,4 +299,40 @@ export const getSalonInventoryRef: GetSalonInventoryRef;
 
 export function getSalonInventory(vars: GetSalonInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonInventoryData, GetSalonInventoryVariables>;
 export function getSalonInventory(dc: DataConnect, vars: GetSalonInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonInventoryData, GetSalonInventoryVariables>;
+
+interface ListActiveRequestsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListActiveRequestsVariables): QueryRef<ListActiveRequestsData, ListActiveRequestsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ListActiveRequestsVariables): QueryRef<ListActiveRequestsData, ListActiveRequestsVariables>;
+  operationName: string;
+}
+export const listActiveRequestsRef: ListActiveRequestsRef;
+
+export function listActiveRequests(vars: ListActiveRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListActiveRequestsData, ListActiveRequestsVariables>;
+export function listActiveRequests(dc: DataConnect, vars: ListActiveRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListActiveRequestsData, ListActiveRequestsVariables>;
+
+interface ListHqQueueRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars?: ListHqQueueVariables): QueryRef<ListHqQueueData, ListHqQueueVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars?: ListHqQueueVariables): QueryRef<ListHqQueueData, ListHqQueueVariables>;
+  operationName: string;
+}
+export const listHqQueueRef: ListHqQueueRef;
+
+export function listHqQueue(vars?: ListHqQueueVariables, options?: ExecuteQueryOptions): QueryPromise<ListHqQueueData, ListHqQueueVariables>;
+export function listHqQueue(dc: DataConnect, vars?: ListHqQueueVariables, options?: ExecuteQueryOptions): QueryPromise<ListHqQueueData, ListHqQueueVariables>;
+
+interface GetRequestDetailRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRequestDetailVariables): QueryRef<GetRequestDetailData, GetRequestDetailVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetRequestDetailVariables): QueryRef<GetRequestDetailData, GetRequestDetailVariables>;
+  operationName: string;
+}
+export const getRequestDetailRef: GetRequestDetailRef;
+
+export function getRequestDetail(vars: GetRequestDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetRequestDetailData, GetRequestDetailVariables>;
+export function getRequestDetail(dc: DataConnect, vars: GetRequestDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetRequestDetailData, GetRequestDetailVariables>;
 

@@ -22,7 +22,11 @@ test("real sign-in, scoped quantities, nested refresh and sign-out", async ({
   await expect(
     page.getByRole("heading", { name: "Legnicka", exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("Pomada Matowa", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("table", { name: "Salon stock" })
+      .getByText("Pomada Matowa", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveText("2");
   expect(
     (
@@ -31,6 +35,10 @@ test("real sign-in, scoped quantities, nested refresh and sign-out", async ({
         .analyze()
     ).violations,
   ).toEqual([]);
+  await page.getByRole("link", { name: "BarberHQ DEMO" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Legnicka", exact: true }),
+  ).toBeVisible();
   await page.reload();
   await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveText("2");
   await page.screenshot({
@@ -40,7 +48,10 @@ test("real sign-in, scoped quantities, nested refresh and sign-out", async ({
   await page.getByRole("button", { name: "Account menu" }).click();
   await page.getByRole("menuitem", { name: "Sign out" }).click();
   await expect(
-    page.getByRole("heading", { name: "Good to see you." }),
+    page.getByRole("heading", {
+      name: "Sign in with your work account.",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveCount(0);
 });
@@ -109,4 +120,34 @@ test("mobile layout and keyboard login do not overflow at 320px", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+});
+
+test("failed refresh keeps last-known stock and retry replaces the stale state", async ({
+  page,
+}) => {
+  await login(page);
+  await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveText("2");
+  await page.route("**:9399/**", async (route) => {
+    if (route.request().postData()?.includes("GetSalonInventory"))
+      await route.abort();
+    else await route.continue();
+  });
+  await page.getByRole("button", { name: "Refresh", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText(
+    "last loaded quantities",
+  );
+  await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveText("2");
+  await page.unrouteAll();
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "last loaded quantities" }),
+  ).toHaveCount(0);
+  await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveText("2");
 });

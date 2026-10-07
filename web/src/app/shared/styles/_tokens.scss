@@ -1,0 +1,24 @@
+// Brand values shared by the Material theme and the app's custom components.
+$brand: #dc241f;
+$ink: #171614;
+$muted: #57534c;
+$border: #e2ded6;
+$background: #f6f5f2;
+$surface: #ffffff;
+
+@mixin properties {
+  --brand: #{$brand};
+  --ink: #{$ink};
+  --muted: #{$muted};
+  --border: #{$border};
+  --background: #{$background};
+  --surface: #{$surface};
+  --table-header: #faf9f7;
+  --divider: #ece9e3;
+  --chip-border: #cfc9bf;
+  --warning-row: #fffbf3;
+  --warning-text: #5c3700;
+  --warning-background: #fbefd6;
+  --radius-card: 12px;
+  --font-mono: 'IBM Plex Mono', monospace;
+}

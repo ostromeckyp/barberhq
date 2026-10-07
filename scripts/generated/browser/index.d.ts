@@ -11,6 +11,29 @@ export enum MemberRole {
   HQ = "HQ",
   SALON = "SALON",
 }
+export enum MovementType {
+  DISPATCH = "DISPATCH",
+  RECEIPT = "RECEIPT",
+}
+
+export interface ActionKey_Key {
+  businessId: string;
+  actorUid: string;
+  idempotencyKey: string;
+  __typename?: 'ActionKey_Key';
+}
+
+export interface ActionReceipt_Key {
+  id: string;
+  __typename?: 'ActionReceipt_Key';
+}
+
+export interface ActiveRequest_Key {
+  businessId: string;
+  salonId: string;
+  productId: string;
+  __typename?: 'ActiveRequest_Key';
+}
 
 export interface Business_Key {
   id: string;
@@ -39,6 +62,42 @@ export interface GetMyMembershipData {
       } & Location_Key)[];
     };
   } & Membership_Key;
+}
+
+export interface GetRequestDetailData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+        transfer?: {
+          dispatchedQuantity: number;
+          receivedQuantity: number;
+        };
+        timeline: ({
+          state: RequestState;
+          createdAt: TimestampString;
+          action: StockActionType;
+          reason?: string | null;
+        })[];
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface GetRequestDetailVariables {
+  requestId: string;
 }
 
 export interface GetSalonInventoryData {
@@ -83,6 +142,61 @@ export interface Inventory_Key {
   __typename?: 'Inventory_Key';
 }
 
+export interface ListActiveRequestsData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface ListActiveRequestsVariables {
+  salonId: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ListHqQueueData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        productId: string;
+        quantity: number;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        product: {
+          name: string;
+        };
+        salon: {
+          name: string;
+        };
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface ListHqQueueVariables {
+  limit?: number;
+  offset?: number;
+}
+
 export interface ListProductsData {
   membership?: {
     business: {
@@ -124,10 +238,26 @@ export interface Product_Key {
   __typename?: 'Product_Key';
 }
 
+export interface ReplenishmentRequest_Key {
+  id: string;
+  __typename?: 'ReplenishmentRequest_Key';
+}
+
 export interface SalonAccess_Key {
   membershipUid: string;
   locationId: string;
   __typename?: 'SalonAccess_Key';
+}
+
+export interface StockMovement_Key {
+  transferRequestId: string;
+  type: MovementType;
+  __typename?: 'StockMovement_Key';
+}
+
+export interface Transfer_Key {
+  requestId: string;
+  __typename?: 'Transfer_Key';
 }
 
 /** Generated Node Admin SDK operation action function for the 'GetMyMembership' Query. Allow users to execute without passing in DataConnect. */
@@ -144,4 +274,19 @@ export function listProducts(vars?: ListProductsVariables, options?: OperationOp
 export function getSalonInventory(dc: DataConnect, vars: GetSalonInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonInventoryData>>;
 /** Generated Node Admin SDK operation action function for the 'GetSalonInventory' Query. Allow users to pass in custom DataConnect instances. */
 export function getSalonInventory(vars: GetSalonInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonInventoryData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ListActiveRequests' Query. Allow users to execute without passing in DataConnect. */
+export function listActiveRequests(dc: DataConnect, vars: ListActiveRequestsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListActiveRequestsData>>;
+/** Generated Node Admin SDK operation action function for the 'ListActiveRequests' Query. Allow users to pass in custom DataConnect instances. */
+export function listActiveRequests(vars: ListActiveRequestsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListActiveRequestsData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ListHqQueue' Query. Allow users to execute without passing in DataConnect. */
+export function listHqQueue(dc: DataConnect, vars?: ListHqQueueVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListHqQueueData>>;
+/** Generated Node Admin SDK operation action function for the 'ListHqQueue' Query. Allow users to pass in custom DataConnect instances. */
+export function listHqQueue(vars?: ListHqQueueVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListHqQueueData>>;
+
+/** Generated Node Admin SDK operation action function for the 'GetRequestDetail' Query. Allow users to execute without passing in DataConnect. */
+export function getRequestDetail(dc: DataConnect, vars: GetRequestDetailVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetRequestDetailData>>;
+/** Generated Node Admin SDK operation action function for the 'GetRequestDetail' Query. Allow users to pass in custom DataConnect instances. */
+export function getRequestDetail(vars: GetRequestDetailVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetRequestDetailData>>;
 

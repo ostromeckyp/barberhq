@@ -1,0 +1,59 @@
+enum RequestState { PENDING_APPROVAL RESERVED DISPATCHED RECEIVED REJECTED }
+enum StockActionType { SUBMIT APPROVE REJECT DISPATCH RECEIVE }
+enum MovementType { DISPATCH RECEIPT }
+type ReplenishmentRequest @table(key: "id") @index(fields: ["businessId", "state", "createdAt"]) {
+  id: String!
+  business: Business!
+  salon: Location!
+  product: Product!
+  quantity: Int!
+  state: RequestState!
+  revision: Int!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+type ActiveRequest @table(key: ["business", "salon", "product"]) {
+  business: Business!
+  salon: Location!
+  product: Product!
+  request: ReplenishmentRequest! @unique
+}
+type Transfer @table(key: "request") {
+  request: ReplenishmentRequest!
+  business: Business!
+  warehouse: Location!
+  destination: Location!
+  product: Product!
+  quantity: Int!
+  dispatchedQuantity: Int! @default(value: 0)
+  receivedQuantity: Int! @default(value: 0)
+}
+type StockMovement @table(key: ["transfer", "type"]) {
+  transfer: Transfer!
+  business: Business!
+  type: MovementType!
+  quantity: Int!
+  actorUid: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+type ActionReceipt @table(key: "id") @unique(fields: ["business", "actorUid", "idempotencyKey"]) @unique(fields: ["request", "action"]) {
+  id: String!
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  request: ReplenishmentRequest!
+  action: StockActionType!
+  payloadHash: String!
+  semanticHash: String!
+  state: RequestState!
+  revision: Int!
+  reason: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+# Every attempted action key binds to one immutable result, including semantic retries.
+type ActionKey @table(key:["business","actorUid","idempotencyKey"]) {
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  receipt: ActionReceipt!
+  payloadHash: String!
+}

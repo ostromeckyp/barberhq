@@ -1,6 +1,6 @@
 # DevFest demo: BarberHQ
 
-Increment 1 is implemented and verified locally: Angular login and scoped inventory. No cloud deployment has been performed. [Local run / Hosting guide](docs/implementation/deployment-runbook.md) · [current handoff](docs/implementation/handoffs/increment-1.md).
+Increments 1–2 are implemented locally: Angular login, scoped inventory and manual replenishment. No cloud deployment has been performed. [Local run / Hosting guide](docs/implementation/deployment-runbook.md) · [current handoff](docs/implementation/handoffs/increment-2.md).
 
 **Confirmed demo: two use cases for Not Bad Stuff.**
 
@@ -49,6 +49,8 @@ The phased handoffs and owner setup guide were added on **27 September 2026**. C
 
 ## Local implementation
 
+[Angular facades, data-access boundaries and UI customization](docs/implementation/angular-architecture.md) describe the current frontend structure.
+
 `web/` contains the Angular SPA; `dataconnect/` owns schema and generated GraphQL operations; `scripts/` prepares fixtures, seeds safely and checks builds; `shared/contracts/` contains browser-safe types.
 
-Follow the [runbook](docs/implementation/deployment-runbook.md) for clean installs, emulator startup, generated private local accounts and verification commands. The [owner checklist](docs/implementation/firebase-owner-checklist.md) describes the missing cloud prerequisites. Replenishment commands, PDFs and RAG are later increments.
+Follow the [runbook](docs/implementation/deployment-runbook.md) for clean installs, emulator startup, generated private local accounts and verification commands. The [owner checklist](docs/implementation/firebase-owner-checklist.md) describes the missing cloud prerequisites. Manual replenishment startup now includes the Functions emulator; see the [increment 2 run instructions](docs/implementation/handoffs/increment-2.md). PDFs and RAG are later increments.

@@ -6,6 +6,12 @@ const MemberRole = {
 }
 exports.MemberRole = MemberRole;
 
+const MovementType = {
+  DISPATCH: "DISPATCH",
+  RECEIPT: "RECEIPT",
+}
+exports.MovementType = MovementType;
+
 const connectorConfig = {
   connector: 'browser',
   service: 'barberhq',
@@ -55,5 +61,50 @@ exports.getSalonInventory = function getSalonInventory(dcOrVars, varsOrOptions, 
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getSalonInventoryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const listActiveRequestsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListActiveRequests', inputVars);
+}
+listActiveRequestsRef.operationName = 'ListActiveRequests';
+exports.listActiveRequestsRef = listActiveRequestsRef;
+
+exports.listActiveRequests = function listActiveRequests(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(listActiveRequestsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const listHqQueueRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListHQQueue', inputVars);
+}
+listHqQueueRef.operationName = 'ListHQQueue';
+exports.listHqQueueRef = listHqQueueRef;
+
+exports.listHqQueue = function listHqQueue(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
+  return executeQuery(listHqQueueRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getRequestDetailRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetRequestDetail', inputVars);
+}
+getRequestDetailRef.operationName = 'GetRequestDetail';
+exports.getRequestDetailRef = getRequestDetailRef;
+
+exports.getRequestDetail = function getRequestDetail(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getRequestDetailRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;

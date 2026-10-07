@@ -1,0 +1,21 @@
+<section class="inventory-card" aria-labelledby="hq-heading">
+  <header class="card-heading">
+    <h2 id="hq-heading"><mat-icon>warehouse</mat-icon>HQ availability</h2>
+  </header>
+  <dl>
+    @for (row of rows(); track row.productId) {
+      <div>
+        <dt>
+          {{ row.productName }}<small>{{ row.netContent.value }} {{ row.netContent.unit }}</small>
+        </dt>
+        <dd>
+          <strong>{{ row.hqAvailable }}</strong
+          ><small>available</small>
+        </dd>
+      </div>
+    }
+  </dl>
+  <footer class="card-footer">
+    <mat-icon>info</mat-icon>Available quantities exclude reserved units.
+  </footer>
+</section>

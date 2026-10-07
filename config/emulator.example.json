@@ -17,7 +17,7 @@
     "siteKey": "emulator-only"
   },
   "lowStockThreshold": 2,
-  "replenishmentEnabled": false,
+  "replenishmentEnabled": true,
   "knowledgeEnabled": false,
   "replenishmentAiEnabled": false,
   "ragEnabled": false
