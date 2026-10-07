@@ -66,6 +66,15 @@
           ><mat-icon matListItemIcon>receipt_long</mat-icon>Requests</a
         >
       }
+      @if (facade.navSalonId(); as salonId) {
+        <a
+          mat-list-item
+          [routerLink]="['/salons', salonId, 'settings']"
+          routerLinkActive="active"
+          (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>settings</mat-icon>Settings</a
+        >
+      }
     </mat-nav-list>
     <div class="nav-footer">NOT BAD STUFF<br /><span>Demo workspace</span></div></mat-sidenav
   >

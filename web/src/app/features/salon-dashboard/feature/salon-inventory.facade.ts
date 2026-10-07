@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { BrowserActivity } from '../../../core/browser-activity';
-import { runtimeConfig } from '../../../core/public-config';
+import { SalonSettingsApi } from '../../salon-settings/data-access/salon-settings-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { InventoryApi } from '../data-access/inventory-api';
 import type { InventoryRow } from '../../../../../../shared/contracts/business';
@@ -22,6 +22,7 @@ interface InventorySnapshot {
 /** One instance per salon page. Components consume selectors and issue commands. */
 @Service({ autoProvided: false })
 export class SalonInventoryFacade {
+  private readonly settingsApi = inject(SalonSettingsApi);
   private readonly api = inject(InventoryApi);
   private readonly session = inject(SessionFacade);
   private readonly browser = inject(BrowserActivity);
@@ -61,7 +62,26 @@ export class SalonInventoryFacade {
   readonly name = computed(
     () => this.session.salons().find((s) => s.id === this.salonId())?.name ?? 'Salon',
   );
-  readonly threshold = runtimeConfig.publicConfig?.lowStockThreshold ?? 2;
+  private readonly settings = resource({
+    params: () => {
+      const scope = this.scope();
+      return scope
+        ? { scope, revision: this.settingsApi.revision(), tick: this.browser.refreshTick() }
+        : undefined;
+    },
+    loader: async ({ params }) => ({
+      scope: params.scope,
+      settings: await this.settingsApi.get(params.scope.salonId),
+    }),
+  });
+  readonly threshold = computed(() =>
+    this.settings.hasValue() && this.settings.value().scope === this.scope()
+      ? this.settings.value().settings.lowStockThreshold
+      : undefined,
+  );
+  readonly settingsUnavailable = computed(
+    () => this.threshold() === undefined && !this.settings.isLoading(),
+  );
   readonly rows = computed(() => this.snapshot()?.rows ?? []);
   readonly loading = this.inventory.isLoading;
   readonly error = computed(() => this.inventory.error() !== undefined);
@@ -76,5 +96,6 @@ export class SalonInventoryFacade {
 
   refresh() {
     this.inventory.reload();
+    this.settings.reload();
   }
 }

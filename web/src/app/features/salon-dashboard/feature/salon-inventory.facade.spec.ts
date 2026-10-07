@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { SessionFacade } from '../../auth/feature/session.facade';
+import { SalonSettingsApi } from '../../salon-settings/data-access/salon-settings-api';
 import { InventoryApi } from '../data-access/inventory-api';
 import { SalonInventoryFacade } from './salon-inventory.facade';
 import type { InventoryRow, SessionState } from '../../../../../../shared/contracts/business';
@@ -43,9 +44,14 @@ function setup() {
   const getInventory = vi
     .fn<(id: string, abort: AbortSignal) => Promise<InventoryRow[]>>()
     .mockReturnValueOnce(first.promise);
+  const settingsGet = vi
+    .fn()
+    .mockResolvedValue({ salonId: 'legnicka', lowStockThreshold: 2, version: 1, updatedAt: 'now' });
+  const settingsRevision = signal(0);
   TestBed.configureTestingModule({
     providers: [
       SalonInventoryFacade,
+      { provide: SalonSettingsApi, useValue: { get: settingsGet, revision: settingsRevision } },
       { provide: ActivatedRoute, useValue: { paramMap: params } },
       { provide: BrowserActivity, useValue: { online, refreshTick } },
       {
@@ -71,7 +77,18 @@ function setup() {
     await TestBed.inject(ApplicationRef).whenStable();
     TestBed.tick();
   };
-  return { facade, state, params, online, refreshTick, first, getInventory, settled };
+  return {
+    facade,
+    state,
+    params,
+    online,
+    refreshTick,
+    first,
+    getInventory,
+    settled,
+    settingsGet,
+    settingsRevision,
+  };
 }
 
 describe('SalonInventoryFacade', () => {
@@ -153,4 +170,28 @@ describe('SalonInventoryFacade', () => {
     expect(h.facade.rows()[0].salonOnHand).toBe(6);
     expect(h.facade.stale()).toBe(false);
   });
+});
+
+it('uses_authoritative_threshold_and_discards_failed_foreign_scope_read', async () => {
+  const h = setup();
+  expect(h.facade.threshold()).toBeUndefined();
+  h.first.resolve([row]);
+  await h.settled();
+  expect(h.facade.threshold()).toBe(2);
+  h.settingsGet.mockResolvedValue({
+    salonId: 'legnicka',
+    lowStockThreshold: 0,
+    version: 2,
+    updatedAt: 'now',
+  });
+  h.settingsRevision.update((n) => n + 1);
+  TestBed.tick();
+  await h.settled();
+  expect(h.facade.threshold()).toBe(0);
+  h.settingsGet.mockRejectedValue(Error('unavailable'));
+  h.getInventory.mockResolvedValue([]);
+  h.params.next(convertToParamMap({ salonId: 'lodzka' }));
+  TestBed.tick();
+  await h.settled();
+  expect(h.facade.threshold()).toBeUndefined();
 });

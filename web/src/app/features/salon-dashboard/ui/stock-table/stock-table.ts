@@ -11,7 +11,7 @@ import type { InventoryRow } from '../../../../../../../shared/contracts/busines
 })
 export class StockTable {
   readonly rows = input.required<InventoryRow[]>();
-  readonly threshold = input.required<number>();
+  readonly threshold = input.required<number | undefined>();
   readonly updated = input.required<string>();
   readonly requestEnabled = input(false);
   readonly requestProduct = output<string>();

@@ -49,3 +49,5 @@ Rollback was also rehearsed: the isolated service was restarted with the origina
 ### Salon settings defaults
 
 After importing request items, run the ordinary business seed against the same explicit target to insert missing `SalonSettings` rows (threshold 2, version 1). This step preserves existing settings and inventory. Verify one row per salon before reopening clients. Reset preserves settings. Missing rows are setup errors, never client defaults.
+
+Remove the obsolete `lowStockThreshold` property from any private local public-config JSON before rebuilding; the strict allowlist now rejects it. Do not copy its value into every salon automatically. Thresholds now come from authorized database reads.

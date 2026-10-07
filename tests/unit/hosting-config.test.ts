@@ -20,7 +20,6 @@ const config = {
   },
   hostingSiteId: "test-project",
   appCheck: { siteKey: "public-fixture-site-key" },
-  lowStockThreshold: 2,
   replenishmentEnabled: false,
   knowledgeEnabled: false,
   replenishmentAiEnabled: false,

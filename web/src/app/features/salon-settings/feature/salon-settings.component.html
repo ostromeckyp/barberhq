@@ -1,0 +1,40 @@
+<app-page-header
+  eyebrow="SALON WORKSPACE"
+  title="Settings"
+  description="Configure how this salon tracks its inventory."
+/>
+<section aria-labelledby="inventory-settings">
+  <h2 id="inventory-settings">Inventory</h2>
+  <p>
+    Show a low-stock warning when the quantity is at or below this threshold. This is a warning
+    threshold, not an order quantity. Zero warns only when stock is empty.
+  </p>
+  @if (facade.loading() || facade.saving()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Loading or saving settings" />
+  }
+  @if (facade.error()) {
+    <p role="alert">
+      {{ facade.error() }}
+      <button mat-button (click)="facade.reload()" [disabled]="facade.saving()">
+        Reload settings
+      </button>
+    </p>
+  }
+  @if (facade.saved()) {
+    <p role="status">Settings saved.</p>
+  }
+  @if (facade.version() !== undefined) {
+    <form (submit)="$event.preventDefault(); facade.save()">
+      <mat-form-field appearance="outline"
+        ><mat-label>Low-stock threshold</mat-label
+        ><input matInput type="number" step="1" [formField]="facade.fields.lowStockThreshold" />
+        @for (error of facade.fields.lowStockThreshold().errors(); track error.kind) {
+          <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+      <button mat-flat-button type="submit" [disabled]="!facade.canSave()">
+        {{ facade.saving() ? 'Saving…' : 'Save' }}
+      </button>
+    </form>
+  }
+</section>

@@ -16,7 +16,6 @@ export const validConfig = {
   },
   hostingSiteId: "barberhq-test",
   appCheck: { siteKey: "public-site-key" },
-  lowStockThreshold: 2,
   replenishmentEnabled: false,
   knowledgeEnabled: false,
   replenishmentAiEnabled: false,
@@ -56,9 +55,9 @@ describe("public config", () => {
     expect(() =>
       parsePublicConfig({ ...validConfig, ragEnabled: true }),
     ).toThrow());
-  it("rejects negative thresholds and missing identifiers", () => {
+  it("rejects obsolete thresholds and missing identifiers", () => {
     expect(() =>
-      parsePublicConfig({ ...validConfig, lowStockThreshold: -1 }),
+      parsePublicConfig({ ...validConfig, lowStockThreshold: 2 }),
     ).toThrow();
     expect(() =>
       parsePublicConfig({

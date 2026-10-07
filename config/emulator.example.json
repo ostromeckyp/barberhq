@@ -16,7 +16,6 @@
   "appCheck": {
     "siteKey": "emulator-only"
   },
-  "lowStockThreshold": 2,
   "replenishmentEnabled": true,
   "knowledgeEnabled": false,
   "replenishmentAiEnabled": false,

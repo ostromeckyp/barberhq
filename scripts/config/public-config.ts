@@ -25,7 +25,6 @@ const schema = z
     }),
     hostingSiteId: identifier,
     appCheck: z.strictObject({ siteKey: z.string().min(1) }),
-    lowStockThreshold: z.number().int().nonnegative().default(2),
     pdfReadUrl: httpsUrl.optional(),
     pdfUploadUrl: httpsUrl.optional(),
     replenishmentEnabled: z.boolean(),

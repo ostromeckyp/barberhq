@@ -11,6 +11,12 @@
     <mat-icon>refresh</mat-icon>Refresh
   </button>
 </app-page-header>
+@if (facade.settingsUnavailable()) {
+  <p role="status">
+    Low-stock warnings unavailable. Settings could not be loaded.
+    <button mat-button (click)="facade.refresh()">Retry</button>
+  </p>
+}
 @if (facade.stale()) {
   <app-stale-banner
     message="These are the last loaded quantities. Refresh before making a decision."
@@ -44,7 +50,7 @@
   <div class="inventory-layout" [attr.aria-busy]="facade.loading()">
     <app-stock-table
       [rows]="facade.rows()"
-      [threshold]="facade.threshold"
+      [threshold]="facade.threshold()"
       [updated]="facade.updated()"
       [requestEnabled]="!!order?.staff()"
       (requestProduct)="order?.select($event)"

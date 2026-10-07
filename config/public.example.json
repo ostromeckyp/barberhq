@@ -16,7 +16,6 @@
   "appCheck": {
     "siteKey": "REPLACE_WITH_PUBLIC_SITE_KEY"
   },
-  "lowStockThreshold": 2,
   "replenishmentEnabled": false,
   "knowledgeEnabled": false,
   "replenishmentAiEnabled": false,
