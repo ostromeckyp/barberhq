@@ -10,6 +10,14 @@ export const MovementType = {
   RECEIPT: "RECEIPT",
 }
 
+export const RequestState = {
+  PENDING_APPROVAL: "PENDING_APPROVAL",
+  RESERVED: "RESERVED",
+  DISPATCHED: "DISPATCHED",
+  RECEIVED: "RECEIVED",
+  REJECTED: "REJECTED",
+}
+
 export const connectorConfig = {
   connector: 'browser',
   service: 'barberhq',
@@ -91,5 +99,18 @@ export function getRequestDetail(dcOrVars, varsOrOptions, options) {
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getRequestDetailRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+
+export const listSalonRequestsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListSalonRequests', inputVars);
+}
+listSalonRequestsRef.operationName = 'ListSalonRequests';
+
+export function listSalonRequests(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(listSalonRequestsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 

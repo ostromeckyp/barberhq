@@ -15,8 +15,7 @@ it("conserves_twenty", async () => {
     type: "SUBMIT",
     input: {
       salonId: h.legnickaId,
-      productId: `${h.businessId}:NBS-MATOWA-100`,
-      quantity: 2,
+      items: [{ productId: `${h.businessId}:NBS-MATOWA-100`, quantity: 2 }],
       idempotencyKey: randomUUID(),
     },
   });
@@ -26,7 +25,12 @@ it("conserves_twenty", async () => {
     input: {
       requestId: submitted.requestId,
       expectedRevision: 1,
-      expectedHqInventoryVersion: 1,
+      inventoryVersions: [
+        {
+          productId: `${h.businessId}:NBS-MATOWA-100`,
+          expectedHqInventoryVersion: 1,
+        },
+      ],
       idempotencyKey: randomUUID(),
     },
   });
@@ -45,7 +49,9 @@ it("conserves_twenty", async () => {
     input: {
       requestId: submitted.requestId,
       expectedRevision: 3,
-      receivedQuantity: 2,
+      items: [
+        { productId: `${h.businessId}:NBS-MATOWA-100`, receivedQuantity: 2 },
+      ],
       allIntact: true,
       idempotencyKey: randomUUID(),
     },

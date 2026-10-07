@@ -420,6 +420,7 @@ if (
       backup: { type: "string" },
       export: { type: "boolean" },
       verify: { type: "boolean" },
+      apply: { type: "boolean" },
     },
   });
   const target = {
@@ -430,8 +431,8 @@ if (
   };
   assertMigrationTarget(target);
   assert(
-    v.backup && Boolean(v.export) !== Boolean(v.verify),
-    "Choose --export or --verify and an explicit --backup file",
+    v.backup && [v.export, v.verify, v.apply].filter(Boolean).length === 1,
+    "Choose --export, --verify or --apply and an explicit --backup file",
   );
   if (v.verify) {
     const s = decodeBackup(JSON.parse(readFileSync(v.backup, "utf8")));
@@ -460,17 +461,28 @@ if (
         { serviceId: "barberhq", location: "europe-west1" },
         app,
       );
-      const s = await exportLegacySnapshot(
-        dc,
-        target.projectId,
-        target.businessId,
-      );
-      const envelope = encodeBackup(s);
-      writeFileSync(v.backup, JSON.stringify(envelope, null, 2) + "\n", {
-        flag: "wx",
-        mode: 0o600,
-      });
-      console.log({ exported: true, counts: envelope.counts });
+      if (v.apply) {
+        const backup = decodeBackup(JSON.parse(readFileSync(v.backup, "utf8")));
+        assert(
+          backup.projectId === target.projectId &&
+            backup.businessId === target.businessId,
+          "Backup target mismatch",
+        );
+        const { applyItemsSnapshot } = await import("./items-import.ts");
+        console.log(await applyItemsSnapshot(dc, backup));
+      } else {
+        const s = await exportLegacySnapshot(
+          dc,
+          target.projectId,
+          target.businessId,
+        );
+        const envelope = encodeBackup(s);
+        writeFileSync(v.backup, JSON.stringify(envelope, null, 2) + "\n", {
+          flag: "wx",
+          mode: 0o600,
+        });
+        console.log({ exported: true, counts: envelope.counts });
+      }
     } finally {
       await deleteApp(app);
     }

@@ -1,10 +1,10 @@
 import type { InventoryRow } from "./business.js";
 export type RequestState =
   "PENDING_APPROVAL" | "RESERVED" | "DISPATCHED" | "RECEIVED" | "REJECTED";
+export type RequestItemInput = { productId: string; quantity: number };
 export type SubmitInput = {
   salonId: string;
-  productId: string;
-  quantity: number;
+  items: RequestItemInput[];
   idempotencyKey: string;
 };
 export type TransitionInput = {
@@ -13,11 +13,14 @@ export type TransitionInput = {
   idempotencyKey: string;
 };
 export type ApproveInput = TransitionInput & {
-  expectedHqInventoryVersion: number;
+  inventoryVersions: {
+    productId: string;
+    expectedHqInventoryVersion: number;
+  }[];
 };
 export type RejectInput = TransitionInput & { reason: string };
 export type ReceiveInput = TransitionInput & {
-  receivedQuantity: number;
+  items: { productId: string; receivedQuantity: number }[];
   allIntact: true;
 };
 export type StockAction =
@@ -33,29 +36,34 @@ export type CommandResult = {
   revision: number;
   replayed: boolean;
 };
+export type ActiveConflict = { productId: string; requestId: string };
+export type RequestItemSummary = RequestItemInput & { productName: string };
 export type RequestSummary = {
   id: string;
   salonId: string;
-  productId: string;
-  productName: string;
   salonName: string;
-  quantity: number;
   state: RequestState;
   revision: number;
   createdAt: string;
+  items: RequestItemSummary[];
+  itemCount: number;
+  totalUnits: number;
 };
-export type RequestDetail = RequestSummary & {
+export type RequestDetailItem = RequestItemSummary & {
   dispatchedQuantity: number;
   receivedQuantity: number;
-  hqInventoryVersion: number;
+  stock: InventoryRow;
+};
+export type RequestDetail = Omit<RequestSummary, "items"> & {
+  items: RequestDetailItem[];
   timeline: {
     state: RequestState;
     at: string;
     actorLabel: string;
     reason?: string;
   }[];
-  stock: InventoryRow;
 };
+export type RequestFilter = "ALL" | "ACTIVE" | "RECEIVED" | "REJECTED";
 export type StockErrorCode =
   | "UNAUTHENTICATED"
   | "FORBIDDEN"

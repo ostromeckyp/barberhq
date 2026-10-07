@@ -14,6 +14,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*ListActiveRequests*](#listactiverequests)
   - [*ListHQQueue*](#listhqqueue)
   - [*GetRequestDetail*](#getrequestdetail)
+  - [*ListSalonRequests*](#listsalonrequests)
 - [**Mutations**](#mutations)
 
 # Accessing the connector
@@ -496,17 +497,24 @@ export interface ListActiveRequestsData {
       requests: ({
         id: string;
         salonId: string;
-        productId: string;
-        quantity: number;
         state: RequestState;
         revision: number;
         createdAt: TimestampString;
-        product: {
-          name: string;
-        };
         salon: {
           name: string;
         };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
       } & ReplenishmentRequest_Key)[];
     };
   };
@@ -628,17 +636,24 @@ export interface ListHqQueueData {
       requests: ({
         id: string;
         salonId: string;
-        productId: string;
-        quantity: number;
         state: RequestState;
         revision: number;
         createdAt: TimestampString;
-        product: {
-          name: string;
-        };
         salon: {
           name: string;
         };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
       } & ReplenishmentRequest_Key)[];
     };
   };
@@ -761,21 +776,24 @@ export interface GetRequestDetailData {
       requests: ({
         id: string;
         salonId: string;
-        productId: string;
-        quantity: number;
         state: RequestState;
         revision: number;
         createdAt: TimestampString;
-        product: {
-          name: string;
-        };
         salon: {
           name: string;
         };
-        transfer?: {
-          dispatchedQuantity: number;
-          receivedQuantity: number;
-        };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
         timeline: ({
           state: RequestState;
           createdAt: TimestampString;
@@ -836,6 +854,149 @@ const ref = getRequestDetailRef({ requestId: ..., });
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = getRequestDetailRef(dataConnect, getRequestDetailVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+## ListSalonRequests
+You can execute the `ListSalonRequests` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+listSalonRequests(vars: ListSalonRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListSalonRequestsData, ListSalonRequestsVariables>;
+
+interface ListSalonRequestsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListSalonRequestsVariables): QueryRef<ListSalonRequestsData, ListSalonRequestsVariables>;
+}
+export const listSalonRequestsRef: ListSalonRequestsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listSalonRequests(dc: DataConnect, vars: ListSalonRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListSalonRequestsData, ListSalonRequestsVariables>;
+
+interface ListSalonRequestsRef {
+  ...
+  (dc: DataConnect, vars: ListSalonRequestsVariables): QueryRef<ListSalonRequestsData, ListSalonRequestsVariables>;
+}
+export const listSalonRequestsRef: ListSalonRequestsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listSalonRequestsRef:
+```typescript
+const name = listSalonRequestsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListSalonRequests` query requires an argument of type `ListSalonRequestsVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ListSalonRequestsVariables {
+  salonId: string;
+  states: RequestState[];
+  limit?: number;
+  offset?: number;
+}
+```
+### Return Type
+Recall that executing the `ListSalonRequests` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListSalonRequestsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListSalonRequestsData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        salon: {
+          name: string;
+        };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+```
+### Using `ListSalonRequests`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listSalonRequests, ListSalonRequestsVariables } from '@barberhq/browser';
+
+// The `ListSalonRequests` query requires an argument of type `ListSalonRequestsVariables`:
+const listSalonRequestsVars: ListSalonRequestsVariables = {
+  salonId: ..., 
+  states: ..., 
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listSalonRequests()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listSalonRequests(listSalonRequestsVars);
+// Variables can be defined inline as well.
+const { data } = await listSalonRequests({ salonId: ..., states: ..., limit: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listSalonRequests(dataConnect, listSalonRequestsVars);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+listSalonRequests(listSalonRequestsVars).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `ListSalonRequests`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listSalonRequestsRef, ListSalonRequestsVariables } from '@barberhq/browser';
+
+// The `ListSalonRequests` query requires an argument of type `ListSalonRequestsVariables`:
+const listSalonRequestsVars: ListSalonRequestsVariables = {
+  salonId: ..., 
+  states: ..., 
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listSalonRequestsRef()` function to get a reference to the query.
+const ref = listSalonRequestsRef(listSalonRequestsVars);
+// Variables can be defined inline as well.
+const ref = listSalonRequestsRef({ salonId: ..., states: ..., limit: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listSalonRequestsRef(dataConnect, listSalonRequestsVars);
 
 // Call `executeQuery()` on the reference to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.

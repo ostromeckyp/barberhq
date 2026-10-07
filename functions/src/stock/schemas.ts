@@ -3,6 +3,15 @@ import type { StockAction } from "../../../shared/contracts/stock.js";
 import { StockError } from "./errors.js";
 const id = z.string().min(1).max(300);
 const quantity = z.number().int().min(1).max(99);
+const items = <T extends z.ZodType<{ productId: string }>>(item: T) =>
+  z
+    .array(item)
+    .min(1)
+    .max(6)
+    .refine(
+      (rows) => new Set(rows.map((r) => r.productId)).size === rows.length,
+      "Distinct products required",
+    );
 const transition = {
   requestId: id,
   expectedRevision: z.number().int().min(1),
@@ -11,13 +20,17 @@ const transition = {
 const schemas = {
   SUBMIT: z.strictObject({
     salonId: id,
-    productId: id,
-    quantity,
+    items: items(z.strictObject({ productId: id, quantity })),
     idempotencyKey: z.uuid(),
   }),
   APPROVE: z.strictObject({
     ...transition,
-    expectedHqInventoryVersion: z.number().int().min(1),
+    inventoryVersions: items(
+      z.strictObject({
+        productId: id,
+        expectedHqInventoryVersion: z.number().int().min(1),
+      }),
+    ),
   }),
   REJECT: z.strictObject({
     ...transition,
@@ -26,7 +39,7 @@ const schemas = {
   DISPATCH: z.strictObject(transition),
   RECEIVE: z.strictObject({
     ...transition,
-    receivedQuantity: quantity,
+    items: items(z.strictObject({ productId: id, receivedQuantity: quantity })),
     allIntact: z.literal(true),
   }),
 };

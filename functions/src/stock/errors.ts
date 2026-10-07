@@ -1,9 +1,12 @@
-import type { StockErrorCode } from "../../../shared/contracts/stock.js";
+import type {
+  StockErrorCode,
+  ActiveConflict,
+} from "../../../shared/contracts/stock.js";
 export class StockError extends Error {
   constructor(
     readonly code: StockErrorCode,
     message: string = code,
-    readonly requestId?: string,
+    readonly conflicts?: ActiveConflict[],
   ) {
     super(message);
   }

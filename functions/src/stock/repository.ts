@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { DataConnect } from "firebase-admin/data-connect";
 import * as sql from "@barberhq/server";
 import type {
@@ -8,23 +8,32 @@ import type {
 } from "../../../shared/contracts/stock.js";
 import { parseAction } from "./schemas.js";
 import { StockError } from "./errors.js";
-
+import {
+  canonicalizeAction,
+  payloadHash,
+  semanticHash,
+  requestItemId,
+} from "./intent.js";
 type Context = sql.StockContextData;
 type Receipt = Context["semantic"][number];
-const hash = (value: unknown) =>
-  createHash("sha256").update(JSON.stringify(value)).digest("hex");
-const result = (receipt: Receipt, replayed: boolean): CommandResult => ({
-  actionReceiptId: receipt.id,
-  requestId: receipt.requestId,
-  state: receipt.state as RequestState,
-  revision: receipt.revision,
+const result = (r: Receipt, replayed: boolean): CommandResult => ({
+  actionReceiptId: r.id,
+  requestId: r.requestId,
+  state: r.state as RequestState,
+  revision: r.revision,
   replayed,
 });
-
-/** Auth UID comes from the callable token. Business, scope and inventory come from SQL. */
+const slots = (count: number) => ({
+  use0: count > 0,
+  use1: count > 1,
+  use2: count > 2,
+  use3: count > 3,
+  use4: count > 4,
+  use5: count > 5,
+});
+/** Only the verified callable UID enters this boundary. SQL derives and rechecks scope. */
 export class StockRepository {
   constructor(private readonly dc: DataConnect) {}
-
   private async context(uid: string, action: StockAction): Promise<Context> {
     const input = action.input;
     const { data } = await sql.stockContext(this.dc, {
@@ -33,122 +42,113 @@ export class StockRepository {
       action: sql.StockActionType[action.type],
       requestId: "requestId" in input ? input.requestId : "",
       salonId: "salonId" in input ? input.salonId : "",
-      productId: "productId" in input ? input.productId : "",
+      productIds:
+        action.type === "SUBMIT"
+          ? action.input.items.map((i) => i.productId)
+          : [],
     });
-    const member = data.membership;
-    if (!member) throw new StockError("FORBIDDEN");
+    const m = data.membership;
+    if (!m) throw new StockError("FORBIDDEN");
     const salonId =
       action.type === "SUBMIT"
         ? action.input.salonId
         : data.replenishmentRequest?.salonId;
-    const salonAction = action.type === "SUBMIT" || action.type === "RECEIVE";
-    if (
-      salonAction
-        ? member.role !== "SALON" ||
-          !member.salonAccesses_on_membership.some(
-            (a) => a.locationId === salonId,
-          )
-        : member.role !== "HQ"
-    )
-      throw new StockError("FORBIDDEN");
+    if (action.type === "SUBMIT" || action.type === "RECEIVE") {
+      if (
+        m.role !== "SALON" ||
+        !m.salonAccesses_on_membership.some((a) => a.locationId === salonId)
+      )
+        throw new StockError("FORBIDDEN");
+    } else if (m.role !== "HQ") throw new StockError("FORBIDDEN");
     if (action.type === "SUBMIT") {
       if (
-        data.product?.businessId !== member.businessId ||
-        data.location?.businessId !== member.businessId ||
+        data.products.length !== action.input.items.length ||
+        data.products.some((p) => p.businessId !== m.businessId) ||
+        data.location?.businessId !== m.businessId ||
         data.location.kind !== "SALON"
       )
         throw new StockError("FORBIDDEN");
-    } else if (data.replenishmentRequest?.businessId !== member.businessId)
+    } else if (data.replenishmentRequest?.businessId !== m.businessId)
       throw new StockError("FORBIDDEN");
     return data;
   }
-
   private async replay(
     c: Context,
     uid: string,
     action: StockAction,
-    payloadHash: string,
-    semanticHash: string,
+    payload: string,
+    semantic: string,
   ): Promise<CommandResult | undefined> {
     const keyed = c.keyed[0];
     if (keyed) {
       if (
         keyed.receipt.businessId !== c.membership!.businessId ||
-        keyed.payloadHash !== payloadHash
+        keyed.payloadHash !== payload
       )
         throw new StockError("IDEMPOTENCY_CONFLICT");
       return result(keyed.receipt, true);
     }
-    const semantic = c.semantic[0];
-    if (semantic) {
-      if (semantic.semanticHash !== semanticHash)
+    const existing = c.semantic[0];
+    if (existing) {
+      if (existing.semanticHash !== semantic)
         throw new StockError("IDEMPOTENCY_CONFLICT");
       try {
         await sql.bindReplayKey(this.dc, {
           uid,
           businessId: c.membership!.businessId,
-          receiptId: semantic.id,
+          receiptId: existing.id,
           key: action.input.idempotencyKey,
-          payloadHash,
+          payloadHash: payload,
         });
       } catch (error) {
-        const fresh = await this.context(uid, action);
-        const existing = fresh.keyed[0];
-        if (!existing) throw error;
-        if (existing.payloadHash !== payloadHash)
+        const fresh = await this.context(uid, action),
+          bound = fresh.keyed[0];
+        if (!bound) throw error;
+        if (bound.payloadHash !== payload)
           throw new StockError("IDEMPOTENCY_CONFLICT");
-        return result(existing.receipt, true);
+        return result(bound.receipt, true);
       }
-      return result(semantic, true);
+      return result(existing, true);
     }
-    return undefined;
   }
-
   async execute(uid: string, raw: StockAction): Promise<CommandResult> {
     if (!uid) throw new StockError("UNAUTHENTICATED");
-    const action = parseAction(raw.type, raw.input);
-    const { idempotencyKey, ...payload } = action.input;
-    const {
-      expectedRevision: _revision,
-      expectedHqInventoryVersion: _version,
-      ...intent
-    } = payload as typeof payload & {
-      expectedRevision?: number;
-      expectedHqInventoryVersion?: number;
-    };
-    const payloadHash = hash({ type: action.type, ...payload });
-    const semanticHash = hash({ type: action.type, ...intent });
-    const c = await this.context(uid, action);
-    const replay = await this.replay(c, uid, action, payloadHash, semanticHash);
+    const action = canonicalizeAction(parseAction(raw.type, raw.input));
+    const payload = payloadHash(action),
+      semantic = semanticHash(action),
+      c = await this.context(uid, action);
+    const replay = await this.replay(c, uid, action, payload, semantic);
     if (replay) return replay;
-    const businessId = c.membership!.businessId;
-    if (action.type === "SUBMIT" && c.activeRequests[0])
+    if (action.type === "SUBMIT" && c.activeRequests.length)
       throw new StockError(
         "ALREADY_ACTIVE",
-        "This product already has an active request.",
-        c.activeRequests[0].requestId,
+        "Some products already have active requests.",
+        c.activeRequests,
       );
     const requestId =
-      action.type === "SUBMIT" ? randomUUID() : action.input.requestId;
-    const receiptId = randomUUID();
+        action.type === "SUBMIT" ? randomUUID() : action.input.requestId,
+      receiptId = randomUUID();
     const base = {
       uid,
-      businessId,
+      businessId: c.membership!.businessId,
       requestId,
       receiptId,
-      key: idempotencyKey,
-      payloadHash,
-      semanticHash,
+      key: action.input.idempotencyKey,
+      payloadHash: payload,
+      semanticHash: semantic,
     };
-    let state: RequestState;
-    let revision: number;
+    let state: RequestState, revision: number;
     try {
       if (action.type === "SUBMIT") {
+        const items = action.input.items;
         await sql.submitStock(this.dc, {
           ...base,
+          ...slots(items.length),
+          count: items.length,
           salonId: action.input.salonId,
-          productId: action.input.productId,
-          quantity: action.input.quantity,
+          productIds: items.map((i) => i.productId),
+          itemIds: items.map((i) => requestItemId(requestId, i.productId)),
+          quantities: items.map((i) => i.quantity),
         });
         state = "PENDING_APPROVAL";
         revision = 1;
@@ -164,83 +164,102 @@ export class StockRepository {
         };
         if (request.state !== expected[action.type])
           throw new StockError("INVALID_TRANSITION");
-        const locationId =
-          action.type === "RECEIVE"
-            ? request.salonId
-            : c.membership!.business.locations_on_business[0]?.id;
-        const inventory = request.product.inventories_on_product.find(
-          (i) => i.locationId === locationId,
-        );
+        const items = request.items;
+        if (items.length < 1 || items.length > 6)
+          throw new StockError("INVALID_TRANSITION");
         const vars = {
           ...base,
           revision: action.input.expectedRevision,
-          inventoryVersion: inventory?.version ?? 0,
+          count: items.length,
         };
+        const indexed = { ...vars, ...slots(items.length) };
         switch (action.type) {
-          case "APPROVE":
+          case "APPROVE": {
+            const versions = action.input.inventoryVersions;
             if (
-              !inventory ||
-              inventory.version !== action.input.expectedHqInventoryVersion
+              versions.length !== items.length ||
+              items.some((item, i) => item.productId !== versions[i].productId)
             )
-              throw new StockError("STALE_STATE");
-            if (inventory.onHand - inventory.reserved < request.quantity)
-              throw new StockError("INSUFFICIENT_STOCK");
-            await sql.approveStock(this.dc, vars);
+              throw new StockError("VALIDATION_ERROR");
+            for (const [i, item] of items.entries()) {
+              const inventory = item.product.inventories_on_product.find(
+                (row) =>
+                  row.locationId ===
+                  c.membership!.business.locations_on_business[0]?.id,
+              );
+              if (
+                !inventory ||
+                inventory.version !== versions[i].expectedHqInventoryVersion
+              )
+                throw new StockError("STALE_STATE");
+              if (inventory.onHand - inventory.reserved < item.quantity)
+                throw new StockError("INSUFFICIENT_STOCK");
+            }
+            await sql.approveStock(this.dc, {
+              ...indexed,
+              inventoryVersions: versions.map(
+                (v) => v.expectedHqInventoryVersion,
+              ),
+            });
             state = "RESERVED";
             break;
+          }
           case "REJECT":
             await sql.rejectStock(this.dc, {
-              ...base,
-              revision: action.input.expectedRevision,
+              ...vars,
               reason: action.input.reason,
             });
             state = "REJECTED";
             break;
           case "DISPATCH":
-            await sql.dispatchStock(this.dc, vars);
+            await sql.dispatchStock(this.dc, indexed);
             state = "DISPATCHED";
             break;
-          case "RECEIVE":
-            if (action.input.receivedQuantity !== request.quantity)
+          case "RECEIVE": {
+            const received = action.input.items;
+            if (
+              received.length !== items.length ||
+              items.some(
+                (item, i) =>
+                  item.productId !== received[i].productId ||
+                  item.quantity !== received[i].receivedQuantity,
+              )
+            )
               throw new StockError(
                 "VALIDATION_ERROR",
-                "Only a full, intact delivery can be received.",
+                "Only a complete, intact delivery can be received.",
               );
             await sql.receiveStock(this.dc, {
-              ...vars,
-              receivedQuantity: action.input.receivedQuantity,
+              ...indexed,
+              receivedQuantities: received.map((i) => i.receivedQuantity),
+              allIntact: true,
             });
             state = "RECEIVED";
             break;
+          }
         }
         revision = request.revision + 1;
       }
     } catch (error) {
       if (error instanceof StockError) throw error;
-      // A rival command may have committed while this transaction waited on a row/unique key.
-      // Re-authorize before inspecting its receipt; never retry a write automatically.
       const fresh = await this.context(uid, action);
-      const replay = await this.replay(
-        fresh,
-        uid,
-        action,
-        payloadHash,
-        semanticHash,
-      );
+      const replay = await this.replay(fresh, uid, action, payload, semantic);
       if (replay) return replay;
-      if (action.type === "SUBMIT" && fresh.activeRequests[0])
+      if (action.type === "SUBMIT" && fresh.activeRequests.length)
         throw new StockError(
           "ALREADY_ACTIVE",
-          "This product already has an active request.",
-          fresh.activeRequests[0].requestId,
+          "Some products already have active requests.",
+          fresh.activeRequests,
         );
       const message = error instanceof Error ? error.message : "";
-      if (message.includes("STALE_STATE")) throw new StockError("STALE_STATE");
-      if (message.includes("FORBIDDEN")) throw new StockError("FORBIDDEN");
-      if (message.includes("INVALID_TRANSITION"))
-        throw new StockError("INVALID_TRANSITION");
-      // Preserve unexpected infrastructure failures as UNKNOWN at the transport boundary.
-      throw error;
+      for (const code of [
+        "STALE_STATE",
+        "FORBIDDEN",
+        "INVALID_TRANSITION",
+        "VALIDATION_ERROR",
+      ] as const)
+        if (message.includes(code)) throw new StockError(code);
+      throw error; // Caller reports UNKNOWN; a lost response is not proof of rollback.
     }
     return {
       actionReceiptId: receiptId,

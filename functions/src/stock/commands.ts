@@ -31,7 +31,7 @@ export function stockCommand(type: StockAction["type"]) {
                 : "failed-precondition";
           throw new HttpsError(code, error.message, {
             code: error.code,
-            ...(error.requestId ? { requestId: error.requestId } : {}),
+            ...(error.conflicts ? { conflicts: error.conflicts } : {}),
           });
         }
         // Do not promise failure: SQL may have committed before its response was lost.

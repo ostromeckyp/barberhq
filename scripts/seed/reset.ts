@@ -78,6 +78,8 @@ export async function resetRecords(
         data.requests,
         data.active,
         data.transfers,
+        data.items,
+        data.transferItems,
         data.movements,
         data.receipts,
         data.keys,
@@ -95,6 +97,8 @@ export async function resetRecords(
       data.receipts +
       data.movements +
       data.transfers +
+      data.items +
+      data.transferItems +
       data.active +
       data.requests,
     resetInventoryRows: data.hq + data.salons,

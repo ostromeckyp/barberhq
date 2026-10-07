@@ -18,6 +18,14 @@ export enum MovementType {
   RECEIPT = "RECEIPT",
 };
 
+export enum RequestState {
+  PENDING_APPROVAL = "PENDING_APPROVAL",
+  RESERVED = "RESERVED",
+  DISPATCHED = "DISPATCHED",
+  RECEIVED = "RECEIVED",
+  REJECTED = "REJECTED",
+};
+
 
 
 export interface ActionKey_Key {
@@ -74,21 +82,24 @@ export interface GetRequestDetailData {
       requests: ({
         id: string;
         salonId: string;
-        productId: string;
-        quantity: number;
         state: RequestState;
         revision: number;
         createdAt: TimestampString;
-        product: {
-          name: string;
-        };
         salon: {
           name: string;
         };
-        transfer?: {
-          dispatchedQuantity: number;
-          receivedQuantity: number;
-        };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
         timeline: ({
           state: RequestState;
           createdAt: TimestampString;
@@ -152,17 +163,24 @@ export interface ListActiveRequestsData {
       requests: ({
         id: string;
         salonId: string;
-        productId: string;
-        quantity: number;
         state: RequestState;
         revision: number;
         createdAt: TimestampString;
-        product: {
-          name: string;
-        };
         salon: {
           name: string;
         };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
       } & ReplenishmentRequest_Key)[];
     };
   };
@@ -180,17 +198,24 @@ export interface ListHqQueueData {
       requests: ({
         id: string;
         salonId: string;
-        productId: string;
-        quantity: number;
         state: RequestState;
         revision: number;
         createdAt: TimestampString;
-        product: {
-          name: string;
-        };
         salon: {
           name: string;
         };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
       } & ReplenishmentRequest_Key)[];
     };
   };
@@ -227,6 +252,42 @@ export interface ListProductsVariables {
   offset?: number;
 }
 
+export interface ListSalonRequestsData {
+  membership?: {
+    business: {
+      requests: ({
+        id: string;
+        salonId: string;
+        state: RequestState;
+        revision: number;
+        createdAt: TimestampString;
+        salon: {
+          name: string;
+        };
+        items: ({
+          id: string;
+          productId: string;
+          quantity: number;
+          product: {
+            name: string;
+          };
+          transferItem?: {
+            dispatchedQuantity: number;
+            receivedQuantity: number;
+          };
+        } & RequestItem_Key)[];
+      } & ReplenishmentRequest_Key)[];
+    };
+  };
+}
+
+export interface ListSalonRequestsVariables {
+  salonId: string;
+  states: RequestState[];
+  limit?: number;
+  offset?: number;
+}
+
 export interface Location_Key {
   id: string;
   __typename?: 'Location_Key';
@@ -247,6 +308,11 @@ export interface ReplenishmentRequest_Key {
   __typename?: 'ReplenishmentRequest_Key';
 }
 
+export interface RequestItem_Key {
+  id: string;
+  __typename?: 'RequestItem_Key';
+}
+
 export interface SalonAccess_Key {
   membershipUid: string;
   locationId: string;
@@ -254,9 +320,14 @@ export interface SalonAccess_Key {
 }
 
 export interface StockMovement_Key {
-  transferRequestId: string;
+  transferItemRequestItemId: string;
   type: MovementType;
   __typename?: 'StockMovement_Key';
+}
+
+export interface TransferItem_Key {
+  requestItemId: string;
+  __typename?: 'TransferItem_Key';
 }
 
 export interface Transfer_Key {
@@ -335,4 +406,16 @@ export const getRequestDetailRef: GetRequestDetailRef;
 
 export function getRequestDetail(vars: GetRequestDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetRequestDetailData, GetRequestDetailVariables>;
 export function getRequestDetail(dc: DataConnect, vars: GetRequestDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetRequestDetailData, GetRequestDetailVariables>;
+
+interface ListSalonRequestsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListSalonRequestsVariables): QueryRef<ListSalonRequestsData, ListSalonRequestsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ListSalonRequestsVariables): QueryRef<ListSalonRequestsData, ListSalonRequestsVariables>;
+  operationName: string;
+}
+export const listSalonRequestsRef: ListSalonRequestsRef;
+
+export function listSalonRequests(vars: ListSalonRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListSalonRequestsData, ListSalonRequestsVariables>;
+export function listSalonRequests(dc: DataConnect, vars: ListSalonRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<ListSalonRequestsData, ListSalonRequestsVariables>;
 

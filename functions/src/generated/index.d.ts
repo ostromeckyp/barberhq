@@ -55,8 +55,19 @@ export interface ActiveRequest_Key {
 
 export interface ApproveStockData {
   changed: number;
-  inventory_updateMany: number;
   transfer_insert: Transfer_Key;
+  update0: number;
+  transfer0: TransferItem_Key;
+  update1: number;
+  transfer1: TransferItem_Key;
+  update2: number;
+  transfer2: TransferItem_Key;
+  update3: number;
+  transfer3: TransferItem_Key;
+  update4: number;
+  transfer4: TransferItem_Key;
+  update5: number;
+  transfer5: TransferItem_Key;
   actionReceipt_insert: ActionReceipt_Key;
   actionKey_insert: ActionKey_Key;
 }
@@ -65,12 +76,19 @@ export interface ApproveStockVariables {
   uid: string;
   businessId: string;
   requestId: string;
-  revision: number;
   receiptId: string;
   key: string;
   payloadHash: string;
   semanticHash: string;
-  inventoryVersion: number;
+  revision: number;
+  count: number;
+  inventoryVersions: number[];
+  use0: boolean;
+  use1: boolean;
+  use2: boolean;
+  use3: boolean;
+  use4: boolean;
+  use5: boolean;
 }
 
 export interface BindReplayKeyData {
@@ -92,9 +110,24 @@ export interface Business_Key {
 
 export interface DispatchStockData {
   changed: number;
-  inventory_updateMany: number;
-  transfer_updateMany: number;
-  stockMovement_insert: StockMovement_Key;
+  update0: number;
+  transfer0: number;
+  movement0: StockMovement_Key;
+  update1: number;
+  transfer1: number;
+  movement1: StockMovement_Key;
+  update2: number;
+  transfer2: number;
+  movement2: StockMovement_Key;
+  update3: number;
+  transfer3: number;
+  movement3: StockMovement_Key;
+  update4: number;
+  transfer4: number;
+  movement4: StockMovement_Key;
+  update5: number;
+  transfer5: number;
+  movement5: StockMovement_Key;
   actionReceipt_insert: ActionReceipt_Key;
   actionKey_insert: ActionKey_Key;
 }
@@ -103,12 +136,18 @@ export interface DispatchStockVariables {
   uid: string;
   businessId: string;
   requestId: string;
-  revision: number;
   receiptId: string;
   key: string;
   payloadHash: string;
   semanticHash: string;
-  inventoryVersion: number;
+  revision: number;
+  count: number;
+  use0: boolean;
+  use1: boolean;
+  use2: boolean;
+  use3: boolean;
+  use4: boolean;
+  use5: boolean;
 }
 
 export interface InsertInventoryData {
@@ -161,6 +200,12 @@ export interface ReadResetCountsData {
   active: ({
     _count: number;
   })[];
+  items: ({
+    _count: number;
+  })[];
+  transferItems: ({
+    _count: number;
+  })[];
   transfers: ({
     _count: number;
   })[];
@@ -210,9 +255,24 @@ export interface ReadSeedStateVariables {
 
 export interface ReceiveStockData {
   changed: number;
-  inventory_updateMany: number;
-  transfer_updateMany: number;
-  stockMovement_insert: StockMovement_Key;
+  update0: number;
+  transfer0: number;
+  movement0: StockMovement_Key;
+  update1: number;
+  transfer1: number;
+  movement1: StockMovement_Key;
+  update2: number;
+  transfer2: number;
+  movement2: StockMovement_Key;
+  update3: number;
+  transfer3: number;
+  movement3: StockMovement_Key;
+  update4: number;
+  transfer4: number;
+  movement4: StockMovement_Key;
+  update5: number;
+  transfer5: number;
+  movement5: StockMovement_Key;
   activeRequest_deleteMany: number;
   actionReceipt_insert: ActionReceipt_Key;
   actionKey_insert: ActionKey_Key;
@@ -222,13 +282,20 @@ export interface ReceiveStockVariables {
   uid: string;
   businessId: string;
   requestId: string;
-  revision: number;
   receiptId: string;
   key: string;
   payloadHash: string;
   semanticHash: string;
-  inventoryVersion: number;
-  receivedQuantity: number;
+  revision: number;
+  count: number;
+  receivedQuantities: number[];
+  allIntact: boolean;
+  use0: boolean;
+  use1: boolean;
+  use2: boolean;
+  use3: boolean;
+  use4: boolean;
+  use5: boolean;
 }
 
 export interface RejectStockData {
@@ -242,11 +309,12 @@ export interface RejectStockVariables {
   uid: string;
   businessId: string;
   requestId: string;
-  revision: number;
   receiptId: string;
   key: string;
   payloadHash: string;
   semanticHash: string;
+  revision: number;
+  count: number;
   reason: string;
 }
 
@@ -255,12 +323,19 @@ export interface ReplenishmentRequest_Key {
   __typename?: 'ReplenishmentRequest_Key';
 }
 
+export interface RequestItem_Key {
+  id: string;
+  __typename?: 'RequestItem_Key';
+}
+
 export interface ResetDemoStockData {
   keys: number;
   receipts: number;
   movements: number;
+  transferItems: number;
   transfers: number;
   active: number;
+  items: number;
   requests: number;
   hq: number;
   salons: number;
@@ -295,29 +370,26 @@ export interface StockContextData {
     id: string;
     businessId: string;
     salonId: string;
-    productId: string;
-    quantity: number;
     state: RequestState;
     revision: number;
-    product: {
-      inventories_on_product: ({
-        locationId: string;
-        onHand: number;
-        reserved: number;
-        version: number;
-      })[];
-    };
+    items: ({
+      id: string;
+      productId: string;
+      quantity: number;
+      product: {
+        inventories_on_product: ({
+          locationId: string;
+          onHand: number;
+          reserved: number;
+          version: number;
+        })[];
+      };
+    } & RequestItem_Key)[];
   } & ReplenishmentRequest_Key;
-  product?: {
+  products: ({
     id: string;
     businessId: string;
-    inventories_on_product: ({
-      locationId: string;
-      onHand: number;
-      reserved: number;
-      version: number;
-    })[];
-  } & Product_Key;
+  } & Product_Key)[];
   location?: {
     id: string;
     businessId: string;
@@ -350,6 +422,7 @@ export interface StockContextData {
   } & ActionReceipt_Key)[];
   activeRequests: ({
     requestId: string;
+    productId: string;
   })[];
 }
 
@@ -357,20 +430,31 @@ export interface StockContextVariables {
   uid: string;
   requestId?: string | null;
   salonId?: string | null;
-  productId?: string | null;
+  productIds: string[];
   key: string;
   action: StockActionType;
 }
 
 export interface StockMovement_Key {
-  transferRequestId: string;
+  transferItemRequestItemId: string;
   type: MovementType;
   __typename?: 'StockMovement_Key';
 }
 
 export interface SubmitStockData {
   replenishmentRequest_insert: ReplenishmentRequest_Key;
-  activeRequest_insert: ActiveRequest_Key;
+  item0: RequestItem_Key;
+  active0: ActiveRequest_Key;
+  item1: RequestItem_Key;
+  active1: ActiveRequest_Key;
+  item2: RequestItem_Key;
+  active2: ActiveRequest_Key;
+  item3: RequestItem_Key;
+  active3: ActiveRequest_Key;
+  item4: RequestItem_Key;
+  active4: ActiveRequest_Key;
+  item5: RequestItem_Key;
+  active5: ActiveRequest_Key;
   actionReceipt_insert: ActionReceipt_Key;
   actionKey_insert: ActionKey_Key;
 }
@@ -378,14 +462,27 @@ export interface SubmitStockData {
 export interface SubmitStockVariables {
   uid: string;
   businessId: string;
-  salonId: string;
-  productId: string;
-  quantity: number;
   requestId: string;
   receiptId: string;
   key: string;
   payloadHash: string;
   semanticHash: string;
+  salonId: string;
+  productIds: string[];
+  itemIds: string[];
+  quantities: number[];
+  count: number;
+  use0: boolean;
+  use1: boolean;
+  use2: boolean;
+  use3: boolean;
+  use4: boolean;
+  use5: boolean;
+}
+
+export interface TransferItem_Key {
+  requestItemId: string;
+  __typename?: 'TransferItem_Key';
 }
 
 export interface Transfer_Key {

@@ -19,3 +19,5 @@ npx vitest run --config tests/capabilities/whole-request/vitest.config.ts
 ```
 
 Compilation does not deploy. The fixture uses SQL Connect9599, hub4401, logging4501; its PostgreSQL picked5433 while the demo used5432. Avoid starting two copies. Wait for connector reload after edits before running tests: an immediate test ran the previous operation until the watcher reloaded it. The existing demo service on9399 is untouched. Fixture-generated `.dataconnect` and logs are ignored.
+
+Production integration additionally found that SQL Connect evaluates scalar `_expr` arguments even for skipped groups. The generator uses safe index-zero/scalar fallbacks for disabled slots, while `@include` still prevents writes. Full integration tests cover single-, three- and six-item commands with these expressions.

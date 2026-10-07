@@ -14,8 +14,7 @@ afterEach(async () => {
 });
 const submitInput = (): SubmitInput => ({
   salonId: h.legnickaId,
-  productId: `${h.businessId}:NBS-MATOWA-100`,
-  quantity: 2,
+  items: [{ productId: `${h.businessId}:NBS-MATOWA-100`, quantity: 2 }],
   idempotencyKey: randomUUID(),
 });
 const submit = () =>
@@ -26,7 +25,12 @@ const approve = (id: string, version = 1) =>
     input: {
       requestId: id,
       expectedRevision: 1,
-      expectedHqInventoryVersion: version,
+      inventoryVersions: [
+        {
+          productId: `${h.businessId}:NBS-MATOWA-100`,
+          expectedHqInventoryVersion: version,
+        },
+      ],
       idempotencyKey: randomUUID(),
     },
   });
@@ -36,8 +40,9 @@ async function snapshot() {
       `query($id:String!){
     inventories(where:{location:{businessId:{eq:$id}}},orderBy:[{locationId:ASC},{productId:ASC}]){locationId productId onHand reserved version}
     replenishmentRequests(where:{businessId:{eq:$id}},orderBy:{id:ASC}){id state revision}
-    transfers(where:{businessId:{eq:$id}}){requestId dispatchedQuantity receivedQuantity}
-    stockMovements(where:{businessId:{eq:$id}}){transferRequestId type quantity}
+    transfers(where:{businessId:{eq:$id}}){requestId}
+    transferItems(where:{transfer:{businessId:{eq:$id}}}){requestItemId dispatchedQuantity receivedQuantity}
+    stockMovements(where:{businessId:{eq:$id}}){transferItemRequestItemId type quantity}
     actionReceipts(where:{businessId:{eq:$id}}){id}
     activeRequests(where:{businessId:{eq:$id}}){requestId}
   }`,
@@ -119,7 +124,10 @@ it("rejects_conflicting_keys_wrong_scope_stale_versions_and_partial_receipt", as
   await expect(
     repo.execute(h.users.legnicka, {
       ...action,
-      input: { ...action.input, quantity: 3 },
+      input: {
+        ...action.input,
+        items: [{ ...action.input.items[0], quantity: 3 }],
+      },
     }),
   ).rejects.toMatchObject({ code: "IDEMPOTENCY_CONFLICT" });
   await expect(repo.execute(h.users.lodzka, action)).rejects.toMatchObject({
@@ -131,7 +139,12 @@ it("rejects_conflicting_keys_wrong_scope_stale_versions_and_partial_receipt", as
       input: {
         requestId: created.requestId,
         expectedRevision: 1,
-        expectedHqInventoryVersion: 1,
+        inventoryVersions: [
+          {
+            productId: `${h.businessId}:NBS-MATOWA-100`,
+            expectedHqInventoryVersion: 1,
+          },
+        ],
         idempotencyKey: randomUUID(),
       },
     }),
@@ -155,7 +168,9 @@ it("rejects_conflicting_keys_wrong_scope_stale_versions_and_partial_receipt", as
       input: {
         requestId: created.requestId,
         expectedRevision: 3,
-        receivedQuantity: 1,
+        items: [
+          { productId: `${h.businessId}:NBS-MATOWA-100`, receivedQuantity: 1 },
+        ],
         allIntact: true,
         idempotencyKey: randomUUID(),
       },
@@ -169,7 +184,7 @@ it("failure_rolls_back_all_writes", async () => {
   // Corrupt only this isolated fixture: force the later transfer guard to fail,
   // after the transaction has attempted request and inventory writes.
   await h.operator.executeGraphql(
-    "mutation($id:String!){transfer_update(key:{requestId:$id},data:{dispatchedQuantity:1})}",
+    "mutation($id:String!){transferItem_updateMany(where:{transferRequestId:{eq:$id}},data:{dispatchedQuantity:1})}",
     { variables: { id: created.requestId } },
   );
   const before = await snapshot();
@@ -194,7 +209,12 @@ it("semantic_replay_binds_the_new_key_to_its_original_payload", async () => {
     input: {
       requestId: request.requestId,
       expectedRevision: 1,
-      expectedHqInventoryVersion: 1,
+      inventoryVersions: [
+        {
+          productId: `${h.businessId}:NBS-MATOWA-100`,
+          expectedHqInventoryVersion: 1,
+        },
+      ],
       idempotencyKey: key,
     },
   };

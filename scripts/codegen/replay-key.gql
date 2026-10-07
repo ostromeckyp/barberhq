@@ -1,0 +1,9 @@
+mutation BindReplayKey($uid:String!,$businessId:String!,$receiptId:String!,$key:String!,$payloadHash:String!) @auth(level:NO_ACCESS) @transaction {
+  original: query @redact {
+    actionReceipt(id:$receiptId) @check(expr:"this != null && this.businessId == vars.businessId",message:"FORBIDDEN") { businessId action request { salonId } }
+  }
+  query @redact {
+    membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && ((response.original.actionReceipt.action in ['SUBMIT','RECEIVE'] && this.role == 'SALON' && this.salonAccesses_on_membership.exists(a,a.locationId == response.original.actionReceipt.request.salonId)) || (response.original.actionReceipt.action in ['APPROVE','REJECT','DISPATCH'] && this.role == 'HQ'))",message:"FORBIDDEN") { businessId role salonAccesses_on_membership { locationId } }
+  }
+  actionKey_insert(data:{businessId:$businessId,actorUid:$uid,idempotencyKey:$key,receiptId:$receiptId,payloadHash:$payloadHash})
+}

@@ -5,8 +5,6 @@ type ReplenishmentRequest @table(key: "id") @index(fields: ["businessId", "state
   id: String!
   business: Business!
   salon: Location!
-  product: Product!
-  quantity: Int!
   state: RequestState!
   revision: Int!
   createdAt: Timestamp! @default(expr: "request.time")
@@ -15,20 +13,33 @@ type ActiveRequest @table(key: ["business", "salon", "product"]) {
   business: Business!
   salon: Location!
   product: Product!
-  request: ReplenishmentRequest! @unique
-}
-type Transfer @table(key: "request") {
   request: ReplenishmentRequest!
+}
+type RequestItem @table(key: "id") @unique(fields: ["request", "product"]) {
+  id: String!
+  request: ReplenishmentRequest!
+  product: Product!
+  quantity: Int!
+}
+type Transfer @table(key: "requestId") {
+  requestId: String!
+  request: ReplenishmentRequest! @ref(fields: ["requestId"], references: ["id"])
   business: Business!
   warehouse: Location!
   destination: Location!
-  product: Product!
+}
+type TransferItem @table(key: "requestItemId") {
+  requestItemId: String!
+  requestItem: RequestItem! @ref(fields: ["requestItemId"], references: ["id"])
+  transferRequestId: String!
+  transfer: Transfer! @ref(fields: ["transferRequestId"], references: ["requestId"])
   quantity: Int!
   dispatchedQuantity: Int! @default(value: 0)
   receivedQuantity: Int! @default(value: 0)
 }
-type StockMovement @table(key: ["transfer", "type"]) {
-  transfer: Transfer!
+type StockMovement @table(name: "stock_item_movement", key: ["transferItemRequestItemId", "type"]) {
+  transferItemRequestItemId: String!
+  transferItem: TransferItem! @ref(fields: ["transferItemRequestItemId"], references: ["requestItemId"])
   business: Business!
   type: MovementType!
   quantity: Int!

@@ -10,6 +10,14 @@ export const MovementType = {
   RECEIPT: "RECEIPT",
 }
 
+export const RequestState = {
+  PENDING_APPROVAL: "PENDING_APPROVAL",
+  RESERVED: "RESERVED",
+  DISPATCHED: "DISPATCHED",
+  RECEIVED: "RECEIVED",
+  REJECTED: "REJECTED",
+}
+
 export const connectorConfig = {
   connector: 'browser',
   serviceId: 'barberhq',
@@ -50,5 +58,11 @@ export function getRequestDetail(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeQuery('GetRequestDetail', inputVars, inputOpts);
+}
+
+export function listSalonRequests(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ListSalonRequests', inputVars, inputOpts);
 }
 

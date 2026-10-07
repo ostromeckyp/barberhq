@@ -23,8 +23,7 @@ it("reset_refuses_foreign_target_and_restores_seed", async () => {
     type: "SUBMIT",
     input: {
       salonId: h.legnickaId,
-      productId: `${h.businessId}:NBS-MATOWA-100`,
-      quantity: 2,
+      items: [{ productId: `${h.businessId}:NBS-MATOWA-100`, quantity: 2 }],
       idempotencyKey: randomUUID(),
     },
   });

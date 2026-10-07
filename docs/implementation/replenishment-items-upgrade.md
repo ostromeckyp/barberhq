@@ -14,7 +14,7 @@ DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 npm run migrate:replenishment -- --pro
 npm run migrate:replenishment -- --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --verify --backup artifacts/replenishment-upgrade/before.json
 ```
 
-Export reads every page, writes mode0600 with exclusive creation, records counts/checksum and validates references, states, audit, movements and reservations. Verification is read-only. Restore requires the same project/business and preserved unchanged parent tables. Never apply a schema change before verifying the backup. Import/apply is added and rehearsed as part of the item-schema implementation; the tools at this stage deliberately cannot apply changes.
+Export reads every page, writes mode0600 with exclusive creation, records counts/checksum and validates references, states, audit, movements and reservations. Verification is read-only. Restore requires the same project/business and preserved unchanged parent tables. Never apply a schema change before verifying the backup. The --apply mode imports missing target records in one transaction, refuses conflicting records or changed inventory, then verifies all tables. Repeating the same verified import inserts zero rows.
 
 ## Reconcile old browser submissions
 
@@ -30,6 +30,18 @@ The tool only reads files and writes a new report; it never sends stock commands
 
 Existing request IDs/states/timestamps remain. Stable item IDs hash the request/product pair; uniqueness of that pair is also a database constraint. Transfer headers retain request identity; transfer items reference the request item. Movement identity changes to transfer item/type while quantities/actors/timestamps remain byte-for-byte data values. Action receipts, original hashes and alias keys are retained unchanged. Conversion does not run approval/dispatch/receipt commands or alter inventory balances.
 
-Install the target schema only while writers are stopped, import the verified conversion, compare all reconstructed records and inventory values, create missing salon settings at2 without overwriting existing settings, then deploy/rebuild matching Functions and Angular. Remove obsolete `lowStockThreshold` from private web config before rebuilding after Settings is implemented. Reload every client and verify the same history/stock. Partial import is not a successful upgrade; remain offline and resume using the same verified backup or restore the old schema/data. Exact apply/restore commands and disposable-database evidence must be added before cutover.
+Install the target schema only while writers are stopped, import the verified conversion, compare all reconstructed records and inventory values, create missing salon settings at2 without overwriting existing settings, then deploy/rebuild matching Functions and Angular. Remove obsolete `lowStockThreshold` from private web config before rebuilding after Settings is implemented. Reload every client and verify the same history/stock. Partial import is not a successful upgrade; remain offline and resume using the same verified backup or restore the old schema/data. After starting the new schema with writers stopped, use:
+
+```sh
+DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 npm run migrate:replenishment -- --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --apply --backup artifacts/replenishment-upgrade/before.json
+```
+
+StockMovement now maps to physical `stock_item_movement`; changing a populated table's primary key in place failed in the emulator rehearsal. The additive table receives the backed-up movements. Keep the old table/backup until verification; never use the old table for new writes. SQL Connect may retire old schema columns as it synchronizes, so the verified backup is mandatory before loading the new schema.
+
+Full local rollback: stop the affected emulators, restore the exact old dataconnect sources and matching Functions/client build, then start `firebase emulators:start --only auth,dataconnect,functions --project demo-barberhq --import artifacts/replenishment-upgrade/emulators-v1`. Do not seed/reset over the restored state. Verify the backup counts and inventory before reopening clients. Use the private credentials file corresponding to the preserved Auth UIDs.
+
+Rehearsal evidence (7 October): full Auth/PostgreSQL backup exported before code changes; an isolated restored database on9799 accepted the new schema and imported10 missing item/movement records. Complete target verification matched all6 requests,2 transfers,2 movements,11 receipts,11 keys and24 stock rows. A second apply inserted0 rows. Fixture tests additionally preserve all five request states, rejection reason, movement actors/times and replay aliases, and refuse conflicts. Timestamp comparison normalizes trailing fractional zeroes without discarding nonzero precision. This is emulator proof, not a cloud migration rehearsal.
 
 Cloud `notbad-6be95` uses the same explicit targeting rules and refuses emulator configuration. No cloud deployment or data mutation is authorized merely by running export/verify. Real Cloud SQL verification remains a release gate.
+
+Rollback was also rehearsed: the isolated service was restarted with the original schema and full emulator export. A fresh business export matched the original backup checksum after normalizing only the export timestamp, including all original records and balances.
