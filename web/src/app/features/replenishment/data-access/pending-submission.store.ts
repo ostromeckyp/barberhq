@@ -4,71 +4,85 @@ export const PENDING_STORAGE = new InjectionToken<Storage>('Pending submission s
   providedIn: 'root',
   factory: () => sessionStorage,
 });
-const KEY = 'barberhq.pending.v1';
-export function validPending(value: unknown): value is PendingSubmission {
-  if (!value || typeof value !== 'object') return false;
-  const p = value as PendingSubmission;
+const KEY = 'barberhq.pending.v2',
+  LEGACY = 'barberhq.pending.v1';
+const record = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === 'object' && !Array.isArray(v);
+const keys = (v: Record<string, unknown>, expected: string[]) =>
+  Object.keys(v).length === expected.length && expected.every((k) => Object.hasOwn(v, k));
+const id = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 300;
+export function validPending(v: unknown): v is PendingSubmission {
   if (
-    ![p.userId, p.businessId, p.salonId].every(
-      (x) => typeof x === 'string' && x.length > 0 && x.length <= 300,
-    ) ||
-    !Array.isArray(p.rows) ||
-    p.rows.length > 6
+    !record(v) ||
+    !keys(v, ['version', 'userId', 'businessId', 'salonId', 'payload']) ||
+    v['version'] !== 2 ||
+    ![v['userId'], v['businessId'], v['salonId']].every(id)
   )
     return false;
-  const keys = new Set<string>(),
-    products = new Set<string>();
-  return p.rows.every((r) => {
-    const a = r?.payload;
-    if (
-      !a ||
-      !['UNSENT', 'UNKNOWN'].includes(r.status) ||
-      typeof r.lineId !== 'string' ||
-      r.lineId.length > 300 ||
-      a.salonId !== p.salonId ||
-      typeof a.productId !== 'string' ||
-      !a.productId ||
-      a.productId.length > 300 ||
-      !Number.isInteger(a.quantity) ||
-      a.quantity < 1 ||
-      a.quantity > 99 ||
-      typeof a.idempotencyKey !== 'string' ||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-        a.idempotencyKey,
-      ) ||
-      keys.has(a.idempotencyKey) ||
-      products.has(a.productId)
+  const p = v['payload'];
+  if (
+    !record(p) ||
+    !keys(p, ['salonId', 'items', 'idempotencyKey']) ||
+    p['salonId'] !== v['salonId'] ||
+    typeof p['idempotencyKey'] !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      p['idempotencyKey'],
     )
-      return false;
-    keys.add(a.idempotencyKey);
-    products.add(a.productId);
-    return true;
-  });
+  )
+    return false;
+  const items = p['items'];
+  return (
+    Array.isArray(items) &&
+    items.length >= 1 &&
+    items.length <= 6 &&
+    items.every(
+      (i) =>
+        record(i) &&
+        keys(i, ['productId', 'quantity']) &&
+        id(i['productId']) &&
+        typeof i['quantity'] === 'number' &&
+        Number.isInteger(i['quantity']) &&
+        i['quantity'] >= 1 &&
+        i['quantity'] <= 99,
+    ) &&
+    new Set(items.map((i) => i.productId)).size === items.length
+  );
 }
+export type PendingState =
+  | { kind: 'EMPTY' }
+  | { kind: 'PENDING'; value: PendingSubmission }
+  | { kind: 'BLOCKED'; reason: 'LEGACY' | 'INVALID' | 'STORAGE_UNAVAILABLE' };
 @Service()
 export class PendingSubmissionStore {
   private readonly storage = inject(PENDING_STORAGE);
-  load(): PendingSubmission | undefined {
+  load(): PendingState {
+    let raw: string | null;
     try {
-      const raw = this.storage.getItem(KEY);
-      if (!raw) return;
-      const data: unknown = JSON.parse(raw);
-      if (validPending(data)) return data;
-      this.clear();
+      if (this.storage.getItem(LEGACY) !== null) return { kind: 'BLOCKED', reason: 'LEGACY' };
+      raw = this.storage.getItem(KEY);
     } catch {
-      this.clear();
+      return { kind: 'BLOCKED', reason: 'STORAGE_UNAVAILABLE' };
     }
-    return undefined;
+    if (raw === null) return { kind: 'EMPTY' };
+    try {
+      const value: unknown = JSON.parse(raw);
+      return validPending(value)
+        ? { kind: 'PENDING', value }
+        : { kind: 'BLOCKED', reason: 'INVALID' };
+    } catch {
+      return { kind: 'BLOCKED', reason: 'INVALID' };
+    }
   }
-  save(value: PendingSubmission) {
-    if (!validPending(value)) throw new Error('Invalid pending submission.');
+  save(value: PendingSubmission): void {
+    if (!validPending(value)) throw Error('Invalid pending submission.');
+    if (this.load().kind === 'BLOCKED') throw Error('Reconcile saved state before submitting.');
     this.storage.setItem(KEY, JSON.stringify(value));
   }
-  clear() {
-    try {
-      this.storage.removeItem(KEY);
-    } catch {
-      // Storage can be disabled by the browser. Saving still fails closed before any write.
-    }
+  clearPending(): void {
+    const raw = this.storage.getItem(KEY);
+    if (raw === null) return;
+    const value: unknown = JSON.parse(raw);
+    if (!validPending(value)) throw Error('Unrecognized pending state must be preserved.');
+    this.storage.removeItem(KEY);
   }
 }

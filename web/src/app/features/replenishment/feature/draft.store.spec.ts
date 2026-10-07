@@ -39,3 +39,10 @@ it('clarification_blocks_and_six_distinct_products_is_the_limit', () => {
   for (let i = 0; i < 7; i++) store.add({ ...line(1), lineId: String(i), productId: String(i) });
   expect(store.lines()).toHaveLength(6);
 });
+it('recovery_preserves_products_that_cannot_be_resolved_from_inventory', () => {
+  const store = new DraftStore();
+  store.restore([{ productId: 'missing-product', quantity: 3 }], []);
+  expect(store.lines()).toHaveLength(1);
+  expect(store.lines()[0]).toMatchObject({ status: 'NEEDS_CLARIFICATION', quantity: 3 });
+  expect(store.canSubmit()).toBe(false);
+});

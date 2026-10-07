@@ -48,10 +48,12 @@ export class OrderFacade {
       this.session.salons().find((s) => s.id === this.submission.savedSalonId())?.name ??
       'saved salon',
   );
-  readonly results = computed(() =>
-    this.submission.rows().filter((row) => row.payload.salonId === this.salonId()),
+  readonly outcome = computed(() =>
+    this.submission.outcomeSalonId() === this.salonId() ? this.submission.outcome() : undefined,
   );
-  readonly locked = computed(() => this.submission.busy() || this.submission.pending());
+  readonly locked = computed(
+    () => this.submission.busy() || this.submission.pending() || !!this.submission.blocked(),
+  );
   readonly canSubmit = computed(
     () =>
       this.staff() && this.draft.canSubmit() && !this.locked() && !this.loading() && !this.error(),
@@ -71,7 +73,7 @@ export class OrderFacade {
     this.manual.set({ productId, quantity: 2 });
   }
   activeFor(productId: string) {
-    return this.requests().find((r) => r.productId === productId);
+    return this.requests().find((r) => r.items.some((i) => i.productId === productId));
   }
   add() {
     const { productId, quantity } = this.manual();
@@ -103,19 +105,29 @@ export class OrderFacade {
     });
     this.notice.set('');
   }
+  private scopeKey() {
+    const s = this.session.state();
+    return s.status === 'READY'
+      ? JSON.stringify([s.membership.userId, s.membership.businessId, this.salonId()])
+      : undefined;
+  }
   async submit() {
     if (!this.canSubmit()) return;
+    const scope = this.scopeKey();
     await this.submission.submit(this.salonId()!, this.draft.lines() as ReadyDraftLine[]);
-    this.reconcile();
+    if (scope && this.scopeKey() === scope) this.reconcile();
   }
   async resume() {
+    const scope = this.scopeKey();
     await this.submission.resume(this.salonId()!);
-    this.reconcile();
+    if (scope && this.scopeKey() === scope) this.reconcile();
   }
   private reconcile() {
-    for (const row of this.submission.rows())
-      if (row.status === 'CREATED' || row.status === 'ALREADY_ACTIVE')
-        this.draft.remove(row.lineId);
+    const outcome = this.outcome();
+    if (outcome?.status === 'CREATED') this.draft.clear();
+    if (outcome?.status === 'FAILED' && this.draft.lines().length === 0) {
+      this.draft.restore(this.submission.submittedItems(), this.inventory.rows());
+    }
     this.refresh();
   }
   refresh() {

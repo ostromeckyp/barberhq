@@ -1,6 +1,10 @@
 import type { RequestDetail, StockAction } from '../../../../../../shared/contracts/stock';
 export type TransitionType = Exclude<StockAction['type'], 'SUBMIT'>;
-export type Confirmation = { reason: string; receivedQuantity: number; allIntact: boolean };
+export type Confirmation = {
+  reason: string;
+  items: { productId: string; receivedQuantity: number }[];
+  allIntact: boolean;
+};
 export const ACTION_LABELS: Record<TransitionType, string> = {
   APPROVE: 'Approve request',
   REJECT: 'Reject request',
@@ -14,7 +18,10 @@ export function canConfirm(
 ): boolean {
   switch (type) {
     case 'APPROVE':
-      return request.state === 'PENDING_APPROVAL' && request.stock.hqAvailable >= request.quantity;
+      return (
+        request.state === 'PENDING_APPROVAL' &&
+        request.items.every((item) => item.stock.hqAvailable >= item.quantity)
+      );
     case 'REJECT':
       return (
         request.state === 'PENDING_APPROVAL' &&
@@ -27,7 +34,13 @@ export function canConfirm(
       return (
         request.state === 'DISPATCHED' &&
         value.allIntact &&
-        value.receivedQuantity === request.quantity
+        value.items.length === request.items.length &&
+        new Set(value.items.map((i) => i.productId)).size === value.items.length &&
+        request.items.every((item) =>
+          value.items.some(
+            (i) => i.productId === item.productId && i.receivedQuantity === item.quantity,
+          ),
+        )
       );
   }
 }
@@ -40,7 +53,16 @@ export function buildAction(
   const common = { requestId: request.id, expectedRevision: request.revision, idempotencyKey: key };
   switch (type) {
     case 'APPROVE':
-      return { type, input: { ...common, expectedHqInventoryVersion: request.hqInventoryVersion } };
+      return {
+        type,
+        input: {
+          ...common,
+          inventoryVersions: request.items.map((i) => ({
+            productId: i.productId,
+            expectedHqInventoryVersion: i.stock.hqInventoryVersion,
+          })),
+        },
+      };
     case 'REJECT':
       return { type, input: { ...common, reason: value.reason.trim() } };
     case 'DISPATCH':
@@ -48,7 +70,7 @@ export function buildAction(
     case 'RECEIVE':
       return {
         type,
-        input: { ...common, receivedQuantity: value.receivedQuantity, allIntact: true },
+        input: { ...common, items: value.items.map((i) => ({ ...i })), allIntact: true },
       };
   }
 }

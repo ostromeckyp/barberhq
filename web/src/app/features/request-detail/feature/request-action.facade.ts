@@ -23,7 +23,10 @@ export class RequestActionFacade {
   private readonly api = inject(ReplenishmentApi);
   readonly model = signal<Confirmation>({
     reason: '',
-    receivedQuantity: this.data.request.quantity,
+    items: this.data.request.items.map((i) => ({
+      productId: i.productId,
+      receivedQuantity: i.quantity,
+    })),
     allIntact: false,
   });
   readonly busy = signal(false);

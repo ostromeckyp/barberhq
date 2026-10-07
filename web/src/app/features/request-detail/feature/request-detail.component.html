@@ -1,6 +1,6 @@
 <app-page-header
   eyebrow="REPLENISHMENT REQUEST"
-  [title]="facade.request()?.productName ?? 'Request details'"
+  [title]="facade.request() ? 'Request ' + facade.request()!.id.slice(0, 8) : 'Request details'"
   [description]="facade.request()?.salonName ?? ''"
   ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
     Refresh
@@ -25,17 +25,21 @@
       <section class="card">
         <app-status-chip [state]="request.state" />
         <h2>Delivery quantities</h2>
-        <div class="figures">
-          <div>
-            Ordered<strong>{{ request.quantity }}</strong>
+        <p class="muted">Reference: {{ request.id }}</p>
+        @for (item of request.items; track item.productId) {
+          <h3>{{ item.productName }}</h3>
+          <div class="figures">
+            <div>
+              Ordered<strong>{{ item.quantity }}</strong>
+            </div>
+            <div>
+              Dispatched<strong>{{ item.dispatchedQuantity }}</strong>
+            </div>
+            <div>
+              Received<strong>{{ item.receivedQuantity }}</strong>
+            </div>
           </div>
-          <div>
-            Dispatched<strong>{{ request.dispatchedQuantity }}</strong>
-          </div>
-          <div>
-            Received<strong>{{ request.receivedQuantity }}</strong>
-          </div>
-        </div>
+        }
         <h2>Next step</h2>
         @switch (request.state) {
           @case ('PENDING_APPROVAL') {
@@ -81,18 +85,21 @@
     </div>
     <aside class="card">
       <h2>Stock now</h2>
-      <dl>
-        <dt>HQ on hand</dt>
-        <dd data-testid="hq-on-hand">{{ request.stock.hqOnHand }}</dd>
-        <dt>HQ reserved</dt>
-        <dd>{{ request.stock.hqReserved }}</dd>
-        <dt>HQ available</dt>
-        <dd>{{ request.stock.hqAvailable }}</dd>
-        <dt>In transit · this request</dt>
-        <dd data-testid="in-transit">{{ facade.transit() }}</dd>
-        <dt>{{ request.salonName }} on hand</dt>
-        <dd data-testid="salon-on-hand">{{ request.stock.salonOnHand }}</dd>
-      </dl>
+      @for (item of request.items; track item.productId) {
+        <h3>{{ item.productName }}</h3>
+        <dl>
+          <dt>HQ on hand</dt>
+          <dd data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</dd>
+          <dt>HQ reserved</dt>
+          <dd>{{ item.stock.hqReserved }}</dd>
+          <dt>HQ available</dt>
+          <dd>{{ item.stock.hqAvailable }}</dd>
+          <dt>In transit · this product</dt>
+          <dd data-testid="in-transit">{{ item.dispatchedQuantity - item.receivedQuantity }}</dd>
+          <dt>{{ request.salonName }} on hand</dt>
+          <dd data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</dd>
+        </dl>
+      }
       <p class="muted">Synthetic demo quantities. Refreshed from the database.</p>
     </aside>
   </div>

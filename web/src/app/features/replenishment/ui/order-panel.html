@@ -2,11 +2,11 @@
   <header>
     <span class="eyebrow">REPLENISHMENT</span>
     <h2 id="order-title">Request products</h2>
-    <p>Build your list. HQ approves each product separately.</p>
+    <p>Build your list. HQ approves and delivers the whole request together.</p>
   </header>
   @if (facade.submission.pending()) {
     <div class="warning" role="status">
-      Saved requests for {{ facade.savedSalonName() }} have a result to reconcile. Their quantities
+      The saved request for {{ facade.savedSalonName() }} has a result to reconcile. Its quantities
       are frozen until it is known.
     </div>
     @if (facade.pendingElsewhere()) {
@@ -15,9 +15,15 @@
       >
     } @else {
       <button mat-flat-button (click)="facade.resume()" [disabled]="facade.submission.busy()">
-        {{ facade.submission.busy() ? 'Checking…' : 'Reconcile saved requests' }}
+        {{ facade.submission.busy() ? 'Checking…' : 'Reconcile saved request' }}
       </button>
     }
+  }
+  @if (facade.submission.blocked()) {
+    <p class="warning" role="alert">
+      Saved submission data needs reconciliation before you can send a new request. Contact the demo
+      operator. Your saved data has been preserved.
+    </p>
   }
   <fieldset [disabled]="facade.locked()">
     <legend class="sr-only">Add a product</legend>
@@ -85,28 +91,36 @@
           <p class="error" role="alert">Enter a whole number from 1 to 99.</p>
         }
       } @else {
-        <p>{{ line.originalWording }} — {{ line.reason }}</p>
+        <p>{{ line.originalWording }} × {{ line.quantity }} — {{ line.reason }}</p>
+        <button mat-button (click)="facade.draft.remove(line.lineId)" [disabled]="facade.locked()">
+          Remove unresolved item
+        </button>
       }
     </article>
   } @empty {
     <p class="muted">Your request list is empty.</p>
   }
   <button mat-flat-button (click)="facade.submit()" [disabled]="!facade.canSubmit()">
-    {{ facade.submission.busy() ? 'Submitting…' : 'Submit requests' }}
+    {{ facade.submission.busy() ? 'Submitting…' : 'Submit request' }}
   </button>
   @if (facade.submission.error()) {
     <p class="error" role="alert">{{ facade.submission.error() }}</p>
   }
   <div aria-live="polite">
-    @for (row of facade.results(); track row.lineId) {
-      <p>
-        {{ row.payload.quantity }} pcs · {{ row.status }}
-        @if (row.requestId) {
-          <a [routerLink]="['/requests', row.requestId]">Open request</a>
-        } @else if (row.errorCode) {
-          <span>{{ row.errorCode }}</span>
+    @if (facade.outcome(); as outcome) {
+      <p>{{ outcome.status }}</p>
+      @if (outcome.status === 'CREATED') {
+        <a [routerLink]="['/requests', outcome.requestId]">Open request</a>
+      } @else if (outcome.status === 'FAILED') {
+        <p role="alert">
+          Request was not submitted ({{ outcome.code }}). Review the complete list before retrying.
+        </p>
+        @for (conflict of outcome.conflicts; track conflict.productId) {
+          <a [routerLink]="['/requests', conflict.requestId]"
+            >Open existing request for {{ conflict.productId }}</a
+          >
         }
-      </p>
+      }
     }
   </div>
   <footer>No stock moves until HQ dispatches and you confirm receipt.</footer>

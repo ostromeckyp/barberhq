@@ -23,45 +23,57 @@ import { RequestActionFacade } from '../feature/request-action.facade';
     <h2 mat-dialog-title>{{ facade.label }}</h2>
     <mat-dialog-content>
       <p>
-        <strong>{{ facade.data.request.productName }} × {{ facade.data.request.quantity }}</strong
-        ><br />{{ facade.data.request.salonName }}
+        {{ facade.data.request.salonName }} · {{ facade.data.request.itemCount }} items ·
+        {{ facade.data.request.totalUnits }} units
       </p>
+      @for (item of facade.data.request.items; track item.productId; let index = $index) {
+        <h3>{{ item.productName }} × {{ item.quantity }}</h3>
+        @switch (facade.data.type) {
+          @case ('APPROVE') {
+            <p>
+              HQ available: {{ item.stock.hqAvailable }} →
+              {{ item.stock.hqAvailable - item.quantity }}
+            </p>
+          }
+          @case ('DISPATCH') {
+            <p>HQ on hand: {{ item.stock.hqOnHand }} → {{ item.stock.hqOnHand - item.quantity }}</p>
+          }
+          @case ('RECEIVE') {
+            <p>
+              Salon on hand: {{ item.stock.salonOnHand }} →
+              {{ item.stock.salonOnHand + item.quantity }}
+            </p>
+            <mat-form-field appearance="outline"
+              ><mat-label>Received quantity · {{ item.productName }}</mat-label>
+              <input
+                matInput
+                type="number"
+                step="1"
+                [formField]="fields.items[index].receivedQuantity"
+              />
+            </mat-form-field>
+          }
+        }
+      }
       @switch (facade.data.type) {
         @case ('APPROVE') {
-          <p>
-            HQ available: {{ facade.data.request.stock.hqAvailable }} →
-            {{ facade.data.request.stock.hqAvailable - facade.data.request.quantity }}
-          </p>
-          <p>These units will be reserved. Physical stock stays unchanged until dispatch.</p>
+          <p>Reserve all products together. Physical stock stays unchanged until dispatch.</p>
         }
         @case ('DISPATCH') {
-          <p>
-            HQ on hand: {{ facade.data.request.stock.hqOnHand }} →
-            {{ facade.data.request.stock.hqOnHand - facade.data.request.quantity }}
-          </p>
-          <p>Confirm only after the products leave HQ.</p>
+          <p>Confirm only after all products leave HQ.</p>
         }
         @case ('REJECT') {
           <mat-form-field appearance="outline"
-            ><mat-label>Reason for rejection</mat-label
-            ><textarea matInput [formField]="fields.reason"></textarea>
+            ><mat-label>Reason for rejection</mat-label>
+            <textarea matInput [formField]="fields.reason"></textarea>
           </mat-form-field>
         }
         @case ('RECEIVE') {
-          <p>
-            Salon on hand: {{ facade.data.request.stock.salonOnHand }} →
-            {{ facade.data.request.stock.salonOnHand + facade.data.request.quantity }}
-          </p>
-          <mat-form-field appearance="outline"
-            ><mat-label>Received quantity</mat-label
-            ><input matInput type="number" step="1" [formField]="fields.receivedQuantity"
-          /></mat-form-field>
           <mat-checkbox [formField]="fields.allIntact">All products are intact</mat-checkbox>
           @if (!facade.valid()) {
             <p class="warning" role="status">
-              Only a complete, intact delivery can be received. For damaged or missing products,
-              leave this request dispatched and contact HQ. Procedure guidance will be available in
-              a later stage.
+              Receipt blocked. Contact HQ about missing or damaged products. The whole request
+              remains dispatched until every product arrives intact.
             </p>
           }
         }

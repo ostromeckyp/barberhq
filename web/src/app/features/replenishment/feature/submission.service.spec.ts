@@ -8,7 +8,7 @@ import { PENDING_STORAGE, PendingSubmissionStore } from '../data-access/pending-
 import { CommandError } from '../data-access/command-error';
 import type { SessionState } from '../../../../../../shared/contracts/business';
 import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft';
-import type { StockAction } from '../../../../../../shared/contracts/stock';
+import type { StockAction, CommandResult } from '../../../../../../shared/contracts/stock';
 const line = (id: string): ReadyDraftLine => ({
   status: 'READY',
   lineId: id,
@@ -21,107 +21,139 @@ const line = (id: string): ReadyDraftLine => ({
   hqInventoryVersion: 1,
   salonInventoryVersion: 1,
 });
-it('stops_on_unknown_and_refresh_reconciles_same_key_without_resending_confirmed_rows', async () => {
-  sessionStorage.clear();
-  const state = signal<SessionState>({
-    status: 'READY',
-    membership: { userId: 'u', businessId: 'b', role: 'SALON', salonIds: ['salon'] },
-  });
-  const keys: string[] = [];
-  const committed = new Map<string, string>();
-  let lose = true;
-  const runAction = vi.fn(async (action: StockAction) => {
-    const key = action.input.idempotencyKey;
-    keys.push(key);
-    const id = committed.get(key) ?? String(committed.size + 1);
-    committed.set(key, id);
-    if (lose) {
-      lose = false;
-      throw new CommandError('UNKNOWN', 'Lost response');
-    }
-    return { requestId: id };
-  });
-  const providers = [
-    { provide: SessionFacade, useValue: { state } },
-    { provide: ReplenishmentApi, useValue: { runAction } },
-    { provide: PENDING_STORAGE, useValue: sessionStorage },
-  ];
-  TestBed.configureTestingModule({ providers });
-  const service = TestBed.inject(SubmissionService);
-  await service.submit('salon', [line('1'), line('2')]);
-  expect(keys).toHaveLength(1);
-  expect(service.rows()[0].status).toBe('UNKNOWN');
-  TestBed.resetTestingModule();
-  TestBed.configureTestingModule({ providers });
-  const restored = TestBed.inject(SubmissionService);
-  await restored.resume('salon');
-  expect(keys).toEqual([keys[0], keys[0], keys[2]]);
-  expect(keys).toHaveLength(3);
-  expect(committed.size).toBe(2);
-  await restored.resume('salon');
-  expect(keys).toHaveLength(3);
-  expect(TestBed.inject(PendingSubmissionStore).load()).toBeUndefined();
-  state.set({ status: 'SIGNED_OUT' });
-  TestBed.tick();
-  expect(restored.rows()).toEqual([]);
-});
-function recoveryFixture() {
-  sessionStorage.clear();
+const result: CommandResult = {
+  requestId: 'one',
+  actionReceiptId: 'receipt',
+  state: 'PENDING_APPROVAL',
+  revision: 1,
+  replayed: false,
+};
+function setup(
+  runAction: (a: StockAction) => Promise<CommandResult>,
+  storage: Storage = sessionStorage,
+) {
   const ready: SessionState = {
     status: 'READY',
     membership: { userId: 'u', businessId: 'b', role: 'SALON', salonIds: ['salon', 'other'] },
   };
   const state = signal<SessionState>(ready);
-  const keys: string[] = [];
-  let lose = true;
-  const runAction = vi.fn(async (action: StockAction) => {
-    keys.push(action.input.idempotencyKey);
-    if (lose) {
-      lose = false;
-      throw new CommandError('UNKNOWN', 'Lost response');
-    }
-    return { requestId: action.input.idempotencyKey };
-  });
-  TestBed.configureTestingModule({
-    providers: [
-      { provide: SessionFacade, useValue: { state } },
-      { provide: ReplenishmentApi, useValue: { runAction } },
-      { provide: PENDING_STORAGE, useValue: sessionStorage },
-    ],
-  });
+  const providers = [
+    { provide: SessionFacade, useValue: { state } },
+    { provide: ReplenishmentApi, useValue: { runAction } },
+    { provide: PENDING_STORAGE, useValue: storage },
+  ];
+  TestBed.configureTestingModule({ providers });
   return {
     state,
     ready,
-    keys,
+    providers,
     service: TestBed.inject(SubmissionService),
-    storage: TestBed.inject(PendingSubmissionStore),
+    store: TestBed.inject(PendingSubmissionStore),
   };
 }
-it('transient_session_error_preserves_unknown_and_unsent_rows_until_access_recovers', async () => {
-  const h = recoveryFixture();
-  await h.service.submit('salon', [line('1'), line('2')]);
-  const pending = h.storage.load();
+it('recovers_one_frozen_payload_and_key_after_reload', async () => {
+  sessionStorage.clear();
+  const sent: StockAction[] = [];
+  let lost = true;
+  const h = setup(async (action) => {
+    sent.push(structuredClone(action));
+    if (lost) {
+      lost = false;
+      throw new CommandError('UNKNOWN', 'Lost');
+    }
+    return result;
+  });
+  await h.service.submit('salon', [line('c'), line('a'), line('b')]);
+  expect(sent).toHaveLength(1);
+  expect(h.service.outcome()?.status).toBe('UNKNOWN');
+  const first = sent[0];
+  TestBed.resetTestingModule();
+  TestBed.configureTestingModule({ providers: h.providers });
+  const restored = TestBed.inject(SubmissionService);
+  await restored.resume('salon');
+  expect(sent).toEqual([first, first]);
+  expect(restored.outcome()).toEqual({ status: 'CREATED', requestId: 'one' });
+  expect(TestBed.inject(PendingSubmissionStore).load()).toEqual({ kind: 'EMPTY' });
+  await restored.resume('salon');
+  expect(sent).toHaveLength(2);
+});
+it('preserves_unknown_on_session_error_and_only_resumes_in_saved_salon', async () => {
+  sessionStorage.clear();
+  const send = vi
+    .fn()
+    .mockRejectedValueOnce(new CommandError('UNKNOWN', 'lost'))
+    .mockResolvedValue(result);
+  const h = setup(send);
+  await h.service.submit('salon', [line('a'), line('b')]);
+  const pending = h.store.load();
   h.state.set({ status: 'ERROR' });
   TestBed.tick();
-  expect(h.storage.load()).toEqual(pending);
+  expect(h.store.load()).toEqual(pending);
   await h.service.resume('salon');
-  expect(h.keys).toHaveLength(1);
+  expect(send).toHaveBeenCalledTimes(1);
   h.state.set(h.ready);
   TestBed.tick();
-  await h.service.resume('salon');
-  expect(h.keys).toEqual([
-    pending!.rows[0].payload.idempotencyKey,
-    pending!.rows[0].payload.idempotencyKey,
-    pending!.rows[1].payload.idempotencyKey,
-  ]);
-});
-it('reconciliation_cannot_send_a_saved_batch_from_a_different_salon_page', async () => {
-  const h = recoveryFixture();
-  await h.service.submit('salon', [line('1'), line('2')]);
-  const pending = h.storage.load();
   await h.service.resume('other');
-  expect(h.keys).toHaveLength(1);
-  expect(h.storage.load()).toEqual(pending);
+  expect(send).toHaveBeenCalledTimes(1);
   await h.service.resume('salon');
-  expect(h.keys).toHaveLength(3);
+  expect(send).toHaveBeenCalledTimes(2);
+});
+it('double_click_sends_once_and_late_response_cannot_leak_to_new_identity', async () => {
+  sessionStorage.clear();
+  let finish!: (r: CommandResult) => void;
+  const send = vi.fn(() => new Promise<CommandResult>((resolve) => (finish = resolve)));
+  const h = setup(send);
+  const saving = h.service.submit('salon', [line('a')]);
+  await h.service.submit('salon', [line('b')]);
+  expect(send).toHaveBeenCalledTimes(1);
+  h.state.set({ status: 'SIGNED_OUT' });
+  TestBed.tick();
+  finish(result);
+  await saving;
+  expect(h.service.outcome()).toBeUndefined();
+  expect(h.store.load()).toEqual({ kind: 'EMPTY' });
+});
+it('definitive_conflict_keeps_all_items_available_for_correction', async () => {
+  sessionStorage.clear();
+  const h = setup(async () => {
+    throw new CommandError('ALREADY_ACTIVE', 'conflict', [
+      { productId: 'a', requestId: 'existing' },
+    ]);
+  });
+  await h.service.submit('salon', [line('a'), line('b')]);
+  expect(h.service.outcome()?.status).toBe('FAILED');
+  expect(h.service.submittedItems().map((i) => i.productId)).toEqual(['a', 'b']);
+  expect(h.store.load()).toEqual({ kind: 'EMPTY' });
+});
+it('blocked_journal_or_storage_failure_prevents_writes', async () => {
+  sessionStorage.clear();
+  sessionStorage.setItem('barberhq.pending.v1', '{}');
+  const send = vi.fn().mockResolvedValue(result);
+  const h = setup(send);
+  await h.service.submit('salon', [line('a')]);
+  expect(send).not.toHaveBeenCalled();
+  expect(sessionStorage.getItem('barberhq.pending.v1')).toBe('{}');
+  TestBed.resetTestingModule();
+  const broken = setup(send, {
+    getItem: () => null,
+    setItem() {
+      throw Error('Denied');
+    },
+    removeItem() {},
+  } as unknown as Storage);
+  await broken.service.submit('salon', [line('a')]);
+  expect(send).not.toHaveBeenCalled();
+  expect(broken.service.error()).toContain('storage');
+});
+
+it('clears_completed_result_when_ready_identity_changes_directly', async () => {
+  sessionStorage.clear();
+  const h = setup(async () => result);
+  TestBed.tick();
+  await h.service.submit('salon', [line('a')]);
+  expect(h.service.outcome()?.status).toBe('CREATED');
+  h.state.set({status: 'READY', membership: {userId:'new', businessId:'b',role:'SALON',salonIds:['salon']}});
+  TestBed.tick();
+  expect(h.service.outcome()).toBeUndefined();
+  expect(h.service.submittedItems()).toEqual([]);
 });

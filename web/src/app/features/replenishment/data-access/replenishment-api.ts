@@ -9,10 +9,11 @@ import type {
   CommandResult,
   RequestSummary,
   RequestDetail,
-  RequestState,
+  RequestFilter,
 } from '../../../../../../shared/contracts/stock';
 import type { Page, PageInput } from '../../../../../../shared/contracts/business';
 import { commandError } from './command-error';
+import { toRequestSummary, toRequestDetail } from './request.mapper';
 const names = {
   SUBMIT: 'submitRequest',
   APPROVE: 'approveRequest',
@@ -21,16 +22,6 @@ const names = {
   RECEIVE: 'receiveTransfer',
 };
 const policy = { fetchPolicy: QueryFetchPolicy.SERVER_ONLY };
-function summary(
-  r: NonNullable<sdk.ListHqQueueData['membership']>['business']['requests'][number],
-): RequestSummary {
-  return {
-    ...r,
-    state: r.state as RequestState,
-    productName: r.product.name,
-    salonName: r.salon.name,
-  };
-}
 @Service()
 export class ReplenishmentApi {
   private readonly firebase = inject(FIREBASE);
@@ -53,33 +44,40 @@ export class ReplenishmentApi {
       { salonId, limit: 100, offset: 0 },
       policy,
     );
-    return data.membership?.business.requests.map(summary) ?? [];
+    return data.membership?.business.requests.map(toRequestSummary) ?? [];
   }
   async listHQQueue(page: PageInput): Promise<Page<RequestSummary>> {
     const { data } = await sdk.listHqQueue(this.firebase.data, page, policy);
-    const items = data.membership?.business.requests.map(summary) ?? [];
+    const items = data.membership?.business.requests.map(toRequestSummary) ?? [];
     return { items, nextOffset: items.length === page.limit ? page.offset + page.limit : null };
   }
   async getRequest(requestId: string): Promise<RequestDetail> {
     const { data } = await sdk.getRequestDetail(this.firebase.data, { requestId }, policy);
     const r = data.membership?.business.requests[0];
     if (!r) throw new Error('Request unavailable.');
-    const stock = (await this.inventory.getInventory(r.salonId)).find(
-      (row) => row.productId === r.productId,
+    return toRequestDetail(r, await this.inventory.getInventory(r.salonId));
+  }
+  async listRequests(
+    salonId: string,
+    filter: RequestFilter,
+    page: PageInput,
+  ): Promise<Page<RequestSummary>> {
+    const states =
+      filter === 'ALL'
+        ? Object.values(sdk.RequestState)
+        : filter === 'ACTIVE'
+          ? [
+              sdk.RequestState.PENDING_APPROVAL,
+              sdk.RequestState.RESERVED,
+              sdk.RequestState.DISPATCHED,
+            ]
+          : [sdk.RequestState[filter]];
+    const { data } = await sdk.listSalonRequests(
+      this.firebase.data,
+      { salonId, states, ...page },
+      policy,
     );
-    if (!stock) throw new Error('Inventory unavailable.');
-    return {
-      ...summary(r),
-      stock,
-      hqInventoryVersion: stock.hqInventoryVersion,
-      dispatchedQuantity: r.transfer?.dispatchedQuantity ?? 0,
-      receivedQuantity: r.transfer?.receivedQuantity ?? 0,
-      timeline: r.timeline.map((t) => ({
-        state: t.state as RequestState,
-        at: t.createdAt,
-        actorLabel: t.action === 'SUBMIT' || t.action === 'RECEIVE' ? 'Salon' : 'HQ',
-        ...(t.reason ? { reason: t.reason } : {}),
-      })),
-    };
+    const items = data.membership?.business.requests.map(toRequestSummary) ?? [];
+    return { items, nextOffset: items.length === page.limit ? page.offset + page.limit : null };
   }
 }

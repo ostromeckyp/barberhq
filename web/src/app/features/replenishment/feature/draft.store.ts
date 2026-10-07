@@ -1,4 +1,6 @@
 import { Service, signal, computed } from '@angular/core';
+import type { InventoryRow } from '../../../../../../shared/contracts/business';
+import type { RequestItemInput } from '../../../../../../shared/contracts/stock';
 import type { DraftLine, ReadyDraftLine } from '../../../../../../shared/contracts/draft';
 @Service({ autoProvided: false })
 export class DraftStore {
@@ -41,6 +43,36 @@ export class DraftStore {
   }
   remove(lineId: string) {
     this.value.update((lines) => lines.filter((line) => line.lineId !== lineId));
+  }
+  restore(items: RequestItemInput[], inventory: InventoryRow[]) {
+    this.value.set(
+      items.map((item) => {
+        const stock = inventory.find((row) => row.productId === item.productId);
+        if (!stock)
+          return {
+            status: 'NEEDS_CLARIFICATION',
+            lineId: crypto.randomUUID(),
+            originalWording: item.productId,
+            reason:
+              'Product inventory unavailable. Refresh and add this product again before submitting.',
+            origin: 'manual',
+            candidates: [],
+            quantity: item.quantity,
+          };
+        return {
+          status: 'READY',
+          lineId: crypto.randomUUID(),
+          productId: item.productId,
+          productName: stock.productName,
+          quantity: item.quantity,
+          origin: 'manual',
+          hqAvailable: stock.hqAvailable,
+          salonOnHand: stock.salonOnHand,
+          hqInventoryVersion: stock.hqInventoryVersion,
+          salonInventoryVersion: stock.salonInventoryVersion,
+        };
+      }),
+    );
   }
   clear() {
     this.value.set([]);

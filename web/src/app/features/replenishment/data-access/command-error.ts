@@ -1,19 +1,23 @@
+import type { ActiveConflict } from '../../../../../../shared/contracts/stock';
 export class CommandError extends Error {
   constructor(
     readonly code: string,
     message: string,
-    readonly requestId?: string,
+    readonly conflicts?: ActiveConflict[],
   ) {
     super(message);
   }
 }
 export function commandError(error: unknown): CommandError {
-  const e = error as { details?: { code?: string; requestId?: string }; message?: string };
+  const e = error as {
+    details?: { code?: string; conflicts?: ActiveConflict[] };
+    message?: string;
+  };
   return new CommandError(
     e?.details?.code ?? 'UNKNOWN',
     e?.details?.code
       ? (e.message ?? e.details.code)
       : 'Outcome unknown. Reconcile before continuing.',
-    e?.details?.requestId,
+    e?.details?.conflicts,
   );
 }

@@ -46,7 +46,7 @@ export class RequestDetailFacade {
   });
   readonly transit = computed(() => {
     const r = this.request();
-    return r ? r.dispatchedQuantity - r.receivedQuantity : 0;
+    return r ? r.items.reduce((sum, i) => sum + i.dispatchedQuantity - i.receivedQuantity, 0) : 0;
   });
   async act(type: TransitionType) {
     const r = this.request();

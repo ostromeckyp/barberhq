@@ -11,10 +11,14 @@ import type { RequestSummary } from '../../../../../../shared/contracts/stock';
     @for (request of requests(); track request.id) {
       <article class="request-row">
         <div class="description">
-          <strong>{{ request.productName }}</strong
+          <strong>Request {{ request.id.slice(0, 8) }} · {{ request.itemCount }} items</strong
+          ><small>
+            @for (item of request.items; track item.productId) {
+              {{ item.productName }} × {{ item.quantity }}{{ $last ? '' : ' · ' }}
+            }</small
           ><small>{{ request.salonName }} · {{ request.createdAt | date: 'd MMM, HH:mm' }}</small>
         </div>
-        <span class="quantity">{{ request.quantity }} <small>pcs</small></span
+        <span class="quantity">{{ request.totalUnits }} <small>pcs</small></span
         ><app-status-chip [state]="request.state" /><a
           mat-stroked-button
           [routerLink]="['/requests', request.id]"

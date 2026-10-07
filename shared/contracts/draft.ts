@@ -1,4 +1,4 @@
-import type { SubmitInput } from "./stock.js";
+import type { SubmitInput, ActiveConflict } from "./stock.js";
 export type LineOrigin = "manual" | "assistant";
 export type ReadyDraftLine = {
   status: "READY";
@@ -22,20 +22,14 @@ export type ClarificationLine = {
   quantity?: number;
 };
 export type DraftLine = ReadyDraftLine | ClarificationLine;
-export type SubmissionRow = {
-  lineId: string;
-  payload: SubmitInput;
-  status: "CREATED" | "ALREADY_ACTIVE" | "FAILED" | "UNKNOWN";
-  requestId?: string;
-  errorCode?: string;
-};
+export type SubmissionOutcome =
+  | { status: "CREATED"; requestId: string }
+  | { status: "FAILED"; code: string; conflicts?: ActiveConflict[] }
+  | { status: "UNKNOWN" };
 export type PendingSubmission = {
+  version: 2;
   userId: string;
   businessId: string;
   salonId: string;
-  rows: {
-    lineId: string;
-    payload: SubmitInput;
-    status: "UNSENT" | "UNKNOWN";
-  }[];
+  payload: SubmitInput;
 };
