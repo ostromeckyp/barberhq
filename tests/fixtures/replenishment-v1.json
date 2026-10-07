@@ -1,0 +1,474 @@
+{
+  "format": 1,
+  "projectId": "demo-barberhq",
+  "businessId": "not-bad-stuff-demo",
+  "schemaCommit": "197f93c",
+  "quiescent": true,
+  "complete": true,
+  "exportedAt": "2026-10-07T10:00:00Z",
+  "requests": [
+    {
+      "id": "r0",
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:A",
+      "quantity": 2,
+      "state": "PENDING_APPROVAL",
+      "revision": 1,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r1",
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:B",
+      "quantity": 2,
+      "state": "RESERVED",
+      "revision": 2,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r2",
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:C",
+      "quantity": 2,
+      "state": "DISPATCHED",
+      "revision": 3,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r3",
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:D",
+      "quantity": 2,
+      "state": "RECEIVED",
+      "revision": 4,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r4",
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:E",
+      "quantity": 2,
+      "state": "REJECTED",
+      "revision": 2,
+      "createdAt": "2026-10-07T10:00:00Z"
+    }
+  ],
+  "active": [
+    {
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:A",
+      "requestId": "r0"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:B",
+      "requestId": "r1"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "salonId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:C",
+      "requestId": "r2"
+    }
+  ],
+  "transfers": [
+    {
+      "requestId": "r1",
+      "businessId": "not-bad-stuff-demo",
+      "warehouseId": "not-bad-stuff-demo:hq",
+      "destinationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:B",
+      "quantity": 2,
+      "dispatchedQuantity": 0,
+      "receivedQuantity": 0
+    },
+    {
+      "requestId": "r2",
+      "businessId": "not-bad-stuff-demo",
+      "warehouseId": "not-bad-stuff-demo:hq",
+      "destinationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:C",
+      "quantity": 2,
+      "dispatchedQuantity": 2,
+      "receivedQuantity": 0
+    },
+    {
+      "requestId": "r3",
+      "businessId": "not-bad-stuff-demo",
+      "warehouseId": "not-bad-stuff-demo:hq",
+      "destinationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:D",
+      "quantity": 2,
+      "dispatchedQuantity": 2,
+      "receivedQuantity": 2
+    }
+  ],
+  "movements": [
+    {
+      "transferRequestId": "r2",
+      "businessId": "not-bad-stuff-demo",
+      "type": "DISPATCH",
+      "quantity": 2,
+      "actorUid": "hq",
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "transferRequestId": "r3",
+      "businessId": "not-bad-stuff-demo",
+      "type": "DISPATCH",
+      "quantity": 2,
+      "actorUid": "hq",
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "transferRequestId": "r3",
+      "businessId": "not-bad-stuff-demo",
+      "type": "RECEIPT",
+      "quantity": 2,
+      "actorUid": "salon",
+      "createdAt": "2026-10-07T10:00:00Z"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "r0-audit0",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000000",
+      "requestId": "r0",
+      "action": "SUBMIT",
+      "payloadHash": "4794bf98b42e169e28f5a8ec814eed7443a4ce091393b76b9decbaa96d31cd5a",
+      "semanticHash": "4794bf98b42e169e28f5a8ec814eed7443a4ce091393b76b9decbaa96d31cd5a",
+      "state": "PENDING_APPROVAL",
+      "revision": 1,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r1-audit0",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000010",
+      "requestId": "r1",
+      "action": "SUBMIT",
+      "payloadHash": "e506acfcca2464300ec92b8482e4cd3fc65850c9ebfdc51675a2ab45ca742948",
+      "semanticHash": "e506acfcca2464300ec92b8482e4cd3fc65850c9ebfdc51675a2ab45ca742948",
+      "state": "PENDING_APPROVAL",
+      "revision": 1,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r1-audit1",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000011",
+      "requestId": "r1",
+      "action": "APPROVE",
+      "payloadHash": "46f0d1f8f217f83a04dc6a28488ba9d28bf946e5e6f50ded43a29c7613e78ecb",
+      "semanticHash": "46f0d1f8f217f83a04dc6a28488ba9d28bf946e5e6f50ded43a29c7613e78ecb",
+      "state": "RESERVED",
+      "revision": 2,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r2-audit0",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000020",
+      "requestId": "r2",
+      "action": "SUBMIT",
+      "payloadHash": "947fb4559b83e407e602ea5439b3d1f685822b4ee3986821a38df8e8a1649f1f",
+      "semanticHash": "947fb4559b83e407e602ea5439b3d1f685822b4ee3986821a38df8e8a1649f1f",
+      "state": "PENDING_APPROVAL",
+      "revision": 1,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r2-audit1",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000021",
+      "requestId": "r2",
+      "action": "APPROVE",
+      "payloadHash": "249d71a0e2f083d6f753a713aeb808d1b175085530b1b8589ee953214ebfca1d",
+      "semanticHash": "249d71a0e2f083d6f753a713aeb808d1b175085530b1b8589ee953214ebfca1d",
+      "state": "RESERVED",
+      "revision": 2,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r2-audit2",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000022",
+      "requestId": "r2",
+      "action": "DISPATCH",
+      "payloadHash": "8cbd9b697bc9836327ecf864150fd22aba0cb37f4968be09ca0c54d5649108db",
+      "semanticHash": "8cbd9b697bc9836327ecf864150fd22aba0cb37f4968be09ca0c54d5649108db",
+      "state": "DISPATCHED",
+      "revision": 3,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r3-audit0",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000030",
+      "requestId": "r3",
+      "action": "SUBMIT",
+      "payloadHash": "d39e5f50dbe521c517f79c860f96e5762c5e67e769f8273fc117d8177dd31ed0",
+      "semanticHash": "d39e5f50dbe521c517f79c860f96e5762c5e67e769f8273fc117d8177dd31ed0",
+      "state": "PENDING_APPROVAL",
+      "revision": 1,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r3-audit1",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000031",
+      "requestId": "r3",
+      "action": "APPROVE",
+      "payloadHash": "32275bc5c1b7e79c2e86629070930bc842286778f790d75b4c1637edbacc3980",
+      "semanticHash": "32275bc5c1b7e79c2e86629070930bc842286778f790d75b4c1637edbacc3980",
+      "state": "RESERVED",
+      "revision": 2,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r3-audit2",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000032",
+      "requestId": "r3",
+      "action": "DISPATCH",
+      "payloadHash": "eb8df15fc1b17fc763885190dd4bf54b25c8eda13a9543376c9ef9e81d79404b",
+      "semanticHash": "eb8df15fc1b17fc763885190dd4bf54b25c8eda13a9543376c9ef9e81d79404b",
+      "state": "DISPATCHED",
+      "revision": 3,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r3-audit3",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000033",
+      "requestId": "r3",
+      "action": "RECEIVE",
+      "payloadHash": "33d750ac07d5b7c07e470761d4cf32bfcfa31770ba5b58691fce922fddcca44b",
+      "semanticHash": "33d750ac07d5b7c07e470761d4cf32bfcfa31770ba5b58691fce922fddcca44b",
+      "state": "RECEIVED",
+      "revision": 4,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r4-audit0",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000040",
+      "requestId": "r4",
+      "action": "SUBMIT",
+      "payloadHash": "ef88dcffbe8fe9dceb36f016d983c989010da75db95df090aebaddce60fdd2ef",
+      "semanticHash": "ef88dcffbe8fe9dceb36f016d983c989010da75db95df090aebaddce60fdd2ef",
+      "state": "PENDING_APPROVAL",
+      "revision": 1,
+      "reason": null,
+      "createdAt": "2026-10-07T10:00:00Z"
+    },
+    {
+      "id": "r4-audit1",
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000041",
+      "requestId": "r4",
+      "action": "REJECT",
+      "payloadHash": "69958342507483cd7412f790373e139eafdee94050db29eda493ef1524581f98",
+      "semanticHash": "69958342507483cd7412f790373e139eafdee94050db29eda493ef1524581f98",
+      "state": "REJECTED",
+      "revision": 2,
+      "reason": "Broken packaging",
+      "createdAt": "2026-10-07T10:00:00Z"
+    }
+  ],
+  "actionKeys": [
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000000",
+      "receiptId": "r0-audit0",
+      "payloadHash": "4794bf98b42e169e28f5a8ec814eed7443a4ce091393b76b9decbaa96d31cd5a"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000010",
+      "receiptId": "r1-audit0",
+      "payloadHash": "e506acfcca2464300ec92b8482e4cd3fc65850c9ebfdc51675a2ab45ca742948"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000011",
+      "receiptId": "r1-audit1",
+      "payloadHash": "46f0d1f8f217f83a04dc6a28488ba9d28bf946e5e6f50ded43a29c7613e78ecb"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000020",
+      "receiptId": "r2-audit0",
+      "payloadHash": "947fb4559b83e407e602ea5439b3d1f685822b4ee3986821a38df8e8a1649f1f"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000021",
+      "receiptId": "r2-audit1",
+      "payloadHash": "249d71a0e2f083d6f753a713aeb808d1b175085530b1b8589ee953214ebfca1d"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000022",
+      "receiptId": "r2-audit2",
+      "payloadHash": "8cbd9b697bc9836327ecf864150fd22aba0cb37f4968be09ca0c54d5649108db"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000030",
+      "receiptId": "r3-audit0",
+      "payloadHash": "d39e5f50dbe521c517f79c860f96e5762c5e67e769f8273fc117d8177dd31ed0"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000031",
+      "receiptId": "r3-audit1",
+      "payloadHash": "32275bc5c1b7e79c2e86629070930bc842286778f790d75b4c1637edbacc3980"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000032",
+      "receiptId": "r3-audit2",
+      "payloadHash": "eb8df15fc1b17fc763885190dd4bf54b25c8eda13a9543376c9ef9e81d79404b"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000033",
+      "receiptId": "r3-audit3",
+      "payloadHash": "33d750ac07d5b7c07e470761d4cf32bfcfa31770ba5b58691fce922fddcca44b"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000040",
+      "receiptId": "r4-audit0",
+      "payloadHash": "ef88dcffbe8fe9dceb36f016d983c989010da75db95df090aebaddce60fdd2ef"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "hq",
+      "idempotencyKey": "00000000-0000-4000-8000-000000000041",
+      "receiptId": "r4-audit1",
+      "payloadHash": "69958342507483cd7412f790373e139eafdee94050db29eda493ef1524581f98"
+    },
+    {
+      "businessId": "not-bad-stuff-demo",
+      "actorUid": "salon",
+      "idempotencyKey": "00000000-0000-4000-8000-999999999999",
+      "receiptId": "r0-audit0",
+      "payloadHash": "4794bf98b42e169e28f5a8ec814eed7443a4ce091393b76b9decbaa96d31cd5a"
+    }
+  ],
+  "inventory": [
+    {
+      "locationId": "not-bad-stuff-demo:hq",
+      "productId": "not-bad-stuff-demo:A",
+      "onHand": 18,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:A",
+      "onHand": 2,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:hq",
+      "productId": "not-bad-stuff-demo:B",
+      "onHand": 18,
+      "reserved": 2,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:B",
+      "onHand": 2,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:hq",
+      "productId": "not-bad-stuff-demo:C",
+      "onHand": 16,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:C",
+      "onHand": 2,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:hq",
+      "productId": "not-bad-stuff-demo:D",
+      "onHand": 16,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:D",
+      "onHand": 4,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:hq",
+      "productId": "not-bad-stuff-demo:E",
+      "onHand": 18,
+      "reserved": 0,
+      "version": 1
+    },
+    {
+      "locationId": "not-bad-stuff-demo:legnicka",
+      "productId": "not-bad-stuff-demo:E",
+      "onHand": 2,
+      "reserved": 0,
+      "version": 1
+    }
+  ]
+}

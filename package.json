@@ -20,7 +20,9 @@
     "demo:local": "node --import tsx scripts/dev/demo.ts",
     "start:local": "npm --prefix web run start:emulator",
     "build:functions": "npm --prefix functions run build",
-    "demo:reset": "node --import tsx scripts/seed/reset.ts"
+    "demo:reset": "node --import tsx scripts/seed/reset.ts",
+    "migrate:replenishment": "node --import tsx scripts/migrations/replenishment-items.ts",
+    "reconcile:legacy-pending": "node --import tsx scripts/migrations/legacy-pending.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
