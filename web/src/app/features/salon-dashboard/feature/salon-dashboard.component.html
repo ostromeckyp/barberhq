@@ -1,7 +1,11 @@
 <app-page-header
   eyebrow="SALON INVENTORY"
   [title]="facade.name()"
-  description="What’s on your shelf. What’s available at HQ."
+  [description]="
+    order?.isHq()
+      ? 'Salon stock. Request products on behalf of this salon.'
+      : 'What’s on your shelf. What’s available at HQ.'
+  "
 >
   <button
     mat-stroked-button
@@ -52,17 +56,23 @@
       [rows]="facade.rows()"
       [threshold]="facade.threshold()"
       [updated]="facade.updated()"
-      [requestEnabled]="!!order?.staff()"
+      [requestEnabled]="!!order?.canOrder()"
       (requestProduct)="order?.select($event)"
     />
     <div>
-      @if (order?.staff()) {
+      @if (order?.canOrder()) {
         <app-order-panel />
-      } @else {
+      }
+      @if (!order?.isHq()) {
         <app-hq-availability [rows]="facade.rows()" />
       }
     </div>
   </div>
 }
 
-<a class="requests-link" mat-stroked-button [routerLink]="['/salons', context.salonId(), 'requests']">View requests</a>
+<a
+  class="requests-link"
+  mat-stroked-button
+  [routerLink]="['/salons', context.salonId(), 'requests']"
+  >View requests</a
+>

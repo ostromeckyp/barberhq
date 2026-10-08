@@ -22,11 +22,20 @@ export class OrderFacade {
   );
   readonly manual = signal({ productId: '', quantity: 2 });
   readonly notice = signal('');
-  readonly staff = computed(
-    () =>
-      this.session.state().status === 'READY' &&
-      (this.session.state() as { membership?: { role: string } }).membership?.role === 'SALON',
-  );
+  readonly canOrder = computed(() => {
+    const state = this.session.state();
+    const salonId = this.salonId();
+    return (
+      state.status === 'READY' &&
+      !!salonId &&
+      this.session.canOpen(salonId) &&
+      (state.membership.role === 'HQ' || state.membership.role === 'SALON')
+    );
+  });
+  readonly isHq = computed(() => {
+    const state = this.session.state();
+    return state.status === 'READY' && state.membership.role === 'HQ';
+  });
   private readonly active = resource({
     params: () => {
       const s = this.session.state(),
@@ -56,7 +65,11 @@ export class OrderFacade {
   );
   readonly canSubmit = computed(
     () =>
-      this.staff() && this.draft.canSubmit() && !this.locked() && !this.loading() && !this.error(),
+      this.canOrder() &&
+      this.draft.canSubmit() &&
+      !this.locked() &&
+      !this.loading() &&
+      !this.error(),
   );
   constructor() {
     effect(() => {

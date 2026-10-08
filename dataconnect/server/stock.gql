@@ -10,7 +10,7 @@ query StockContext($uid:String!,$requestId:String,$salonId:String,$productIds:[S
 }
 mutation SubmitStock($uid:String!,$businessId:String!,$requestId:String!,$receiptId:String!,$key:String!,$payloadHash:String!,$semanticHash:String!,$salonId:String!,$productIds:[String!]!,$itemIds:[String!]!,$quantities:[Int!]!,$count:Int!,$use0:Boolean!,$use1:Boolean!,$use2:Boolean!,$use3:Boolean!,$use4:Boolean!,$use5:Boolean!) @auth(level:NO_ACCESS) @transaction {
  query @redact {
-  membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && this.role == 'SALON' && this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId)",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}
+  membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && (this.role == 'HQ' || (this.role == 'SALON' && this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId)))",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}
   location(id:$salonId) @check(expr:"this != null && this.businessId == vars.businessId && this.kind == 'SALON'",message:"FORBIDDEN"){businessId kind}
   products(where:{id:{in:$productIds},businessId:{eq:$businessId}},limit:6) @check(expr:"vars.count >= 1 && vars.count <= 6 && vars.productIds.size() == vars.count && vars.itemIds.size() == vars.count && vars.quantities.size() == vars.count && this.size() == vars.count && vars.quantities.all(q,q >= 1 && q <= 99) && vars.use0 == (vars.count > 0) && vars.use1 == (vars.count > 1) && vars.use2 == (vars.count > 2) && vars.use3 == (vars.count > 3) && vars.use4 == (vars.count > 4) && vars.use5 == (vars.count > 5)",message:"VALIDATION_ERROR"){id}
  }

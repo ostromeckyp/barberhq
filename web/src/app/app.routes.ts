@@ -49,6 +49,16 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'hq/stock',
+        title: 'HQ stock · BarberHQ',
+        data: { kind: 'hq' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/hq-stock/feature/hq-stock/hq-stock.component').then(
+            (m) => m.HqStockComponent,
+          ),
+      },
+      {
         path: 'hq',
         title: 'HQ · BarberHQ',
         data: { kind: 'hq' },

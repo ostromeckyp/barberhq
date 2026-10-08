@@ -45,8 +45,16 @@
     <div class="nav-label">WORKSPACE</div>
     <mat-nav-list aria-label="Main navigation">
       @if (facade.isHq()) {
-        <a mat-list-item routerLink="/hq" routerLinkActive="active" (click)="closeDrawer()"
+        <a
+          mat-list-item
+          routerLink="/hq"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeDrawer()"
           ><mat-icon matListItemIcon>warehouse</mat-icon>HQ overview</a
+        >
+        <a mat-list-item routerLink="/hq/stock" routerLinkActive="active" (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>inventory_2</mat-icon>HQ stock</a
         >
       }
       @if (facade.navSalonId(); as salonId) {

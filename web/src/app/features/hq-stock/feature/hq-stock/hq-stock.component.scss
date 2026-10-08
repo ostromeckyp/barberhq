@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  min-width: 540px;
+  table-layout: fixed;
+  background: var(--surface);
+}
+.mat-column-product {
+  width: 46%;
+}
+th,
+td {
+  padding: 16px;
+  border-bottom-color: var(--divider);
+}
+th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+th:not(:first-child),
+td:not(:first-child) {
+  text-align: right;
+}
+strong,
+small {
+  display: block;
+}
+small,
+p {
+  color: var(--muted);
+  font-size: 12px;
+}
+p {
+  padding: 0 16px;
+}
+.quantity {
+  font: 18px var(--font-mono);
+}
+mat-progress-bar {
+  margin-bottom: 16px;
+}

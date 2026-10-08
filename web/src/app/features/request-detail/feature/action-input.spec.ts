@@ -1,5 +1,10 @@
 import { expect, it } from 'vitest';
-import { canConfirm, buildAction, type Confirmation } from './action-input';
+import {
+  availableRequestActions,
+  canConfirm,
+  buildAction,
+  type Confirmation,
+} from './action-input';
 import type { RequestDetail, RequestDetailItem } from '../../../../../../shared/contracts/stock';
 const item = (id: string, quantity: number): RequestDetailItem => ({
   productId: id,
@@ -76,4 +81,32 @@ it('approval_checks_every_product_and_rejection_requires_reason', () => {
       ],
     },
   });
+});
+
+it('gives HQ actions from request state and salon authorization regardless of list origin', () => {
+  const hq = {
+    userId: 'hq-user',
+    businessId: 'business',
+    role: 'HQ' as const,
+    salonIds: ['salon'],
+  };
+  expect(availableRequestActions(hq, request)).toEqual([]);
+  expect(availableRequestActions(hq, { ...request, state: 'PENDING_APPROVAL' })).toEqual([
+    'APPROVE',
+    'REJECT',
+  ]);
+  expect(availableRequestActions(hq, { ...request, state: 'RESERVED' })).toEqual(['DISPATCH']);
+  expect(availableRequestActions({ ...hq, salonIds: [] }, request)).toEqual([]);
+});
+
+it('keeps receipt confirmation salon-only', () => {
+  const salon = {
+    userId: 'salon-user',
+    businessId: 'business',
+    role: 'SALON' as const,
+    salonIds: ['salon'],
+  };
+  expect(availableRequestActions(salon, request)).toEqual(['RECEIVE']);
+  expect(availableRequestActions({ ...salon, salonIds: [] }, request)).toEqual([]);
+  expect(availableRequestActions({ ...salon, role: 'HQ' }, request)).toEqual([]);
 });

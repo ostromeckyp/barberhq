@@ -1,4 +1,5 @@
 import type { RequestDetail, StockAction } from '../../../../../../shared/contracts/stock';
+import type { Membership } from '../../../../../../shared/contracts/business';
 export type TransitionType = Exclude<StockAction['type'], 'SUBMIT'>;
 export type Confirmation = {
   reason: string;
@@ -11,6 +12,20 @@ export const ACTION_LABELS: Record<TransitionType, string> = {
   DISPATCH: 'Confirm dispatch',
   RECEIVE: 'Confirm receipt',
 };
+export function availableRequestActions(
+  membership: Membership,
+  request: Pick<RequestDetail, 'salonId' | 'state'>,
+): TransitionType[] {
+  if (!membership.salonIds.includes(request.salonId)) return [];
+  if (membership.role === 'HQ') {
+    return request.state === 'PENDING_APPROVAL'
+      ? ['APPROVE', 'REJECT']
+      : request.state === 'RESERVED'
+        ? ['DISPATCH']
+        : [];
+  }
+  return request.state === 'DISPATCHED' ? ['RECEIVE'] : [];
+}
 export function canConfirm(
   type: TransitionType,
   request: RequestDetail,

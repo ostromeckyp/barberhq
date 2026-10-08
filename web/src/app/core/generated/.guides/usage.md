@@ -14,7 +14,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getMyMembership, listProducts, getSalonInventory, getSalonSettings, saveSalonSettings, listActiveRequests, listHqQueue, getRequestDetail, listSalonRequests } from '@barberhq/browser';
+import { getMyMembership, listProducts, getSalonInventory, getHqInventory, getSalonSettings, saveSalonSettings, listActiveRequests, listHqQueue, getRequestDetail, listSalonRequests } from '@barberhq/browser';
 
 
 // Operation GetMyMembership: 
@@ -25,6 +25,9 @@ const { data } = await ListProducts(dataConnect, listProductsVars);
 
 // Operation GetSalonInventory:  For variables, look at type GetSalonInventoryVars in ../index.d.ts
 const { data } = await GetSalonInventory(dataConnect, getSalonInventoryVars);
+
+// Operation GetHqInventory:  For variables, look at type GetHqInventoryVars in ../index.d.ts
+const { data } = await GetHqInventory(dataConnect, getHqInventoryVars);
 
 // Operation GetSalonSettings:  For variables, look at type GetSalonSettingsVars in ../index.d.ts
 const { data } = await GetSalonSettings(dataConnect, getSalonSettingsVars);

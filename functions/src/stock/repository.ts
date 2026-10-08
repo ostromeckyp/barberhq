@@ -53,7 +53,14 @@ export class StockRepository {
       action.type === "SUBMIT"
         ? action.input.salonId
         : data.replenishmentRequest?.salonId;
-    if (action.type === "SUBMIT" || action.type === "RECEIVE") {
+    if (action.type === "SUBMIT") {
+      if (
+        m.role !== "HQ" &&
+        (m.role !== "SALON" ||
+          !m.salonAccesses_on_membership.some((a) => a.locationId === salonId))
+      )
+        throw new StockError("FORBIDDEN");
+    } else if (action.type === "RECEIVE") {
       if (
         m.role !== "SALON" ||
         !m.salonAccesses_on_membership.some((a) => a.locationId === salonId)

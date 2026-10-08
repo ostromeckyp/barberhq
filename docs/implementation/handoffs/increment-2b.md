@@ -32,7 +32,7 @@ The original local demo was exported before schema edits to `artifacts/replenish
 
 Actual local restoration preserved Auth and PostgreSQL, imported10 missing item/movement records, then a second apply inserted0. Verification matched all6 original requests,4 active slots,2 transfers,2 movements,11 receipts,11 keys and24 inventory rows. Original4 Auth UIDs verified. Missing settings were inserted for all3 salons without changing inventory. No stock commands were replayed.
 
-**Operator gate still pending:** the open user's browser recovery journal is not accessible through the browser tool. User was asked to evaluate `sessionStorage.getItem('barberhq.pending.v1') === null` in that tab. If false, save/reconcile the journal with the [upgrade guide](../replenishment-items-upgrade.md); never delete unknown evidence to unblock the UI. Auth/SQL are restored; stock Functions remain stopped until this check is resolved. Do not describe the interactive cutover as complete yet.
+**Runtime update, 8 October:** after the initial journal gate, the owner explicitly instructed “Tak, uruchom Functions bez resetu”. Functions5001 were reopened against the preserved Auth9099/SQL9399 data. The current browser form was observed unlocked with no recovery warning; sessionStorage itself was not directly inspected. Legacy/unrecognized journals remain protected and block new submissions if encountered. No journal was deleted and no demo stock command was replayed to perform this restart. See [HQ refinement](hq-workspace-refinement.md) for current behavior and verification.
 
 A separate `emulators-v2` export preserves the migrated state for restart. Preserve the v1 export and matching old schema/build for rollback. Never start a fresh empty emulator and seed over the preserved business for convenience.
 
@@ -49,4 +49,4 @@ A separate `emulators-v2` export preserves the migrated state for restart. Prese
 
 ## Remaining release gates
 
-Complete browser-journal reconciliation and reopen local commands. Then independently verify provisioned Cloud SQL/SQL Connect, real project auth/concurrency, App Check enforcement, explicit schema migration review, Hosting preview/deployment/rollback, and the owner checklist. Emulator proof does not certify those gates. Continue the PDF/RAG/agent work only under its next approved increment, using the updated whole-request contracts.
+Reconcile any browser that reports a saved legacy/unknown journal before submitting from it. Independently verify provisioned Cloud SQL/SQL Connect, real project auth/concurrency, App Check enforcement, explicit schema migration review, Hosting preview/deployment/rollback, and the owner checklist. Emulator proof does not certify those gates. Continue the PDF/RAG/agent work only under its next approved increment, using the updated whole-request contracts.

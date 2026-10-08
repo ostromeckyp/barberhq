@@ -37,7 +37,7 @@ getMyMembershipRef.operationName = 'GetMyMembership';
 exports.getMyMembershipRef = getMyMembershipRef;
 
 exports.getMyMembership = function getMyMembership(dcOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
   return executeQuery(getMyMembershipRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -52,7 +52,7 @@ listProductsRef.operationName = 'ListProducts';
 exports.listProductsRef = listProductsRef;
 
 exports.listProducts = function listProducts(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   return executeQuery(listProductsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -67,9 +67,24 @@ getSalonInventoryRef.operationName = 'GetSalonInventory';
 exports.getSalonInventoryRef = getSalonInventoryRef;
 
 exports.getSalonInventory = function getSalonInventory(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getSalonInventoryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getHqInventoryRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetHqInventory', inputVars);
+}
+getHqInventoryRef.operationName = 'GetHqInventory';
+exports.getHqInventoryRef = getHqInventoryRef;
+
+exports.getHqInventory = function getHqInventory(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
+  return executeQuery(getHqInventoryRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
@@ -82,7 +97,7 @@ getSalonSettingsRef.operationName = 'GetSalonSettings';
 exports.getSalonSettingsRef = getSalonSettingsRef;
 
 exports.getSalonSettings = function getSalonSettings(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getSalonSettingsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -111,7 +126,7 @@ listActiveRequestsRef.operationName = 'ListActiveRequests';
 exports.listActiveRequestsRef = listActiveRequestsRef;
 
 exports.listActiveRequests = function listActiveRequests(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(listActiveRequestsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -126,7 +141,7 @@ listHqQueueRef.operationName = 'ListHQQueue';
 exports.listHqQueueRef = listHqQueueRef;
 
 exports.listHqQueue = function listHqQueue(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
   return executeQuery(listHqQueueRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -141,7 +156,7 @@ getRequestDetailRef.operationName = 'GetRequestDetail';
 exports.getRequestDetailRef = getRequestDetailRef;
 
 exports.getRequestDetail = function getRequestDetail(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getRequestDetailRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -156,7 +171,7 @@ listSalonRequestsRef.operationName = 'ListSalonRequests';
 exports.listSalonRequestsRef = listSalonRequestsRef;
 
 exports.listSalonRequests = function listSalonRequests(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(listSalonRequestsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }

@@ -42,6 +42,12 @@ export function getSalonInventory(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeQuery('GetSalonInventory', inputVars, inputOpts);
 }
 
+export function getHqInventory(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, false);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('GetHqInventory', inputVars, inputOpts);
+}
+
 export function getSalonSettings(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);

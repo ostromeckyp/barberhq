@@ -9,7 +9,7 @@ import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { RequestActions } from './request-actions';
-import type { TransitionType } from './action-input';
+import { availableRequestActions, type TransitionType } from './action-input';
 @Service({ autoProvided: false })
 export class RequestDetailFacade {
   private readonly router = inject(Router);
@@ -68,15 +68,7 @@ export class RequestDetailFacade {
     const r = this.request(),
       s = this.session.state();
     if (!r || s.status !== 'READY') return [] as TransitionType[];
-    return s.membership.role === 'HQ'
-      ? ((r.state === 'PENDING_APPROVAL'
-          ? ['APPROVE', 'REJECT']
-          : r.state === 'RESERVED'
-            ? ['DISPATCH']
-            : []) as TransitionType[])
-      : r.state === 'DISPATCHED'
-        ? (['RECEIVE'] as TransitionType[])
-        : [];
+    return availableRequestActions(s.membership, r);
   });
   readonly transit = computed(() => {
     const r = this.request();

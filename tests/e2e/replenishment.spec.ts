@@ -77,7 +77,7 @@ for (const many of [false, true])
     for (const [name, q] of products) await add(salon, name, q);
     const url = await submit(salon);
     await login(hq, "hq");
-    await expect(hq.locator("article.request-row")).toHaveCount(1);
+    await expect(hq.locator("tr.request-row")).toHaveCount(1);
     await hq.goto(url);
     await confirm(hq, "Approve request");
     await confirm(hq, "Confirm dispatch");
@@ -207,8 +207,8 @@ test("one_three_item_request_survives_committed_lost_response", async ({
     (rows.data as { replenishmentRequests: unknown[] }).replenishmentRequests,
   ).toHaveLength(1);
   await page.getByRole("link", { name: "View requests", exact: true }).click();
-  await expect(page.locator("article.request-row")).toHaveCount(1);
-  await expect(page.locator("article.request-row")).toContainText("3 items");
+  await expect(page.locator("tr.request-row")).toHaveCount(1);
+  await expect(page.locator("tr.request-row")).toContainText("3 items");
 });
 test("rejected_request_retains_reason_history_and_safe_back_context", async ({
   page,
@@ -224,7 +224,7 @@ test("rejected_request_retains_reason_history_and_safe_back_context", async ({
   });
   await login(page, "hq");
   await page
-    .locator("article.request-row")
+    .locator("tr.request-row")
     .getByRole("link", { name: "Open request" })
     .click();
   await page
@@ -271,10 +271,10 @@ test("rejected_request_retains_reason_history_and_safe_back_context", async ({
   await page.getByRole("button", { name: "Back to requests" }).click();
   await expect(page).toHaveURL(/\/hq/);
   await page.goto(`/salons/${encodeURIComponent(h.legnickaId)}/requests`);
-  await expect(page.locator("article.request-row")).toHaveCount(1);
+  await expect(page.locator("tr.request-row")).toHaveCount(1);
   await page.getByRole("radio", { name: "Rejected", exact: true }).click();
   await page
-    .locator("article.request-row")
+    .locator("tr.request-row")
     .getByRole("link", { name: "Open request" })
     .click();
   await expect(page.getByText("Please verify the salon count.")).toBeVisible();
@@ -282,6 +282,9 @@ test("rejected_request_retains_reason_history_and_safe_back_context", async ({
   await expect(page).toHaveURL(/filter=REJECTED/);
   await accessible(page);
   expect((await h.inventory()).hqOnHand).toBe(18);
-  const salonStock = await h.client('legnicka').getSalonInventory(h.legnickaId);
-  expect(salonStock.inventory?.find(row=>row.product.demoId==='NBS-MATOWA-100')?.onHand).toBe(2);
+  const salonStock = await h.client("legnicka").getSalonInventory(h.legnickaId);
+  expect(
+    salonStock.inventory?.find((row) => row.product.demoId === "NBS-MATOWA-100")
+      ?.onHand,
+  ).toBe(2);
 });

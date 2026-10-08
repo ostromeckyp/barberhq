@@ -13,6 +13,8 @@ const item = (i) =>
   `response.requestGuard.replenishmentRequest.items[vars.count > ${i} ? ${i} : 0]`;
 const member = (salon) =>
   `membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && this.role == '${salon ? "SALON" : "HQ"}'${salon ? " && this.salonAccesses_on_membership.exists(a, a.locationId == " + salon + ")" : ""}",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}`;
+const submitter =
+  'membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && (this.role == \'HQ\' || (this.role == \'SALON\' && this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId)))",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}';
 const audit = (
   action,
   state,
@@ -31,7 +33,7 @@ query StockContext($uid:String!,$requestId:String,$salonId:String,$productIds:[S
 }
 mutation SubmitStock(${base},$salonId:String!,$productIds:[String!]!,$itemIds:[String!]!,$quantities:[Int!]!,$count:Int!,${switches}) @auth(level:NO_ACCESS) @transaction {
  query @redact {
-  ${member("vars.salonId")}
+  ${submitter}
   location(id:$salonId) @check(expr:"this != null && this.businessId == vars.businessId && this.kind == 'SALON'",message:"FORBIDDEN"){businessId kind}
   products(where:{id:{in:$productIds},businessId:{eq:$businessId}},limit:6) @check(expr:"vars.count >= 1 && vars.count <= 6 && vars.productIds.size() == vars.count && vars.itemIds.size() == vars.count && vars.quantities.size() == vars.count && this.size() == vars.count && vars.quantities.all(q,q >= 1 && q <= 99) && ${prefix}",message:"VALIDATION_ERROR"){id}
  }

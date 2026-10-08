@@ -11,7 +11,7 @@ export const accessGuard: CanActivateFn = async (route, state) => {
   const id = route.paramMap.get('salonId');
   if (
     (id && !session.canOpen(id)) ||
-    (route.routeConfig?.path === 'hq' && current.membership.role !== 'HQ')
+    (route.data['kind'] === 'hq' && current.membership.role !== 'HQ')
   )
     return router.parseUrl('/no-access');
   return true;

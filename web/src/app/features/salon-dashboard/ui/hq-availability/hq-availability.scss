@@ -1,5 +1,6 @@
 @use '../../../../shared/styles/surfaces' as surfaces;
 @include surfaces.inventory-card;
+
 h2 {
   display: flex;
   align-items: center;
@@ -11,33 +12,63 @@ h2 mat-icon {
   width: 20px;
   height: 20px;
 }
-dl {
-  margin: 0;
-  padding: 0 20px;
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
-dl > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  border-top: 1px solid var(--divider);
+.table-scroll:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
-dt {
+table {
+  width: 100%;
+  min-width: 440px;
+  table-layout: fixed;
+  background: var(--surface);
+}
+.mat-column-product {
+  width: 68%;
+}
+.mat-column-quantity {
+  width: 32%;
+}
+.mat-mdc-header-cell {
+  background: var(--table-header);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+td,
+th {
+  padding: 10px 20px;
+  border-bottom-color: var(--divider);
+  vertical-align: middle;
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+td strong {
   font-size: 14px;
+  font-weight: 600;
 }
-dd {
-  margin: 0;
-  text-align: right;
-}
-dd strong {
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 500;
-}
-small {
+td small {
   display: block;
   color: var(--muted);
   font-size: 12px;
   margin-top: 2px;
+}
+.quantity-cell {
+  text-align: right;
+}
+.quantity-cell strong {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+}
+@media (max-width: 500px) {
+  td,
+  th {
+    padding: 10px 12px;
+  }
 }

@@ -36,3 +36,20 @@ query GetSalonInventory($salonId: String!, $limit: Int! = 50, $offset: Int! = 0)
     }
   }
 }
+
+query GetHqInventory($limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
+  membership(key: {uid_expr: "auth.uid"})
+    @check(expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0", message: "No HQ access or invalid pagination") {
+    role @redact
+    business {
+      hq: locations_on_business(where: {kind: {eq: HQ}}, limit: 1)
+        @check(expr: "this.size() == 1", message: "No HQ access") {
+        id name
+        inventory: inventories_on_location(orderBy: {productId: ASC}, limit: $limit, offset: $offset) {
+          onHand reserved version
+          product { id demoId name netContentMl }
+        }
+      }
+    }
+  }
+}

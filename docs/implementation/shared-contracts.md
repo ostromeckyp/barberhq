@@ -24,7 +24,7 @@ Use Angular SPA, Firebase Auth, classic Firebase Hosting, SQL Connect (formerly 
 
 ## Interfaces and authorization
 
-Scoped reads: `GetMyMembership`, `ListProducts`, `GetSalonInventory`, `ListActiveRequests`, `GetRequestDetail`, `ListHQQueue`, `ListSalonRequests`, `GetSalonSettings`, `GetSourceSection`, `ListKnowledgeDocuments`, and HQ-only `GetKnowledgeReview`.
+Scoped reads: `GetMyMembership`, `ListProducts`, `GetSalonInventory`, HQ-only `GetHqInventory`, `ListActiveRequests`, `GetRequestDetail`, `ListHQQueue`, `ListSalonRequests`, `GetSalonSettings`, `GetSourceSection`, `ListKnowledgeDocuments`, and HQ-only `GetKnowledgeReview`.
 
 Explicit callable commands: `submitRequest`, `approveRequest`, `rejectRequest`, `dispatchTransfer`, `receiveTransfer`. Each carries an idempotency key; transitions also carry the expected request revision, approval a complete per-product `inventoryVersions[]` set. Submit carries `items: {productId,quantity}[]`; receipt carries the complete `items: {productId,receivedQuantity}[]` set and `allIntact: true`. Return `{actionReceiptId, requestId, state, revision, replayed}`. Atomic SQL transactions enforce permissions, state, uniqueness and stock invariants. Retry an unknown outcome with the same key.
 
@@ -63,3 +63,9 @@ Planned implementation paths: `web/`, `functions/`, `dataconnect/`, `scripts/`, 
 Salon routes: `/salons/:salonId` (Dashboard), `/salons/:salonId/requests` (All/Active/Received/Rejected; server filtering and pages of 50), `/salons/:salonId/settings`. Details use bounded, authorized return context in router state; direct links default to their salon's All list or HQ queue. The topbar owns salon selection.
 
 Pending submission format2 contains one immutable payload/key in `barberhq.pending.v2`. Unknown outcomes only reconcile that payload. Legacy/unknown journals remain untouched and block a new submission until operator reconciliation. See [increment 2b handoff](handoffs/increment-2b.md).
+
+## HQ workspace refinement — 8 October 2026
+
+HQ can submit requests for salons in its own business, retaining its actual UID in ActionReceipt and ActionKey; it does not impersonate salon staff. Salon submit still requires assignment. Approval/rejection/dispatch depend on authenticated HQ role and request state, independently of navigation origin. Receipt remains salon-only. Detail rendering and authorized return context are shared; navigation state never grants permission.
+
+HQ salon Dashboard shows salon inventory and the order form without the redundant HQ availability panel. Salon staff retain that panel. HQ has a dedicated `/hq/stock` route with an HQ-only GraphQL read, showing onHand, reserved and available without depending on a selected salon. Request/stock tables use Material columns with contained horizontal scrolling on small screens.

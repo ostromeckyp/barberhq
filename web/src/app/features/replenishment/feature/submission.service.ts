@@ -72,7 +72,7 @@ export class SubmissionService {
     const s = this.session.state();
     return (
       s.status === 'READY' &&
-      s.membership.role === 'SALON' &&
+      (s.membership.role === 'SALON' || s.membership.role === 'HQ') &&
       s.membership.userId === p.userId &&
       s.membership.businessId === p.businessId &&
       s.membership.salonIds.includes(p.salonId)
@@ -91,7 +91,7 @@ export class SubmissionService {
     const s = this.session.state();
     if (
       s.status !== 'READY' ||
-      s.membership.role !== 'SALON' ||
+      !['SALON', 'HQ'].includes(s.membership.role) ||
       !s.membership.salonIds.includes(salonId)
     )
       return;

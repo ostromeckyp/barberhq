@@ -52,6 +52,33 @@ export interface Business_Key {
   __typename?: 'Business_Key';
 }
 
+export interface GetHqInventoryData {
+  membership?: {
+    business: {
+      hq: ({
+        id: string;
+        name: string;
+        inventory: ({
+          onHand: number;
+          reserved: number;
+          version: number;
+          product: {
+            id: string;
+            demoId: string;
+            name: string;
+            netContentMl: number;
+          } & Product_Key;
+        })[];
+      } & Location_Key)[];
+    };
+  };
+}
+
+export interface GetHqInventoryVariables {
+  limit?: number;
+  offset?: number;
+}
+
 export interface GetMyMembershipData {
   membership?: {
     uid: string;
@@ -406,6 +433,18 @@ export const getSalonInventoryRef: GetSalonInventoryRef;
 
 export function getSalonInventory(vars: GetSalonInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonInventoryData, GetSalonInventoryVariables>;
 export function getSalonInventory(dc: DataConnect, vars: GetSalonInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetSalonInventoryData, GetSalonInventoryVariables>;
+
+interface GetHqInventoryRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars?: GetHqInventoryVariables): QueryRef<GetHqInventoryData, GetHqInventoryVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars?: GetHqInventoryVariables): QueryRef<GetHqInventoryData, GetHqInventoryVariables>;
+  operationName: string;
+}
+export const getHqInventoryRef: GetHqInventoryRef;
+
+export function getHqInventory(vars?: GetHqInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetHqInventoryData, GetHqInventoryVariables>;
+export function getHqInventory(dc: DataConnect, vars?: GetHqInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetHqInventoryData, GetHqInventoryVariables>;
 
 interface GetSalonSettingsRef {
   /* Allow users to create refs without passing in DataConnect */

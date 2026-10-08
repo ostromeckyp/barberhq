@@ -51,6 +51,28 @@ function setup(
     store: TestBed.inject(PendingSubmissionStore),
   };
 }
+it('allows_hq_submission_and_recovers_its_original_payload_without_impersonation', async () => {
+  sessionStorage.clear();
+  const sent: StockAction[] = [];
+  const h = setup(async (action) => {
+    sent.push(structuredClone(action));
+    if (sent.length === 1) throw new CommandError('UNKNOWN', 'Lost');
+    return result;
+  });
+  h.state.set({
+    status: 'READY',
+    membership: { userId: 'hq', businessId: 'b', role: 'HQ', salonIds: ['salon'] },
+  });
+  TestBed.tick();
+  await h.service.submit('salon', [line('a')]);
+  expect(sent).toHaveLength(1);
+  expect(h.store.load()).toMatchObject({ kind: 'PENDING', value: { userId: 'hq' } });
+  await h.service.resume('salon');
+  expect(sent).toEqual([sent[0], sent[0]]);
+  expect(h.service.outcome()?.status).toBe('CREATED');
+  await h.service.submit('foreign', [line('a')]);
+  expect(sent).toHaveLength(2);
+});
 it('recovers_one_frozen_payload_and_key_after_reload', async () => {
   sessionStorage.clear();
   const sent: StockAction[] = [];

@@ -47,6 +47,33 @@ export interface Business_Key {
   __typename?: 'Business_Key';
 }
 
+export interface GetHqInventoryData {
+  membership?: {
+    business: {
+      hq: ({
+        id: string;
+        name: string;
+        inventory: ({
+          onHand: number;
+          reserved: number;
+          version: number;
+          product: {
+            id: string;
+            demoId: string;
+            name: string;
+            netContentMl: number;
+          } & Product_Key;
+        })[];
+      } & Location_Key)[];
+    };
+  };
+}
+
+export interface GetHqInventoryVariables {
+  limit?: number;
+  offset?: number;
+}
+
 export interface GetMyMembershipData {
   membership?: {
     uid: string;
@@ -380,6 +407,11 @@ export function listProducts(vars?: ListProductsVariables, options?: OperationOp
 export function getSalonInventory(dc: DataConnect, vars: GetSalonInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonInventoryData>>;
 /** Generated Node Admin SDK operation action function for the 'GetSalonInventory' Query. Allow users to pass in custom DataConnect instances. */
 export function getSalonInventory(vars: GetSalonInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonInventoryData>>;
+
+/** Generated Node Admin SDK operation action function for the 'GetHqInventory' Query. Allow users to execute without passing in DataConnect. */
+export function getHqInventory(dc: DataConnect, vars?: GetHqInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetHqInventoryData>>;
+/** Generated Node Admin SDK operation action function for the 'GetHqInventory' Query. Allow users to pass in custom DataConnect instances. */
+export function getHqInventory(vars?: GetHqInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetHqInventoryData>>;
 
 /** Generated Node Admin SDK operation action function for the 'GetSalonSettings' Query. Allow users to execute without passing in DataConnect. */
 export function getSalonSettings(dc: DataConnect, vars: GetSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSalonSettingsData>>;

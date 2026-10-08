@@ -11,6 +11,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetMyMembership*](#getmymembership)
   - [*ListProducts*](#listproducts)
   - [*GetSalonInventory*](#getsaloninventory)
+  - [*GetHqInventory*](#gethqinventory)
   - [*GetSalonSettings*](#getsalonsettings)
   - [*ListActiveRequests*](#listactiverequests)
   - [*ListHQQueue*](#listhqqueue)
@@ -435,6 +436,140 @@ const ref = getSalonInventoryRef({ salonId: ..., limit: ..., offset: ..., });
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = getSalonInventoryRef(dataConnect, getSalonInventoryVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+## GetHqInventory
+You can execute the `GetHqInventory` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+getHqInventory(vars?: GetHqInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetHqInventoryData, GetHqInventoryVariables>;
+
+interface GetHqInventoryRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars?: GetHqInventoryVariables): QueryRef<GetHqInventoryData, GetHqInventoryVariables>;
+}
+export const getHqInventoryRef: GetHqInventoryRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getHqInventory(dc: DataConnect, vars?: GetHqInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetHqInventoryData, GetHqInventoryVariables>;
+
+interface GetHqInventoryRef {
+  ...
+  (dc: DataConnect, vars?: GetHqInventoryVariables): QueryRef<GetHqInventoryData, GetHqInventoryVariables>;
+}
+export const getHqInventoryRef: GetHqInventoryRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getHqInventoryRef:
+```typescript
+const name = getHqInventoryRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetHqInventory` query has an optional argument of type `GetHqInventoryVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetHqInventoryVariables {
+  limit?: number;
+  offset?: number;
+}
+```
+### Return Type
+Recall that executing the `GetHqInventory` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetHqInventoryData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetHqInventoryData {
+  membership?: {
+    business: {
+      hq: ({
+        id: string;
+        name: string;
+        inventory: ({
+          onHand: number;
+          reserved: number;
+          version: number;
+          product: {
+            id: string;
+            demoId: string;
+            name: string;
+            netContentMl: number;
+          } & Product_Key;
+        })[];
+      } & Location_Key)[];
+    };
+  };
+}
+```
+### Using `GetHqInventory`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getHqInventory, GetHqInventoryVariables } from '@barberhq/browser';
+
+// The `GetHqInventory` query has an optional argument of type `GetHqInventoryVariables`:
+const getHqInventoryVars: GetHqInventoryVariables = {
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `getHqInventory()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getHqInventory(getHqInventoryVars);
+// Variables can be defined inline as well.
+const { data } = await getHqInventory({ limit: ..., offset: ..., });
+// Since all variables are optional for this query, you can omit the `GetHqInventoryVariables` argument.
+const { data } = await getHqInventory();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getHqInventory(dataConnect, getHqInventoryVars);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+getHqInventory(getHqInventoryVars).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `GetHqInventory`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getHqInventoryRef, GetHqInventoryVariables } from '@barberhq/browser';
+
+// The `GetHqInventory` query has an optional argument of type `GetHqInventoryVariables`:
+const getHqInventoryVars: GetHqInventoryVariables = {
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `getHqInventoryRef()` function to get a reference to the query.
+const ref = getHqInventoryRef(getHqInventoryVars);
+// Variables can be defined inline as well.
+const ref = getHqInventoryRef({ limit: ..., offset: ..., });
+// Since all variables are optional for this query, you can omit the `GetHqInventoryVariables` argument.
+const ref = getHqInventoryRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getHqInventoryRef(dataConnect, getHqInventoryVars);
 
 // Call `executeQuery()` on the reference to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.
