@@ -47,7 +47,11 @@ import { StatusChip } from './status-chip';
             <td mat-cell *matCellDef="let request">
               <a
                 mat-stroked-button
-                [routerLink]="['/requests', request.id]"
+                [routerLink]="
+                  context()?.kind === 'HQ'
+                    ? ['/hq', 'requests', request.id]
+                    : ['/salons', request.salonId, 'requests', request.id]
+                "
                 [state]="{ listContext: context() }"
                 >Open request</a
               >

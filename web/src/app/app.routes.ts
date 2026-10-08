@@ -22,6 +22,26 @@ export const routes: Routes = [
     canActivate: [accessGuard],
     children: [
       {
+        path: 'salons/:salonId/requests/:requestId',
+        title: 'Salon request · BarberHQ',
+        data: { workspace: 'SALON' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/request-detail/feature/request-detail.component').then(
+            (m) => m.RequestDetailComponent,
+          ),
+      },
+      {
+        path: 'hq/requests/:requestId',
+        title: 'HQ request · BarberHQ',
+        data: { kind: 'hq', workspace: 'HQ' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/request-detail/feature/request-detail.component').then(
+            (m) => m.RequestDetailComponent,
+          ),
+      },
+      {
         path: 'salons/:salonId/settings',
         title: 'Settings · BarberHQ',
         canActivate: [accessGuard],

@@ -60,7 +60,7 @@ export class StockRepository {
           !m.salonAccesses_on_membership.some((a) => a.locationId === salonId))
       )
         throw new StockError("FORBIDDEN");
-    } else if (action.type === "RECEIVE") {
+    } else if (action.type === "RECEIVE" && m.role !== "HQ") {
       if (
         m.role !== "SALON" ||
         !m.salonAccesses_on_membership.some((a) => a.locationId === salonId)

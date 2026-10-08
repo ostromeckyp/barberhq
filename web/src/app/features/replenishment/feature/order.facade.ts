@@ -17,9 +17,7 @@ export class OrderFacade {
   private readonly session = inject(SessionFacade);
   private readonly api = inject(ReplenishmentApi);
   private readonly activity = inject(BrowserActivity);
-  private readonly salonId = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('salonId'))),
-  );
+  readonly salonId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('salonId'))));
   readonly manual = signal({ productId: '', quantity: 2 });
   readonly notice = signal('');
   readonly canOrder = computed(() => {

@@ -33,12 +33,14 @@ export function requestReturnContext(
   request: RequestSummary,
   membership: Membership,
   candidate?: RequestListContext,
+  workspace: 'HQ' | 'SALON' = membership.role,
 ): RequestListContext {
   if (!membership.salonIds.includes(request.salonId)) throw Error('Unauthorized request salon');
   const safe = parseListContext(candidate);
-  if (safe?.kind === 'HQ' && membership.role === 'HQ') return safe;
-  if (safe?.kind === 'SALON' && safe.salonId === request.salonId) return safe;
-  return membership.role === 'HQ'
+  if (safe?.kind === 'HQ' && membership.role === 'HQ' && workspace === 'HQ') return safe;
+  if (safe?.kind === 'SALON' && safe.salonId === request.salonId && workspace === 'SALON')
+    return safe;
+  return membership.role === 'HQ' && workspace === 'HQ'
     ? { kind: 'HQ', offset: 0 }
     : { kind: 'SALON', salonId: request.salonId, filter: 'ALL', offset: 0 };
 }

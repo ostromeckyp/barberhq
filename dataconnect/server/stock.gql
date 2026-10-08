@@ -111,7 +111,7 @@ mutation ReceiveStock($uid:String!,$businessId:String!,$requestId:String!,$recei
  requestGuard:query @redact {
   replenishmentRequest(id:$requestId) @check(expr:"this != null && this.businessId == vars.businessId && this.state == 'DISPATCHED' && this.revision == vars.revision && vars.count >= 1 && vars.count <= 6 && this.items.size() == vars.count && vars.use0 == (vars.count > 0) && vars.use1 == (vars.count > 1) && vars.use2 == (vars.count > 2) && vars.use3 == (vars.count > 3) && vars.use4 == (vars.count > 4) && vars.use5 == (vars.count > 5) && vars.receivedQuantities.size() == vars.count && vars.allIntact",message:"STALE_STATE"){businessId salonId state revision items:requestItems_on_request(orderBy:{productId:ASC}){id productId quantity}}
  }
- actor:query @redact {membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && this.role == 'SALON' && this.salonAccesses_on_membership.exists(a, a.locationId == response.requestGuard.replenishmentRequest.salonId)",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}
+ actor:query @redact {membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && (this.role == 'HQ' || (this.role == 'SALON' && this.salonAccesses_on_membership.exists(a, a.locationId == response.requestGuard.replenishmentRequest.salonId)))",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}
   
  }
  changed:replenishmentRequest_updateMany(where:{id:{eq:$requestId},businessId:{eq:$businessId},state:{eq:DISPATCHED},revision:{eq:$revision}},data:{state:RECEIVED,revision_update:{inc:1}}) @check(expr:"this == 1",message:"STALE_STATE")

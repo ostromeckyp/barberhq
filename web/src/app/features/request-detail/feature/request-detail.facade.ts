@@ -1,6 +1,5 @@
 import { Service, inject, computed, resource, signal, effect } from '@angular/core';
 import { Location } from '@angular/common';
-import { SalonContext } from '../../../core/salon-context';
 import { parseListContext, requestReturnContext } from '../../../core/request-navigation';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,7 +13,9 @@ import { availableRequestActions, type TransitionType } from './action-input';
 export class RequestDetailFacade {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
-  private readonly context = inject(SalonContext);
+  private readonly route = inject(ActivatedRoute);
+  readonly workspace: 'HQ' | 'SALON' | undefined = this.route.snapshot.data['workspace'];
+  private readonly routeSalonId = toSignal(this.route.paramMap.pipe(map((p) => p.get('salonId'))));
   private readonly candidate = parseListContext(
     (this.location.getState() as { listContext?: unknown })?.listContext,
   );
@@ -22,9 +23,7 @@ export class RequestDetailFacade {
   private readonly session = inject(SessionFacade);
   private readonly activity = inject(BrowserActivity);
   private readonly actions = inject(RequestActions);
-  private readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('requestId'))),
-  );
+  private readonly id = toSignal(this.route.paramMap.pipe(map((p) => p.get('requestId'))));
   private readonly record = resource({
     params: () => {
       const s = this.session.state(),
@@ -34,23 +33,43 @@ export class RequestDetailFacade {
             id,
             uid: s.membership.userId,
             businessId: s.membership.businessId,
+            salonId: this.routeSalonId(),
             tick: this.activity.refreshTick(),
           }
         : undefined;
     },
-    loader: ({ params }) => this.api.getRequest(params.id),
+    loader: async ({ params }) => {
+      const request = await this.api.getRequest(params.id);
+      if (params.salonId && request.salonId !== params.salonId)
+        throw new Error('Request outside this salon');
+      return request;
+    },
   });
   readonly request = computed(() => (this.record.hasValue() ? this.record.value() : undefined));
   readonly back = computed(() => {
     const r = this.request(),
       s = this.session.state();
     if (!r || s.status !== 'READY' || !s.membership.salonIds.includes(r.salonId)) return undefined;
-    return requestReturnContext(r, s.membership, this.candidate);
+    return requestReturnContext(
+      r,
+      s.membership,
+      this.candidate,
+      this.workspace ?? this.candidate?.kind ?? s.membership.role,
+    );
   });
   constructor() {
     effect(() => {
       const r = this.request();
-      if (r) this.context.setDetailSalon(r.id, r.salonId);
+      const back = this.back();
+      if (r && back && !this.workspace) {
+        void this.router.navigate(
+          back.kind === 'HQ' ? ['/hq', 'requests', r.id] : ['/salons', r.salonId, 'requests', r.id],
+          {
+            replaceUrl: true,
+            state: { listContext: back },
+          },
+        );
+      }
     });
   }
   goBack() {
@@ -67,8 +86,8 @@ export class RequestDetailFacade {
   readonly availableActions = computed(() => {
     const r = this.request(),
       s = this.session.state();
-    if (!r || s.status !== 'READY') return [] as TransitionType[];
-    return availableRequestActions(s.membership, r);
+    if (!r || s.status !== 'READY' || !this.workspace) return [] as TransitionType[];
+    return availableRequestActions(s.membership, r, this.workspace);
   });
   readonly transit = computed(() => {
     const r = this.request();

@@ -110,13 +110,15 @@
     @if (facade.outcome(); as outcome) {
       <p>{{ outcome.status }}</p>
       @if (outcome.status === 'CREATED') {
-        <a [routerLink]="['/requests', outcome.requestId]">Open request</a>
+        <a [routerLink]="['/salons', facade.salonId(), 'requests', outcome.requestId]"
+          >Open request</a
+        >
       } @else if (outcome.status === 'FAILED') {
         <p role="alert">
           Request was not submitted ({{ outcome.code }}). Review the complete list before retrying.
         </p>
         @for (conflict of outcome.conflicts; track conflict.productId) {
-          <a [routerLink]="['/requests', conflict.requestId]"
+          <a [routerLink]="['/salons', facade.salonId(), 'requests', conflict.requestId]"
             >Open existing request for {{ conflict.productId }}</a
           >
         }

@@ -1,7 +1,5 @@
 import { Service, computed, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, PRIMARY_OUTLET, Router } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { Router } from '@angular/router';
 import { SalonContext } from '../core/salon-context';
 import { SessionFacade } from '../features/auth/feature/session.facade';
 
@@ -13,18 +11,26 @@ export class ShellFacade {
   readonly salonContext = inject(SalonContext);
   readonly salons = this.session.salons;
   readonly ready = computed(() => this.session.state().status === 'READY');
-  readonly isHq = computed(() => {
+  readonly isHqUser = computed(() => {
     const s = this.session.state();
     return s.status === 'READY' && s.membership.role === 'HQ';
   });
-  readonly home = computed(() => this.router.parseUrl(this.session.home()));
-  readonly role = computed(() => (this.isHq() ? 'HQ team' : 'Salon staff'));
+  readonly isHqWorkspace = computed(() => this.salonContext.workspace()?.kind === 'HQ');
+  readonly isActingForSalon = computed(
+    () => this.isHqUser() && this.salonContext.workspace()?.kind === 'SALON',
+  );
+  readonly home = this.salonContext.home;
   readonly selectedSalonId = this.salonContext.salonId;
-  readonly navSalonId = computed(() => this.selectedSalonId() ?? this.salons()[0]?.id);
-  readonly context = computed(
-    () =>
-      this.salons().find((s) => s.id === this.selectedSalonId())?.name ??
-      (this.router.url.startsWith('/requests/') ? 'Loading salon…' : this.isHq() ? 'HQ' : 'Salon'),
+  readonly navSalonId = this.selectedSalonId;
+  readonly selectedWorkspace = this.salonContext.selectedWorkspace;
+  readonly workspaceLabel = computed(() => {
+    if (this.isHqWorkspace()) return 'HQ';
+    const salonId = this.selectedSalonId();
+    const name = this.salons().find((salon) => salon.id === salonId)?.name;
+    return name ? `Salon — ${name}` : 'Select workspace';
+  });
+  readonly actingSalonName = computed(
+    () => this.salons().find((salon) => salon.id === this.selectedSalonId())?.name ?? 'salon',
   );
   readonly signOutError = this.failure.asReadonly();
   constructor() {
@@ -42,5 +48,10 @@ export class ShellFacade {
     } catch {
       this.failure.set('Could not sign out. Please retry.');
     }
+  }
+
+  switchWorkspace(value: string) {
+    if (value === 'HQ' || value.startsWith('SALON:'))
+      void this.salonContext.switchWorkspace(value as 'HQ' | `SALON:${string}`);
   }
 }

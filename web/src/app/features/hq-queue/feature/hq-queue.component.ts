@@ -11,7 +11,7 @@ import { HqQueueFacade } from './hq-queue.facade';
   template: `
     <app-page-header
       eyebrow="HQ WORKSPACE"
-      title="Request queue"
+      title="Salon requests"
       description="Review requests. Reserve stock. Keep salons supplied."
       ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
         Refresh

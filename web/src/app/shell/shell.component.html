@@ -7,21 +7,23 @@
   }
   <a class="brand" [routerLink]="facade.home()"><app-brand [inverse]="true" /></a
   ><span class="toolbar-space"></span>
-  @if (facade.salons().length > 1) {
+  <label class="workspace-control">
+    <span>Workspace</span>
     <mat-select
-      class="salon-select"
-      aria-label="Select salon"
-      [value]="facade.selectedSalonId()"
-      placeholder="Select salon"
-      (selectionChange)="facade.salonContext.switchSalon($event.value)"
+      aria-label="Workspace"
+      [value]="facade.selectedWorkspace()"
+      [disabled]="!facade.ready()"
+      (selectionChange)="facade.switchWorkspace($event.value)"
     >
+      @if (facade.isHqUser()) {
+        <mat-option value="HQ">HQ</mat-option>
+      }
       @for (salon of facade.salons(); track salon.id) {
-        <mat-option [value]="salon.id">{{ salon.name }}</mat-option>
+        <mat-option [value]="'SALON:' + salon.id">Salon — {{ salon.name }}</mat-option>
       }
     </mat-select>
-  }
-  <span class="context">{{ facade.context() }} · {{ facade.role() }}</span
-  ><button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Account menu">
+  </label>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Account menu">
     <mat-icon>account_circle</mat-icon>
   </button>
   <mat-menu #userMenu="matMenu"
@@ -30,11 +32,6 @@
     </button></mat-menu
   ></mat-toolbar
 >
-@if (mobile()?.matches) {
-  <div class="mobile-context">
-    {{ facade.context() }} <span>{{ facade.role() }}</span>
-  </div>
-}
 <mat-sidenav-container
   ><mat-sidenav
     #drawer
@@ -44,27 +41,27 @@
   >
     <div class="nav-label">WORKSPACE</div>
     <mat-nav-list aria-label="Main navigation">
-      @if (facade.isHq()) {
+      @if (facade.isHqWorkspace()) {
         <a
           mat-list-item
           routerLink="/hq"
           routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeDrawer()"
-          ><mat-icon matListItemIcon>warehouse</mat-icon>HQ overview</a
+          [routerLinkActiveOptions]="{ exact: true }"
+          ><mat-icon matListItemIcon>warehouse</mat-icon>Salon requests</a
         >
         <a mat-list-item routerLink="/hq/stock" routerLinkActive="active" (click)="closeDrawer()"
           ><mat-icon matListItemIcon>inventory_2</mat-icon>HQ stock</a
         >
       }
-      @if (facade.navSalonId(); as salonId) {
+      @if (facade.salonContext.salonId(); as salonId) {
         <a
           mat-list-item
           [routerLink]="['/salons', salonId]"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeDrawer()"
-          ><mat-icon matListItemIcon>dashboard</mat-icon>Dashboard</a
+          ><mat-icon matListItemIcon>dashboard</mat-icon>Inventory</a
         >
         <a
           mat-list-item
@@ -74,7 +71,7 @@
           ><mat-icon matListItemIcon>receipt_long</mat-icon>Requests</a
         >
       }
-      @if (facade.navSalonId(); as salonId) {
+      @if (facade.salonContext.salonId(); as salonId) {
         <a
           mat-list-item
           [routerLink]="['/salons', salonId, 'settings']"
@@ -89,6 +86,9 @@
   <mat-sidenav-content
     ><main id="main-content" tabindex="-1">
       @if (facade.ready()) {
+        @if (facade.isActingForSalon()) {
+          <p class="acting-banner">Acting on behalf of salon {{ facade.actingSalonName() }}</p>
+        }
         <router-outlet />
       }
       @if (facade.signOutError()) {

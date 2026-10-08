@@ -46,7 +46,7 @@ export function toRequestDetail(r: DetailRecord, inventory: InventoryRow[]): Req
     timeline: r.timeline.map((t) => ({
       state: t.state as RequestState,
       at: t.createdAt,
-      actorLabel: t.action === 'SUBMIT' ? 'Requester' : t.action === 'RECEIVE' ? 'Salon' : 'HQ',
+      actorLabel: t.action === 'SUBMIT' ? 'Requester' : t.action === 'RECEIVE' ? 'Recipient' : 'HQ',
       ...(t.reason ? { reason: t.reason } : {}),
     })),
   };

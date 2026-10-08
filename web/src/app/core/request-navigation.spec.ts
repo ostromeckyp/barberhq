@@ -29,3 +29,21 @@ it('bounds_return_context_and_rejects_external_urls', () => {
   });
   expect(() => requestReturnContext(request, { ...member, salonIds: [] })).toThrow();
 });
+
+it('url_workspace_overrides_conflicting_return_state', () => {
+  const hq = { ...member, role: 'HQ' as const };
+  expect(requestReturnContext(request, hq, { kind: 'HQ', offset: 50 }, 'SALON')).toEqual({
+    kind: 'SALON',
+    salonId: 's',
+    filter: 'ALL',
+    offset: 0,
+  });
+  expect(
+    requestReturnContext(
+      request,
+      hq,
+      { kind: 'SALON', salonId: 's', filter: 'REJECTED', offset: 50 },
+      'HQ',
+    ),
+  ).toEqual({ kind: 'HQ', offset: 0 });
+});

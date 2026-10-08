@@ -1,5 +1,7 @@
 # HQ workspace refinement — 8 October 2026
 
+> Navigation and receipt policy are superseded by the subsequently approved [workspace switching](workspace-switching.md). The evidence below describes the earlier increment.
+
 Extends increment 2b in the existing checkout. No cloud deployment or data reset.
 
 ## Behavior

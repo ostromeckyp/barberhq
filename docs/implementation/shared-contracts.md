@@ -60,12 +60,16 @@ Planned implementation paths: `web/`, `functions/`, `dataconnect/`, `scripts/`, 
 
 `SaveSalonSettings` is an authenticated, version-guarded GraphQL mutation returning its authoritative row. It checks business, assignment and SALON kind inside the transaction. Integer range is 0–2147483647. Seed inserts missing defaults; reset preserves settings. Settings are not stock movements.
 
-Salon routes: `/salons/:salonId` (Dashboard), `/salons/:salonId/requests` (All/Active/Received/Rejected; server filtering and pages of 50), `/salons/:salonId/settings`. Details use bounded, authorized return context in router state; direct links default to their salon's All list or HQ queue. The topbar owns salon selection.
+Salon routes: `/salons/:salonId` (Inventory), `/salons/:salonId/requests` (All/Active/Received/Rejected; server filtering and pages of 50), `/salons/:salonId/settings`. Details use bounded, authorized return context in router state; direct links default to their salon's All list or HQ queue. The topbar owns workspace selection.
 
 Pending submission format2 contains one immutable payload/key in `barberhq.pending.v2`. Unknown outcomes only reconcile that payload. Legacy/unknown journals remain untouched and block a new submission until operator reconciliation. See [increment 2b handoff](handoffs/increment-2b.md).
 
-## HQ workspace refinement — 8 October 2026
+## Workspace navigation — approved 8 October 2026
 
-HQ can submit requests for salons in its own business, retaining its actual UID in ActionReceipt and ActionKey; it does not impersonate salon staff. Salon submit still requires assignment. Approval/rejection/dispatch depend on authenticated HQ role and request state, independently of navigation origin. Receipt remains salon-only. Detail rendering and authorized return context are shared; navigation state never grants permission.
+Exactly one URL-derived workspace is active. HQ members choose HQ or an accessible salon from the Workspace selector; salon members never receive an HQ option. Switching to a salon always opens its inventory, switching to HQ opens the salon-request queue. HQ navigation contains Salon requests and HQ stock; salon navigation contains Inventory, Requests, Settings. The brand link opens the active workspace home.
 
-HQ salon Dashboard shows salon inventory and the order form without the redundant HQ availability panel. Salon staff retain that panel. HQ has a dedicated `/hq/stock` route with an HQ-only GraphQL read, showing onHand, reserved and available without depending on a selected salon. Request/stock tables use Material columns with contained horizontal scrolling on small screens.
+Canonical details are `/hq/requests/:requestId` and `/salons/:salonId/requests/:requestId`. The latter verifies the loaded request belongs to the URL salon before display. Existing `/requests/:requestId` links redirect to an authorized canonical route, retaining only validated matching list context. URL workspace governs actions and Back; router state only preserves matching filter/offset and cannot change perspective.
+
+HQ workspace exposes approval, rejection and dispatch. Salon workspace exposes ordering and receipt, including HQ acting on behalf of its own-business salon. A persistent banner makes that delegation visible. Both roles see the same salon availability and workflow. Actual authenticated HQ UID is retained in ActionReceipt/StockMovement; context never impersonates another identity. Backend membership/business/assignment and atomic whole-request checks remain authoritative. Submission and receipt labels do not infer the actor role from the action type.
+
+HQ-only `/hq/stock` and `GetHqInventory` show onHand, reserved and available independently of a salon selection. Existing Material tables preserve shared columns and contained scrolling. Prefer CDK primitives when further table styling requires them; this navigation change does not replace the table implementation.

@@ -18,7 +18,7 @@ async function login(page: Page, role: "hq" | "legnicka") {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(
     page.getByRole("heading", {
-      name: role === "hq" ? "Request queue" : "Legnicka",
+      name: role === "hq" ? "Salon requests" : "Legnicka",
       exact: true,
     }),
   ).toBeVisible();
@@ -78,7 +78,7 @@ for (const many of [false, true])
     const url = await submit(salon);
     await login(hq, "hq");
     await expect(hq.locator("tr.request-row")).toHaveCount(1);
-    await hq.goto(url);
+    await hq.goto(`/hq/requests/${url.split("/").at(-1)}`);
     await confirm(hq, "Approve request");
     await confirm(hq, "Confirm dispatch");
     await expect(hq.getByTestId("hq-on-hand")).toHaveCount(products.length);

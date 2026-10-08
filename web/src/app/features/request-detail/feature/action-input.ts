@@ -15,9 +15,11 @@ export const ACTION_LABELS: Record<TransitionType, string> = {
 export function availableRequestActions(
   membership: Membership,
   request: Pick<RequestDetail, 'salonId' | 'state'>,
+  workspace: 'HQ' | 'SALON',
 ): TransitionType[] {
   if (!membership.salonIds.includes(request.salonId)) return [];
-  if (membership.role === 'HQ') {
+  if (workspace === 'HQ') {
+    if (membership.role !== 'HQ') return [];
     return request.state === 'PENDING_APPROVAL'
       ? ['APPROVE', 'REJECT']
       : request.state === 'RESERVED'

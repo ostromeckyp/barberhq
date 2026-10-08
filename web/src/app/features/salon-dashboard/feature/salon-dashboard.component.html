@@ -63,9 +63,7 @@
       @if (order?.canOrder()) {
         <app-order-panel />
       }
-      @if (!order?.isHq()) {
-        <app-hq-availability [rows]="facade.rows()" />
-      }
+      <app-hq-availability [rows]="facade.rows()" />
     </div>
   </div>
 }

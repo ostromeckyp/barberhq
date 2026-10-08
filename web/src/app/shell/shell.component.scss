@@ -20,25 +20,20 @@
 .toolbar-space {
   flex: 1;
 }
-.mobile-context {
-  height: 40px;
-  padding: 0 16px;
+.workspace-control {
   display: flex;
   align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  font-size: 12px;
-}
-.mobile-context span {
-  color: var(--muted);
-}
-.context {
-  font-size: 12px;
+  gap: 8px;
   color: var(--surface);
-  padding: 5px 10px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  font-size: 12px;
+}
+.workspace-control mat-select {
+  width: 220px;
+  max-width: min(32vw, 280px);
+  --mat-select-enabled-trigger-text-color: var(--surface);
+  --mat-select-enabled-arrow-color: var(--surface);
+  --mat-select-disabled-trigger-text-color: var(--muted);
+  font-size: 14px;
 }
 mat-sidenav-container {
   min-height: calc(100dvh - 60px);
@@ -95,21 +90,34 @@ main {
 }
 @media (max-width: 759px) {
   .toolbar {
-    height: 56px;
+    height: 104px;
     padding: 0 8px;
     gap: 4px;
+    flex-wrap: wrap;
+    align-content: center;
   }
   .brand {
     font-size: 17px;
   }
-  .context {
-    display: none;
+  .workspace-control {
+    order: 1;
+    flex-basis: 100%;
+    height: 40px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    gap: 12px;
+    font-size: 11px;
+  }
+  .workspace-control mat-select {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
   }
   main {
     padding: 20px 16px;
   }
   mat-sidenav-container {
-    min-height: calc(100dvh - 96px);
+    min-height: calc(100dvh - 104px);
   }
 }
 
@@ -117,20 +125,11 @@ main {
   color: var(--surface);
 }
 
-.salon-select {
-  max-width: 150px;
-  min-width: 100px;
-  --mat-select-enabled-trigger-text-color: var(--surface);
-  --mat-select-enabled-arrow-color: var(--surface);
-  --mat-select-placeholder-text-color: var(--surface);
+.acting-banner {
+  padding: 12px 16px;
+  margin: 0 0 16px;
+  border-left: 3px solid var(--brand);
+  background: var(--surface);
+  color: var(--ink);
   font-size: 14px;
-}
-@media (max-width: 400px) {
-  .toolbar .brand {
-    max-width: 95px;
-    overflow: hidden;
-  }
-  .salon-select {
-    max-width: 110px;
-  }
 }

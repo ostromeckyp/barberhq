@@ -15,7 +15,7 @@ async function login(page: Page) {
   await page.getByLabel("Password", { exact: true }).fill(c.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Request queue", exact: true }),
+    page.getByRole("heading", { name: "Salon requests", exact: true }),
   ).toBeVisible();
 }
 async function axe(page: Page) {
@@ -27,7 +27,7 @@ async function axe(page: Page) {
     ).violations,
   ).toEqual([]);
 }
-test("settings_persist_and_salon_switch_preserves_activity_without_threshold_leak", async ({
+test("settings_persist_and_workspace_switch_starts_at_inventory_without_threshold_leak", async ({
   page,
 }) => {
   test.setTimeout(60000);
@@ -45,20 +45,23 @@ test("settings_persist_and_salon_switch_preserves_activity_without_threshold_lea
   await page.reload();
   await expect(page.getByLabel("Low-stock threshold")).toHaveValue("1");
   await axe(page);
-  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
+  await page.getByRole("link", { name: "Inventory", exact: true }).click();
   await expect(page.getByTestId("stock-NBS-MATOWA-100")).toHaveText("2");
   await expect(page.getByTestId("low-stock-NBS-MATOWA-100")).toHaveCount(0);
   await page.getByRole("link", { name: "Settings", exact: true }).click();
-  await page.getByRole("combobox", { name: "Select salon" }).click();
-  await page.getByRole("option", { name: "Łódzka", exact: true }).click();
-  await expect(page).toHaveURL(/lodzka\/settings/);
+  await page.getByRole("combobox", { name: "Workspace" }).click();
+  await page
+    .getByRole("option", { name: "Salon — Łódzka", exact: true })
+    .click();
+  await expect(page).toHaveURL(/lodzka$/);
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
   await expect(page.getByLabel("Low-stock threshold")).toHaveValue("2");
   await page.getByLabel("Low-stock threshold").fill("0");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(
     page.getByText("Settings saved.", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
+  await page.getByRole("link", { name: "Inventory", exact: true }).click();
   await expect(page.getByTestId("low-stock-NBS-MATOWA-100")).toHaveCount(0);
   await page.goto(path + "/settings");
   await expect(page.getByLabel("Low-stock threshold")).toHaveValue("1");
@@ -93,7 +96,7 @@ test("settings_persist_and_salon_switch_preserves_activity_without_threshold_lea
   await page.getByRole("button", { name: "Open navigation" }).click();
   const nav = page.getByRole("navigation", { name: "Main navigation" });
   await expect(
-    nav.getByRole("link", { name: "Dashboard", exact: true }),
+    nav.getByRole("link", { name: "Inventory", exact: true }),
   ).toBeVisible();
   await expect(
     nav.getByRole("link", { name: "Requests", exact: true }),

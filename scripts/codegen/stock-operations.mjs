@@ -15,6 +15,8 @@ const member = (salon) =>
   `membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && this.role == '${salon ? "SALON" : "HQ"}'${salon ? " && this.salonAccesses_on_membership.exists(a, a.locationId == " + salon + ")" : ""}",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}`;
 const submitter =
   'membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && (this.role == \'HQ\' || (this.role == \'SALON\' && this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId)))",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}';
+const receiver =
+  'membership(key:{uid:$uid}) @check(expr:"this != null && this.businessId == vars.businessId && (this.role == \'HQ\' || (this.role == \'SALON\' && this.salonAccesses_on_membership.exists(a, a.locationId == response.requestGuard.replenishmentRequest.salonId)))",message:"FORBIDDEN") {businessId role salonAccesses_on_membership {locationId}}';
 const audit = (
   action,
   state,
@@ -69,7 +71,7 @@ for (const [action, from, to] of [
  requestGuard:query @redact {
   replenishmentRequest(id:$requestId) @check(expr:"this != null && this.businessId == vars.businessId && this.state == '${from}' && this.revision == vars.revision && vars.count >= 1 && vars.count <= 6 && this.items.size() == vars.count${indexed ? " && " + prefix : ""}${action === "APPROVE" ? " && vars.inventoryVersions.size() == vars.count" : ""}${action === "RECEIVE" ? " && vars.receivedQuantities.size() == vars.count && vars.allIntact" : ""}${action === "REJECT" ? " && vars.reason.size() >= 1 && vars.reason.size() <= 500" : ""}",message:"STALE_STATE"){businessId salonId state revision items:requestItems_on_request(orderBy:{productId:ASC}){id productId quantity}}
  }
- actor:query @redact {${member(action === "RECEIVE" ? "response.requestGuard.replenishmentRequest.salonId" : false)}
+ actor:query @redact {${action === "RECEIVE" ? receiver : member(false)}
   ${action === "APPROVE" ? 'locations(where:{businessId:{eq:$businessId},kind:{eq:HQ}},limit:2) @check(expr:"this.size() == 1",message:"INVALID_TRANSITION"){id}' : ""}
  }
  changed:replenishmentRequest_updateMany(where:{id:{eq:$requestId},businessId:{eq:$businessId},state:{eq:${from}},revision:{eq:$revision}},data:{state:${to},revision_update:{inc:1}}) @check(expr:"this == 1",message:"STALE_STATE")
