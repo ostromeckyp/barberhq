@@ -1,3 +1,4 @@
+import { applyItemsSnapshot } from "./items-import.ts";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -468,7 +469,6 @@ if (
             backup.businessId === target.businessId,
           "Backup target mismatch",
         );
-        const { applyItemsSnapshot } = await import("./items-import.ts");
         console.log(await applyItemsSnapshot(dc, backup));
       } else {
         const s = await exportLegacySnapshot(

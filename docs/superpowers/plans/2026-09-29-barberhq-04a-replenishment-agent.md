@@ -1,5 +1,8 @@
 # BarberHQ 4A — Replenishment agent Implementation Plan
 
+> Supersession (8 October 2026): request grouping, recovery journals, salon navigation and settings now follow [the approved whole-request plan](../plans/2026-10-07-replenishment-requests-and-salon-settings.md) and [current contracts](../../implementation/shared-contracts.md). Historical acceptance evidence below is retained; future AI drafts must submit through the current one-request items[] contract.
+
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Turn natural language into an editable, verified multi-product basket without stock writes.

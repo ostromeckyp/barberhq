@@ -77,11 +77,19 @@ Replenishment should add its own feature facade and data-access adapter, reusing
 ## Manual replenishment (increment 2)
 
 - `features/replenishment/data-access`: generated browser queries, callable adapter and validated sessionStorage persistence. No component invokes Firebase directly.
-- `features/replenishment/feature`: `DraftStore` owns the editable list; page-scoped `OrderFacade` composes inventory, active requests and draft; singleton `SubmissionService` freezes and reconciles submitted rows across navigation.
+- `features/replenishment/feature`: `DraftStore` owns the editable list; page-scoped `OrderFacade` composes inventory, active requests and draft; singleton `SubmissionService` freezes and reconciles one submitted request across navigation.
 - `features/replenishment/ui`: reusable `StatusChip`, `RequestList` and Material-based order panel.
 - `features/request-detail/feature`: scoped detail and confirmation facades; pure `action-input.ts` validation/building. `RequestActions` opens the shared Material dialog. The queue links to this same detail/action path.
 - `features/hq-queue/feature`: paged authoritative queue, divided into pending, reserved and other requests.
 
-Drafts stay in memory. Only explicitly submitted, unresolved rows are stored in sessionStorage, with user/business/salon scope and immutable action keys. Confirmed rows are removed; logout clears pending storage. SQL remains the authority for authorization and quantities.
+Drafts stay in memory. Only an explicitly submitted, unresolved request is stored in sessionStorage, with user/business/salon scope and immutable action keys. A definitive outcome clears only its recognized v2 journal; legacy/invalid evidence is preserved. Verified sign-out clears recognized pending state. SQL remains the authority for authorization and quantities.
 
 Recovery after a transient session ERROR preserves the frozen batch while blocking sends. `SubmissionService.resume(salonId)` requires the current page to match the saved salon; the order facade exposes its name and a navigation link when another salon is open.
+
+## Request history and salon settings (increment 2b)
+
+`SalonRequestsFacade` owns route-derived salon/filter/offset and scoped server reads. `SalonContext` owns topbar context and activity-preserving switches; `request-navigation.ts` validates bounded return contexts. `RequestList` displays all items, totals and one status per request. The dashboard links to history.
+
+`SalonSettingsApi` owns generated GraphQL operations and a confirmed-save revision signal. `SalonSettingsFacade` owns scoped resource reads, a linked editable model, Signal Forms and explicit saves. Stale writes require explicit reload; unknown outcomes trigger an authoritative read without announcing success. Late completions cannot alter a new salon/user scope. The inventory facade independently reads settings; unavailable settings show a warning and suppress threshold chips.
+
+No component imports Firebase. Theme typography remains Archivo Variable for Material and custom UI. Detail cancellation preserves dialog-trigger focus; secondary back navigation uses readable ink text.

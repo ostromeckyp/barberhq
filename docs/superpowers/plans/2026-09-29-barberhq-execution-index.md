@@ -1,5 +1,8 @@
 # BarberHQ — Master Execution Plan
 
+> Increment 2b: [whole requests, salon history/settings](2026-10-07-replenishment-requests-and-salon-settings.md), approved Native execution. See [handoff](../../implementation/handoffs/increment-2b.md) for local verification and remaining release gates. This supersedes increment2 per-row submission and static threshold rules.
+
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Deliver the approved demo in small independently checked increments without loading the whole conversation into each task.

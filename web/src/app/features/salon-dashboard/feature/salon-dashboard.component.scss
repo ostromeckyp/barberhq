@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 .inventory-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
@@ -12,3 +13,5 @@ mat-progress-bar {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.requests-link { @include mat.button-overrides((outlined-label-text-color:var(--ink))); }

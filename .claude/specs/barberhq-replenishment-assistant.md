@@ -1,5 +1,8 @@
 # Spec: BarberHQ replenishment and procedure assistant
 
+> Updated 8 October 2026: the implemented [whole-request/settings contract](../../docs/implementation/shared-contracts.md) and [increment 2b handoff](../../docs/implementation/handoffs/increment-2b.md) supersede earlier single-product, per-row submission and public-threshold descriptions. RAG/AI remain future phases.
+
+
 > Complete a measurable two-unit replenishment and, in a separate use case, retrieve cited instructions for a damaged delivery.
 
 Project overview and document relationships: [master specification](barberhq-master.md). This document owns the detailed application requirements. The [approved design extensions](approved-design-extensions.md) define the deliberately expanded handoff approved on 29 September 2026.
@@ -24,7 +27,7 @@ Do not connect scenario B to the completed, intact delivery in A. Use a separate
 
 ### 2. Replenishment quantities and lifecycle
 
-One SKU per persisted request, integer quantities 1–99, individual retail units. A shared manual/assistant draft can contain several products, each submitted as an independent request with its own lifecycle and retry key. “Send two” means two additional units. No target-stock inference or six-unit pack rounding. Unclear product/quantity means clarification; ambiguous “the matte stuff” offers Matowa, Dry Matt and Cement. Unknown products require clarification; multi-product requests produce editable separate lines. No silent substitutions.
+One persisted request contains 1–6 distinct products, integer quantities 1–99, individual retail units. A shared manual/assistant draft submits one items[] payload with one lifecycle and retry key. All transitions apply to every item; no partial fulfillment. “Send two” means two additional units. No target-stock inference or six-unit pack rounding. Unclear product/quantity means clarification; ambiguous “the matte stuff” offers Matowa, Dry Matt and Cement. Unknown products require clarification; multi-product requests produce editable separate lines. No silent substitutions.
 
 Main product: Pomada Matowa 100 ml, local demo ID `NBS-MATOWA-100`, published code `5905191055165`. The demo ID is invented; net contents are ml, not mass or external dimensions.
 

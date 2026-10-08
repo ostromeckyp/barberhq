@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
@@ -73,4 +74,12 @@ li {
   .layout {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.back-link {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: var(--ink),
+    )
+  );
 }

@@ -90,3 +90,24 @@ Official reference: [Firebase Hosting releases and versions](https://firebase.go
 ## Increment 2 local startup
 
 Use `npm --prefix functions ci` once, then `npm run start:emulators` (Auth, SQL Connect, Functions). Keep that terminal running; run `npm run demo:local` and `npm run start:local` in a second terminal. See [increment 2 handoff](handoffs/increment-2.md) for reset and verification. Older auth/dataconnect-only commands above support the foundation only and cannot execute replenishment actions.
+
+## Increment 2b coordinated local upgrade
+
+Read [the handoff](handoffs/increment-2b.md) and [backup/migration/journal procedure](replenishment-items-upgrade.md) before restarting an existing demo. The preserved state is in `artifacts/replenishment-upgrade/emulators-v2`; v1 remains a rollback artifact. Reconcile any `barberhq.pending.v1` journal before reopening writers. Remove obsolete `lowStockThreshold` from private public-config JSON.
+
+After that gate, stop any existing local emulator launchers and use three terminals from the repository root:
+
+```sh
+# Terminal 1 — matching backend, restored existing data
+npm --prefix functions run build
+npx firebase emulators:start --only auth,dataconnect,functions --project demo-barberhq --import artifacts/replenishment-upgrade/emulators-v2
+
+# Terminal 2 — matching browser build
+npm run configure:emulators
+npm run start:local -- --poll=1000
+
+# Terminal 3 — before stopping, export current state to a NEW directory
+npx firebase emulators:export artifacts/demo-session-YYYYMMDD-HHMM --project demo-barberhq
+```
+
+Use the latest verified export on the next restart, not the original v2 snapshot after new business actions. Existing local credentials stay in `config/demo-accounts.local.json`; no password changes are required. `npm run demo:local` is for missing setup, not a substitute for restoring existing requests/history.

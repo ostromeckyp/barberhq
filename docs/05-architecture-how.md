@@ -1,8 +1,8 @@
 # BarberHQ — how the application will work
 
-**Architecture proposal · updated 29 September 2026 · planning only**
+**Architecture · updated 8 October 2026 · stock/settings implemented locally; AI/RAG and cloud release pending**
 
-The [master specification](../.claude/specs/barberhq-master.md) provides the project overview and document map. This document explains how to implement the [requirements](../.claude/specs/barberhq-replenishment-assistant.md). It does not claim that code, cloud infrastructure, model calls or database transactions have been tested. Product and salon names are real; stock and [procedure documents](synthetic-knowledge/README.md) are demo fixtures.
+The [master specification](../.claude/specs/barberhq-master.md) provides the project overview and document map. This document explains how to implement the [requirements](../.claude/specs/barberhq-replenishment-assistant.md). Local stock/settings evidence is recorded in the [increment 2b handoff](implementation/handoffs/increment-2b.md); cloud infrastructure and AI flows are not yet certified. Product and salon names are real; stock and [procedure documents](synthetic-knowledge/README.md) are demo fixtures.
 
 Implementation is split into [bounded phase specifications](implementation/README.md), with a separate [Firebase setup guide for the presenter](06-firebase-setup-guide.md).
 
@@ -398,3 +398,17 @@ Check every state-table row; verify total stock including in-transit units remai
 Also verify malformed/encrypted/scanned and mixed-content PDFs fail safely; unsupported layout is held for review; unauthorized and revoked PDF access is denied; retries do not republish conflicting bytes; source citations highlight correct regions; HQ upload/replace/delete and concurrent publication preserve access rules; a broken extraction leaves the prior version active.
 
 Four implementation decisions remain deliberately gated: exact compatible package/model versions; deployed region support; the compiled conditional-write expression; and the calibrated retrieval threshold. None changes the agreed business scope. If Firestore Vector becomes mandatory, revise the storage decision explicitly before building; do not add it silently alongside this design.
+
+## Implemented replenishment/settings refinement
+
+```mermaid
+flowchart LR
+  Draft[Angular draft: 1–6 products] -->|one items payload + key| Submit[Callable submitRequest]
+  Submit -->|atomic transaction| Header[Request header + items + active slots]
+  Header --> Approve[Reserve every item]
+  Approve --> Dispatch[Transfer items + HQ movements]
+  Dispatch --> Receive[Exact intact receipt + salon movements]
+  Angular[Angular Settings] -->|authorized version guard| Settings[SalonSettings in PostgreSQL]
+```
+
+All commands apply to the entire request. Partial/damaged receipt makes no stock changes. One movement pair per item proves quantity conservation. History includes rejected requests with original items/reason/time. Settings seed at2, accept0, and survive stock reset. See [current contracts](implementation/shared-contracts.md) for APIs, journal recovery, navigation and table identities.

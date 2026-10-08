@@ -1,5 +1,8 @@
 # BarberHQ — incremental delivery design
 
+> Supersession (8 October 2026): request grouping, recovery journals, salon navigation and settings now follow [the approved whole-request plan](../plans/2026-10-07-replenishment-requests-and-salon-settings.md) and [current contracts](../../implementation/shared-contracts.md). Historical acceptance evidence below is retained; future AI drafts must submit through the current one-request items[] contract.
+
+
 **29 September 2026 · Architectural brainstorming · Written design accepted for implementation planning.**
 
 The user approved the delivery approach and all five increments in conversation. The user subsequently invoked `superpowers:writing-plans` after receiving this document, authorizing the planning transition. The [execution index](../plans/2026-09-29-barberhq-execution-index.md) now links the detailed plans awaiting review. No application code, canonical PDFs or cloud resources have been created by this work.

@@ -1,5 +1,8 @@
 # Spec: BarberHQ — master project specification
 
+> Updated 8 October 2026: the implemented [whole-request/settings contract](../../docs/implementation/shared-contracts.md) and [increment 2b handoff](../../docs/implementation/handoffs/increment-2b.md) supersede earlier single-product, per-row submission and public-threshold descriptions. RAG/AI remain future phases.
+
+
 > Build a small business application that demonstrates measurable salon replenishment and evidence-based procedure guidance in a 20-minute DevFest presentation.
 
 ## Background
@@ -8,7 +11,7 @@
 
 The presentation is **“My Barber Shipped While I Debated Architecture: Agentic AI in minutes with Firebase.”** Its central message is that understanding a business problem produces useful software, while engineering makes its behavior reliable and operable. The application should make that message visible through two small, complete workflows. It is not a production rollout or a claim that inaccessible company procedures have been reproduced.
 
-The user approved the expanded Claude Design scope: multi-product drafts that create independent requests, an HQ-managed PDF library, a low-stock indicator and cited-region highlighting. The [approved design extensions](approved-design-extensions.md) define their behavior and phase ownership.
+The user approved the expanded Claude Design scope: multi-product drafts that create one request containing all items, an HQ-managed PDF library, a low-stock indicator and cited-region highlighting. The [approved design extensions](approved-design-extensions.md) define their behavior and phase ownership.
 
 This is the project entry point. It describes the whole and connects the detailed specifications; agents should load only the details relevant to their assigned phase.
 

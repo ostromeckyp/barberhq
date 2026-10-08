@@ -10,7 +10,7 @@ The four approved additions are multi-product drafts, a document library with HQ
 
 ## Requirements
 
-### 1. One draft, separate requests
+### 1. One draft, one multi-item request (updated 8 October 2026)
 
 Assistant and Manual share an in-memory list. Manual adds one product at a time; Assistant can prepare several. Each resolved row has a stable local line ID, product, integer quantity **1–99**, origin (`assistant` or `manual`), current HQ availability, salon on-hand and a clearly conditional “after full receipt” quantity. No displayed projection changes real stock.
 
@@ -18,9 +18,9 @@ Merge repeated products by adding quantities; keep the row's original origin. A 
 
 `prepareReplenishment` accepts `salonId`, `message` and optional selected clarification fields keyed by line ID. It returns `PROPOSAL | NEEDS_CLARIFICATION | UNAVAILABLE`, with `lines[]` and excluded existing requests. Each line is `READY` or `NEEDS_CLARIFICATION`; ready lines include verified product ID/name, quantity, HQ available, salon on-hand and inventory versions. Clarification lines include original wording, reason and authorized catalog candidates. Server-calculated numbers replace model numbers. The three read tools accept bounded arrays so multi-product preparation fits the existing five-turn/eight-tool-call budget. Do not truncate a longer request silently.
 
-On Submit, snapshot valid rows and call the existing `submitRequest` once per product, sequentially. Each row gets its own stable idempotency key and independent SQL transaction. There is **no batch entity, multi-line persisted request or all-or-nothing batch transaction**. Record each outcome as `CREATED`, `ALREADY_ACTIVE`, `FAILED` or `UNKNOWN` and show links for all confirmed requests. Stop on unknown outcome or session loss, reconcile with the same key, then resume unsent rows. Never resubmit confirmed rows. A rejected validation permits editing only that uncommitted row and then creating a new action key. Persist only pending submission IDs/keys and immutable payloads in session storage for recovery after refresh; clear after reconciliation or sign-out. Ordinary unsent drafts remain memory-only. Recheck authorization on every retry.
+On Submit, snapshot all valid rows and call `submitRequest` once with `items[]` and one stable key. One SQL transaction creates the header, every item, active slots and one receipt. Any item conflict rejects the whole command. Outcomes are CREATED, FAILED or UNKNOWN. Unknown outcomes freeze the payload and reconcile the same key after refresh. Definitive failure keeps the entire draft editable; no confirmed subset exists.
 
-Partial batch success means some independent requests exist; it is not partial fulfillment of one request. Each created request follows its own unchanged approval, dispatch and full-intact receipt lifecycle. The two-unit Matowa scenario remains the stage proof.
+One request has one whole approval, dispatch and full-intact receipt lifecycle. Keep the Matowa two-unit proof plus the three-item 2/3/1 proof. Preserve legacy journals for operator reconciliation before upgrade; do not reinterpret them as format2.
 
 ### 2. Document library and HQ management
 
@@ -48,7 +48,7 @@ Storage still denies direct client reads/writes. The upload proxy writes immutab
 
 ### 3. Low-stock indicator
 
-One shared public demo setting `lowStockThreshold`, default **2**, marks salon on-hand quantities ≤ threshold. It is a static warning icon/chip and subtle row tint, not a reorder target, AI inference or automatic request. Unknown/stale data retains its data-state warning; missing quantities are never interpreted as zero. No per-product threshold table or configuration screen is needed.
+One versioned database `SalonSettings.lowStockThreshold` per salon, initially **2**, marks salon on-hand quantities ≤ threshold. It is a static warning icon/chip and subtle row tint, not a reorder target, AI inference or automatic request. Unknown/stale data retains its data-state warning; missing quantities are never interpreted as zero. The Settings activity edits the salon-wide threshold; no per-product threshold table is needed. Missing settings suppress warning chips and show a setup/read error.
 
 ### 4. Exact cited region in the original PDF
 
@@ -90,7 +90,7 @@ No scope confirmation is needed. Implementation must prove parser/viewport mappi
 
 ## Acceptance Criteria
 
-- [ ] Manual and assistant can prepare three products; each submission creates independent requests with honest per-row outcomes and safe lost-response recovery.
+- [ ] Manual and assistant can prepare three products; each submission creates one request with all items and one outcome and safe lost-response recovery.
 - [ ] Unknown/ambiguous lines block submission; shortage warns without blocking submission; approval still prevents overselling.
 - [ ] Salon can open allowed documents; only HQ can upload, review, replace or delete, including when endpoints are called directly.
 - [ ] Failed/repeated uploads preserve current evidence; concurrent publish/delete cannot revive revoked content or publish incomplete text.

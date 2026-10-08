@@ -88,6 +88,7 @@ export class RequestDetailFacade {
     const identity = this.session.state();
     const outcome = await this.actions.open(r, type);
     if (this.id() !== r.id || this.session.state() !== identity) return;
+    if (!outcome) return;
     if (outcome) {
       this.message.set(
         outcome.error ??

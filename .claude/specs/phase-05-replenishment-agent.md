@@ -1,5 +1,8 @@
 # Spec: Phase 5 — agentic replenishment assistant
 
+> Updated 8 October 2026: the implemented [whole-request/settings contract](../../docs/implementation/shared-contracts.md) and [increment 2b handoff](../../docs/implementation/handoffs/increment-2b.md) supersede earlier single-product, per-row submission and public-threshold descriptions. RAG/AI remain future phases.
+
+
 > Let staff express a stock request naturally and review a proposal backed by live business data.
 
 ## Background
@@ -15,7 +18,7 @@ Read the [approved design extensions](approved-design-extensions.md) for this ph
 1. Implement prepareReplenishment with verified caller scope, runtime schemas, shared usage admission and configured time/turn/tool limits. Expose only findProduct, getStockContext and calculateProposal; inject membership scope from server context, never from model arguments.
 2. Resolve catalog products using exact codes/names/curated aliases; handle ambiguous matte-product wording with explicit choices. Require integer quantities 1–99 per line. Parse multiple products; use bounded array read tools so the same turn/tool budget applies. Read live inventory and active-request information through scoped operations.
 3. Rebuild each final line from validated tool results: product ID/name, quantity, HQ available, salon on-hand and inventory versions. Return line-level clarification and excluded existing requests; never discard unresolved products silently. Return PROPOSAL, NEEDS_CLARIFICATION or UNAVAILABLE. A proposal reserves nothing; never include a model-accessible stock write tool.
-4. Add natural-language input to the shared phase-04 draft, preserving manual corrections and line provenance. On explicit submission use the same per-row submitRequest orchestration as the manual form. Preserve product/quantity correction controls, unknown-outcome retry behavior and manual fallback.
+4. Add natural-language input to the shared phase-04 draft, preserving manual corrections and line provenance. On explicit submission use the same whole-request submitRequest orchestration (one items[] payload and one key) as the manual form. Preserve product/quantity correction controls, unknown-outcome retry behavior and manual fallback.
 5. Show only actual tool events if an activity display is included. Record timing and tool names without logging tokens, personal account data or full prompts by default. Do not fabricate a reasoning trace.
 6. Run focused cases: exact two-unit Matowa request, three-product request, duplicate product merge/overflow, mixed ready/ambiguous lines, ambiguous product, missing/invalid quantity, insufficient stock, existing active request, foreign salon attempt, quota and timeout. Include an instruction attempting to force direct dispatch and prove it cannot write.
 

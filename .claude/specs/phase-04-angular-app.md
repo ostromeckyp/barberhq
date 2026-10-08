@@ -1,5 +1,8 @@
 # Spec: Phase 4 — Angular application and manual workflow
 
+> Updated 8 October 2026: the implemented [whole-request/settings contract](../../docs/implementation/shared-contracts.md) and [increment 2b handoff](../../docs/implementation/handoffs/increment-2b.md) supersede earlier single-product, per-row submission and public-threshold descriptions. RAG/AI remain future phases.
+
+
 > Build the complete authenticated stock workflow and source viewer before introducing AI.
 
 ## Background
@@ -14,7 +17,7 @@ Read the [approved design extensions](approved-design-extensions.md) for this ph
 
 1. Create standalone Angular routes for sign-in, /salons/:salonId, /requests/:requestId, /hq, /procedures (including ?tab=documents) and /procedures/sources/:versionId?page=N&chunk=CHUNK_ID. Use feature-local signals and small SessionService, StockApi, KnowledgeApi and AssistantApi boundaries; defer actual AI integration to phases 5/6.
 2. Integrate configured Firebase Auth and App Check. Resolve membership through SQL Connect after sign-in; show a useful no-access screen for authenticated users without membership. Route guards guide navigation while backend rules enforce access. Provide sign-out and consistent session expiry handling.
-3. Use the generated GraphQL read SDK for products, stock, requests and queue views. Implement a shared manual multi-product draft with quantity 1–99, duplicate merging, active-request exclusion, nonblocking shortage warnings and per-row submission/recovery. Create independent requests via submitRequest; then implement HQ approval/rejection/dispatch and destination full-intact receipt via callable commands. Use stable action idempotency keys through retries and uncertain outcomes.
+3. Use the generated GraphQL read SDK for products, stock, requests and queue views. Implement a shared manual multi-product draft with quantity 1–99, duplicate merging, active-request exclusion, nonblocking shortage warnings and whole-request submission/recovery. Create one request with all items via submitRequest; then implement HQ approval/rejection/dispatch and destination full-intact receipt via callable commands. Use stable action idempotency keys through retries and uncertain outcomes.
 4. Display on-hand, reserved, available, in-transit and received quantities with status/actor timeline. Refresh affected server records after success and on focus/reconnect; include manual Refresh. Do not optimistically change inventory. Stale versions require refreshed review.
 5. Handle loading, empty queue, invalid quantity, insufficient stock, duplicate request, unauthorized scope and unavailable backend. If receipt is short/damaged, explain that the happy path cannot close; link to procedures without adding stock. Maintain the independent damaged-delivery demo scenario.
 6. Implement the private PDF viewer using the authorized endpoint and a compatible PDF.js dependency. Open the cited physical page and transform validated chunk rectangles to the viewport for highlighting; support zoom, rotation and direct deep links. Handle invalid chunk/version combinations and missing geometry explicitly. Show document/version/synthetic or superseded labels, and offer authorized download on preview failure. Clean up temporary object URLs; never expose raw bucket URLs.

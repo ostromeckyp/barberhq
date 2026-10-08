@@ -10,3 +10,9 @@ nav {
   justify-content: flex-end;
   margin-top: 20px;
 }
+app-request-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 20px;
+}

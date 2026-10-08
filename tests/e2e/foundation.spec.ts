@@ -2,10 +2,10 @@ import { test, expect, type Page } from "@playwright/test";
 import { createCloudHarness } from "../support/cloud.ts";
 import { AxeBuilder } from "@axe-core/playwright";
 let h: Awaited<ReturnType<typeof createCloudHarness>>;
-test.beforeAll(async () => {
+test.beforeEach(async () => {
   h = await createCloudHarness("browser");
 });
-test.afterAll(async () => {
+test.afterEach(async () => {
   if (h) await h.dispose();
 });
 async function login(page: Page, role: "legnicka" | "unassigned" = "legnicka") {

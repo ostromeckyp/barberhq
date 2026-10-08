@@ -1,5 +1,8 @@
 # Spec: Phase 2 — Firebase and GraphQL backend
 
+> Updated 8 October 2026: the implemented [whole-request/settings contract](../../docs/implementation/shared-contracts.md) and [increment 2b handoff](../../docs/implementation/handoffs/increment-2b.md) supersede earlier single-product, per-row submission and public-threshold descriptions. RAG/AI remain future phases.
+
+
 > Provide an authenticated, transactional backend that can complete the stock workflow without AI.
 
 ## Background
