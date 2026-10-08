@@ -18,6 +18,7 @@ function setup() {
   const params = new BehaviorSubject(convertToParamMap({ salonId: 'a' }));
   const get = vi.fn().mockResolvedValue(setting()),
     save = vi.fn();
+  const refreshTick = signal(0);
   const state = signal({
     status: 'READY',
     membership: { userId: 'u', businessId: 'b', role: 'SALON', salonIds: ['a', 'b'] },
@@ -27,7 +28,7 @@ function setup() {
       SalonSettingsFacade,
       { provide: ActivatedRoute, useValue: { paramMap: params } },
       { provide: SessionFacade, useValue: { state } },
-      { provide: BrowserActivity, useValue: { refreshTick: signal(0) } },
+      { provide: BrowserActivity, useValue: { refreshTick } },
       { provide: SalonSettingsApi, useValue: { get, save, revision: signal(0) } },
     ],
   });
@@ -37,7 +38,7 @@ function setup() {
     await TestBed.inject(ApplicationRef).whenStable();
     TestBed.tick();
   };
-  return { params, get, save, state, facade, settle };
+  return { params, get, save, state, refreshTick, facade, settle };
 }
 it('loads_authoritative_value_and_preserves_edits_after_stale_save', async () => {
   const h = setup();
@@ -71,6 +72,76 @@ it('reconciles_unknown_save_without_claiming_confirmation_from_matching_values',
   expect(h.facade.version()).toBe(2);
   expect(h.facade.error()).toContain('not confirmed');
   expect(h.facade.canSave()).toBe(true);
+  h.save.mockResolvedValue(undefined);
+  await h.facade.save();
+  expect(h.save).toHaveBeenLastCalledWith({
+    salonId: 'a',
+    lowStockThreshold: 4,
+    expectedVersion: 2,
+  });
+  expect(h.facade.saved()).toBe(true);
+});
+it('blocks_a_dirty_draft_when_a_background_refresh_finds_a_newer_version', async () => {
+  const h = setup();
+  await h.settle();
+  h.facade.model.set({ lowStockThreshold: 4 });
+  h.get.mockResolvedValue(setting('a', 8, 2));
+  h.refreshTick.update((v) => v + 1);
+  TestBed.tick();
+  await h.settle();
+  expect(h.facade.model().lowStockThreshold).toBe(4);
+  expect(h.facade.version()).toBe(2);
+  expect(h.facade.stale()).toBe(true);
+  expect(h.facade.error()).toContain('changed elsewhere');
+  expect(h.facade.canSave()).toBe(false);
+  await h.facade.save();
+  expect(h.save).not.toHaveBeenCalled();
+});
+it('requires_review_when_a_pristine_form_refreshes_to_a_newer_version', async () => {
+  const h = setup();
+  await h.settle();
+  h.get.mockResolvedValue(setting('a', 8, 2));
+  h.refreshTick.update((v) => v + 1);
+  TestBed.tick();
+  await h.settle();
+  expect(h.facade.model().lowStockThreshold).toBe(2);
+  expect(h.facade.version()).toBe(2);
+  expect(h.facade.stale()).toBe(true);
+  expect(h.facade.canSave()).toBe(false);
+  h.facade.reload();
+  TestBed.tick();
+  await h.settle();
+  expect(h.facade.model().lowStockThreshold).toBe(8);
+  expect(h.facade.canSave()).toBe(true);
+});
+it('requires_explicit_reload_after_an_unknown_save_reads_a_different_value', async () => {
+  const h = setup();
+  await h.settle();
+  h.facade.model.set({ lowStockThreshold: 4 });
+  h.save.mockRejectedValue(new SettingsSaveError('UNKNOWN'));
+  h.get.mockResolvedValue(setting('a', 8, 2));
+  await h.facade.save();
+  TestBed.tick();
+  await h.settle();
+  expect(h.facade.model().lowStockThreshold).toBe(4);
+  expect(h.facade.version()).toBe(2);
+  expect(h.facade.stale()).toBe(true);
+  expect(h.facade.error()).toContain('Current server threshold: 8');
+  expect(h.facade.canSave()).toBe(false);
+  await h.facade.save();
+  expect(h.save).toHaveBeenCalledTimes(1);
+  h.facade.reload();
+  TestBed.tick();
+  await h.settle();
+  expect(h.facade.model().lowStockThreshold).toBe(8);
+  expect(h.facade.version()).toBe(2);
+  h.save.mockResolvedValue(undefined);
+  await h.facade.save();
+  expect(h.save).toHaveBeenLastCalledWith({
+    salonId: 'a',
+    lowStockThreshold: 8,
+    expectedVersion: 2,
+  });
 });
 it('discards_previous_salon_save_and_load_completion', async () => {
   const h = setup();

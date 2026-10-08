@@ -61,7 +61,7 @@ All model calls run on the server. Neither AI flow can call a stock mutation. Th
 | Read-only damaged-delivery scenario | Demonstrates RAG without inventing a claims/replacement system |
 | No persistent chat history in the MVP | Each request/question is bounded; fewer records and less hidden conversational context |
 
-SQL Connect exposes deployed operations and generated SDKs, supports transactional mutations, and provides vector similarity search. These capabilities support the design; the specific operations below still need compilation and concurrency testing. [Web SDK](https://firebase.google.com/docs/sql-connect/web-sdk), [mutations](https://firebase.google.com/docs/sql-connect/mutations-guide), [vector search](https://firebase.google.com/docs/sql-connect/solutions-vector-similarity-search).
+SQL Connect exposes deployed operations and generated SDKs, supports transactional mutations, and provides vector similarity search. Stock/settings operations and their atomicity/concurrency behavior are verified locally against the emulator; deployed cloud schema, operations and concurrency still require release verification. Knowledge/vector operations remain future work. [Web SDK](https://firebase.google.com/docs/sql-connect/web-sdk), [mutations](https://firebase.google.com/docs/sql-connect/mutations-guide), [vector search](https://firebase.google.com/docs/sql-connect/solutions-vector-similarity-search).
 
 ## 3. Angular structure and state
 
@@ -69,8 +69,10 @@ The first increment is implemented in `web/`, with Angular/CLI 22.2.0 and Materi
 
 | Route | Responsibility |
 |---|---|
-| `/salons/:salonId` | Stock list/low-stock marker, shared multi-product draft, active transfers |
-| `/requests/:requestId` | Quantity, action buttons and status timeline |
+| `/salons/:salonId` | Dashboard: stock list/low-stock marker, shared multi-product draft, active transfers |
+| `/salons/:salonId/requests` | Requests: All, Active, Received and Rejected history, filtered by the server before pagination |
+| `/salons/:salonId/settings` | Salon-specific low-stock threshold |
+| `/requests/:requestId` | Quantity/items, action buttons and status timeline |
 | `/hq` | Pending approvals and reserved transfers ready for dispatch |
 | `/procedures` | Question input, guidance and cited source sections |
 | `/procedures?tab=documents` | Salon read-only library; HQ upload/review/replace/delete |
@@ -82,7 +84,9 @@ The server is authoritative. After a successful stock command, reload the reques
 
 Route guards improve navigation but never constitute authorization. Use accessible labels, keyboard-operable dialogs, large numerical stock cards and live status announcements. Show source content as escaped text or sanitized Markdown; never render document HTML directly.
 
-The proposal is an in-memory UI draft. `DRAFT` in the requirements is a presentation state; persisted requests begin at `PENDING_APPROVAL`. Refreshing before submission loses the draft, but does not create an orphan request. Preserve only pending submitted payloads/keys in session storage until reconciliation, as specified in the approved extensions. A shared list is submitted through independent per-product commands; its partial-success UI does not change backend request states. Low-stock is a display rule with one configured threshold (default 2), not automatic replenishment.
+The proposal is an in-memory UI draft. `DRAFT` in the requirements is a presentation state; persisted requests begin at `PENDING_APPROVAL`. A draft contains 1–6 unique products, each with an integer quantity from 1–99, and submits as one immutable request payload with one idempotency key. Refreshing before submission loses the draft, but does not create an orphan request. Preserve only pending submitted payloads/keys in session storage until reconciliation, as specified in the approved extensions. Approval, dispatch and receipt are atomic across every request item; no partial lifecycle transition is allowed. Low-stock is a display rule using the salon's versioned `SalonSettings.lowStockThreshold`, default 2; it does not trigger replenishment.
+
+The salon navigation is Dashboard, Requests and Settings. Detail return context is bounded and authorized (`safeBack`); a direct link falls back to that salon's All requests list or the HQ queue. The topbar owns salon selection.
 
 ## 4. Interfaces and ownership
 
@@ -90,7 +94,7 @@ Names below describe application contracts, not pre-existing SDK methods. Define
 
 ### Read operations
 
-`GetMyMembership`, `ListProducts`, `GetSalonInventory`, `ListActiveRequests`, `GetRequestDetail`, `ListHQQueue`, `GetSourceSection`, `ListKnowledgeDocuments` and HQ-only `GetKnowledgeReview` are deployed scoped operations. Paginate lists, initially 50 rows. Do not expose unrestricted inventory or document listing to authenticated users.
+`GetMyMembership`, `ListProducts`, `GetSalonInventory`, `ListActiveRequests`, `GetRequestDetail`, `ListHQQueue`, `ListSalonRequests`, `GetSalonSettings`, `GetSourceSection`, `ListKnowledgeDocuments` and HQ-only `GetKnowledgeReview` are scoped operations. Paginate lists, initially 50 rows. Do not expose unrestricted inventory or document listing to authenticated users.
 
 The browser uses Firebase identity directly for these operations. Server read tools should impersonate the verified caller where supported, preserving operation-level scope checks. The Admin SDK supports privileged access and impersonation; unrestricted use is not a replacement for authorization. [Admin SDK](https://firebase.google.com/docs/sql-connect/admin-sdk)
 
@@ -111,13 +115,13 @@ Use Genkit flows behind Firebase callable functions, with verified Auth and App 
 
 | Command | Input beyond idempotency key | Authorized actor |
 |---|---|---|
-| `submitRequest` | salon/product IDs, integer quantity | Staff assigned to destination salon |
+| `submitRequest` | salon ID, `items: {productId, quantity}[]` (1–6 unique products; each quantity 1–99) | Staff assigned to destination salon |
 | `approveRequest` | request ID, expected request and HQ inventory versions | HQ |
 | `rejectRequest` | request ID, expected request revision | HQ |
 | `dispatchTransfer` | request ID, expected revision | HQ |
-| `receiveTransfer` | request ID, expected revision, received quantity, `allIntact: true` | Staff assigned to destination salon |
+| `receiveTransfer` | request ID, expected revision, complete `items: {productId, receivedQuantity}[]` set, `allIntact: true` | Staff assigned to destination salon |
 
-Return `{actionReceiptId, requestId, state, revision, replayed}`. Actor, role, business and timestamps are never accepted from the client as facts. The receipt quantity must equal the stored dispatched quantity. A damage/missing-item response stops this happy path and opens guidance; it does not increment saleable stock.
+Return `{actionReceiptId, requestId, state, revision, replayed}`. Actor, role, business and timestamps are never accepted from the client as facts. The complete receipt item set and each received quantity must match the stored dispatched items. A damage/missing-item response stops this happy path and opens guidance; it does not increment saleable stock.
 
 ### Document commands
 
@@ -134,10 +138,13 @@ All domain keys include or are checked against `businessId`; never allow a cross
 | `Membership` / `SalonAccess` | User/business role and allowed locations; operator-maintained |
 | `Location` / `Product` | Locations and six catalog products; published code stored as string; local demo ID separate |
 | `Inventory` | Unique business/location/product; `onHand`, `reserved`, `version`; nonnegative and reserved ≤ onHand |
-| `ReplenishmentRequest` | Salon/product/quantity; lifecycle state and revision; actor/time fields |
+| `ReplenishmentRequest` | Request header with business, salon, lifecycle state, revision and creation time; no actor fields |
+| `RequestItem` | 1–6 unique products per request and requested quantity; stable item identity |
 | `ActiveRequest` | Unique business/salon/product slot referencing the current open request |
-| `Transfer` | Unique request reference; warehouse/destination/product/quantity; dispatch and receipt quantities/times |
-| `StockMovement` | Unique transfer/movement-type; `DISPATCH` or `RECEIPT`, quantity, actor/time |
+| `Transfer` | Header keyed by and referencing the request; business, warehouse and destination |
+| `TransferItem` | Item-level request-item link, quantity, dispatched quantity and received quantity |
+| `StockMovement` | Unique transfer-item/type; `DISPATCH` or `RECEIPT`, quantity, actor/time |
+| `SalonSettings` | One versioned low-stock threshold per salon; default 2 |
 | `ActionReceipt` | Unique original business/actor/idempotency-key and unique request/action; payload hash and immutable committed result |
 | `ActionKey` | Unique business/actor/idempotency-key, including semantic retry aliases; binds payload hash to the original ActionReceipt |
 | `KnowledgeDocument` | Stable business/document ID; pointer to active version and publication revision |
@@ -149,7 +156,7 @@ All domain keys include or are checked against `businessId`; never allow a cross
 
 `ActiveRequest` is a small uniqueness guard, not a queue: insert it with submission, remove it only on rejection or completed receipt, in the same transaction. A competing submission gets the existing request instead of a second open workflow. This avoids relying on a client-side “does a request exist?” check.
 
-The request is the canonical lifecycle record. If transfer state is materialized for convenience, change it in the same transaction and enforce consistency. `inTransit` is derived from dispatched transfers whose receipt is incomplete; do not maintain another stock counter for it. StockMovement is an audit record, not an event-sourcing architecture.
+The request is the canonical lifecycle record; its state and revision define transfer lifecycle. Transfer holds routing identity, while TransferItem holds item quantities. Action actors and action timestamps are recorded in `ActionReceipt`; movement actors and timestamps are recorded in `StockMovement`. `inTransit` is derived from dispatched quantities not yet received; do not maintain another stock counter for it. StockMovement is an audit record, not an event-sourcing architecture.
 
 Add ordinary indexes for inventory keys, queue state/time, request salon/time and chunk version IDs. The tiny corpus can use exact vector search; approximate indexes and search infrastructure are unnecessary until measurement justifies them. Do not implement unverified schema syntax from this table; inspect generated types and compile operations during implementation.
 
@@ -178,14 +185,14 @@ stateDiagram-v2
 
 Every command executes one deployed transactional mutation. Recheck membership and entity business scope within the mutation, in addition to callable validation. Browser-visible operations use Auth-derived identity. Server-only command mutations use `NO_ACCESS`; the callable supplies actor identity from its verified token, never from the browser payload, and the mutation validates membership for that actor. Client traffic must not be able to invoke these mutations directly. [SQL Connect authorization](https://firebase.google.com/docs/sql-connect/authorization-and-security)
 
-1. Look up the idempotency receipt within the caller's permitted scope. Same key and payload means return the stored result; different payload means `IDEMPOTENCY_CONFLICT`.
+1. Validate the complete request item set (1–6 unique product IDs, quantities 1–99), then look up the idempotency receipt within the caller's permitted scope. Same key and payload means return the stored result; different payload means `IDEMPOTENCY_CONFLICT`.
 2. Read the stored request, inventory and current versions; validate role, business, state and quantities.
 3. Update the lifecycle row with a predicate matching its ID, expected state and revision. Increment revision; require exactly one affected row.
 4. Update inventory using an expected-version predicate; use validated arithmetic. Require exactly one affected row for every affected inventory record.
 5. Insert any transfer/movement records and the action receipt; update/remove the active-request slot as required.
 6. Commit everything together. Any failed check rolls back all writes.
 
-**Approve:** require available units ≥ quantity; increase reserved. **Dispatch:** require the transfer's reservation still exists; decrease both onHand and reserved, create the unique dispatch movement. **Receive:** require dispatched state and full intact quantity; increase destination onHand, create the unique receipt movement and close the active slot. **Reject:** pending only, release the active slot without touching stock.
+**Approve:** validate availability for every item and reserve all items in one transaction. **Dispatch:** require every reservation still exists; decrease HQ `onHand` and `reserved` for every item, create each unique transfer-item dispatch movement, and commit all items together. **Receive:** require the complete item set and full intact quantity for every item; increase destination `onHand` for all items, create each unique transfer-item receipt movement and close the active slot in one transaction. Any incomplete or damaged receipt leaves the entire request dispatched with no stock changes. **Reject:** pending only, release the active slots without touching stock.
 
 Use compare-and-set updates: compute the new value from a read version, then update only if that version still matches. Do not rely on separate read/check/write calls without conditional predicates. A racing action fails and is re-reviewed. The implementation gate must prove the operation's behavior against the deployed database, not merely a mocked repository.
 
@@ -388,7 +395,7 @@ Public settings are compiled into Angular; backend secrets stay with functions/p
 | 1. Data and PDFs | Six-product fixtures and five reviewed PDFs | Labels, provenance, hashes and extraction verified |
 | 2. Backend | Scoped GraphQL and guarded stock commands | Concurrent approval and duplicate receipt cannot corrupt stock |
 | 3. Seed and ingest | SQL fixtures, shared worker, private originals, text/geometry/vectors | Reviewed retryable publication; retired/foreign/revoked content excluded |
-| 4. Angular | Manual batch/HQ/receipt, document library and highlighted viewer | Exact 18 → 16 and 2 → 4 without Gemini; independent batch retries and document permissions pass |
+| 4. Angular | Manual multi-item request/HQ/receipt, settings, document library and highlighted viewer | Exact 18 → 16 and 2 → 4 without Gemini; whole-request replay and document permissions pass |
 | 5. Replenishment agent | Multi-product interpretation and bounded array read tools | Valid request and ambiguity cases pass; AI cannot mutate stock |
 | 6. Procedure RAG | Filtered retrieval and cited answers | Corpus positive/negative cases and page citations pass |
 | 7. Stage readiness | Deployment, reset and timed rehearsal | Both scenarios complete within six minutes repeatedly |
@@ -411,4 +418,4 @@ flowchart LR
   Angular[Angular Settings] -->|authorized version guard| Settings[SalonSettings in PostgreSQL]
 ```
 
-All commands apply to the entire request. Partial/damaged receipt makes no stock changes. One movement pair per item proves quantity conservation. History includes rejected requests with original items/reason/time. Settings seed at2, accept0, and survive stock reset. See [current contracts](implementation/shared-contracts.md) for APIs, journal recovery, navigation and table identities.
+All commands apply to the entire request. Partial/damaged receipt makes no stock changes. Each `TransferItem` has one unique `StockMovement` per movement type, proving quantity conservation. History includes rejected requests with original items/reason/time. Versioned salon settings seed at 2, accept values from 0 through 2147483647, and survive stock reset. Stock and settings are locally verified; cloud deployment/migration and RAG remain pending. See [current contracts](implementation/shared-contracts.md) for APIs, journal recovery, navigation and table identities.

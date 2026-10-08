@@ -15,7 +15,7 @@ Updated 8 October 2026. Implemented locally on `codex/foundation` using the appr
 | Check | Result |
 |---|---|
 | `npm test` | 38 tests pass |
-| `npm run test:web` | 36 tests pass |
+| `npm run test:web` | 39 tests pass, including final review regressions |
 | `npm run typecheck` | Pass |
 | `BARBERHQ_TEST_MODE=emulator npm run test:integration` | 30 tests pass |
 | Browser suite | 11 scenarios verified; full pass initially found one contrast issue, affected foundation scenarios rerun after correction |
@@ -23,6 +23,8 @@ Updated 8 October 2026. Implemented locally on `codex/foundation` using the appr
 | `npm run build:emulator` | Pass; public artifact inspection passes. Existing initial budget warning ~544kB vs500kB remains |
 
 Browser evidence covers single-product 18→16 / 2→4, three-item quantities2/3/1 with HQ16/15/17 and salon4/5/3, six movements, one request/timeline, blocked damaged receipt, committed lost-response recovery with one key, rejection history/back context, settings isolation, 320/360/1280px and Axe/keyboard/dialog cancellation focus. Every test uses its own isolated business fixture. Screenshots are under ignored `artifacts/`.
+
+Final independent review found one settings concurrency issue: a background read could advance the write version while retaining an older draft. The fix binds the draft to its reviewed version, preserves edits, displays a differing server threshold and blocks saving until explicit reload. Regressions cover dirty/pristine focus refresh and differing UNKNOWN recovery; a matching recovery read does not falsely confirm a save. Both settings browser scenarios passed again after the fix. Implementation fixes and documentation cleanup were delegated to GPT-6 Luna as requested; the parent reviewed the diff and independently verified the affected suites and build.
 
 ## Migration and current runtime
 

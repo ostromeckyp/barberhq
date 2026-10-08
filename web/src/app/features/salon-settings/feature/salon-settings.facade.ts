@@ -21,6 +21,7 @@ interface SaveState {
   phase: 'IDLE' | 'SAVING' | 'SAVED' | 'STALE' | 'UNKNOWN' | 'ERROR';
   message: string;
   readEpoch: number;
+  value?: number;
 }
 @Service({ autoProvided: false })
 export class SalonSettingsFacade {
@@ -69,8 +70,49 @@ export class SalonSettingsFacade {
           : undefined;
     },
   });
+  private readonly status = linkedSignal({
+    source: this.scope,
+    computation: (): SaveState => ({ phase: 'IDLE', message: '', readEpoch: 0 }),
+  });
+  private readonly draftVersion = linkedSignal({
+    source: () => ({
+      scope: this.scope(),
+      snapshot: this.snapshot(),
+      resetEpoch: this.resetEpoch(),
+      status: this.status(),
+    }),
+    computation: (s, previous): number | undefined => {
+      if (!s.scope) return undefined;
+      if (!previous || previous.source.scope !== s.scope)
+        return s.snapshot?.settings.version;
+      if (s.snapshot && previous.value === undefined) return s.snapshot.settings.version;
+      if (
+        s.snapshot?.resetEpoch === s.resetEpoch &&
+        previous.source.snapshot?.resetEpoch !== s.resetEpoch
+      )
+        return s.snapshot.settings.version;
+      if (previous.source.resetEpoch !== s.resetEpoch) {
+        return s.snapshot?.resetEpoch === s.resetEpoch
+          ? s.snapshot.settings.version
+          : previous.value;
+      }
+      const reconciledSave = s.status.phase === 'UNKNOWN' || s.status.phase === 'SAVED';
+      if (
+        reconciledSave &&
+        s.snapshot &&
+        s.snapshot.readEpoch > s.status.readEpoch &&
+        s.snapshot.settings.lowStockThreshold === s.status.value
+      )
+        return s.snapshot.settings.version;
+      return previous.value;
+    },
+  });
   readonly model = linkedSignal({
-    source: () => ({ scope: this.scope(), snapshot: this.snapshot() }),
+    source: () => ({
+      scope: this.scope(),
+      snapshot: this.snapshot(),
+      draftVersion: this.draftVersion(),
+    }),
     computation: (s, previous): { lowStockThreshold: number } => {
       if (!s.scope) return { lowStockThreshold: 0 };
       if (
@@ -82,28 +124,34 @@ export class SalonSettingsFacade {
       return { lowStockThreshold: s.snapshot?.settings.lowStockThreshold ?? 0 };
     },
   });
-  private readonly status = linkedSignal({
-    source: this.scope,
-    computation: (): SaveState => ({ phase: 'IDLE', message: '', readEpoch: 0 }),
-  });
   readonly version = computed(() => this.snapshot()?.settings.version);
+  private readonly draftNeedsReview = computed(
+    () =>
+      this.draftVersion() !== undefined &&
+      this.version() !== undefined &&
+      this.draftVersion() !== this.version(),
+  );
   readonly loading = this.record.isLoading;
   readonly saving = computed(() => this.status().phase === 'SAVING');
   readonly saved = computed(() => this.status().phase === 'SAVED');
-  readonly stale = computed(() => this.status().phase === 'STALE');
-  readonly error = computed(
-    () =>
+  readonly stale = computed(() => this.status().phase === 'STALE' || this.draftNeedsReview());
+  readonly error = computed(() => {
+    if (this.draftNeedsReview())
+      return `Settings changed elsewhere. Current server threshold: ${this.snapshot()?.settings.lowStockThreshold}. Reload and review before saving.`;
+    return (
       this.status().message ||
       (this.record.error()
         ? 'Settings unavailable. Retry or contact HQ.'
         : !this.scope()
           ? 'Access denied.'
-          : ''),
-  );
+          : '')
+    );
+  });
   readonly canSave = computed(
     () =>
       !!this.scope() &&
       this.version() !== undefined &&
+      !this.draftNeedsReview() &&
       !this.loading() &&
       !this.record.error() &&
       !this.saving() &&
@@ -128,15 +176,21 @@ export class SalonSettingsFacade {
     const scope = this.scope();
     if (!scope || !this.canSave()) return;
     const readEpoch = this.readEpoch();
-    this.status.set({ phase: 'SAVING', message: '', readEpoch });
+    const value = this.model().lowStockThreshold;
+    this.status.set({
+      phase: 'SAVING',
+      message: '',
+      readEpoch,
+      value,
+    });
     try {
       await this.api.save({
         salonId: scope.salonId,
-        lowStockThreshold: this.model().lowStockThreshold,
-        expectedVersion: this.version()!,
+        lowStockThreshold: value,
+        expectedVersion: this.draftVersion()!,
       });
       if (this.scope() !== scope) return;
-      this.status.set({ phase: 'SAVED', message: '', readEpoch });
+      this.status.set({ phase: 'SAVED', message: '', readEpoch, value });
       this.readEpoch.update((v) => v + 1);
     } catch (error) {
       if (this.scope() !== scope) return;
@@ -152,6 +206,7 @@ export class SalonSettingsFacade {
                 ? 'Access denied.'
                 : 'Setting was rejected. Review the value.',
         readEpoch,
+        value,
       });
       if (code === 'UNKNOWN') this.readEpoch.update((v) => v + 1);
     }
