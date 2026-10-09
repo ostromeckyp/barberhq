@@ -18,6 +18,8 @@ Implementation of the two UI slices was delegated to GPT-6 Luna; the parent revi
 
 ## Mobile FAB and sheet polish
 
-Request products now uses Material Extended FAB, fixed at the lower right with safe-area insets and bottom content clearance. The existing draft count is white/red for contrast. The mobile sheet has 28px upper corners, square lower corners and a centered decorative handle. Native vertical scrolling is retained; the handle does not add swipe gestures. The focused browser suite verifies preserved draft/submission behavior, populated FAB contrast and unobscured history navigation at 320px. FAB and sheet screenshots were visually inspected.
+Request products now uses Material Extended FAB, fixed at the lower right with safe-area insets and bottom content clearance. The existing draft count is white/red for contrast. The mobile sheet has 1rem upper corners, square lower corners and a centered decorative handle. Native vertical scrolling is retained; the handle does not add swipe gestures. The focused browser suite verifies preserved draft/submission behavior, populated FAB contrast and unobscured history navigation at 320px. FAB and sheet screenshots were visually inspected.
 
 Final FAB check: focused browser tests 2/2 and emulator Hosting build passed; 46 public files. Initial bundle warning 546.76/500 kB. Evidence: `artifacts/responsive-ui/fab-*`.
+
+Radius correction: Material attaches `panelClass` to the CDK overlay pane. Target `.request-products-sheet mat-bottom-sheet-container` so the radius reaches the actual panel. Direct Chromium inspection verified upper corners 16px, lower corners 0px and overflow-y auto; the previous same-element selector returned 0px. Emulator Hosting build passed with the existing bundle warning (546.73/500 kB). Evidence: `artifacts/responsive-ui/sheet-radius-*`.

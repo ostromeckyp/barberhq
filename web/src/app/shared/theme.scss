@@ -1,16 +1,12 @@
 @use './styles/tokens';
 @use '@angular/material' as mat;
-.request-products-sheet {
+.request-products-sheet mat-bottom-sheet-container {
+  border-radius: 1rem 1rem 0 0;
   @include mat.bottom-sheet-overrides(
     (
       container-background-color: tokens.$surface,
     )
   );
-}
-@media (max-width: 759px) {
-  .request-products-sheet {
-    border-radius: 28px 28px 0 0;
-  }
 }
 html {
   @include mat.theme(
