@@ -135,6 +135,7 @@ test("workspace_switch_drives_menu_request_actions_and_hq_receipt_without_impers
   await page.goto(`/requests/${id}`);
   await expect(page).toHaveURL(`/hq/requests/${id}`);
   for (const path of [`/salons/${h.legnickaId}/requests`, "/hq/stock"]) {
+    await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(path);
     await expect(page.getByRole("table")).toBeVisible();
     for (const width of [1280, 360, 320]) {

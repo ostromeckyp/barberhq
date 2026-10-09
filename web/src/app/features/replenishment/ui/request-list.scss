@@ -1,0 +1,167 @@
+@use '../../../shared/styles/compact-records' as compact-records;
+
+@include compact-records.list;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.compact-record {
+  padding-inline: 0;
+}
+
+.record-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.record-heading .compact-title {
+  flex: 1 1 100%;
+}
+
+.record-heading app-status-chip {
+  display: block;
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.compact-meta {
+  margin: 4px 0 0;
+}
+
+.compact-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.compact-metrics dd {
+  font-size: 16px;
+}
+
+.unit {
+  font-size: 12px;
+}
+
+.product-summary {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.product-summary span {
+  display: block;
+}
+
+.more-items {
+  font-size: 12px;
+}
+
+.compact-actions a {
+  min-height: 48px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  border-radius: 8px;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+table {
+  width: 100%;
+  min-width: 760px;
+  table-layout: fixed;
+  background: var(--surface);
+}
+
+.mat-column-request {
+  width: 42%;
+}
+
+.mat-column-quantity {
+  width: 13%;
+}
+
+.mat-column-status {
+  width: 27%;
+}
+
+.mat-column-action {
+  width: 18%;
+}
+
+.mat-mdc-header-cell {
+  background: var(--table-header);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+td,
+th {
+  padding: 10px 16px;
+  border-bottom-color: var(--divider);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+td strong,
+td small {
+  display: block;
+}
+
+td strong {
+  font-weight: 600;
+}
+
+td small,
+.empty {
+  color: var(--muted);
+}
+
+.items {
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  margin-top: 4px;
+}
+
+.quantity-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.quantity {
+  font: 20px var(--font-mono);
+}
+
+.quantity-cell small {
+  display: inline;
+  margin-left: 4px;
+  font: 12px var(--font-mono);
+}
+
+.empty {
+  margin: 0;
+  padding: 18px 0;
+}
+
+@media (max-width: 500px) {
+  td,
+  th {
+    padding: 10px 12px;
+  }
+}

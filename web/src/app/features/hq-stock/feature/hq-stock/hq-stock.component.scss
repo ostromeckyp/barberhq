@@ -1,3 +1,6 @@
+@use '../../../../shared/styles/compact-records' as compact;
+@include compact.list;
+
 :host {
   display: block;
   min-width: 0;

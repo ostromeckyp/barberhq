@@ -1,0 +1,51 @@
+// Shared structure for compact records; feature templates own labels and actions.
+@mixin list {
+  .compact-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .compact-record {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--divider);
+    min-width: 0;
+    background: var(--surface);
+  }
+  .compact-record:last-child {
+    border-bottom: 0;
+  }
+  .compact-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .compact-meta {
+    color: var(--muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .compact-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 12px 0 0;
+  }
+  .compact-metrics dt {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .compact-metrics dd {
+    margin: 2px 0 0;
+    font: 18px var(--font-mono);
+    overflow-wrap: anywhere;
+  }
+  .compact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+  }
+}

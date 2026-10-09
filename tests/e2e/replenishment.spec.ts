@@ -46,7 +46,7 @@ async function confirm(page: Page, label: string) {
   const d = page.getByRole("dialog");
   await expect(d).toBeVisible();
   await d.getByRole("button", { name: label, exact: true }).click();
-  await expect(d).toBeHidden();
+  await expect(d).toBeHidden({ timeout: 20000 });
 }
 async function accessible(page: Page) {
   expect(

@@ -19,35 +19,60 @@
 }
 @if (facade.rows().length) {
   <section class="card">
-    <div class="table-scroll" role="region" aria-label="HQ stock table" tabindex="0">
-      <table mat-table [dataSource]="facade.rows()" aria-label="HQ stock">
-        <ng-container matColumnDef="product">
-          <th mat-header-cell *matHeaderCellDef>Product</th>
-          <td mat-cell *matCellDef="let row">
-            <strong>{{ row.name }}</strong
-            ><small>{{ row.netContentMl }} ml</small>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="onHand">
-          <th mat-header-cell *matHeaderCellDef>On hand</th>
-          <td mat-cell *matCellDef="let row" class="quantity">{{ row.onHand }}</td>
-        </ng-container>
-        <ng-container matColumnDef="reserved">
-          <th mat-header-cell *matHeaderCellDef>Reserved</th>
-          <td mat-cell *matCellDef="let row" class="quantity">{{ row.reserved }}</td>
-        </ng-container>
-        <ng-container matColumnDef="available">
-          <th mat-header-cell *matHeaderCellDef>Available</th>
-          <td mat-cell *matCellDef="let row" class="quantity">{{ row.available }}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="columns"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: columns"
-          [attr.data-testid]="'hq-stock-' + row.demoId"
-        ></tr>
-      </table>
-    </div>
+    @if (responsiveLayout.compact()) {
+      <ul class="compact-list" aria-label="HQ stock">
+        @for (row of facade.rows(); track row.productId) {
+          <li class="compact-record" [attr.data-testid]="'hq-stock-' + row.demoId">
+            <h2 class="compact-title">{{ row.name }}</h2>
+            <div class="compact-meta">{{ row.netContentMl }} ml</div>
+            <dl class="compact-metrics">
+              <div>
+                <dt>On hand</dt>
+                <dd>{{ row.onHand }}</dd>
+              </div>
+              <div>
+                <dt>Reserved</dt>
+                <dd>{{ row.reserved }}</dd>
+              </div>
+              <div>
+                <dt>Available</dt>
+                <dd>{{ row.available }}</dd>
+              </div>
+            </dl>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="table-scroll" role="region" aria-label="HQ stock table" tabindex="0">
+        <table mat-table [dataSource]="facade.rows()" aria-label="HQ stock">
+          <ng-container matColumnDef="product">
+            <th mat-header-cell *matHeaderCellDef>Product</th>
+            <td mat-cell *matCellDef="let row">
+              <strong>{{ row.name }}</strong
+              ><small>{{ row.netContentMl }} ml</small>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="onHand">
+            <th mat-header-cell *matHeaderCellDef>On hand</th>
+            <td mat-cell *matCellDef="let row" class="quantity">{{ row.onHand }}</td>
+          </ng-container>
+          <ng-container matColumnDef="reserved">
+            <th mat-header-cell *matHeaderCellDef>Reserved</th>
+            <td mat-cell *matCellDef="let row" class="quantity">{{ row.reserved }}</td>
+          </ng-container>
+          <ng-container matColumnDef="available">
+            <th mat-header-cell *matHeaderCellDef>Available</th>
+            <td mat-cell *matCellDef="let row" class="quantity">{{ row.available }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: columns"
+            [attr.data-testid]="'hq-stock-' + row.demoId"
+          ></tr>
+        </table>
+      </div>
+    }
     <p>Synthetic demo quantities · Units in pieces</p>
   </section>
 }

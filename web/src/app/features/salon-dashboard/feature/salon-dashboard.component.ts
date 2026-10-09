@@ -1,5 +1,3 @@
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { toSignal } from '@angular/core/rxjs-interop';
 import {
   Component,
   DestroyRef,
@@ -18,7 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { ResponsiveLayout } from '../../../core/responsive-layout';
 import { SalonContext } from '../../../core/salon-context';
 import { runtimeConfig } from '../../../core/public-config';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -54,17 +52,11 @@ export class SalonDashboardComponent {
   readonly enabled = runtimeConfig.publicConfig?.replenishmentEnabled ?? false;
   readonly order = this.enabled ? inject(OrderFacade) : undefined;
   private readonly session = inject(SessionFacade);
-  private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly bottomSheet = inject(MatBottomSheet);
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly requestSheet = viewChild<TemplateRef<unknown>>('requestSheet');
-  readonly mobile = toSignal(
-    this.breakpointObserver.observe('(max-width: 759px)').pipe(map(({ matches }) => matches)),
-    {
-      initialValue: this.breakpointObserver.isMatched('(max-width: 759px)'),
-    },
-  );
+  readonly mobile = inject(ResponsiveLayout).compact;
   private sheetRef?: MatBottomSheetRef<unknown>;
   private contextKey: string | undefined;
 

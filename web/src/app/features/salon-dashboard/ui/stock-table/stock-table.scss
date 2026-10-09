@@ -1,5 +1,20 @@
 @use '../../../../shared/styles/surfaces' as surfaces;
+@use '../../../../shared/styles/compact-records' as compact;
 @include surfaces.inventory-card;
+
+@include compact.list;
+
+.compact-list {
+  .compact-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .compact-metrics > div {
+    min-width: 0;
+  }
+  .compact-actions button {
+    min-height: 48px;
+  }
+}
 
 .table-scroll {
   max-width: 100%;
