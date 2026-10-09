@@ -15,5 +15,5 @@ export class StockTable {
   readonly updated = input.required<string>();
   readonly requestEnabled = input(false);
   readonly requestProduct = output<string>();
-  readonly columns = ['product', 'quantity', 'status', 'action'];
+  readonly columns = ['product', 'quantity', 'hqAvailable', 'status', 'action'];
 }

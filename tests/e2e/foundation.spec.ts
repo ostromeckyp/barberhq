@@ -113,7 +113,18 @@ test("mobile layout and keyboard login do not overflow at 320px", async ({
   await expect(
     page.getByRole("navigation", { name: "Main navigation" }),
   ).toBeVisible();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Inventory", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("navigation", { name: "Main navigation" }),
+  ).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: "Open navigation" }),
+  ).toBeFocused();
   await page.setViewportSize({ width: 320, height: 800 });
   expect(
     await page.evaluate(

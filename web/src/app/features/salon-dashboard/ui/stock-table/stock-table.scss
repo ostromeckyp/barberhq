@@ -17,13 +17,16 @@ table {
   background: var(--surface);
 }
 .mat-column-product {
-  width: 38%;
+  width: 26%;
 }
 .mat-column-quantity {
-  width: 15%;
+  width: 16%;
+}
+.mat-column-hqAvailable {
+  width: 18%;
 }
 .mat-column-status {
-  width: 27%;
+  width: 20%;
 }
 .mat-column-action {
   width: 20%;

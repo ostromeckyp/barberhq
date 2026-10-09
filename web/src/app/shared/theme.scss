@@ -1,5 +1,12 @@
 @use './styles/tokens';
 @use '@angular/material' as mat;
+.request-products-sheet {
+  @include mat.bottom-sheet-overrides(
+    (
+      container-background-color: tokens.$surface,
+    )
+  );
+}
 html {
   @include mat.theme(
     (

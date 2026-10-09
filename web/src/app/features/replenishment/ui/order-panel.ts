@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { form, required, min, max, FormField, disabled } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,6 +23,7 @@ import { OrderFacade } from '../feature/order.facade';
 })
 export class OrderPanel {
   readonly facade = inject(OrderFacade);
+  readonly embedded = input(false);
   readonly fields = form(this.facade.manual, (p) => {
     disabled(p, () => this.facade.locked());
     required(p.productId);

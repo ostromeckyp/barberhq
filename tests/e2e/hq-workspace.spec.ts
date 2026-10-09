@@ -63,7 +63,7 @@ test("workspace_switch_drives_menu_request_actions_and_hq_receipt_without_impers
     nav.getByRole("link", { name: "HQ stock", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "HQ availability", exact: true }),
+    page.getByRole("columnheader", { name: "HQ available", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Request Pomada Matowa", exact: true })

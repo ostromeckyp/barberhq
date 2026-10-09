@@ -51,21 +51,37 @@
     message="Ask HQ to set up inventory for this salon. Missing stock is not zero stock."
   />
 } @else if (facade.rows().length) {
-  <div class="inventory-layout" [attr.aria-busy]="facade.loading()">
+  <div
+    class="inventory-layout"
+    [class.with-order-panel]="!mobile() && !!order?.canOrder()"
+    [attr.aria-busy]="facade.loading()"
+  >
     <app-stock-table
       [rows]="facade.rows()"
       [threshold]="facade.threshold()"
       [updated]="facade.updated()"
       [requestEnabled]="!!order?.canOrder()"
-      (requestProduct)="order?.select($event)"
+      (requestProduct)="requestProduct($event)"
     />
-    <div>
-      @if (order?.canOrder()) {
-        <app-order-panel />
-      }
-      <app-hq-availability [rows]="facade.rows()" />
-    </div>
+    @if (!mobile() && order?.canOrder()) {
+      <app-order-panel />
+    }
   </div>
+}
+
+@if (mobile() && order?.canOrder()) {
+  <button
+    class="mobile-request-trigger"
+    mat-stroked-button
+    aria-haspopup="dialog"
+    (click)="openRequestSheet()"
+  >
+    <mat-icon>add_shopping_cart</mat-icon>
+    Request products
+    @if (order!.draft.lines().length) {
+      <span class="draft-count" aria-label="draft products">{{ order!.draft.lines().length }}</span>
+    }
+  </button>
 }
 
 <a
@@ -74,3 +90,19 @@
   [routerLink]="['/salons', context.salonId(), 'requests']"
   >View requests</a
 >
+
+<ng-template #requestSheet>
+  <div class="request-sheet-content">
+    <header class="request-sheet-header">
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Close request products"
+        (click)="closeRequestSheet()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+    <app-order-panel [embedded]="true" />
+  </div>
+</ng-template>

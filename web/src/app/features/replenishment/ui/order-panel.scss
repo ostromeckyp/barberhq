@@ -8,6 +8,12 @@
   border: 1px solid var(--border);
   border-radius: 12px;
 }
+.panel.embedded {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
 h2 {
   font-size: 18px;
   margin: 6px 0;

@@ -1,18 +1,34 @@
-import { runtimeConfig } from '../../../core/public-config';
-import { OrderFacade } from '../../replenishment/feature/order.facade';
-import { DraftStore } from '../../replenishment/feature/draft.store';
-import { OrderPanel } from '../../replenishment/ui/order-panel';
-import { RouterLink } from '@angular/router';
-import { SalonContext } from '../../../core/salon-context';
-import { Component, inject } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  TemplateRef,
+  viewChild,
+  ViewContainerRef,
+} from '@angular/core';
+import {
+  MatBottomSheet,
+  MatBottomSheetModule,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { RouterLink } from '@angular/router';
+import { map } from 'rxjs';
+import { SalonContext } from '../../../core/salon-context';
+import { runtimeConfig } from '../../../core/public-config';
+import { SessionFacade } from '../../auth/feature/session.facade';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { StaleBannerComponent } from '../../../shared/ui/stale-banner/stale-banner.component';
+import { DraftStore } from '../../replenishment/feature/draft.store';
+import { OrderFacade } from '../../replenishment/feature/order.facade';
+import { OrderPanel } from '../../replenishment/ui/order-panel';
 import { StockTable } from '../ui/stock-table/stock-table';
-import { HqAvailability } from '../ui/hq-availability/hq-availability';
 import { SalonInventoryFacade } from './salon-inventory.facade';
 @Component({
   selector: 'app-salon-dashboard',
@@ -21,13 +37,13 @@ import { SalonInventoryFacade } from './salon-inventory.facade';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    MatBottomSheetModule,
     PageHeader,
     EmptyStateComponent,
     StaleBannerComponent,
     StockTable,
     OrderPanel,
     RouterLink,
-    HqAvailability,
   ],
   templateUrl: './salon-dashboard.component.html',
   styleUrl: './salon-dashboard.component.scss',
@@ -37,4 +53,57 @@ export class SalonDashboardComponent {
   readonly facade = inject(SalonInventoryFacade);
   readonly enabled = runtimeConfig.publicConfig?.replenishmentEnabled ?? false;
   readonly order = this.enabled ? inject(OrderFacade) : undefined;
+  private readonly session = inject(SessionFacade);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly bottomSheet = inject(MatBottomSheet);
+  private readonly viewContainerRef = inject(ViewContainerRef);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly requestSheet = viewChild<TemplateRef<unknown>>('requestSheet');
+  readonly mobile = toSignal(
+    this.breakpointObserver.observe('(max-width: 759px)').pipe(map(({ matches }) => matches)),
+    {
+      initialValue: this.breakpointObserver.isMatched('(max-width: 759px)'),
+    },
+  );
+  private sheetRef?: MatBottomSheetRef<unknown>;
+  private contextKey: string | undefined;
+
+  constructor() {
+    effect(() => {
+      const session = this.session.state();
+      const identity =
+        session.status === 'READY'
+          ? `${session.membership.userId}:${session.membership.businessId}`
+          : session.status;
+      const key = `${this.context.selectedWorkspace() ?? ''}:${this.order?.salonId() ?? ''}:${identity}:${!!this.order?.canOrder()}`;
+      if (this.contextKey !== undefined && this.contextKey !== key) this.closeRequestSheet();
+      this.contextKey = key;
+
+      if (!this.mobile()) this.closeRequestSheet();
+    });
+    this.destroyRef.onDestroy(() => this.closeRequestSheet());
+  }
+
+  requestProduct(productId: string) {
+    this.order?.select(productId);
+    if (this.mobile()) this.openRequestSheet();
+  }
+
+  openRequestSheet() {
+    const template = this.requestSheet();
+    if (!template || !this.mobile() || !this.order?.canOrder() || this.sheetRef) return;
+    this.sheetRef = this.bottomSheet.open(template, {
+      viewContainerRef: this.viewContainerRef,
+      ariaLabel: 'Request products',
+      panelClass: 'request-products-sheet',
+      autoFocus: 'dialog',
+      closeOnNavigation: true,
+      maxHeight: '90dvh',
+    });
+    this.sheetRef.afterDismissed().subscribe(() => (this.sheetRef = undefined));
+  }
+
+  closeRequestSheet() {
+    this.sheetRef?.dismiss();
+  }
 }

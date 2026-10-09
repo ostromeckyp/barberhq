@@ -5,14 +5,22 @@
       <p class="eyebrow">[ NOT BAD STUFF · INTERNAL ]</p>
       <h1>Sign in with your work account.</h1>
       <form (submit)="signIn($event)">
-        <mat-form-field appearance="outline" floatLabel="always" hideRequiredMarker
+        <mat-form-field
+          appearance="outline"
+          floatLabel="always"
+          hideRequiredMarker
+          subscriptSizing="dynamic"
           ><mat-label>Email address</mat-label
           ><input matInput type="email" autocomplete="username" [formField]="fields.email" />
           @if (fields.email().invalid() && fields.email().touched()) {
             <mat-error>Enter a valid email address.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline" floatLabel="always" hideRequiredMarker
+        <mat-form-field
+          appearance="outline"
+          floatLabel="always"
+          hideRequiredMarker
+          subscriptSizing="dynamic"
           ><mat-label>Password</mat-label
           ><input
             matInput
@@ -26,9 +34,12 @@
             (click)="showPassword.set(!showPassword())"
             [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
           >
-            <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon></button
-          ><mat-error>Password is required.</mat-error></mat-form-field
-        >
+            <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (fields.password().invalid() && fields.password().touched()) {
+            <mat-error>Password is required.</mat-error>
+          }
+        </mat-form-field>
         @if (facade.error()) {
           <p class="error-message" role="alert"><mat-icon>error</mat-icon>{{ facade.error() }}</p>
         }
