@@ -72,7 +72,8 @@
 @if (mobile() && order?.canOrder()) {
   <button
     class="mobile-request-trigger"
-    mat-stroked-button
+    mat-fab
+    extended
     aria-haspopup="dialog"
     (click)="openRequestSheet()"
   >
@@ -93,6 +94,7 @@
 
 <ng-template #requestSheet>
   <div class="request-sheet-content">
+    <div class="request-sheet-handle" aria-hidden="true"></div>
     <header class="request-sheet-header">
       <button
         mat-icon-button

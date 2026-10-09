@@ -50,19 +50,43 @@ mat-progress-bar {
   height: 22px;
   padding-inline: 4px;
   border-radius: 999px;
-  background: var(--brand);
-  color: white;
+  background: #fff;
+  color: var(--brand);
   font-size: 12px;
   font-weight: 700;
 }
 
 @media (max-width: 759px) {
+  :host {
+    display: block;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+
   .mobile-request-trigger {
     display: flex;
-    width: 100%;
-    min-height: 52px;
-    margin: 16px 0;
+    position: fixed;
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 2;
+    max-width: calc(
+      100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    );
+    white-space: nowrap;
     justify-content: center;
     gap: 8px;
+    @include mat.fab-overrides(
+      (
+        container-color: var(--brand),
+        foreground-color: #fff,
+      )
+    );
   }
+}
+
+.request-sheet-handle {
+  width: 32px;
+  height: 4px;
+  margin: 0 auto 8px;
+  border-radius: 999px;
+  background: var(--muted);
 }

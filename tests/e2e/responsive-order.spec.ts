@@ -92,6 +92,30 @@ test("mobile sheet preserves the draft through dismissal and desktop resize", as
     await expect(sheet).toBeHidden();
     await expect(page.getByLabel("Units for Pomada Matowa")).toHaveValue("3");
     await page.setViewportSize({ width: 320, height: 800 });
+    const historyLink = page.getByRole("link", {
+      name: "View requests",
+      exact: true,
+    });
+    await historyLink.scrollIntoViewIfNeeded();
+    await page.evaluate(() =>
+      window.scrollTo(0, document.documentElement.scrollHeight),
+    );
+    await expect(trigger).toBeInViewport();
+    const historyBounds = await historyLink.boundingBox();
+    const triggerBounds = await trigger.boundingBox();
+    expect(
+      historyBounds &&
+        triggerBounds &&
+        historyBounds.y + historyBounds.height <= triggerBounds.y,
+    ).toBe(true);
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
+    await page.screenshot({ path: "artifacts/request-fab-mobile.png" });
     await trigger.click();
     await expect(sheet.getByLabel("Units for Pomada Matowa")).toHaveValue("3");
     expect(
