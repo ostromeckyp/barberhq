@@ -1,7 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import * as sql from '@barberhq/server';
-import type { StockAction, CommandResult, RequestState } from '../../../shared/contracts/stock/index.js';
+import type {
+  StockAction,
+  CommandResult,
+  RequestState,
+} from '../../../shared/contracts/stock/index.js';
 import { parseAction } from './schemas.js';
 import { StockError } from './errors.js';
 import { canonicalizeAction, payloadHash, semanticHash, requestItemId } from './intent.js';

@@ -1,7 +1,10 @@
 import { expect, it } from 'vitest';
 import { availableRequestActions, canConfirm, buildAction } from './action-input';
 import type { Confirmation } from '../models/confirmation';
-import type { RequestDetail, RequestDetailItem } from '../../../../../../shared/contracts/stock/index';
+import type {
+  RequestDetail,
+  RequestDetailItem,
+} from '../../../../../../shared/contracts/stock/index';
 const item = (id: string, quantity: number): RequestDetailItem => ({
   productId: id,
   productName: id,

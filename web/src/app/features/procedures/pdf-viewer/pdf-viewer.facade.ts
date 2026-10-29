@@ -1,7 +1,10 @@
 import { Service, computed, effect, inject, signal, DestroyRef } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import type { DocumentSource, SourceSection } from '../../../../../../shared/contracts/knowledge/index';
+import type {
+  DocumentSource,
+  SourceSection,
+} from '../../../../../../shared/contracts/knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
