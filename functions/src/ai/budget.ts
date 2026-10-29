@@ -1,18 +1,5 @@
-export type AiErrorCode =
-  | 'UNAUTHENTICATED'
-  | 'FORBIDDEN'
-  | 'APP_CHECK_REQUIRED'
-  | 'VALIDATION_ERROR'
-  | 'RATE_LIMITED'
-  | 'TIMEOUT'
-  | 'MODEL_LIMIT'
-  | 'TOOL_LIMIT'
-  | 'PROVIDER_UNAVAILABLE'
-  | 'SERVICE_UNAVAILABLE'
-  | 'INVALID_CONFIG'
-  | 'EMBEDDING_CONFIG_MISMATCH'
-  | 'INVALID_MODEL_OUTPUT'
-  | 'SOURCE_CHANGED';
+import type { AiBudget } from './models/ai-budget.js';
+import type { AiErrorCode } from './models/ai-error-code.js';
 
 export class AiError extends Error {
   constructor(public readonly code: AiErrorCode) {
@@ -20,12 +7,6 @@ export class AiError extends Error {
     this.name = 'AiError';
   }
 }
-
-export type AiBudget = {
-  deadlineMs: number;
-  modelTurnsRemaining: number;
-  toolCallsRemaining: number;
-};
 
 const clocks = new WeakMap<AiBudget, () => number>();
 

@@ -8,40 +8,21 @@ import { z } from 'genkit';
 import type { ProcedureInput, ProcedureResult } from '../../../shared/contracts/ai/index.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from '../knowledge/runtime.js';
 import { createAiAdmission } from './admission.js';
-import { AiError, consumeToolCall, runWithinBudget, type AiBudget } from './budget.js';
+import { AiError, consumeToolCall, runWithinBudget } from './budget.js';
 import { validateCitations } from './citations.js';
 import {
   aiRuntimeProfileFromEnv,
   createAiAdminDependencies,
   createAiUserEndpoint,
-  type ActorContext,
 } from './context.js';
+import type { ActorContext } from './models/actor-context.js';
 import { createSqlAiRepository } from './repository.js';
-import { observeProcedurePhase, type ProcedurePhaseObserver } from './procedure-diagnostics.js';
-import { retrieveProcedure, type RetrievedChunk } from './retrieval.js';
+import { observeProcedurePhase } from './procedure-diagnostics.js';
+import type { ProcedurePhaseObserver } from './models/procedure-phase-observer.js';
+import { retrieveProcedure } from './retrieval.js';
+import type { RetrievedChunk } from './models/retrieved-chunk.js';
 import { createAiRuntime, createStructuredProcedureGenerator } from './runtime.js';
-import {
-  parseProcedureInput,
-  parseProcedureModelOutput,
-  type ProcedureModelOutput,
-} from './schemas.js';
-
-export type ProcedureDependencies = {
-  resolveActor(uid: string): Promise<ActorContext>;
-  admitAiCall(
-    actor: ActorContext,
-    endpoint: 'procedure',
-    input: string,
-    now: Date,
-  ): Promise<AiBudget>;
-  retrieve(
-    input: { question: string; limit: 3 },
-    actor: ActorContext,
-    signal?: AbortSignal,
-  ): Promise<RetrievedChunk[]>;
-  recheck(sources: RetrievedChunk[], actor: ActorContext): Promise<boolean>;
-  generate(budget: AiBudget, prompt: string): Promise<string | ProcedureModelOutput>;
-};
+import { parseProcedureInput, parseProcedureModelOutput } from './schemas.js';
 
 function evidencePrompt(question: string, chunks: RetrievedChunk[]): string {
   const evidence = chunks
@@ -242,6 +223,7 @@ function header(request: CallableRequest<unknown>, name: string): string | undef
   return typeof value === 'string' ? value : undefined;
 }
 import { publicAiError } from './errors.js';
+import type { ProcedureDependencies } from './models/procedure-dependencies.js';
 export { publicAiError };
 export function createAnswerProcedureQuestionFunction() {
   const emulator = process.env.FUNCTIONS_EMULATOR === 'true';

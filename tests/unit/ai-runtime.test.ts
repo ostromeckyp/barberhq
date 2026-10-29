@@ -5,8 +5,8 @@ import {
   createBudgetedGenerator,
   createStructuredProcedureGenerator,
   runBudgetedModelTurn,
-  type ReasoningConfig,
 } from '../../functions/src/ai/runtime.ts';
+import type { ReasoningConfig } from '../../functions/src/ai/models/reasoning-config.ts';
 
 const config: ReasoningConfig = {
   provider: 'vertex',

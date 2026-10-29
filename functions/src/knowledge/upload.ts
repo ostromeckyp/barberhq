@@ -7,33 +7,15 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { status } from './document-commands.js';
 import { MAX_PDF_BYTES, PdfValidationError, validatePdf } from './pdf-validation.js';
 import { DispatchService } from './queue.js';
-import { KnowledgeError, KnowledgeRepository, type VersionState } from './repository.js';
+import { KnowledgeError, KnowledgeRepository } from './repository.js';
+import type { VersionState } from './models/version-state.js';
 import { sourceStorageBucket } from './source.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from './runtime.js';
 import { CLOUD } from '../cloud-config.js';
+import type { UploadRequest } from './models/upload-request.js';
+import type { UploadResponse } from './models/upload-response.js';
+import type { UploadDeps } from './models/upload-deps.js';
 
-type Headers = Record<string, string | string[] | undefined>;
-export type UploadRequest = {
-  method: string;
-  headers: Headers;
-  query: Record<string, unknown>;
-  rawBody?: Buffer | Uint8Array;
-  [Symbol.asyncIterator]?: () => AsyncIterator<Uint8Array>;
-};
-export type UploadResponse = {
-  status(code: number): UploadResponse;
-  set(name: string, value: string): UploadResponse;
-  send(body: unknown): UploadResponse;
-  end(): UploadResponse;
-};
-export type UploadDeps = {
-  repo: Pick<KnowledgeRepository, 'dc' | 'version' | 'putOriginal' | 'bucket'>;
-  dispatch: Pick<DispatchService, 'dispatch'>;
-  origins: string[];
-  emulator: boolean;
-  verifyAuth(token: string): Promise<string | null>;
-  verifyAppCheck(token: string): Promise<boolean>;
-};
 const header = (r: UploadRequest, name: string) => {
   const v = r.headers[name];
   return typeof v === 'string' ? v : undefined;

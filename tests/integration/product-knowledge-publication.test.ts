@@ -4,7 +4,7 @@ import { createProductKnowledgeHarness } from '../support/product-knowledge.ts';
 import { ReviewPublishService } from '../../functions/src/knowledge/review-publish.ts';
 import { DocumentCommandService } from '../../functions/src/knowledge/document-commands.ts';
 import { processKnowledge } from '../../functions/src/knowledge/worker.ts';
-import type { KnowledgeJob } from '../../functions/src/knowledge/queue.ts';
+import type { KnowledgeJob } from '../../functions/src/knowledge/models/knowledge-job.ts';
 let h: Awaited<ReturnType<typeof createProductKnowledgeHarness>>, jobs: KnowledgeJob[];
 beforeEach(async () => {
   h = await createProductKnowledgeHarness();

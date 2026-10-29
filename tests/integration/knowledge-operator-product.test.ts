@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createKnowledgeHarness } from '../support/knowledge.ts';
 import { seedHqAndProduct } from '../support/product-card-fixture.ts';
-import type { ManifestEntry } from '../../functions/src/knowledge/pipeline.ts';
+import type { ManifestEntry } from '../../functions/src/knowledge/models/manifest-entry.ts';
 
 type H = Awaited<ReturnType<typeof createKnowledgeHarness>>;
 const operator = (businessId: string) =>

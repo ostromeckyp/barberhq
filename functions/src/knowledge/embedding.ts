@@ -1,24 +1,11 @@
 import { createHash } from 'node:crypto';
 import { genkit } from 'genkit';
 import { vertexAI } from '@genkit-ai/google-genai';
-
-export type EmbeddingMode = 'document' | 'query';
-export type EmbeddingTaskType = 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY';
-
-export interface EmbeddingConfig {
-  provider: 'vertex';
-  projectId: string;
-  modelId: string;
-  dimension: number;
-  documentMode: EmbeddingTaskType;
-  queryMode: EmbeddingTaskType;
-  location: string;
-  configHash: string;
-}
-
-export interface EmbeddingConfigInput extends Omit<EmbeddingConfig, 'provider' | 'configHash'> {
-  provider?: 'vertex';
-}
+import type { EmbeddingMode } from './models/embedding-mode.js';
+import type { EmbeddingConfig } from './models/embedding-config.js';
+import type { EmbeddingConfigInput } from './models/embedding-config-input.js';
+import type { EmbeddingProvider } from './models/embedding-provider.js';
+import type { SingleTextEmbeddingProvider } from './models/single-text-embedding-provider.js';
 
 export const MAX_EMBEDDING_INPUTS = 100;
 export const MAX_EMBEDDING_TEXT_CHARS = 8_000;
@@ -109,12 +96,6 @@ export function validateEmbeddingVectors(
   });
 }
 
-export type EmbeddingProvider = (
-  texts: string[],
-  taskType: EmbeddingTaskType,
-  config: EmbeddingConfig,
-) => Promise<number[][]>;
-
 /** Creates the server-side adapter. Tests may inject a fake provider; production uses Vertex AI. */
 export function createEmbeddingAdapter(config: EmbeddingConfig, provider: EmbeddingProvider) {
   const canonicalConfig = canonicalizeEmbeddingConfig(config);
@@ -131,12 +112,6 @@ export function createEmbeddingAdapter(config: EmbeddingConfig, provider: Embedd
     },
   };
 }
-
-export type SingleTextEmbeddingProvider = (
-  text: string,
-  taskType: EmbeddingTaskType,
-  config: EmbeddingConfig,
-) => Promise<number[]>;
 
 export function createVertexEmbeddingAdapter(
   config: EmbeddingConfig,

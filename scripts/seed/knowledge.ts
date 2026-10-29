@@ -1,10 +1,7 @@
 import type { DataConnect } from 'firebase-admin/data-connect';
 import type { BusinessSeed } from '../../shared/contracts/business/index.ts';
-import {
-  KnowledgePipeline,
-  knowledgeIds,
-  type Embedder,
-} from '../../functions/src/knowledge/pipeline.ts';
+import { KnowledgePipeline, knowledgeIds } from '../../functions/src/knowledge/pipeline.ts';
+import type { Embedder } from '../../functions/src/knowledge/models/embedder.ts';
 import type { KnowledgeRepository } from '../../functions/src/knowledge/repository.ts';
 import { checkKnowledgeSeed, readKnowledgeSeed, type KnowledgeSeed } from './knowledge-seed.ts';
 import { wipeKnowledge, type WipeCounts } from './knowledge-wipe.ts';

@@ -1,94 +1,13 @@
-import { runWithinBudget, type AiBudget } from '../ai/budget.js';
+import { runWithinBudget } from '../ai/budget.js';
+import type { AiBudget } from '../ai/models/ai-budget.js';
 import * as sql from '@barberhq/server';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import type {
   ActiveProductAlias,
   KnowledgeCatalogProduct,
-  KnowledgeProductReview,
 } from '../../../shared/contracts/product-knowledge/index.js';
 import { KnowledgeError } from '../knowledge/repository.js';
-import type { PassageChunk } from './rules.js';
-export type KnowledgeLinkRow = {
-  id: string;
-  version_id: string;
-  business_id: string;
-  product_id: string | null;
-  chunk_id: string;
-  start: number;
-  end: number;
-  extraction_hash: string;
-  candidate_product_ids: string[];
-  method: 'hq' | 'code' | 'model';
-  confirmed: boolean;
-  created_by: string;
-  created_at: string;
-};
-export type KnowledgeProfileRow = {
-  version_id: string;
-  business_id: string;
-  product_id: string;
-  proposed_type: string | null;
-  approved_type: string | null;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-};
-export type KnowledgeAliasRow = {
-  id: string;
-  business_id: string;
-  product_id: string;
-  salon_id: null;
-  phrase: string;
-  normalized: string;
-  kind: 'NAME' | 'TYPE' | 'PHONETIC';
-  lang: 'pl' | 'en';
-  source: 'GENERATED' | 'HQ';
-  status: 'PROPOSED' | 'REJECTED' | 'ACTIVE' | 'RETIRED';
-  ambiguous: boolean;
-  source_document_version_id: string;
-  created_by: string;
-  created_at: string;
-  reviewed_by: string | null;
-  reviewed_at: string | null;
-  generation_id: string | null;
-};
-export type ProductOperation = {
-  id: string;
-  business_id: string;
-  version_id: string;
-  actor_uid: string;
-  idempotency_key: string;
-  action: string;
-  payload_hash: string;
-  result: KnowledgeProductReview | null;
-  generation_id: string | null;
-  lease_expires_at: string | null;
-  completed_at: string | null;
-  created_at: string;
-};
-export type ProductKnowledgeState = {
-  versionId: string;
-  documentId: string;
-  replacesVersionId: string | null;
-  businessId: string;
-  extractionHash: string | null;
-  revision: number;
-  catalogRevision: number;
-  reviewedHash: string | null;
-  state: {
-    acknowledgedUnlinkedPassages?: KnowledgeProductReview['acknowledgedUnlinkedPassages'];
-    emptyKnowledgeAcknowledged?: boolean;
-  } | null;
-  kind: string | null;
-  status: string;
-  pendingStage: string | null;
-  publishedAt: string | null;
-  revokedAt: string | null;
-  links: KnowledgeLinkRow[];
-  profiles: KnowledgeProfileRow[];
-  aliases: KnowledgeAliasRow[];
-  chunks: PassageChunk[];
-  operation: ProductOperation | null;
-};
+import type { ProductKnowledgeState } from './models/product-knowledge-state.js';
 export class ProductKnowledgeRepository {
   constructor(readonly dc: DataConnect) {}
   async state(

@@ -2,21 +2,17 @@ import { randomUUID } from 'node:crypto';
 import { getFunctions } from 'firebase-admin/functions';
 import * as sql from '@barberhq/server';
 import { z } from 'zod';
-import type { RetryDocumentInput, VersionStatus } from '../../../shared/contracts/knowledge/index.js';
+import type {
+  RetryDocumentInput,
+  VersionStatus,
+} from '../../../shared/contracts/knowledge/index.js';
 import { status } from './document-commands.js';
-import { KnowledgeError, type KnowledgeRepository, type VersionState } from './repository.js';
+import { KnowledgeError, type KnowledgeRepository } from './repository.js';
+import type { VersionState } from './models/version-state.js';
 import { knowledgePayloadHash, parseRetryDocument } from './schemas.js';
+import type { KnowledgeJob } from './models/knowledge-job.js';
+import type { EnqueueKnowledge } from './models/enqueue-knowledge.js';
 
-export type KnowledgeJob = {
-  versionId: string;
-  stage: 'EXTRACT' | 'PUBLISH';
-  expectedDocumentRevision: number;
-  extractionHash?: string;
-  productKnowledgeReviewedHash?: string;
-  productKnowledgeRevision?: number;
-  productKnowledgeCatalogRevision?: number;
-};
-export type EnqueueKnowledge = (job: KnowledgeJob) => Promise<void>;
 const jobSchema = z
   .strictObject({
     versionId: z.string().min(1).max(200),

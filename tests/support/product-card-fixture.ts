@@ -9,7 +9,7 @@ import { ProductKnowledgeCommands } from '../../functions/src/product-knowledge/
 import { ProductKnowledgeGeneration } from '../../functions/src/product-knowledge/generation.ts';
 import { ReviewPublishService } from '../../functions/src/knowledge/review-publish.ts';
 import { processKnowledge } from '../../functions/src/knowledge/worker.ts';
-import type { KnowledgeJob } from '../../functions/src/knowledge/queue.ts';
+import type { KnowledgeJob } from '../../functions/src/knowledge/models/knowledge-job.ts';
 import { createProductCardService } from '../../functions/src/products/card-attachment.ts';
 
 type H = Awaited<ReturnType<typeof createKnowledgeHarness>>;

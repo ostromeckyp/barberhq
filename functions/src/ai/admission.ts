@@ -1,22 +1,8 @@
-import {
-  AiError,
-  assertTimeRemaining,
-  createAiBudget,
-  runWithinBudget,
-  type AiBudget,
-} from './budget.js';
-import type { ActorContext } from './context.js';
-
-export type AiEndpoint = 'replenishment' | 'procedure' | 'product-knowledge';
-export type AiAdmissionRepository = {
-  readActor(uid: string): Promise<ActorContext | null>;
-  /** Atomic, server-clock SQL admission. Null means the shared window is full. */
-  increment(
-    uid: string,
-    businessId: string,
-    role: ActorContext['role'],
-  ): Promise<{ count: number } | null>;
-};
+import { AiError, assertTimeRemaining, createAiBudget, runWithinBudget } from './budget.js';
+import type { AiBudget } from './models/ai-budget.js';
+import type { ActorContext } from './models/actor-context.js';
+import type { AiAdmissionRepository } from './models/ai-admission-repository.js';
+import type { AiEndpoint } from './models/ai-endpoint.js';
 
 function validActor(actor: ActorContext | null, uid: string): actor is ActorContext {
   return Boolean(

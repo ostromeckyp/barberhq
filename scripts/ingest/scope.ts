@@ -1,4 +1,4 @@
-import type { ManifestEntry } from '../../functions/src/knowledge/pipeline.js';
+import type { ManifestEntry } from '../../functions/src/knowledge/models/manifest-entry.js';
 
 export function validateCloudIngestEnvironment(env: NodeJS.ProcessEnv = process.env): void {
   if (

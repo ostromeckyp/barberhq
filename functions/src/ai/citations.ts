@@ -1,7 +1,7 @@
 import type { CitedStep } from '../../../shared/contracts/ai/index.js';
 import type { SourceSection } from '../../../shared/contracts/knowledge/index.js';
 import { AiError } from './budget.js';
-import type { RetrievedChunk } from './retrieval.js';
+import type { RetrievedChunk } from './models/retrieved-chunk.js';
 
 /** Only database rows can create a public source; model fields are never read here. */
 export function validateCitations(

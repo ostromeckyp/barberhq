@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { BusinessSeed } from '../../shared/contracts/business/index.ts';
-import type { ManifestEntry } from '../../functions/src/knowledge/pipeline.ts';
+import type { ManifestEntry } from '../../functions/src/knowledge/models/manifest-entry.ts';
 import { chunkPages } from '../../functions/src/knowledge/chunk.ts';
 import { extractPdf } from '../../functions/src/knowledge/extract.ts';
 import { readReviewReceipt, type ReviewReceipt } from '../ingest/review.ts';

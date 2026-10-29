@@ -5,22 +5,15 @@ import type {
   ReviewDocumentInput,
   VersionStatus,
 } from '../../../shared/contracts/knowledge/index.js';
-import { KnowledgeError, type KnowledgeRepository, type VersionState } from './repository.js';
-import type { KnowledgePipeline } from './pipeline.js';
+import { KnowledgeError } from './repository.js';
+import type { VersionState } from './models/version-state.js';
 import { knowledgePayloadHash, parseReviewDocument } from './schemas.js';
 import { status } from './document-commands.js';
-import { enqueueKnowledge, type EnqueueKnowledge } from './queue.js';
+import { enqueueKnowledge } from './queue.js';
+import type { EnqueueKnowledge } from './models/enqueue-knowledge.js';
+import type { ReviewPublishDependencies } from './models/review-publish-dependencies.js';
 
 type Context = sql.KnowledgeCommandContextData;
-
-export type ReviewPublishDependencies = {
-  repo: Pick<KnowledgeRepository, 'dc' | 'version' | 'markPublishStale'>;
-  pipeline: Pick<KnowledgePipeline, 'recordReview' | 'publishVersion'> & {
-    embedder: KnowledgePipeline['embedder'];
-  };
-  enqueue?: EnqueueKnowledge;
-  now?: () => Date;
-};
 
 function pagesAreExact(
   version: VersionState,

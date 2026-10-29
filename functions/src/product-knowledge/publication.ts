@@ -1,4 +1,5 @@
-import { KnowledgeError, type VersionState } from '../knowledge/repository.js';
+import { KnowledgeError } from '../knowledge/repository.js';
+import type { VersionState } from '../knowledge/models/version-state.js';
 import { ProductKnowledgeRepository } from './repository.js';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { metadataFromStorage } from '../../../shared/knowledge-metadata.js';

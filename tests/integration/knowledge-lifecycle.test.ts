@@ -7,7 +7,7 @@ import {
   createSourceHandler,
   resolveSourceIdentity,
 } from '../../functions/src/knowledge/source.ts';
-import type { SourceResponse } from '../../functions/src/knowledge/source.ts';
+import type { SourceResponse } from '../../functions/src/knowledge/models/source-response.ts';
 import { seedRecords } from '../../scripts/seed/business.ts';
 import { validateSeed } from '../../scripts/prepare-data/catalog.ts';
 import { readFileSync } from 'node:fs';

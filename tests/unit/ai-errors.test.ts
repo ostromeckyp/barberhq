@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
-import { AiError, type AiErrorCode } from '../../functions/src/ai/budget.ts';
+import { AiError } from '../../functions/src/ai/budget.ts';
+import type { AiErrorCode } from '../../functions/src/ai/models/ai-error-code.ts';
 import { publicAiError } from '../../functions/src/ai/errors.ts';
 import { publicAiError as procedureMapper } from '../../functions/src/ai/procedure.ts';
 

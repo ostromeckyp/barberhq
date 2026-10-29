@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createAiBudget, type AiBudget } from '../../functions/src/ai/budget.ts';
+import { createAiBudget } from '../../functions/src/ai/budget.ts';
+import type { AiBudget } from '../../functions/src/ai/models/ai-budget.ts';
 import { createReplenishmentPreparer } from '../../functions/src/ai/replenishment.ts';
 import { parsePrepareInput } from '../../functions/src/ai/schemas.ts';
-import type { ReplenishmentContext } from '../../functions/src/ai/replenishment-tools.ts';
-import type { ShorthandCommands } from '../../functions/src/ai/salon-alias-commands.ts';
+import type { ReplenishmentContext } from '../../functions/src/ai/models/replenishment-context.ts';
+import type { ShorthandCommands } from '../../functions/src/ai/models/shorthand-commands.ts';
 
 const salonActor = { uid: 'staff', businessId: 'b', role: 'SALON' as const, salonIds: ['salon'] };
 const hqActor = { uid: 'hq', businessId: 'b', role: 'HQ' as const, salonIds: [] };

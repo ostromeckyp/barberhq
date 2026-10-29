@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { validateCitations } from '../../functions/src/ai/citations.ts';
-import type { RetrievedChunk } from '../../functions/src/ai/retrieval.ts';
+import type { RetrievedChunk } from '../../functions/src/ai/models/retrieved-chunk.ts';
 
 const source = {
   businessId: 'business',

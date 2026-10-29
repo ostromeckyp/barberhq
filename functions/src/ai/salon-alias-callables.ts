@@ -10,7 +10,8 @@ import {
   createAiUserEndpoint,
 } from './context.js';
 import { publicAiError } from './errors.js';
-import { createSalonAliasCommands, type RemoveShorthandInput } from './salon-alias-commands.js';
+import { createSalonAliasCommands } from './salon-alias-commands.js';
+import type { RemoveShorthandInput } from './models/remove-shorthand-input.js';
 import { stockConnectorConfig } from '../stock/runtime.js';
 import { CLOUD } from '../cloud-config.js';
 

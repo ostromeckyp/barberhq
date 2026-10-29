@@ -4,8 +4,8 @@ import { createEmbeddingConfig } from '../../functions/src/knowledge/embedding.t
 import {
   createProcedureRetriever,
   createSqlProcedureRepository,
-  type RetrievedChunk,
 } from '../../functions/src/ai/retrieval.ts';
+import type { RetrievedChunk } from '../../functions/src/ai/models/retrieved-chunk.ts';
 import { createKnowledgeHarness } from '../support/knowledge.ts';
 import { AiError } from '../../functions/src/ai/budget.ts';
 

@@ -12,7 +12,7 @@ import type {
   KnowledgeProductReview,
 } from '../../../shared/contracts/product-knowledge/index.js';
 import { KnowledgeError } from '../knowledge/repository.js';
-export type PassageChunk = { id: string; text: string; physicalPage: number };
+import type { PassageChunk } from './models/passage-chunk.js';
 const invalid = (message: string): never => {
   throw new KnowledgeError('VALIDATION_ERROR', message);
 };

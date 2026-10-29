@@ -1,6 +1,9 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getAppCheck } from 'firebase-admin/app-check';
 import { AiError } from './budget.js';
+import type { AiRuntimeProfile } from './models/ai-runtime-profile.js';
+import type { AiUserRequest } from './models/ai-user-request.js';
+import type { AiUserDependencies } from './models/ai-user-dependencies.js';
 
 export function createAiAdminDependencies(
   auth: Pick<ReturnType<typeof getAuth>, 'verifyIdToken'> = getAuth(),
@@ -26,8 +29,6 @@ export function createAiAdminDependencies(
 }
 
 const profiles = new WeakSet<object>();
-export type AiRuntimeProfile = Readonly<{ demoLoopbackEmulator: boolean }>;
-
 function loopback(host: string | undefined): boolean {
   return Boolean(
     host &&
@@ -66,25 +67,6 @@ export function aiRuntimeProfileFromEnv(): AiRuntimeProfile {
     sqlHost: process.env.DATA_CONNECT_EMULATOR_HOST,
   });
 }
-
-export type ActorContext = Readonly<{
-  uid: string;
-  businessId: string;
-  role: 'HQ' | 'SALON';
-  salonIds: readonly string[];
-}>;
-
-export type AiUserRequest<T> = {
-  data: T;
-  authUid?: string;
-  idToken?: string;
-  appCheckToken?: string;
-};
-
-export type AiUserDependencies = {
-  verifyAuth(token: string, checkRevoked: true): Promise<string | null>;
-  verifyAppCheck(token: string): Promise<boolean>;
-};
 
 /** The caller supplies a server-validated profile, never a request field. */
 export function createAiUserEndpoint<T, R>(

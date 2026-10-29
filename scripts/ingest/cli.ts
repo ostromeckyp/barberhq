@@ -8,11 +8,8 @@ import {
   createEmbeddingConfig,
   createVertexEmbeddingAdapter,
 } from '../../functions/src/knowledge/embedding.js';
-import {
-  KnowledgePipeline,
-  knowledgeIds,
-  type ManifestEntry,
-} from '../../functions/src/knowledge/pipeline.js';
+import { KnowledgePipeline, knowledgeIds } from '../../functions/src/knowledge/pipeline.js';
+import type { ManifestEntry } from '../../functions/src/knowledge/models/manifest-entry.js';
 import { KnowledgeRepository } from '../../functions/src/knowledge/repository.js';
 import { readReviewReceipt, preserveReviewReceipt } from './review.js';
 import { validateCloudIngestEnvironment, validatePublicationScope } from './scope.js';

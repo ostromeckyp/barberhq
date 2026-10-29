@@ -1,14 +1,7 @@
-import { AiError, type AiErrorCode } from './budget.js';
-
-export type ProcedurePhase = 'actor' | 'admission' | 'retrieval' | 'generation' | 'recheck';
-export type ProcedurePhaseEvent = {
-  stage: ProcedurePhase;
-  state: 'start' | 'success' | 'error';
-  attempt: 1 | 2;
-  elapsedMs: number;
-  code?: AiErrorCode | 'UNKNOWN';
-};
-export type ProcedurePhaseObserver = (event: ProcedurePhaseEvent) => void;
+import { AiError } from './budget.js';
+import type { ProcedurePhaseEvent } from './models/procedure-phase-event.js';
+import type { ProcedurePhaseObserver } from './models/procedure-phase-observer.js';
+import type { ProcedurePhase } from './models/procedure-phase.js';
 
 function notify(observer: ProcedurePhaseObserver | undefined, event: ProcedurePhaseEvent): void {
   try {

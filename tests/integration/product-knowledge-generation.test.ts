@@ -3,10 +3,8 @@ import { beforeEach, afterEach, it, expect } from 'vitest';
 import { createProductKnowledgeHarness } from '../support/product-knowledge.ts';
 import { createAiAdmission } from '../../functions/src/ai/admission.ts';
 import { createSqlAiRepository } from '../../functions/src/ai/repository.ts';
-import {
-  ProductKnowledgeGeneration,
-  type KnowledgeGenerationProvider,
-} from '../../functions/src/product-knowledge/generation.ts';
+import { ProductKnowledgeGeneration } from '../../functions/src/product-knowledge/generation.ts';
+import type { KnowledgeGenerationProvider } from '../../functions/src/product-knowledge/models/knowledge-generation-provider.ts';
 import * as sql from '@barberhq/server';
 let h: Awaited<ReturnType<typeof createProductKnowledgeHarness>>;
 let provider: KnowledgeGenerationProvider;

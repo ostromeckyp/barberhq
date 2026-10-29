@@ -1,15 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import type { ProcessingResult } from '../../../shared/contracts/knowledge/index.js';
 import { z } from 'zod';
-import { KnowledgeError, type KnowledgeRepository } from './repository.js';
-import type { KnowledgePipeline } from './pipeline.js';
+import { KnowledgeError } from './repository.js';
 import { onTaskDispatched } from 'firebase-functions/v2/tasks';
 import { createEmbeddingConfig, createVertexEmbeddingAdapter } from './embedding.js';
 import { KnowledgePipeline as RuntimePipeline } from './pipeline.js';
 import { KnowledgeRepository as RuntimeRepository } from './repository.js';
 import { knowledgeBucket, knowledgeDataConnectors, knowledgeRuntimeConfig } from './runtime.js';
+import type { KnowledgeProcessingJob } from './models/knowledge-processing-job.js';
+import type { ExtractionWorkerDependencies } from './models/extraction-worker-dependencies.js';
 
-const jobSchema = z.discriminatedUnion('stage', [
+export const jobSchema = z.discriminatedUnion('stage', [
   z.strictObject({
     versionId: z.string().min(1).max(200),
     stage: z.literal('EXTRACT'),
@@ -29,18 +30,6 @@ const jobSchema = z.discriminatedUnion('stage', [
   }),
 ]);
 export const EXTRACTION_LEASE_MS = 6 * 60 * 1000;
-
-export type ExtractionJob = z.infer<typeof jobSchema>;
-export type KnowledgeProcessingJob = ExtractionJob;
-export type ExtractionWorkerDependencies = {
-  repo: Pick<KnowledgeRepository, 'version' | 'claimExtraction' | 'failExtraction'> & {
-    markPublishStale?: KnowledgeRepository['markPublishStale'];
-    document?: KnowledgeRepository['document'];
-  };
-  pipeline: Pick<KnowledgePipeline, 'extractClaimedVersion' | 'publishVersion'>;
-  now?: () => Date;
-  createLeaseId?: () => string;
-};
 
 /** Pure orchestration around injected SQL/pipeline dependencies; task payloads carry IDs only. */
 export async function processKnowledge(

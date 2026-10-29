@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { AiError, createAiBudget } from '../../functions/src/ai/budget.ts';
 import { createProcedureAnswerer } from '../../functions/src/ai/procedure.ts';
-import type { RetrievedChunk } from '../../functions/src/ai/retrieval.ts';
+import type { RetrievedChunk } from '../../functions/src/ai/models/retrieved-chunk.ts';
 
 const actor = {
   uid: 'private-user',

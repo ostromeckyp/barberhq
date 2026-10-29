@@ -1,25 +1,11 @@
 import { vertexAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 import { createAiRuntime, runBudgetedModelTurn } from '../ai/runtime.js';
-import type { AiBudget } from '../ai/budget.js';
+import type { AiBudget } from '../ai/models/ai-budget.js';
 import { AiError } from '../ai/budget.js';
 import { parseProductAliasGeneration, parseProductLinkSuggestion } from './schemas.js';
 import { KnowledgeError } from '../knowledge/repository.js';
-export type ProductKnowledgeProviderOptions = {
-  prompt: string;
-  abortSignal: AbortSignal;
-  maxTurns: 1;
-  tools: [];
-  model: string;
-  output: { format: 'json'; schema: z.ZodType };
-  config: {
-    maxOutputTokens: 2048;
-    thinkingConfig: { thinkingLevel: 'LOW'; includeThoughts: false };
-  };
-};
-export type ProductKnowledgeProvider = (
-  options: ProductKnowledgeProviderOptions,
-) => Promise<{ output: unknown }>;
+import type { ProductKnowledgeProvider } from './models/product-knowledge-provider.js';
 const aliasWireSchema = z
   .object({
     type: z.string().max(80).nullable().describe('Optional source-supported product type'),

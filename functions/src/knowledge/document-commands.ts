@@ -1,6 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import * as sql from '@barberhq/server';
-import type { DeleteVersionInput, VersionStatus } from '../../../shared/contracts/knowledge/index.js';
+import type {
+  DeleteVersionInput,
+  VersionStatus,
+} from '../../../shared/contracts/knowledge/index.js';
 import {
   legacySourceType,
   storageKind,
@@ -8,7 +11,8 @@ import {
   isSyntheticSource,
 } from '../../../shared/knowledge-metadata.js';
 import { knowledgeIds } from './pipeline.js';
-import { KnowledgeError, type KnowledgeRepository, type VersionState } from './repository.js';
+import { KnowledgeError, type KnowledgeRepository } from './repository.js';
+import type { VersionState } from './models/version-state.js';
 import {
   knowledgePayloadHash,
   parseCreateDocumentRequest,

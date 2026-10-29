@@ -1,0 +1,2 @@
+export type CardStatus =
+  'UPLOADING' | 'GENERATING' | 'PUBLISHING' | 'PUBLISHED' | 'NEEDS_REVIEW' | 'FAILED';

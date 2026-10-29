@@ -1,6 +1,7 @@
 import { z } from 'genkit';
 import type { PrepareInput, ProcedureInput } from '../../../shared/contracts/ai/index.js';
 import { AiError } from './budget.js';
+import type { ProcedureModelOutput } from './models/procedure-model-output.js';
 
 const boundedText = z
   .string()
@@ -56,7 +57,6 @@ export const procedureModelSchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('NEEDS_CLARIFICATION'), question: boundedText }).strict(),
   z.object({ status: z.literal('INSUFFICIENT_EVIDENCE'), message: boundedText }).strict(),
 ]);
-export type ProcedureModelOutput = z.infer<typeof procedureModelSchema>;
 export function parseProcedureModelOutput(raw: unknown): ProcedureModelOutput {
   let value: unknown = raw;
   if (typeof raw === 'string') {

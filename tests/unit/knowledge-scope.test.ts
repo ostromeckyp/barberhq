@@ -3,11 +3,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
-import {
-  KnowledgePipeline,
-  knowledgeIds,
-  type ManifestEntry,
-} from '../../functions/src/knowledge/pipeline.ts';
+import { KnowledgePipeline, knowledgeIds } from '../../functions/src/knowledge/pipeline.ts';
+import type { ManifestEntry } from '../../functions/src/knowledge/models/manifest-entry.ts';
 import {
   validateCloudIngestEnvironment,
   validatePublicationScope,

@@ -1,16 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DataConnect } from 'firebase-admin/data-connect';
-import type {
-  SourceSection,
-  PdfRect,
-  KnowledgeDocumentKind,
-} from '../../../shared/contracts/knowledge/index.js';
+import type { PdfRect } from '../../../shared/contracts/knowledge/index.js';
 import {
   createEmbeddingConfig,
   createVertexEmbeddingAdapter,
   validateEmbeddingVectors,
-  type EmbeddingConfig,
 } from '../knowledge/embedding.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from '../knowledge/runtime.js';
 import {
@@ -20,38 +15,11 @@ import {
   isSyntheticSource,
 } from '../../../shared/knowledge-metadata.js';
 import { AiError } from './budget.js';
-import type { ActorContext } from './context.js';
-
-export type RetrievedChunk = SourceSection & {
-  cosineDistance: number;
-  documentRevision: number;
-  embeddingConfigHash: string;
-};
-
-export type RagRetrievalConfig = {
-  maxChunks: 3;
-  maxCosineDistance: number;
-  embeddingConfigHash: string;
-  evaluationSetHash: string;
-};
-
-export type RetrievalEmbedding = {
-  config: EmbeddingConfig;
-  embedTexts(texts: string[], mode: 'query'): Promise<number[][]>;
-};
-
-export type RetrievalRepository = {
-  /** Authorization and every corpus filter run inside SQL before ORDER BY/LIMIT. */
-  search(input: {
-    uid: string;
-    businessId: string;
-    vector: number[];
-    embeddingConfigHash: string;
-    embeddingModel: string;
-    limit: 3;
-    kinds: readonly KnowledgeDocumentKind[];
-  }): Promise<RetrievedChunk[]>;
-};
+import type { ActorContext } from './models/actor-context.js';
+import type { RetrievedChunk } from './models/retrieved-chunk.js';
+import type { RagRetrievalConfig } from './models/rag-retrieval-config.js';
+import type { RetrievalEmbedding } from './models/retrieval-embedding.js';
+import type { RetrievalRepository } from './models/retrieval-repository.js';
 
 function isHash(value: unknown): value is string {
   return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);

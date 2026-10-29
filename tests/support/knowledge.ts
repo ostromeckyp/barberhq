@@ -3,7 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { initializeApp, deleteApp, applicationDefault } from 'firebase-admin/app';
 import { getDataConnect } from 'firebase-admin/data-connect';
 import { createEmbeddingConfig } from '../../functions/src/knowledge/embedding.ts';
-import { KnowledgePipeline, type ManifestEntry } from '../../functions/src/knowledge/pipeline.ts';
+import { KnowledgePipeline } from '../../functions/src/knowledge/pipeline.ts';
+import type { ManifestEntry } from '../../functions/src/knowledge/models/manifest-entry.ts';
 import { KnowledgeRepository } from '../../functions/src/knowledge/repository.ts';
 import {
   KNOWLEDGE_CLOUD_CONFIG_PATH,

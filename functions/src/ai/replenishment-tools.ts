@@ -1,37 +1,20 @@
-import type { StockContext, PrepareInput, ProposalResult } from '../../../shared/contracts/ai/index.js';
 import type {
-  LookupAlias,
-  LookupProduct,
-  ProductMatch,
-} from '../../../shared/contracts/product-lookup/index.js';
+  StockContext,
+  PrepareInput,
+  ProposalResult,
+} from '../../../shared/contracts/ai/index.js';
+import type { ProductMatch } from '../../../shared/contracts/product-lookup/index.js';
 import type { ClarificationLine } from '../../../shared/contracts/draft/index.js';
-import type { ActorContext } from './context.js';
-import { AiError, consumeToolCall, runWithinBudget, type AiBudget } from './budget.js';
-import { bindSourceLines, type RequestedLine } from './proposal.js';
+import type { ActorContext } from './models/actor-context.js';
+import { AiError, consumeToolCall, runWithinBudget } from './budget.js';
+import type { AiBudget } from './models/ai-budget.js';
+import { bindSourceLines } from './proposal.js';
+import type { RequestedLine } from './models/requested-line.js';
 import { lookupProducts } from './product-lookup.js';
-export type ReplenishmentProduct = LookupProduct & StockContext;
-export type ReplenishmentContext = {
-  products: ReplenishmentProduct[];
-  aliases: LookupAlias[];
-  catalogRevision: number;
-  salonAliasRevision: number;
-};
-export type ReplenishmentRepository = {
-  readContext(
-    actor: ActorContext,
-    salonId: string,
-    budget: AiBudget,
-  ): Promise<ReplenishmentContext>;
-};
-export type ReplenishmentTools = ReturnType<typeof createReplenishmentTools>;
-export type FinalProposal = {
-  result: ProposalResult;
-  /** Final product clarifications (model-extracted phrase, offered candidates). */
-  clarifications: { lineId: string; productQuery: string; allowedProductIds: string[] }[];
-  /** Explicit user choices that passed final validation. */
-  choices: { lineId: string; productId: string; choiceReceiptId?: string }[];
-  catalogRevision: number;
-};
+import type { ReplenishmentProduct } from './models/replenishment-product.js';
+import type { ReplenishmentContext } from './models/replenishment-context.js';
+import type { ReplenishmentRepository } from './models/replenishment-repository.js';
+import type { FinalProposal } from './models/final-proposal.js';
 function stockOf(p: ReplenishmentProduct): StockContext {
   const {
     productId,

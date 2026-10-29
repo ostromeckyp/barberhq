@@ -8,57 +8,18 @@ import {
   storageKind,
   storageOrigin,
 } from '../../../shared/knowledge-metadata.js';
-import type {
-  KnowledgeMetadata,
-  ProcessingResult,
-} from '../../../shared/contracts/knowledge/index.js';
+import type { ProcessingResult } from '../../../shared/contracts/knowledge/index.js';
 import { chunkPages } from './chunk.js';
 import { extractPdf, validatePdf } from './extract.js';
-import type { EmbeddingConfig, EmbeddingMode } from './embedding.js';
 import { KnowledgeError, KnowledgeRepository } from './repository.js';
 import { unlinkedPassages } from '../product-knowledge/commands.js';
 import { productKnowledgeHash } from '../product-knowledge/rules.js';
 import type { KnowledgeProductReview } from '../../../shared/contracts/product-knowledge/index.js';
-
-export type ManifestEntry = {
-  documentId: string;
-  version: string;
-  title: string;
-  language: string;
-  businessKey: string;
-  kind: KnowledgeMetadata['kind'];
-  origin: KnowledgeMetadata['origin'];
-  publicationStatus: 'demo-current' | 'retired';
-  /** Product cards only: the seeded product this card belongs to. */
-  productDemoId?: string;
-  /** Procedures only: the delivery problem kind the demo binds to this document. */
-  deliveryProblemKind?: 'DAMAGED' | 'MISSING';
-  inputPdf: string;
-  sha256: string;
-  sourceUrls: string[];
-  observedOn: string | null;
-};
-export type ReviewInput = {
-  versionId: string;
-  pdfSha256: string;
-  extractionHash: string;
-  reviewedPhysicalPages: number[];
-  approvalText: string;
-  approvedAt: string;
-};
-export type OperatorActor = { kind: 'operator'; id: string; businessId: string };
-export type HqActor = { kind: 'hq'; uid: string; businessId: string };
-export type ReviewActor = OperatorActor | HqActor;
-export type PublishInput = {
-  versionId: string;
-  expectedDocumentRevision: number;
-  expectedVersionRevision?: number;
-  extractionHash?: string;
-};
-export type Embedder = {
-  config: EmbeddingConfig;
-  embedTexts(texts: string[], mode: EmbeddingMode): Promise<number[][]>;
-};
+import type { ManifestEntry } from './models/manifest-entry.js';
+import type { ReviewInput } from './models/review-input.js';
+import type { ReviewActor } from './models/review-actor.js';
+import type { PublishInput } from './models/publish-input.js';
+import type { Embedder } from './models/embedder.js';
 
 export function knowledgeIds(businessId: string, documentCode: string, version: string) {
   if (!/^[A-Z0-9-]{3,64}$/.test(documentCode) || !/^v(?:0|[1-9][0-9]*)$/.test(version))

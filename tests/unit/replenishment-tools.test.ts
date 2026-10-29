@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createAiBudget } from '../../functions/src/ai/budget.ts';
-import {
-  createReplenishmentTools,
-  type ReplenishmentContext,
-} from '../../functions/src/ai/replenishment-tools.ts';
+import { createReplenishmentTools } from '../../functions/src/ai/replenishment-tools.ts';
+import type { ReplenishmentContext } from '../../functions/src/ai/models/replenishment-context.ts';
 import type { LookupAlias } from '../../shared/contracts/product-lookup/index.ts';
 
 const actor = { uid: 'staff', businessId: 'business', role: 'SALON' as const, salonIds: ['salon'] };

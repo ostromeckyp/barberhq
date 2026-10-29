@@ -1,9 +1,11 @@
 import { z, type ModelArgument } from 'genkit';
 import { vertexAI } from '@genkit-ai/google-genai';
-import type { PrepareInput, ProductMatch } from '../../../shared/contracts/ai/index.js';
-import { AiError, type AiBudget } from './budget.js';
-import { createAiRuntime, runBudgetedModelTurn, type ReasoningConfig } from './runtime.js';
-import type { ReplenishmentTools } from './replenishment-tools.js';
+import type { ProductMatch } from '../../../shared/contracts/ai/index.js';
+import { AiError } from './budget.js';
+import { createAiRuntime, runBudgetedModelTurn } from './runtime.js';
+import type { ReasoningConfig } from './models/reasoning-config.js';
+import type { ReplenishmentModelOutput } from './models/replenishment-model-output.js';
+import type { ReplenishmentGenerator } from './models/replenishment-generator.js';
 
 const requested = z
   .object({
@@ -13,18 +15,11 @@ const requested = z
   })
   .strict();
 export const replenishmentModelSchema = z.object({ items: z.array(requested).max(20) }).strict();
-export type ReplenishmentModelOutput = z.infer<typeof replenishmentModelSchema>;
 export function parseReplenishmentOutput(value: unknown): ReplenishmentModelOutput {
   const parsed = replenishmentModelSchema.safeParse(value);
   if (!parsed.success) throw new AiError('INVALID_MODEL_OUTPUT');
   return parsed.data;
 }
-export type ReplenishmentGenerator = (
-  budget: AiBudget,
-  input: PrepareInput,
-  tools: ReplenishmentTools,
-) => Promise<unknown>;
-
 export const replenishmentReasoningConfig = Object.freeze({
   provider: 'vertex',
   projectId: 'notbad-6be95',

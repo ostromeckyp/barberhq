@@ -1,30 +1,13 @@
 import { GenkitError, genkit } from 'genkit';
 import { vertexAI } from '@genkit-ai/google-genai';
-import { AiError, consumeModelTurn, runWithinBudget, type AiBudget } from './budget.js';
-import {
-  parseProcedureModelOutput,
-  procedureModelSchema,
-  type ProcedureModelOutput,
-} from './schemas.js';
-
-export type ReasoningConfig = {
-  provider: 'vertex';
-  projectId: string;
-  location: string;
-  modelId: string;
-};
-type GenerationOptions = {
-  model: string;
-  prompt: string;
-  abortSignal: AbortSignal;
-  maxTurns: 1;
-  tools: [];
-  config: {
-    maxOutputTokens: number;
-    thinkingConfig: { thinkingLevel: 'LOW'; includeThoughts: false };
-  };
-};
-export type GenerationProvider = (options: GenerationOptions) => Promise<{ text: string }>;
+import { AiError, consumeModelTurn, runWithinBudget } from './budget.js';
+import type { AiBudget } from './models/ai-budget.js';
+import { parseProcedureModelOutput, procedureModelSchema } from './schemas.js';
+import type { ProcedureModelOutput } from './models/procedure-model-output.js';
+import type { ReasoningConfig } from './models/reasoning-config.js';
+import type { GenerationProvider } from './models/generation-provider.js';
+import type { StructuredGenerationProvider } from './models/structured-generation-provider.js';
+import type { StructuredGenerationOptions } from './models/structured-generation-options.js';
 
 export async function runBudgetedModelTurn<T>(
   budget: AiBudget,
@@ -84,22 +67,6 @@ export function createBudgetedGenerator(config: ReasoningConfig, provider?: Gene
     return result.text;
   };
 }
-
-type StructuredGenerationOptions = {
-  model: string;
-  prompt: string;
-  abortSignal: AbortSignal;
-  maxTurns: 1;
-  tools: [];
-  output: { format: 'json'; schema: typeof procedureModelSchema };
-  config: {
-    maxOutputTokens: 1024;
-    thinkingConfig: { thinkingLevel: 'LOW'; includeThoughts: false };
-  };
-};
-export type StructuredGenerationProvider = (
-  options: StructuredGenerationOptions,
-) => Promise<{ output: unknown }>;
 
 function waitForCapacity(delayMs: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {

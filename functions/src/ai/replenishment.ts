@@ -9,46 +9,29 @@ import type {
   ShorthandLearning,
 } from '../../../shared/contracts/ai/index.js';
 import { createAiAdmission } from './admission.js';
-import { createAiBudget, AiError, runWithinBudget, type AiBudget } from './budget.js';
+import { createAiBudget, AiError, runWithinBudget } from './budget.js';
 import {
   aiRuntimeProfileFromEnv,
   createAiAdminDependencies,
   createAiUserEndpoint,
-  type ActorContext,
 } from './context.js';
 import { bindSourceLines } from './proposal.js';
 import { createSqlAiRepository } from './repository.js';
 import { createReplenishmentRepository } from './replenishment-repository.js';
-import { createReplenishmentTools, type ReplenishmentRepository } from './replenishment-tools.js';
+import { createReplenishmentTools } from './replenishment-tools.js';
 import {
   generateReplenishment,
   parseReplenishmentOutput,
   replenishmentReasoningConfig,
-  type ReplenishmentGenerator,
 } from './replenishment-model.js';
 import { createAiRuntime } from './runtime.js';
-import {
-  createSalonAliasCommands,
-  shorthandBounds,
-  type ShorthandCommands,
-} from './salon-alias-commands.js';
+import { createSalonAliasCommands, shorthandBounds } from './salon-alias-commands.js';
 import { parsePrepareInput } from './schemas.js';
 import { publicAiError } from './errors.js';
 import { stockConnectorConfig } from '../stock/runtime.js';
 import { CLOUD } from '../cloud-config.js';
+import type { ReplenishmentDependencies } from './models/replenishment-dependencies.js';
 
-export type ReplenishmentDependencies = {
-  resolveActor(uid: string): Promise<ActorContext>;
-  admitAiCall(
-    actor: ActorContext,
-    endpoint: 'replenishment',
-    message: string,
-    now: Date,
-  ): Promise<AiBudget>;
-  repository: ReplenishmentRepository;
-  generate: ReplenishmentGenerator;
-  shorthand: ShorthandCommands;
-};
 export function createReplenishmentPreparer(dependencies: ReplenishmentDependencies) {
   return async (uid: string, raw: unknown): Promise<ProposalResult> => {
     const began = Date.now();

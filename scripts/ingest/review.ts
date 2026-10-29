@@ -1,6 +1,7 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { ReviewInput, OperatorActor } from '../../functions/src/knowledge/pipeline.js';
+import type { OperatorActor } from '../../functions/src/knowledge/models/operator-actor.js';
+import type { ReviewInput } from '../../functions/src/knowledge/models/review-input.js';
 
 export type ReviewReceipt = { actor: OperatorActor; review: ReviewInput };
 

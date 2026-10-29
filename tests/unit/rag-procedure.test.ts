@@ -3,7 +3,7 @@ import { createAiBudget } from '../../functions/src/ai/budget.ts';
 import { createProcedureAnswerer } from '../../functions/src/ai/procedure.ts';
 import { createProcedureRetriever } from '../../functions/src/ai/retrieval.ts';
 import { createEmbeddingConfig } from '../../functions/src/knowledge/embedding.ts';
-import type { RetrievedChunk } from '../../functions/src/ai/retrieval.ts';
+import type { RetrievedChunk } from '../../functions/src/ai/models/retrieved-chunk.ts';
 
 const actor = { uid: 'user', businessId: 'business', role: 'HQ' as const, salonIds: [] };
 const chunk = {

@@ -1,8 +1,8 @@
 import type { DataConnect } from 'firebase-admin/data-connect';
 import * as sql from '@barberhq/server';
 import { AiError } from './budget.js';
-import type { ActorContext } from './context.js';
-import type { AiAdmissionRepository } from './admission.js';
+import type { ActorContext } from './models/actor-context.js';
+import type { AiAdmissionRepository } from './models/ai-admission-repository.js';
 
 /** Server connector only; named operations are generated from dataconnect/server/ai.gql. */
 type SqlOperations = Pick<typeof sql, 'readAiActor' | 'admitAiWindow'>;

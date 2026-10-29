@@ -10,16 +10,10 @@ import type { ReviewPublishService } from '../knowledge/review-publish.js';
 import { normalizeProductForMatch } from '../ai/product-lookup.js';
 import { createProductAliasCommands } from './aliases.js';
 import { createProductAdminCommands } from './commands.js';
+import type { CardStatus } from './models/card-status.js';
+import type { CardSuggestion } from './models/card-suggestion.js';
+import type { CardAttachmentState } from './models/card-attachment-state.js';
 
-export type CardStatus =
-  'UPLOADING' | 'GENERATING' | 'PUBLISHING' | 'PUBLISHED' | 'NEEDS_REVIEW' | 'FAILED';
-export type CardSuggestion = { phrase: string; kind: ProductAliasKind; collisions: string[] };
-export type CardAttachmentState = {
-  documentId: string;
-  versionId: string;
-  status: CardStatus;
-  suggestions: CardSuggestion[];
-};
 type Deps = {
   dc: DataConnect;
   repo: KnowledgeRepository;

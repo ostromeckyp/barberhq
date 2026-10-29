@@ -1,38 +1,17 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { z } from 'genkit';
-import type { PrepareInput, ShorthandLearning } from '../../../shared/contracts/ai/index.js';
+import type { ShorthandLearning } from '../../../shared/contracts/ai/index.js';
 import type { SalonShorthand } from '../../../shared/contracts/product-lookup/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 import { normalizeProductForMatch } from './product-lookup.js';
-import type { ActorContext } from './context.js';
-import { AiError, consumeToolCall, runWithinBudget, type AiBudget } from './budget.js';
+import { AiError, consumeToolCall, runWithinBudget } from './budget.js';
+import type { AiBudget } from './models/ai-budget.js';
+import type { ConfirmChoice } from './models/confirm-choice.js';
+import type { RemoveShorthandInput } from './models/remove-shorthand-input.js';
+import type { ShorthandCommands } from './models/shorthand-commands.js';
 
 export const shorthandBounds = Object.freeze({ phraseChars: 120, activePerSalon: 200 });
-export type IssueChoice = { lineId: string; productQuery: string; allowedProductIds: string[] };
-export type ConfirmChoice = { lineId: string; productId: string; choiceReceiptId: string };
-export type RemoveShorthandInput = {
-  salonId: string;
-  aliasId: string;
-  expectedRevision: number;
-  idempotencyKey: string;
-};
-export type ShorthandCommands = {
-  issue(
-    actor: ActorContext,
-    input: PrepareInput,
-    choices: IssueChoice[],
-    budget: AiBudget,
-    catalogRevision: number,
-  ): Promise<Map<string, string>>;
-  confirm(
-    actor: ActorContext,
-    input: PrepareInput,
-    choices: ConfirmChoice[],
-    budget: AiBudget,
-  ): Promise<ShorthandLearning[]>;
-};
-
 const sha256 = (text: string) => createHash('sha256').update(text).digest('hex');
 /**
  * Deterministic per salon phrase as lookup sees it (inflection-folded), so variants share one
@@ -275,4 +254,3 @@ export function createSalonAliasCommands(dc: DataConnect) {
     },
   } satisfies ShorthandCommands & { remove: unknown };
 }
-export type SalonAliasCommands = ReturnType<typeof createSalonAliasCommands>;

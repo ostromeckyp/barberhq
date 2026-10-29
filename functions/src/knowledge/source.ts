@@ -6,6 +6,11 @@ import { getStorage } from 'firebase-admin/storage';
 import { getDataConnect } from 'firebase-admin/data-connect';
 import { onRequest } from 'firebase-functions/v2/https';
 import { CLOUD } from '../cloud-config.js';
+import type { PdfIdentity } from './models/pdf-identity.js';
+import type { SourceRequest } from './models/source-request.js';
+import type { SourceResponse } from './models/source-response.js';
+import type { SourceDeps } from './models/source-deps.js';
+import type { SourceStorageEnvironment } from './models/source-storage-environment.js';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const DEMO_PROJECT = 'demo-barberhq';
@@ -14,40 +19,6 @@ const CLOUD_PROJECT = CLOUD.projectId;
 const CLOUD_SERVICE = CLOUD.sqlService;
 const CLOUD_LOCATION = CLOUD.sqlLocation;
 const CLOUD_BUCKET = CLOUD.bucket;
-
-export type PdfIdentity = {
-  id: string;
-  businessId: string;
-  status: string;
-  publishedAt: string | null;
-  revokedAt: string | null;
-  bucket: string | null;
-  objectPath: string | null;
-  objectGeneration: string | null;
-  pdfSha256: string;
-  byteSize: number | null;
-  pageCount: number | null;
-  contentType: string | null;
-};
-export type SourceRequest = {
-  method: string;
-  headers: Record<string, string | string[] | undefined>;
-  query: Record<string, unknown>;
-};
-export type SourceResponse = {
-  status(code: number): SourceResponse;
-  set(name: string, value: string): SourceResponse;
-  send(body: unknown): SourceResponse;
-  end(): SourceResponse;
-};
-export type SourceDeps = {
-  origins: string[];
-  emulator: boolean;
-  verifyAuth(token: string): Promise<string | null>;
-  verifyAppCheck(token: string): Promise<boolean>;
-  resolve(uid: string, versionId: string): Promise<PdfIdentity | null>;
-  readOriginal(identity: PdfIdentity): Promise<Uint8Array>;
-};
 
 const header = (request: SourceRequest, name: string): string | undefined => {
   const value = request.headers[name];
@@ -193,14 +164,6 @@ export async function resolveSourceIdentity(
   if (member.role === 'HQ' && !identity.publishedAt) return identity;
   return null;
 }
-
-export type SourceStorageEnvironment = {
-  emulator: boolean;
-  projectId: string | undefined;
-  cloudBucket: string;
-  firebaseStorageHost: string | undefined;
-  storageHost: string | undefined;
-};
 
 function localHost(value: string, withProtocol: boolean): string {
   if (!withProtocol && value.includes('://')) throw Error('invalid storage emulator host');

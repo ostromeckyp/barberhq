@@ -5,7 +5,7 @@ import { getDataConnect } from 'firebase-admin/data-connect';
 import { seedRecords } from '../../scripts/seed/business.ts';
 import { validateSeed } from '../../scripts/prepare-data/catalog.ts';
 import { knowledgeConnectorConfig, resolveKnowledgeTarget } from './knowledge-target.ts';
-import type { ActorContext } from '../../functions/src/ai/context.ts';
+import type { ActorContext } from '../../functions/src/ai/models/actor-context.ts';
 
 /** Isolated-emulator business with HQ, two salons, a foreign business and fake (Auth-free) members. */
 export async function createLookupHarness(name = 'lookup') {

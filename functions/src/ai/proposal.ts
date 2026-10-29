@@ -1,19 +1,9 @@
 import type { PrepareInput } from '../../../shared/contracts/ai/index.js';
 import { AiError } from './budget.js';
 
-export type RequestedLine = {
-  originalWording: string;
-  productQuery: string;
-  quantity: number | null;
-};
-export type SourceLine = RequestedLine & {
-  lineId: string;
-  start: number;
-  end: number;
-  selectedProductId?: string;
-  choiceReceiptId?: string;
-};
 import { normalizeProduct } from '../../../shared/product-normalization.js';
+import type { RequestedLine } from './models/requested-line.js';
+import type { SourceLine } from './models/source-line.js';
 export { normalizeProduct } from '../../../shared/product-normalization.js';
 
 /** Keep choices stateless and tied to exact source spans, including repeated wording. */

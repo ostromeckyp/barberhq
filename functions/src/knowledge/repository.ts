@@ -3,9 +3,9 @@ import type { DataConnect } from 'firebase-admin/data-connect';
 import type { getStorage } from 'firebase-admin/storage';
 import * as sql from '@barberhq/server';
 import { validateEmbeddingVectors } from './embedding.js';
+import type { VersionState } from './models/version-state.js';
+import type { DocumentState } from './models/document-state.js';
 
-export type VersionState = NonNullable<sql.KnowledgeVersionStateData['knowledgeVersion']>;
-export type DocumentState = NonNullable<sql.KnowledgeDocumentStateData['knowledgeDocument']>;
 type Bucket = ReturnType<ReturnType<typeof getStorage>['bucket']>;
 
 /** All mutations use the server connector. The Vector scalar currently needs the

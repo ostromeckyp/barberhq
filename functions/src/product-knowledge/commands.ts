@@ -1,4 +1,5 @@
-import { runWithinBudget, type AiBudget } from '../ai/budget.js';
+import { runWithinBudget } from '../ai/budget.js';
+import type { AiBudget } from '../ai/models/ai-budget.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type {
   AcceptKnowledgeProductReviewInput,
@@ -10,14 +11,12 @@ import type {
 } from '../../../shared/contracts/product-knowledge/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 import { KnowledgeError, type KnowledgeRepository } from '../knowledge/repository.js';
-import {
-  ProductKnowledgeRepository,
-  type ProductKnowledgeState,
-  type KnowledgeAliasRow,
-  type KnowledgeLinkRow,
-  type KnowledgeProfileRow,
-  type ProductOperation,
-} from './repository.js';
+import { ProductKnowledgeRepository } from './repository.js';
+import type { ProductKnowledgeState } from './models/product-knowledge-state.js';
+import type { ProductOperation } from './models/product-operation.js';
+import type { KnowledgeAliasRow } from './models/knowledge-alias-row.js';
+import type { KnowledgeProfileRow } from './models/knowledge-profile-row.js';
+import type { KnowledgeLinkRow } from './models/knowledge-link-row.js';
 import {
   resolveKnowledgePassage,
   validateProductLinks,

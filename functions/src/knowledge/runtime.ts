@@ -2,6 +2,10 @@ import { getDataConnect } from 'firebase-admin/data-connect';
 import { getStorage } from 'firebase-admin/storage';
 import { CLOUD } from '../cloud-config.js';
 import { KnowledgeError } from './repository.js';
+import type { KnowledgeRuntimeInput } from './models/knowledge-runtime-input.js';
+import type { KnowledgeRuntimeConfig } from './models/knowledge-runtime-config.js';
+import type { UserEndpointRequest } from './models/user-endpoint-request.js';
+import type { UserEndpointDependencies } from './models/user-endpoint-dependencies.js';
 
 const PROJECT = CLOUD.projectId;
 const CLOUD_SERVICE = CLOUD.sqlService;
@@ -12,34 +16,6 @@ const VERTEX_LOCATION = CLOUD.vertexAi.location;
 const VERTEX_DIMENSION = CLOUD.vertexAi.dimension;
 const DEMO_PROJECT = 'demo-barberhq';
 const DEMO_BUCKET = 'demo-barberhq.appspot.com';
-
-export type KnowledgeRuntimeInput = {
-  emulator: boolean;
-  projectId?: string;
-  authHost?: string;
-  sqlHost?: string;
-  firebaseStorageHost?: string;
-  storageHost?: string;
-  serviceId?: string;
-  sqlLocation?: string;
-  bucket?: string;
-  vertexProject?: string;
-  vertexModel?: string;
-  vertexLocation?: string;
-  vertexDimension?: string;
-};
-
-export type KnowledgeRuntimeConfig = {
-  emulator: boolean;
-  projectId: string;
-  serviceId: string;
-  sqlLocation: string;
-  bucket: string;
-  vertexProject: string;
-  vertexModel: string;
-  vertexLocation: string;
-  vertexDimension: number;
-};
 
 function isLoopback(host: string | undefined, allowUrl: boolean): boolean {
   if (!host) return false;
@@ -185,19 +161,6 @@ export function knowledgeDataConnectors(config: KnowledgeRuntimeConfig) {
 export function knowledgeBucket(config: KnowledgeRuntimeConfig) {
   return getStorage().bucket(config.bucket);
 }
-
-export type UserEndpointRequest<T = unknown> = {
-  data: T;
-  authUid?: string;
-  idToken?: string;
-  appCheckToken?: string;
-  emulator: boolean;
-};
-export type UserEndpointDependencies = {
-  verifyAuth(token: string): Promise<string | null>;
-  verifyAppCheck(token: string): Promise<boolean>;
-};
-export type EndpointFailure = KnowledgeError;
 
 /** Testable security boundary shared by all authenticated callable adapters. */
 export function createUserEndpoint<T, R>(

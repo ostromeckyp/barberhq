@@ -175,4 +175,3 @@ export function createProductAliasCommands(dc: DataConnect) {
     },
   };
 }
-export type ProductAliasCommands = ReturnType<typeof createProductAliasCommands>;

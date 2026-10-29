@@ -213,4 +213,3 @@ export function createProductAdminCommands(dc: DataConnect) {
     },
   };
 }
-export type ProductAdminCommands = ReturnType<typeof createProductAdminCommands>;

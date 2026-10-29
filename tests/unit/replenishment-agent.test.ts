@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { createAiBudget } from '../../functions/src/ai/budget.ts';
 import { createReplenishmentPreparer } from '../../functions/src/ai/replenishment.ts';
-import type { ReplenishmentContext } from '../../functions/src/ai/replenishment-tools.ts';
+import type { ReplenishmentContext } from '../../functions/src/ai/models/replenishment-context.ts';
 
 const noLearning = { issue: async () => new Map<string, string>(), confirm: async () => [] };
 const actor = { uid: 'staff', businessId: 'business', role: 'SALON' as const, salonIds: ['salon'] };
