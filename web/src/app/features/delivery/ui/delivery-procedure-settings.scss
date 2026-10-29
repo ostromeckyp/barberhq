@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  margin: 20px 0;
+}
+mat-form-field {
+  width: 100%;
+}
+article button {
+  margin-top: 5px;
+  min-height: 44px;
+}
+p {
+  line-height: 1.5;
+}
+.note {
+  color: var(--muted);
+  font-size: 14px;
+}

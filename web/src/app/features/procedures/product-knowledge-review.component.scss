@@ -1,0 +1,87 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.product-review {
+  border-top: 1px solid var(--mat-sys-outline-variant, #ddd);
+  margin-top: 32px;
+  padding-top: 24px;
+  min-width: 0;
+}
+h2,
+h3 {
+  margin: 0 0 12px;
+}
+p {
+  line-height: 1.5;
+}
+fieldset,
+.link,
+.profile,
+.unlinked {
+  min-width: 0;
+  border: 1px solid var(--mat-sys-outline-variant, #ddd);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+}
+mat-form-field {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  line-height: 1.5;
+  max-height: 280px;
+  overflow: auto;
+}
+.alias-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.3fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 20px;
+}
+.alias-row small {
+  grid-column: 1/-1;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.origin {
+  font-size: 12px;
+  font-weight: 500;
+}
+.error {
+  color: var(--mat-sys-error, #b00020);
+}
+button {
+  max-width: 100%;
+  white-space: normal;
+  height: auto;
+  min-height: 40px;
+}
+mat-checkbox {
+  max-width: 100%;
+}
+@media (max-width: 680px) {
+  fieldset,
+  .link,
+  .profile,
+  .unlinked {
+    padding: 12px;
+  }
+  .alias-row {
+    grid-template-columns: 1fr;
+  }
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

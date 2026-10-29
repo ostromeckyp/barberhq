@@ -1,0 +1,287 @@
+<app-page-header
+  eyebrow="HQ WORKSPACE"
+  [title]="productId() || facade.productId() ? 'Edit product' : 'Add product'"
+  description="Catalog details, HQ quantity and the phrases the ordering assistant understands."
+>
+  <a mat-stroked-button routerLink="/hq/stock">Back to HQ stock</a>
+</app-page-header>
+
+<section class="card" aria-labelledby="product-details">
+  <h2 id="product-details">Product details</h2>
+  <form class="grid" (submit)="$event.preventDefault(); saveProduct()">
+    <mat-form-field appearance="outline"
+      ><mat-label>Name</mat-label><input matInput [formField]="fields.name"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Brand</mat-label><input matInput [formField]="fields.brand"
+    /></mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Category</mat-label>
+      <mat-select aria-label="Category" [formField]="fields.category">
+        @for (c of categories; track c) {
+          <mat-option [value]="c">{{ c }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Type (optional)</mat-label><input matInput [formField]="fields.type"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Product code</mat-label><input matInput [formField]="fields.sourceCode"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Net content (ml)</mat-label
+      ><input matInput type="number" [formField]="fields.netContentMl"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Retail price (grosz)</mat-label
+      ><input matInput type="number" [formField]="fields.retailPriceGrosz"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Scent (optional)</mat-label><input matInput [formField]="fields.scent"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Source URL</mat-label><input matInput [formField]="fields.sourceUrl"
+    /></mat-form-field>
+    <mat-form-field appearance="outline"
+      ><mat-label>Observed on</mat-label
+      ><input matInput type="date" [formField]="fields.observedOn"
+    /></mat-form-field>
+    <mat-form-field appearance="outline" style="grid-column: 1 / -1"
+      ><mat-label>Description</mat-label
+      ><textarea matInput rows="3" [formField]="fields.summary"></textarea>
+    </mat-form-field>
+    @if (!facade.productId()) {
+      <mat-form-field appearance="outline"
+        ><mat-label>HQ quantity</mat-label
+        ><input matInput type="number" [formField]="fields.hqOnHand"
+      /></mat-form-field>
+    }
+    @if (!facade.productId()) {
+      <div style="grid-column: 1 / -1">
+        <h3>Product card (optional)</h3>
+        <p>The PDF is attached after the product is added; AI then suggests aliases from it.</p>
+        <app-pdf-dropzone
+          label="Product card PDF"
+          [fileName]="pendingCard()?.name ?? ''"
+          [disabled]="facade.saving()"
+          (filesSelected)="pickPendingCard($event)"
+        />
+      </div>
+    }
+    <div class="row" style="grid-column: 1 / -1">
+      <button mat-flat-button type="submit" [disabled]="facade.saving() || fields().invalid()">
+        {{ facade.productId() ? 'Save product' : 'Add product' }}
+      </button>
+      @if (facade.message()) {
+        <span role="status">{{ facade.message() }}</span>
+      }
+    </div>
+  </form>
+</section>
+
+@if (facade.productId() && facade.stock(); as stock) {
+  <section class="card" aria-labelledby="hq-quantity">
+    <h2 id="hq-quantity">HQ quantity</h2>
+    <p>Reserved for salon deliveries: {{ stock.reserved }} · Available: {{ stock.available }}</p>
+    <div class="row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>On hand at HQ</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          [value]="facade.stockDraft()"
+          (input)="facade.stockDraft.set($any($event.target).valueAsNumber)"
+        />
+      </mat-form-field>
+      <button mat-stroked-button (click)="facade.saveStock()">Save quantity</button>
+    </div>
+    @if (facade.stockMessage()) {
+      <p role="status">{{ facade.stockMessage() }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="product-aliases">
+    <h2 id="product-aliases">Aliases</h2>
+    <p>
+      How people name this product when ordering. Pronunciation covers how a foreign name sounds in
+      Polish.
+    </p>
+    @for (group of aliasGroups(); track group.kind) {
+      <h3 class="kind">{{ kindLabel(group.kind) }}</h3>
+      <ul>
+        @for (alias of group.aliases; track alias.id) {
+          <li>
+            @if (editingId() === alias.id) {
+              <div class="row alias-edit phrase">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                  <mat-label>Phrase</mat-label>
+                  <input
+                    matInput
+                    [attr.aria-label]="'Edit phrase ' + alias.phrase"
+                    [value]="editPhrase()"
+                    (input)="editPhrase.set($any($event.target).value)"
+                  />
+                </mat-form-field>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="kind">
+                  <mat-label>Kind</mat-label>
+                  <mat-select
+                    [aria-label]="'Edit kind ' + alias.phrase"
+                    [value]="editKind()"
+                    (valueChange)="editKind.set($event)"
+                  >
+                    @for (k of kinds; track k.value) {
+                      <mat-option [value]="k.value">{{ k.label }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <button
+                mat-button
+                [attr.aria-label]="'Save alias ' + alias.phrase"
+                [disabled]="!editPhrase().trim()"
+                (click)="saveEdit(alias)"
+              >
+                Save
+              </button>
+              <button mat-button (click)="editingId.set(null)">Cancel</button>
+            } @else {
+              <span class="phrase">{{ alias.phrase }}</span>
+              <span class="badge">{{ sourceLabel[alias.source] }}</span>
+              @if (alias.editable) {
+                <button
+                  mat-icon-button
+                  [attr.aria-label]="'Edit alias ' + alias.phrase"
+                  (click)="startEdit(alias)"
+                >
+                  <mat-icon aria-hidden="true">edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  [attr.aria-label]="'Remove alias ' + alias.phrase"
+                  (click)="facade.removeAlias(alias)"
+                >
+                  <mat-icon aria-hidden="true">delete</mat-icon>
+                </button>
+              }
+            }
+          </li>
+        }
+      </ul>
+    } @empty {
+      <p>No aliases yet.</p>
+    }
+    <div class="row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>New alias</mat-label>
+        <input matInput [value]="newAlias()" (input)="newAlias.set($any($event.target).value)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 0 1 180px">
+        <mat-label>Kind</mat-label>
+        <mat-select [value]="facade.newAliasKind()" (valueChange)="facade.newAliasKind.set($event)">
+          @for (k of kinds; track k.value) {
+            <mat-option [value]="k.value">{{ k.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-stroked-button [disabled]="!newAlias().trim()" (click)="addAlias()">
+        Add alias
+      </button>
+    </div>
+    @for (c of facade.collisions(); track c.phrase) {
+      <p class="warning" role="status">
+        “{{ c.phrase }}” also matches: {{ c.productNames.join(', ') }}
+      </p>
+    }
+    @if (facade.aliasMessage()) {
+      <p role="alert">
+        {{ facade.aliasMessage() }}
+        <button mat-button (click)="facade.retryAliases()">Retry</button>
+      </p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="product-card">
+    <h2 id="product-card">Product card</h2>
+    <p>
+      Attach the product card PDF. AI suggests aliases from it; the card is published to the
+      document library.
+    </p>
+    <app-pdf-dropzone
+      label="Product card PDF"
+      [fileName]="attachedName()"
+      [disabled]="cardBusy()"
+      (filesSelected)="attach($event)"
+    />
+    @if (facade.card(); as card) {
+      <p role="status">Card status: {{ cardStatus[card.status] }}</p>
+    }
+    @if (facade.suggestions().length) {
+      <div class="suggestions-head">
+        <h3>Suggested from the card ({{ facade.suggestions().length }})</h3>
+        <button mat-flat-button aria-label="Accept all suggestions" (click)="acceptAll()">
+          Accept all
+        </button>
+      </div>
+      <p class="muted">Edit a phrase or its kind before accepting. Rejected ones are not saved.</p>
+      <ul>
+        @for (s of facade.suggestions(); track s.phrase) {
+          <li class="suggestion">
+            <div class="suggestion-fields">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Phrase</mat-label>
+                <input
+                  matInput
+                  [attr.aria-label]="'Suggested phrase ' + s.phrase"
+                  [value]="suggestionText(s)"
+                  (input)="suggestionEdits.set(s.phrase, $any($event.target).value)"
+                />
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="kind">
+                <mat-label>Kind</mat-label>
+                <mat-select
+                  [aria-label]="'Suggested kind ' + s.phrase"
+                  [value]="suggestionKind(s)"
+                  (valueChange)="suggestionKinds.set(s.phrase, $event)"
+                >
+                  @for (k of kinds; track k.value) {
+                    <mat-option [value]="k.value">{{ k.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="suggestion-actions">
+              <button
+                mat-stroked-button
+                [attr.aria-label]="'Accept ' + s.phrase"
+                (click)="acceptSuggestion(s)"
+              >
+                Accept
+              </button>
+              <button
+                mat-icon-button
+                [attr.aria-label]="'Reject ' + s.phrase"
+                (click)="facade.rejectSuggestion(s)"
+              >
+                <mat-icon aria-hidden="true">close</mat-icon>
+              </button>
+            </div>
+            @if (s.collisions.length) {
+              <p class="collision">
+                <mat-icon aria-hidden="true">warning</mat-icon>Also matches
+                {{ s.collisions.join(', ') }}
+              </p>
+            }
+          </li>
+        }
+      </ul>
+    }
+    @if (facade.cardMessage() || facade.card()?.status === 'FAILED') {
+      <p role="alert">
+        {{ facade.cardMessage() || 'The card could not be processed.' }}
+        <button mat-button (click)="facade.retryCard()">Retry processing</button>
+      </p>
+    }
+  </section>
+}
