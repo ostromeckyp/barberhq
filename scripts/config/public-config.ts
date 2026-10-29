@@ -1,11 +1,12 @@
-import { z } from "zod";
+import { z } from 'zod';
 const identifier = z
   .string()
   .min(1)
   .regex(/^[a-z][a-z0-9-]*$/);
-const httpsUrl = z
-  .url()
-  .refine((u) => new URL(u).protocol === "https:", "HTTPS required");
+const httpsUrl = z.url().refine((value) => {
+  const url = new URL(value);
+  return url.protocol === 'https:' && !url.username && !url.password && !url.hash && !url.search;
+}, 'A credential-free HTTPS endpoint without a fragment is required');
 const schema = z
   .strictObject({
     projectId: identifier,
@@ -35,21 +36,16 @@ const schema = z
   .superRefine((c, ctx) => {
     if (c.projectId !== c.firebase.projectId)
       ctx.addIssue({
-        code: "custom",
-        message: "Firebase project does not match selected project",
-      });
-    if (c.knowledgeEnabled && (!c.pdfReadUrl || !c.pdfUploadUrl))
-      ctx.addIssue({
-        code: "custom",
-        message: "Knowledge requires read and upload endpoints",
+        code: 'custom',
+        message: 'Firebase project does not match selected project',
       });
     if (
       (c.ragEnabled && !c.knowledgeEnabled) ||
       (c.replenishmentAiEnabled && !c.replenishmentEnabled)
     )
       ctx.addIssue({
-        code: "custom",
-        message: "AI feature requires its parent feature",
+        code: 'custom',
+        message: 'AI feature requires its parent feature',
       });
   });
 export type PublicConfig = z.infer<typeof schema>;

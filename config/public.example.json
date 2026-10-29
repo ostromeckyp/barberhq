@@ -8,11 +8,13 @@
   },
   "functionsRegion": "europe-west1",
   "dataConnect": {
-    "serviceId": "barberhq",
-    "location": "europe-west1",
+    "serviceId": "notbad-6be95-service",
+    "location": "europe-west3",
     "browserConnectorId": "browser"
   },
   "hostingSiteId": "notbad-6be95",
+  "pdfReadUrl": "https://europe-west1-notbad-6be95.cloudfunctions.net/getSourcePdf",
+  "pdfUploadUrl": "https://europe-west1-notbad-6be95.cloudfunctions.net/uploadKnowledgePdf",
   "appCheck": {
     "siteKey": "REPLACE_WITH_PUBLIC_SITE_KEY"
   },

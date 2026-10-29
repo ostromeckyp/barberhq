@@ -1,0 +1,7 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o/{path=**} {
+    // Original files are read via the server using Auth/SQL IAM.
+    allow read, write: if false;
+  }
+}

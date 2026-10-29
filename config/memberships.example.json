@@ -1,0 +1,6 @@
+[
+  { "uid": "REPLACE_WITH_HQ_UID", "role": "HQ", "salonKeys": [] },
+  { "uid": "REPLACE_WITH_LEGNICKA_UID", "role": "SALON", "salonKeys": ["legnicka"] },
+  { "uid": "REPLACE_WITH_LODZKA_UID", "role": "SALON", "salonKeys": ["lodzka"] },
+  { "uid": "REPLACE_WITH_ZAKLADOWA_UID", "role": "SALON", "salonKeys": ["zakladowa"] }
+]

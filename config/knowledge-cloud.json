@@ -1,0 +1,15 @@
+{
+  "projectId": "notbad-6be95",
+  "firebaseStorageBucket": "notbad-6be95.firebasestorage.app",
+  "dataConnect": {
+    "serviceId": "notbad-6be95-service",
+    "location": "europe-west3",
+    "database": "notbad-6be95-database",
+    "instanceId": "notbad-6be95-instance"
+  },
+  "vertexAi": {
+    "model": "gemini-embedding-001",
+    "location": "europe-west3",
+    "dimension": 768
+  }
+}

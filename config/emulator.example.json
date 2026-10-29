@@ -18,6 +18,6 @@
   },
   "replenishmentEnabled": true,
   "knowledgeEnabled": false,
-  "replenishmentAiEnabled": false,
+  "replenishmentAiEnabled": true,
   "ragEnabled": false
 }

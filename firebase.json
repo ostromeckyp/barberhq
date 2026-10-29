@@ -12,7 +12,9 @@
       "port": 9099
     },
     "ui": {
-      "enabled": false
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 4000
     },
     "singleProjectMode": true,
     "hosting": {
@@ -27,13 +29,7 @@
   "hosting": {
     "site": "notbad-6be95",
     "public": "web/dist/barberhq/browser",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "**/*.map",
-      "**/*.pdf"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/*.map", "**/*.pdf"],
     "rewrites": [
       {
         "source": "**",
@@ -55,23 +51,18 @@
         ]
       }
     ],
-    "predeploy": [
-      "node --import tsx scripts/checks/release.ts"
-    ]
+    "predeploy": ["node --import tsx scripts/checks/release.ts"]
   },
   "functions": [
     {
       "source": "functions",
       "codebase": "stock",
       "runtime": "nodejs22",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "**/*.log"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
+      "ignore": ["node_modules", ".git", "**/*.log"],
+      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
     }
-  ]
+  ],
+  "storage": {
+    "rules": "storage.rules"
+  }
 }
