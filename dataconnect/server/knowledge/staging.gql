@@ -1,0 +1,221 @@
+mutation StageKnowledgeVersion(
+  $businessId: String!
+  $documentId: String!
+  $documentCode: String!
+  $versionId: String!
+  $versionLabel: String!
+  $nextVersionNumber: Int!
+  $newDocument: Boolean = true
+  $existingDocument: Boolean = false
+  $title: String!
+  $language: String!
+  $sourceType: KnowledgeSourceType
+  $kind: KnowledgeDocumentKind!
+  $origin: KnowledgeOrigin!
+  $synthetic: Boolean!
+  $sourceUrls: Any!
+  $observedOn: Date
+  $bucket: String!
+  $objectPath: String!
+  $objectGeneration: String!
+  $pdfSha256: String!
+  $contentType: String!
+  $byteSize: Int!
+  $pageCount: Int!
+  $publicationStatus: KnowledgePublicationStatus = DEMO_CURRENT
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    business(id: $businessId)
+      @check(
+        expr: "this != null && vars.documentId == vars.businessId + ':' + vars.documentCode && vars.versionId == vars.documentId + ':' + vars.versionLabel && ((vars.versionLabel == 'v0' && vars.nextVersionNumber == 1 && vars.publicationStatus == 'RETIRED') || (vars.versionLabel == 'v' + string(vars.nextVersionNumber - 1) && vars.nextVersionNumber > 1))"
+        message: "INVALID_VERSION_IDENTITY"
+      ) {
+      id
+    }
+    knowledgeDocument(id: $documentId)
+      @check(
+        expr: "(vars.newDocument && !vars.existingDocument && this == null) || (!vars.newDocument && vars.existingDocument && this != null && this.businessId == vars.businessId && this.documentCode == vars.documentCode && this.nextVersionNumber != null)"
+        message: "VERSION_CONFLICT"
+      ) {
+      businessId
+      documentCode
+      nextVersionNumber
+    }
+  }
+  knowledgeDocument_insert(
+    data: {
+      id: $documentId
+      businessId: $businessId
+      documentCode: $documentCode
+      nextVersionNumber: $nextVersionNumber
+    }
+  ) @include(if: $newDocument)
+  knowledgeDocument_updateMany(
+    where: {
+      id: { eq: $documentId }
+      businessId: { eq: $businessId }
+      nextVersionNumber: { lt: $nextVersionNumber }
+    }
+    data: { nextVersionNumber: $nextVersionNumber }
+  ) @include(if: $existingDocument)
+  knowledgeVersion_insert(
+    data: {
+      id: $versionId
+      documentId: $documentId
+      businessId: $businessId
+      versionLabel: $versionLabel
+      title: $title
+      language: $language
+      sourceType: $sourceType
+      kind: $kind
+      origin: $origin
+      publicationStatus: $publicationStatus
+      synthetic: $synthetic
+      sourceUrls: $sourceUrls
+      observedOn: $observedOn
+      status: STAGED
+      revision: 1
+      bucket: $bucket
+      objectPath: $objectPath
+      objectGeneration: $objectGeneration
+      pdfSha256: $pdfSha256
+      contentType: $contentType
+      byteSize: $byteSize
+      pageCount: $pageCount
+    }
+  )
+}
+
+mutation BeginKnowledgeExtraction(
+  $versionId: String!
+  $revision: Int!
+  $pdfSha256: String!
+  $now: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && (this.processingLeaseId == null || this.processingLeaseExpiresAt <= vars.now)"
+        message: "STALE_STATE"
+      ) {
+      revision
+      processingLeaseId
+      processingLeaseExpiresAt
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      revision: { eq: $revision }
+      status: { in: [STAGED, FAILED, NEEDS_REVIEW] }
+      pdfSha256: { eq: $pdfSha256 }
+      publishedAt: { isNull: true }
+      revokedAt: { isNull: true }
+    }
+    data: {
+      status: STAGED
+      revision_update: { inc: 1 }
+      processingAttempt_update: { inc: 1 }
+      processingError: null
+      processingLeaseId: null
+      processingLeaseExpiresAt: null
+    }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+  knowledgeChunk_deleteMany(where: { versionId: { eq: $versionId } })
+  knowledgePage_deleteMany(where: { versionId: { eq: $versionId } })
+}
+
+mutation ClaimKnowledgeExtraction(
+  $versionId: String!
+  $revision: Int!
+  $expectedDocumentRevision: Int!
+  $pdfSha256: String!
+  $leaseId: String!
+  $now: Timestamp!
+  $expiresAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  documentGuard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.document.revision == vars.expectedDocumentRevision"
+        message: "STALE_STATE"
+      ) {
+      revision
+      document {
+        revision
+      }
+    }
+  }
+  leaseGuard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.pdfSha256 == vars.pdfSha256 && this.pendingStage == 'EXTRACT' && this.status in ['STAGED','FAILED'] && this.publishedAt == null && this.revokedAt == null && this.uploadedAt != null && this.bucket != null && this.objectPath != null && this.objectGeneration != null && this.contentType == 'application/pdf' && this.byteSize >= 5 && this.byteSize <= 10485760 && this.pageCount >= 1 && this.pageCount <= 30 && (this.processingLeaseId == null || this.processingLeaseExpiresAt <= vars.now) && vars.expiresAt > vars.now"
+        message: "LEASE_ACTIVE"
+      ) {
+      revision
+      pdfSha256
+      pendingStage
+      status
+      publishedAt
+      revokedAt
+      uploadedAt
+      bucket
+      objectPath
+      objectGeneration
+      contentType
+      byteSize
+      pageCount
+      processingLeaseId
+      processingLeaseExpiresAt
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      revision: { eq: $revision }
+      status: { in: [STAGED, FAILED] }
+      pendingStage: { eq: EXTRACT }
+      pdfSha256: { eq: $pdfSha256 }
+      publishedAt: { isNull: true }
+      revokedAt: { isNull: true }
+    }
+    data: {
+      status: STAGED
+      revision_update: { inc: 1 }
+      processingAttempt_update: { inc: 1 }
+      processingError: null
+      processingLeaseId: $leaseId
+      processingLeaseExpiresAt: $expiresAt
+    }
+  ) @check(expr: "this == 1", message: "LEASE_ACTIVE")
+  knowledgeChunk_deleteMany(where: { versionId: { eq: $versionId } })
+  knowledgePage_deleteMany(where: { versionId: { eq: $versionId } })
+}
+
+mutation FailKnowledgeExtraction(
+  $versionId: String!
+  $revision: Int!
+  $pdfSha256: String!
+  $leaseId: String!
+  $errorCode: String!
+) @auth(level: NO_ACCESS) @transaction {
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      revision: { eq: $revision }
+      status: { eq: STAGED }
+      pdfSha256: { eq: $pdfSha256 }
+      processingLeaseId: { eq: $leaseId }
+      publishedAt: { isNull: true }
+      revokedAt: { isNull: true }
+    }
+    data: {
+      status: FAILED
+      processingError: $errorCode
+      revision_update: { inc: 1 }
+      processingLeaseId: null
+      processingLeaseExpiresAt: null
+      pendingStage: EXTRACT
+    }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

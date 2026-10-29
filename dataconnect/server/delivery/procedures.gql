@@ -1,0 +1,129 @@
+query ReadDeliveryBindings($uid: String!) @auth(level: NO_ACCESS) {
+  membership(key: { uid: $uid }) {
+    uid
+    businessId
+    role
+    business {
+      bindings: deliveryProcedureBindings_on_business(orderBy: { kind: ASC }, limit: 2) {
+        kind
+        documentId
+        revision
+        document {
+          id
+          businessId
+          documentCode
+          activeVersionId
+          versions: knowledgeVersions_on_document(where: { isActive: { eq: true } }, limit: 2) {
+            id
+            title
+            businessId
+            status
+            publishedAt
+            revokedAt
+          }
+        }
+      }
+    }
+  }
+}
+
+query ReadDeliveryProcedureDocument($businessId: String!, $documentId: String!)
+@auth(level: NO_ACCESS) {
+  knowledgeDocument(
+    first: { where: { id: { eq: $documentId }, businessId: { eq: $businessId } } }
+  ) {
+    id
+    businessId
+    activeVersionId
+    versions: knowledgeVersions_on_document(where: { isActive: { eq: true } }, limit: 2) {
+      id
+      title
+      businessId
+      status
+      publishedAt
+      revokedAt
+    }
+  }
+}
+
+mutation SetDeliveryProcedure(
+  $uid: String!
+  $businessId: String!
+  $kind: DeliveryProblemKind!
+  $target: String!
+  $documentId: String
+  $hasDocument: Boolean!
+  $create: Boolean!
+  $revision: Int!
+  $commandId: String!
+  $key: String!
+  $payloadHash: String!
+  $result: Any!
+) @auth(level: NO_ACCESS) @transaction {
+  actor: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+  }
+  bindingGuard: query @redact {
+    deliveryProcedureBinding(key: { businessId: $businessId, kind: $kind })
+      @check(
+        expr: "vars.target == vars.kind && vars.hasDocument == (vars.documentId != null) && (vars.create ? this == null && vars.revision == 0 : this != null && this.revision == vars.revision)"
+        message: "STALE_STATE"
+      ) {
+      documentId
+      revision
+    }
+  }
+  sourceGuard: query @redact @include(if: $hasDocument) {
+    knowledgeDocument(
+      first: { where: { id: { eq: $documentId }, businessId: { eq: $businessId } } }
+    )
+      @check(
+        expr: "this != null && this.activeVersionId != null && this.versions.exists(v,v.id == this.activeVersionId && v.businessId == vars.businessId && v.status == 'READY' && v.publishedAt != null && v.revokedAt == null)"
+        message: "SOURCE_CHANGED"
+      ) {
+      businessId
+      activeVersionId
+      versions: knowledgeVersions_on_document(where: { isActive: { eq: true } }, limit: 2) {
+        id
+        businessId
+        status
+        publishedAt
+        revokedAt
+      }
+    }
+  }
+  created: deliveryProcedureBinding_insert(
+    data: { businessId: $businessId, kind: $kind, documentId: $documentId, revision: 1 }
+  ) @include(if: $create)
+  changed: deliveryProcedureBinding_updateMany(
+    where: { businessId: { eq: $businessId }, kind: { eq: $kind }, revision: { eq: $revision } }
+    data: { documentId: $documentId, revision_update: { inc: 1 }, updatedAt_expr: "request.time" }
+  ) @skip(if: $create) @check(expr: "this == 1", message: "STALE_STATE")
+  deliveryCommandReceipt_insert(
+    data: {
+      id: $commandId
+      businessId: $businessId
+      actorUid: $uid
+      type: SET_PROCEDURE
+      target: $target
+      payloadHash: $payloadHash
+      result: $result
+    }
+  )
+  deliveryActionKey_insert(
+    data: {
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      commandId: $commandId
+      payloadHash: $payloadHash
+    }
+  )
+}

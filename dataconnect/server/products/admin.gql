@@ -1,0 +1,161 @@
+# HQ product administration. Server-only; every write rechecks the HQ member and derives the business.
+query ReadProductAdmin($uid: String!, $productId: String!) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT p.id,p.demo_id AS "demoId",p.name,p.brand,p.category,COALESCE(p.seed_type,p.type) AS type,
+    p.summary_en AS summary,p.scent_pl AS scent,p.net_content_ml AS "netContentMl",
+    p.retail_price_grosz AS "retailPriceGrosz",p.source_code AS "sourceCode",p.source_url AS "sourceUrl",
+    p.observed_on::text AS "observedOn",COALESCE(i.on_hand,0) AS "onHand",COALESCE(i.reserved,0) AS reserved,
+    COALESCE(i.version,0) AS version,p.admin_revision AS revision,b.product_knowledge_revision AS "catalogRevision"
+    FROM membership m JOIN business b ON b.id=m.business_id
+    JOIN product p ON p.business_id=m.business_id AND p.id=$2
+    JOIN location l ON l.business_id=m.business_id AND l.kind::text='HQ'
+    LEFT JOIN inventory i ON i.location_id=l.id AND i.product_id=p.id
+    WHERE m.uid=$1 AND m.role::text='HQ' LIMIT 1
+    """
+    params: [$uid, $productId]
+  )
+}
+
+query ReadProductAdminScope($uid: String!) @auth(level: NO_ACCESS) {
+  membership(key: { uid: $uid }) {
+    role
+    businessId
+  }
+}
+
+query ReadProductCodeOwner($uid: String!, $sourceCode: String!) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT p.id FROM membership m JOIN product p ON p.business_id=m.business_id AND p.source_code=$2
+    WHERE m.uid=$1 AND m.role::text='HQ' LIMIT 2
+    """
+    params: [$uid, $sourceCode]
+  )
+}
+
+query ReadProductAdminOperation($uid: String!, $key: String!) @auth(level: NO_ACCESS) {
+  productAdminOperations(
+    where: { actorUid: { eq: $uid }, idempotencyKey: { eq: $key } }
+    limit: 2
+  ) {
+    action
+    payloadHash
+    result
+  }
+}
+
+mutation CreateProductAdmin(
+  $uid: String!
+  $productId: String!
+  $demoId: String!
+  $formJson: String!
+  $hqOnHand: Int!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (SELECT uid,business_id FROM membership WHERE uid=$1 AND role::text='HQ' FOR SHARE),
+    f AS MATERIALIZED (SELECT $4::jsonb AS v),
+    biz AS (
+    UPDATE business b SET product_knowledge_revision=b.product_knowledge_revision+1 FROM actor a
+    WHERE b.id=a.business_id AND b.product_knowledge_revision<2147483647 RETURNING b.id
+    ), ins AS (
+    INSERT INTO product(id,business_id,demo_id,name,brand,category,summary_en,scent_pl,source_code,net_content_ml,
+    retail_price_grosz,source_url,observed_on,seed_type,type,hq_updated_at,hq_updated_by)
+    SELECT $2,a.business_id,$3,f.v->>'name',f.v->>'brand',f.v->>'category',f.v->>'summary',f.v->>'scent',f.v->>'sourceCode',
+    (f.v->>'netContentMl')::int,(f.v->>'retailPriceGrosz')::int,f.v->>'sourceUrl',(f.v->>'observedOn')::date,
+    f.v->>'type',f.v->>'type',transaction_timestamp(),$1
+    FROM actor a,f WHERE EXISTS(SELECT 1 FROM biz)
+    AND NOT EXISTS(SELECT 1 FROM product p WHERE p.business_id=a.business_id AND p.source_code=f.v->>'sourceCode')
+    RETURNING id,business_id
+    ), inv AS (
+    INSERT INTO inventory(location_id,product_id,on_hand,reserved,version)
+    SELECT l.id,i.id,CASE WHEN l.kind::text='HQ' THEN $5 ELSE 0 END,0,1
+    FROM ins i JOIN location l ON l.business_id=i.business_id RETURNING location_id
+    )
+    INSERT INTO product_admin_operation(id,business_id,actor_uid,idempotency_key,action,payload_hash,result,created_at)
+    SELECT $6,i.business_id,$1,$7,'CREATE',$8,jsonb_build_object('productId',i.id),transaction_timestamp()
+    FROM ins i WHERE (SELECT count(*) FROM inv)>=1
+    """
+    params: [$uid, $productId, $demoId, $formJson, $hqOnHand, $operationId, $key, $payloadHash]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+mutation UpdateProductAdmin(
+  $uid: String!
+  $productId: String!
+  $expectedRevision: Int!
+  $formJson: String!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (SELECT uid,business_id FROM membership WHERE uid=$1 AND role::text='HQ' FOR SHARE),
+    f AS MATERIALIZED (SELECT $4::jsonb AS v),
+    biz AS (
+    UPDATE business b SET product_knowledge_revision=b.product_knowledge_revision+1 FROM actor a
+    WHERE b.id=a.business_id AND b.product_knowledge_revision<2147483647 RETURNING b.id
+    ), upd AS (
+    UPDATE product p SET name=f.v->>'name',brand=f.v->>'brand',category=f.v->>'category',summary_en=f.v->>'summary',
+    scent_pl=f.v->>'scent',source_code=f.v->>'sourceCode',net_content_ml=(f.v->>'netContentMl')::int,
+    retail_price_grosz=(f.v->>'retailPriceGrosz')::int,source_url=f.v->>'sourceUrl',observed_on=(f.v->>'observedOn')::date,
+    seed_type=f.v->>'type',type=CASE WHEN p.type_source_version_id IS NULL THEN f.v->>'type' ELSE p.type END,
+    hq_updated_at=transaction_timestamp(),hq_updated_by=$1,admin_revision=p.admin_revision+1
+    FROM actor a,f WHERE p.id=$2 AND p.business_id=a.business_id AND p.admin_revision=$3
+    AND p.admin_revision<2147483647 AND EXISTS(SELECT 1 FROM biz)
+    AND NOT EXISTS(SELECT 1 FROM product o WHERE o.business_id=a.business_id AND o.id<>$2 AND o.source_code=f.v->>'sourceCode')
+    RETURNING p.id,p.business_id
+    )
+    INSERT INTO product_admin_operation(id,business_id,actor_uid,idempotency_key,action,payload_hash,result,created_at)
+    SELECT $5,u.business_id,$1,$6,'UPDATE',$7,jsonb_build_object('productId',u.id),transaction_timestamp() FROM upd u
+    """
+    params: [$uid, $productId, $expectedRevision, $formJson, $operationId, $key, $payloadHash]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+mutation SetHqStockAdmin(
+  $uid: String!
+  $productId: String!
+  $expectedVersion: Int!
+  $onHand: Int!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+  $adjustmentId: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (SELECT uid,business_id FROM membership WHERE uid=$1 AND role::text='HQ' FOR SHARE),
+    cur AS MATERIALIZED (
+    SELECT i.location_id,i.on_hand,a.business_id FROM inventory i JOIN location l ON l.id=i.location_id AND l.kind::text='HQ'
+    JOIN actor a ON a.business_id=l.business_id JOIN product p ON p.id=i.product_id AND p.business_id=a.business_id
+    WHERE i.product_id=$2 AND i.version=$3 AND i.reserved<=$4 AND i.version<2147483647 FOR UPDATE OF i
+    ), upd AS (
+    UPDATE inventory i SET on_hand=$4,version=i.version+1 FROM cur c
+    WHERE i.location_id=c.location_id AND i.product_id=$2 RETURNING i.product_id
+    ), adj AS (
+    INSERT INTO hq_stock_adjustment(id,business_id,product_id,location_id,before,after,actor_uid,created_at)
+    SELECT $8,c.business_id,$2,c.location_id,c.on_hand,$4,$1,transaction_timestamp() FROM cur c
+    WHERE EXISTS(SELECT 1 FROM upd) RETURNING id
+    )
+    INSERT INTO product_admin_operation(id,business_id,actor_uid,idempotency_key,action,payload_hash,result,created_at)
+    SELECT $5,c.business_id,$1,$6,'SET_HQ_STOCK',$7,jsonb_build_object('productId',$2),transaction_timestamp()
+    FROM cur c WHERE EXISTS(SELECT 1 FROM adj)
+    """
+    params: [
+      $uid
+      $productId
+      $expectedVersion
+      $onHand
+      $operationId
+      $key
+      $payloadHash
+      $adjustmentId
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

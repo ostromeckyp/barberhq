@@ -1,0 +1,364 @@
+mutation ApproveStock(
+  $uid: String!
+  $businessId: String!
+  $requestId: String!
+  $receiptId: String!
+  $key: String!
+  $payloadHash: String!
+  $semanticHash: String!
+  $revision: Int!
+  $count: Int!
+  $inventoryVersions: [Int!]!
+  $use0: Boolean!
+  $use1: Boolean!
+  $use2: Boolean!
+  $use3: Boolean!
+  $use4: Boolean!
+  $use5: Boolean!
+) @auth(level: NO_ACCESS) @transaction {
+  requestGuard: query @redact {
+    replenishmentRequest(id: $requestId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.state == 'PENDING_APPROVAL' && this.revision == vars.revision && vars.count >= 1 && vars.count <= 6 && this.items.size() == vars.count && vars.use0 == (vars.count > 0) && vars.use1 == (vars.count > 1) && vars.use2 == (vars.count > 2) && vars.use3 == (vars.count > 3) && vars.use4 == (vars.count > 4) && vars.use5 == (vars.count > 5) && vars.inventoryVersions.size() == vars.count"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      salonId
+      state
+      revision
+      replacementIssueId
+      items: requestItems_on_request(orderBy: { productId: ASC }) {
+        id
+        productId
+        quantity
+      }
+    }
+  }
+  actor: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+      salonAccesses_on_membership {
+        locationId
+      }
+    }
+    locations(where: { businessId: { eq: $businessId }, kind: { eq: HQ } }, limit: 2)
+      @check(expr: "this.size() == 1", message: "INVALID_TRANSITION") {
+      id
+    }
+  }
+  changed: replenishmentRequest_updateMany(
+    where: {
+      id: { eq: $requestId }
+      businessId: { eq: $businessId }
+      state: { eq: PENDING_APPROVAL }
+      revision: { eq: $revision }
+    }
+    data: { state: RESERVED, revision_update: { inc: 1 } }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer_insert(
+    data: {
+      requestId: $requestId
+      businessId: $businessId
+      warehouseId_expr: "response.actor.locations[0].id"
+      destinationId_expr: "response.requestGuard.replenishmentRequest.salonId"
+    }
+  )
+  stock0: query @redact @include(if: $use0) {
+    inventories(
+      where: {
+        location: { businessId: { eq: $businessId }, kind: { eq: HQ } }
+        productId: {
+          eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 0 ? 0 : 0].productId"
+        }
+      }
+      limit: 2
+    )
+      @check(
+        expr: "this.size() == 1 && this[0].version == vars.inventoryVersions[vars.count > 0 ? 0 : 0] && this[0].onHand - this[0].reserved >= response.requestGuard.replenishmentRequest.items[vars.count > 0 ? 0 : 0].quantity"
+        message: "STALE_STATE"
+      ) {
+      locationId
+      productId
+      onHand
+      reserved
+      version
+    }
+  }
+  update0: inventory_updateMany(
+    where: {
+      locationId: {
+        eq_expr: "(vars.count > 0 ? response.stock0.inventories[0].locationId : response.stock0.inventories[0].locationId)"
+      }
+      productId: {
+        eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 0 ? 0 : 0].productId"
+      }
+      version: {
+        eq_expr: "(vars.count > 0 ? response.stock0.inventories[0].version : response.stock0.inventories[0].version)"
+      }
+    }
+    data: {
+      version_update: { inc: 1 }
+      reserved_expr: "(vars.count > 0 ? response.stock0.inventories[0].reserved : response.stock0.inventories[0].reserved) + response.requestGuard.replenishmentRequest.items[vars.count > 0 ? 0 : 0].quantity"
+    }
+  ) @include(if: $use0) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer0: transferItem_insert(
+    data: {
+      requestItemId_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 0 ? 0 : 0].id"
+      transferRequestId: $requestId
+      quantity_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 0 ? 0 : 0].quantity"
+    }
+  ) @include(if: $use0)
+  stock1: query @redact @include(if: $use1) {
+    inventories(
+      where: {
+        location: { businessId: { eq: $businessId }, kind: { eq: HQ } }
+        productId: {
+          eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 1 ? 1 : 0].productId"
+        }
+      }
+      limit: 2
+    )
+      @check(
+        expr: "this.size() == 1 && this[0].version == vars.inventoryVersions[vars.count > 1 ? 1 : 0] && this[0].onHand - this[0].reserved >= response.requestGuard.replenishmentRequest.items[vars.count > 1 ? 1 : 0].quantity"
+        message: "STALE_STATE"
+      ) {
+      locationId
+      productId
+      onHand
+      reserved
+      version
+    }
+  }
+  update1: inventory_updateMany(
+    where: {
+      locationId: {
+        eq_expr: "(vars.count > 1 ? response.stock1.inventories[0].locationId : response.stock0.inventories[0].locationId)"
+      }
+      productId: {
+        eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 1 ? 1 : 0].productId"
+      }
+      version: {
+        eq_expr: "(vars.count > 1 ? response.stock1.inventories[0].version : response.stock0.inventories[0].version)"
+      }
+    }
+    data: {
+      version_update: { inc: 1 }
+      reserved_expr: "(vars.count > 1 ? response.stock1.inventories[0].reserved : response.stock0.inventories[0].reserved) + response.requestGuard.replenishmentRequest.items[vars.count > 1 ? 1 : 0].quantity"
+    }
+  ) @include(if: $use1) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer1: transferItem_insert(
+    data: {
+      requestItemId_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 1 ? 1 : 0].id"
+      transferRequestId: $requestId
+      quantity_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 1 ? 1 : 0].quantity"
+    }
+  ) @include(if: $use1)
+  stock2: query @redact @include(if: $use2) {
+    inventories(
+      where: {
+        location: { businessId: { eq: $businessId }, kind: { eq: HQ } }
+        productId: {
+          eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 2 ? 2 : 0].productId"
+        }
+      }
+      limit: 2
+    )
+      @check(
+        expr: "this.size() == 1 && this[0].version == vars.inventoryVersions[vars.count > 2 ? 2 : 0] && this[0].onHand - this[0].reserved >= response.requestGuard.replenishmentRequest.items[vars.count > 2 ? 2 : 0].quantity"
+        message: "STALE_STATE"
+      ) {
+      locationId
+      productId
+      onHand
+      reserved
+      version
+    }
+  }
+  update2: inventory_updateMany(
+    where: {
+      locationId: {
+        eq_expr: "(vars.count > 2 ? response.stock2.inventories[0].locationId : response.stock0.inventories[0].locationId)"
+      }
+      productId: {
+        eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 2 ? 2 : 0].productId"
+      }
+      version: {
+        eq_expr: "(vars.count > 2 ? response.stock2.inventories[0].version : response.stock0.inventories[0].version)"
+      }
+    }
+    data: {
+      version_update: { inc: 1 }
+      reserved_expr: "(vars.count > 2 ? response.stock2.inventories[0].reserved : response.stock0.inventories[0].reserved) + response.requestGuard.replenishmentRequest.items[vars.count > 2 ? 2 : 0].quantity"
+    }
+  ) @include(if: $use2) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer2: transferItem_insert(
+    data: {
+      requestItemId_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 2 ? 2 : 0].id"
+      transferRequestId: $requestId
+      quantity_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 2 ? 2 : 0].quantity"
+    }
+  ) @include(if: $use2)
+  stock3: query @redact @include(if: $use3) {
+    inventories(
+      where: {
+        location: { businessId: { eq: $businessId }, kind: { eq: HQ } }
+        productId: {
+          eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 3 ? 3 : 0].productId"
+        }
+      }
+      limit: 2
+    )
+      @check(
+        expr: "this.size() == 1 && this[0].version == vars.inventoryVersions[vars.count > 3 ? 3 : 0] && this[0].onHand - this[0].reserved >= response.requestGuard.replenishmentRequest.items[vars.count > 3 ? 3 : 0].quantity"
+        message: "STALE_STATE"
+      ) {
+      locationId
+      productId
+      onHand
+      reserved
+      version
+    }
+  }
+  update3: inventory_updateMany(
+    where: {
+      locationId: {
+        eq_expr: "(vars.count > 3 ? response.stock3.inventories[0].locationId : response.stock0.inventories[0].locationId)"
+      }
+      productId: {
+        eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 3 ? 3 : 0].productId"
+      }
+      version: {
+        eq_expr: "(vars.count > 3 ? response.stock3.inventories[0].version : response.stock0.inventories[0].version)"
+      }
+    }
+    data: {
+      version_update: { inc: 1 }
+      reserved_expr: "(vars.count > 3 ? response.stock3.inventories[0].reserved : response.stock0.inventories[0].reserved) + response.requestGuard.replenishmentRequest.items[vars.count > 3 ? 3 : 0].quantity"
+    }
+  ) @include(if: $use3) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer3: transferItem_insert(
+    data: {
+      requestItemId_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 3 ? 3 : 0].id"
+      transferRequestId: $requestId
+      quantity_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 3 ? 3 : 0].quantity"
+    }
+  ) @include(if: $use3)
+  stock4: query @redact @include(if: $use4) {
+    inventories(
+      where: {
+        location: { businessId: { eq: $businessId }, kind: { eq: HQ } }
+        productId: {
+          eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 4 ? 4 : 0].productId"
+        }
+      }
+      limit: 2
+    )
+      @check(
+        expr: "this.size() == 1 && this[0].version == vars.inventoryVersions[vars.count > 4 ? 4 : 0] && this[0].onHand - this[0].reserved >= response.requestGuard.replenishmentRequest.items[vars.count > 4 ? 4 : 0].quantity"
+        message: "STALE_STATE"
+      ) {
+      locationId
+      productId
+      onHand
+      reserved
+      version
+    }
+  }
+  update4: inventory_updateMany(
+    where: {
+      locationId: {
+        eq_expr: "(vars.count > 4 ? response.stock4.inventories[0].locationId : response.stock0.inventories[0].locationId)"
+      }
+      productId: {
+        eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 4 ? 4 : 0].productId"
+      }
+      version: {
+        eq_expr: "(vars.count > 4 ? response.stock4.inventories[0].version : response.stock0.inventories[0].version)"
+      }
+    }
+    data: {
+      version_update: { inc: 1 }
+      reserved_expr: "(vars.count > 4 ? response.stock4.inventories[0].reserved : response.stock0.inventories[0].reserved) + response.requestGuard.replenishmentRequest.items[vars.count > 4 ? 4 : 0].quantity"
+    }
+  ) @include(if: $use4) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer4: transferItem_insert(
+    data: {
+      requestItemId_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 4 ? 4 : 0].id"
+      transferRequestId: $requestId
+      quantity_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 4 ? 4 : 0].quantity"
+    }
+  ) @include(if: $use4)
+  stock5: query @redact @include(if: $use5) {
+    inventories(
+      where: {
+        location: { businessId: { eq: $businessId }, kind: { eq: HQ } }
+        productId: {
+          eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 5 ? 5 : 0].productId"
+        }
+      }
+      limit: 2
+    )
+      @check(
+        expr: "this.size() == 1 && this[0].version == vars.inventoryVersions[vars.count > 5 ? 5 : 0] && this[0].onHand - this[0].reserved >= response.requestGuard.replenishmentRequest.items[vars.count > 5 ? 5 : 0].quantity"
+        message: "STALE_STATE"
+      ) {
+      locationId
+      productId
+      onHand
+      reserved
+      version
+    }
+  }
+  update5: inventory_updateMany(
+    where: {
+      locationId: {
+        eq_expr: "(vars.count > 5 ? response.stock5.inventories[0].locationId : response.stock0.inventories[0].locationId)"
+      }
+      productId: {
+        eq_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 5 ? 5 : 0].productId"
+      }
+      version: {
+        eq_expr: "(vars.count > 5 ? response.stock5.inventories[0].version : response.stock0.inventories[0].version)"
+      }
+    }
+    data: {
+      version_update: { inc: 1 }
+      reserved_expr: "(vars.count > 5 ? response.stock5.inventories[0].reserved : response.stock0.inventories[0].reserved) + response.requestGuard.replenishmentRequest.items[vars.count > 5 ? 5 : 0].quantity"
+    }
+  ) @include(if: $use5) @check(expr: "this == 1", message: "STALE_STATE")
+  transfer5: transferItem_insert(
+    data: {
+      requestItemId_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 5 ? 5 : 0].id"
+      transferRequestId: $requestId
+      quantity_expr: "response.requestGuard.replenishmentRequest.items[vars.count > 5 ? 5 : 0].quantity"
+    }
+  ) @include(if: $use5)
+  actionReceipt_insert(
+    data: {
+      id: $receiptId
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      requestId: $requestId
+      action: APPROVE
+      payloadHash: $payloadHash
+      semanticHash: $semanticHash
+      state: RESERVED
+      revision_expr: "vars.revision + 1"
+    }
+  )
+  actionKey_insert(
+    data: {
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      receiptId: $receiptId
+      payloadHash: $payloadHash
+    }
+  )
+}

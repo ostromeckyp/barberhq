@@ -1,0 +1,114 @@
+# Product aliases as HQ sees them: product-owned (HQ), seed, and eligible document rows (read-only).
+query ReadProductAliases($uid: String!, $productId: String!) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.phrase,a.kind::text AS kind,a.revision,
+    CASE WHEN a.source::text='SEED' THEN 'SEED' WHEN a.source::text='HQ' AND a.source_document_version_id IS NULL THEN 'HQ' ELSE 'DOCUMENT' END AS source
+    FROM membership m JOIN product p ON p.business_id=m.business_id AND p.id=$2
+    JOIN product_alias a ON a.product_id=p.id AND a.business_id=m.business_id
+    LEFT JOIN knowledge_version v ON v.id=a.source_document_version_id
+    LEFT JOIN knowledge_document d ON d.id=v.document_id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND a.status::text='ACTIVE' AND a.salon_id IS NULL AND (
+    (a.source::text IN ('SEED','HQ') AND a.source_document_version_id IS NULL) OR
+    (a.source::text IN ('GENERATED','HQ') AND v.business_id=m.business_id AND d.business_id=m.business_id
+    AND v.published_at IS NOT NULL AND v.revoked_at IS NULL AND v.is_active AND v.status::text='READY'
+    AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id))
+    ORDER BY a.id LIMIT 200
+    """
+    params: [$uid, $productId]
+  )
+}
+
+query ReadProductAliasRevisions($uid: String!, $productId: String!, $idsJson: String!)
+@auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.revision,a.status::text AS status FROM membership m JOIN product_alias a ON a.business_id=m.business_id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND a.product_id=$2 AND a.id IN (SELECT jsonb_array_elements_text($3::jsonb))
+    """
+    params: [$uid, $productId, $idsJson]
+  )
+}
+
+query ReadCollisionProducts($uid: String!) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT p.id,p.name,p.source_code AS "sourceCode",p.type,p.category,p.summary_en AS "summaryEn",p.scent_pl AS "scentPl",
+    COALESCE(to_jsonb(p.keywords),'[]'::jsonb) AS keywords
+    FROM membership m JOIN product p ON p.business_id=m.business_id WHERE m.uid=$1 AND m.role::text='HQ'
+    ORDER BY p.id LIMIT 201
+    """
+    params: [$uid]
+  )
+}
+
+query ReadCollisionAliases($uid: String!) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.product_id AS "productId",a.phrase,a.normalized,a.kind::text AS kind,a.source::text AS source,
+    a.salon_id AS "salonId",a.source_document_version_id AS "sourceVersionId",a.ambiguous,a.revision
+    FROM membership m JOIN product_alias a ON a.business_id=m.business_id
+    LEFT JOIN knowledge_version v ON v.id=a.source_document_version_id
+    LEFT JOIN knowledge_document d ON d.id=v.document_id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND a.status::text='ACTIVE' AND a.salon_id IS NULL AND (
+    (a.source::text IN ('SEED','HQ') AND a.source_document_version_id IS NULL) OR
+    (a.source::text IN ('GENERATED','HQ') AND v.published_at IS NOT NULL AND v.revoked_at IS NULL AND v.is_active
+    AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id))
+    ORDER BY a.id LIMIT 5001
+    """
+    params: [$uid]
+  )
+}
+
+# One transaction: retire (seed rows become owner-overridden) and upsert product-owned rows under per-alias CAS.
+mutation SaveProductAliases(
+  $uid: String!
+  $productId: String!
+  $retiresJson: String!
+  $upsertsJson: String!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (
+    SELECT m.uid,m.business_id FROM membership m JOIN product p ON p.business_id=m.business_id AND p.id=$2
+    WHERE m.uid=$1 AND m.role::text='HQ' FOR SHARE OF m
+    ), biz AS (
+    UPDATE business b SET product_knowledge_revision=b.product_knowledge_revision+1 FROM actor a
+    WHERE b.id=a.business_id AND b.product_knowledge_revision<2147483647 RETURNING b.id
+    ), retired AS (
+    UPDATE product_alias x SET status='RETIRED',ambiguous=false,revision=x.revision+1,
+    overridden_by_hq=(x.source::text='SEED'),reviewed_by='hq:'||$1,reviewed_at=transaction_timestamp()
+    FROM jsonb_array_elements($3::jsonb) r, actor a
+    WHERE x.id=r->>'id' AND x.product_id=$2 AND x.business_id=a.business_id AND x.revision=(r->>'expectedRevision')::int
+    AND x.status::text='ACTIVE' AND x.source::text IN ('SEED','HQ') AND x.source_document_version_id IS NULL
+    AND x.salon_id IS NULL AND x.revision<2147483647 AND EXISTS(SELECT 1 FROM biz) RETURNING x.id,x.source::text AS source
+    ), upserted AS (
+    INSERT INTO product_alias(id,business_id,product_id,salon_id,phrase,normalized,kind,lang,source,status,ambiguous,
+    created_by,created_at,reviewed_by,reviewed_at,revision,overridden_by_hq)
+    SELECT u->>'id',a.business_id,$2,NULL,u->>'phrase',u->>'normalized',(u->>'kind')::product_alias_kind,'und','HQ','ACTIVE',false,
+    'hq:'||$1,transaction_timestamp(),'hq:'||$1,transaction_timestamp(),(u->>'expectedRevision')::int+1,false
+    FROM jsonb_array_elements($4::jsonb) u, actor a
+    WHERE (u->>'expectedRevision')::int=COALESCE((SELECT x.revision FROM product_alias x WHERE x.id=u->>'id'),0)
+    AND (u->>'id') LIKE 'product-hq:%' AND EXISTS(SELECT 1 FROM biz)
+    ON CONFLICT (id) DO UPDATE SET phrase=EXCLUDED.phrase,normalized=EXCLUDED.normalized,kind=EXCLUDED.kind,status='ACTIVE',
+    ambiguous=false,reviewed_by=EXCLUDED.reviewed_by,reviewed_at=EXCLUDED.reviewed_at,revision=EXCLUDED.revision
+    WHERE product_alias.product_id=$2 AND product_alias.source::text='HQ' AND product_alias.source_document_version_id IS NULL
+    AND product_alias.revision=EXCLUDED.revision-1
+    RETURNING id
+    )
+    INSERT INTO product_admin_operation(id,business_id,actor_uid,idempotency_key,action,payload_hash,result,created_at)
+    SELECT $5,a.business_id,$1,$6,'ALIASES',$7,jsonb_build_object('productId',$2),transaction_timestamp() FROM actor a
+    WHERE (SELECT count(*) FROM retired)=jsonb_array_length($3::jsonb)
+    AND (SELECT count(*) FROM upserted)=jsonb_array_length($4::jsonb)
+    AND (SELECT count(*) FROM product_alias x WHERE x.product_id=$2 AND x.source::text='HQ' AND x.status::text='ACTIVE'
+    AND x.source_document_version_id IS NULL)
+    - (SELECT count(*) FROM retired WHERE source='HQ')
+    + (SELECT count(*) FROM jsonb_array_elements($4::jsonb) u WHERE NOT EXISTS(
+    SELECT 1 FROM product_alias x WHERE x.id=u->>'id' AND x.status::text='ACTIVE')) <= 32
+    """
+    params: [$uid, $productId, $retiresJson, $upsertsJson, $operationId, $key, $payloadHash]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

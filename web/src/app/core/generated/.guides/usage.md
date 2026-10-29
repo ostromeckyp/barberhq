@@ -14,7 +14,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getMyMembership, listProducts, getSalonInventory, getHqInventory, getDeliveryReceipt, getDeliveryIssue, listDeliveryIssues, getDeliveryProcedureBindings, listDeliveryProcedureDocuments, getSourceSection } from '@barberhq/browser';
+import { getMyMembership, listProducts, getSalonInventory, getHqInventory, getDeliveryProcedureBindings, listDeliveryProcedureDocuments, getDeliveryReceipt, getDeliveryIssue, listDeliveryIssues, getSourceSection } from '@barberhq/browser';
 
 
 // Operation GetMyMembership: 
@@ -29,6 +29,12 @@ const { data } = await GetSalonInventory(dataConnect, getSalonInventoryVars);
 // Operation GetHqInventory:  For variables, look at type GetHqInventoryVars in ../index.d.ts
 const { data } = await GetHqInventory(dataConnect, getHqInventoryVars);
 
+// Operation GetDeliveryProcedureBindings: 
+const { data } = await GetDeliveryProcedureBindings(dataConnect);
+
+// Operation ListDeliveryProcedureDocuments:  For variables, look at type ListDeliveryProcedureDocumentsVars in ../index.d.ts
+const { data } = await ListDeliveryProcedureDocuments(dataConnect, listDeliveryProcedureDocumentsVars);
+
 // Operation GetDeliveryReceipt:  For variables, look at type GetDeliveryReceiptVars in ../index.d.ts
 const { data } = await GetDeliveryReceipt(dataConnect, getDeliveryReceiptVars);
 
@@ -37,12 +43,6 @@ const { data } = await GetDeliveryIssue(dataConnect, getDeliveryIssueVars);
 
 // Operation ListDeliveryIssues:  For variables, look at type ListDeliveryIssuesVars in ../index.d.ts
 const { data } = await ListDeliveryIssues(dataConnect, listDeliveryIssuesVars);
-
-// Operation GetDeliveryProcedureBindings: 
-const { data } = await GetDeliveryProcedureBindings(dataConnect);
-
-// Operation ListDeliveryProcedureDocuments:  For variables, look at type ListDeliveryProcedureDocumentsVars in ../index.d.ts
-const { data } = await ListDeliveryProcedureDocuments(dataConnect, listDeliveryProcedureDocumentsVars);
 
 // Operation GetSourceSection:  For variables, look at type GetSourceSectionVars in ../index.d.ts
 const { data } = await GetSourceSection(dataConnect, getSourceSectionVars);

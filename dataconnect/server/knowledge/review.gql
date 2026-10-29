@@ -1,0 +1,190 @@
+mutation StartKnowledgeReview(
+  $uid: String!
+  $businessId: String!
+  $documentId: String!
+  $versionId: String!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+  $extractionHash: String!
+  $expectedDocumentRevision: Int!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.documentId == vars.documentId && this.extractionHash == vars.extractionHash && this.pdfSha256.matches('^[a-f0-9]{64}$') && this.bucket != null && this.objectPath != null && this.objectGeneration != null && this.uploadedAt != null && this.contentType == 'application/pdf' && this.byteSize >= 5 && this.byteSize <= 10485760 && this.pageCount >= 1 && this.pageCount <= 30 && this.publishedAt == null && this.revokedAt == null && this.processingLeaseId == null && (this.status == 'EXTRACTED' || (this.status == 'REVIEWED' && this.reviewedBy == 'hq:' + vars.uid) || (this.status == 'READY' && this.reviewedBy == 'hq:' + vars.uid && this.embeddingConfigHash != null && this.processingError == 'STALE_STATE' && this.pendingStage == null)) && this.document.revision == vars.expectedDocumentRevision"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      documentId
+      extractionHash
+      pdfSha256
+      bucket
+      objectPath
+      objectGeneration
+      uploadedAt
+      contentType
+      byteSize
+      pageCount
+      status
+      reviewedBy
+      embeddingConfigHash
+      processingError
+      pendingStage
+      publishedAt
+      revokedAt
+      processingLeaseId
+      document {
+        revision
+      }
+    }
+  }
+  knowledgeOperation_insert(
+    data: {
+      id: $operationId
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      action: REVIEW
+      payloadHash: $payloadHash
+      documentId: $documentId
+      versionId: $versionId
+    }
+  )
+}
+
+mutation CompleteKnowledgeReview(
+  $uid: String!
+  $businessId: String!
+  $operationId: String!
+  $versionId: String!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+  }
+  knowledgeOperation_updateMany(
+    where: {
+      id: { eq: $operationId }
+      businessId: { eq: $businessId }
+      actorUid: { eq: $uid }
+      versionId: { eq: $versionId }
+      action: { eq: REVIEW }
+      completedAt: { isNull: true }
+    }
+    data: { completedAt_expr: "request.time" }
+  ) @check(expr: "this == 1 || this == 0", message: "STALE_STATE")
+}
+
+mutation RecordKnowledgeReview(
+  $versionId: String!
+  $revision: Int!
+  $extractionHash: String!
+  $pageCount: Int!
+  $reviewedBy: String!
+) @auth(level: NO_ACCESS) @transaction {
+  version: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.extractionHash == vars.extractionHash && this.pageCount == vars.pageCount && this.status == 'EXTRACTED' && this.publishedAt == null && this.revokedAt == null && this.pages.size() == vars.pageCount && this.pages.all(p,p.quality == 'COMPLETE' && p.reviewed == true)"
+        message: "REVIEW_INCOMPLETE"
+      ) {
+      revision
+      extractionHash
+      pageCount
+      status
+      publishedAt
+      revokedAt
+      pages: knowledgePages_on_version {
+        physicalPage
+        quality
+        reviewed
+      }
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      revision: { eq: $revision }
+      extractionHash: { eq: $extractionHash }
+      status: { eq: EXTRACTED }
+    }
+    data: {
+      status: REVIEWED
+      revision_update: { inc: 1 }
+      reviewedBy: $reviewedBy
+      reviewedAt_expr: "request.time"
+      reviewedPageCount: $pageCount
+    }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+mutation MarkKnowledgePageReviewed(
+  $versionId: String!
+  $physicalPage: Int!
+  $extractionHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  version: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.extractionHash == vars.extractionHash && this.status == 'EXTRACTED' && this.publishedAt == null && this.revokedAt == null"
+        message: "STALE_STATE"
+      ) {
+      extractionHash
+      status
+      publishedAt
+      revokedAt
+    }
+  }
+  knowledgePage_updateMany(
+    where: {
+      versionId: { eq: $versionId }
+      physicalPage: { eq: $physicalPage }
+      quality: { eq: COMPLETE }
+    }
+    data: { reviewed: true }
+  ) @check(expr: "this == 1", message: "REVIEW_INCOMPLETE")
+}
+
+mutation MarkKnowledgeReady(
+  $versionId: String!
+  $revision: Int!
+  $configHash: String!
+  $chunkCount: Int!
+) @auth(level: NO_ACCESS) @transaction {
+  version: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.status == 'REVIEWED' && this.revision == vars.revision && this.expectedChunkCount == vars.chunkCount && this.reviewedPageCount == this.pageCount && this.chunks.size() == vars.chunkCount && this.chunks.all(c,c.embeddingConfigHash == vars.configHash && c.embeddingDimension == 768)"
+        message: "NOT_READY"
+      ) {
+      status
+      revision
+      expectedChunkCount
+      reviewedPageCount
+      pageCount
+      chunks: knowledgeChunks_on_version {
+        embeddingConfigHash
+        embeddingDimension
+      }
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: { id: { eq: $versionId }, revision: { eq: $revision }, status: { eq: REVIEWED } }
+    data: { status: READY, revision_update: { inc: 1 }, embeddingConfigHash: $configHash }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

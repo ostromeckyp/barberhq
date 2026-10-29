@@ -81,6 +81,7 @@ query ListHQQueue($limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
     }
   }
 }
+
 query GetRequestDetail($requestId: String!) @auth(level: USER) {
   membership(key: { uid_expr: "auth.uid" })
     @check(

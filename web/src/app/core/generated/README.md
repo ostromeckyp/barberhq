@@ -12,11 +12,11 @@ This README will guide you through the process of using the generated JavaScript
   - [*ListProducts*](#listproducts)
   - [*GetSalonInventory*](#getsaloninventory)
   - [*GetHqInventory*](#gethqinventory)
+  - [*GetDeliveryProcedureBindings*](#getdeliveryprocedurebindings)
+  - [*ListDeliveryProcedureDocuments*](#listdeliveryproceduredocuments)
   - [*GetDeliveryReceipt*](#getdeliveryreceipt)
   - [*GetDeliveryIssue*](#getdeliveryissue)
   - [*ListDeliveryIssues*](#listdeliveryissues)
-  - [*GetDeliveryProcedureBindings*](#getdeliveryprocedurebindings)
-  - [*ListDeliveryProcedureDocuments*](#listdeliveryproceduredocuments)
   - [*GetSourceSection*](#getsourcesection)
   - [*ListPublishedKnowledgeDocuments*](#listpublishedknowledgedocuments)
   - [*ListHqKnowledgeDocuments*](#listhqknowledgedocuments)
@@ -596,6 +596,249 @@ executeQuery(ref).then((response) => {
 });
 ```
 
+## GetDeliveryProcedureBindings
+You can execute the `GetDeliveryProcedureBindings` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+getDeliveryProcedureBindings(options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
+
+interface GetDeliveryProcedureBindingsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
+}
+export const getDeliveryProcedureBindingsRef: GetDeliveryProcedureBindingsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDeliveryProcedureBindings(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
+
+interface GetDeliveryProcedureBindingsRef {
+  ...
+  (dc: DataConnect): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
+}
+export const getDeliveryProcedureBindingsRef: GetDeliveryProcedureBindingsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDeliveryProcedureBindingsRef:
+```typescript
+const name = getDeliveryProcedureBindingsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDeliveryProcedureBindings` query has no variables.
+### Return Type
+Recall that executing the `GetDeliveryProcedureBindings` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDeliveryProcedureBindingsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDeliveryProcedureBindingsData {
+  membership?: {
+    businessId: string;
+    business: {
+      bindings: ({
+        kind: DeliveryProblemKind;
+        documentId?: string | null;
+        revision: number;
+        updatedAt: TimestampString;
+        document?: {
+          id: string;
+          businessId: string;
+          documentCode: string;
+          activeVersionId?: string | null;
+          versions: ({
+            id: string;
+            title: string;
+            businessId: string;
+            status: KnowledgeProcessingStatus;
+            publishedAt?: TimestampString | null;
+            revokedAt?: TimestampString | null;
+          } & KnowledgeVersion_Key)[];
+        } & KnowledgeDocument_Key;
+      })[];
+    };
+  };
+}
+```
+### Using `GetDeliveryProcedureBindings`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDeliveryProcedureBindings } from '@barberhq/browser';
+
+
+// Call the `getDeliveryProcedureBindings()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDeliveryProcedureBindings();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDeliveryProcedureBindings(dataConnect);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+getDeliveryProcedureBindings().then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `GetDeliveryProcedureBindings`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDeliveryProcedureBindingsRef } from '@barberhq/browser';
+
+
+// Call the `getDeliveryProcedureBindingsRef()` function to get a reference to the query.
+const ref = getDeliveryProcedureBindingsRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDeliveryProcedureBindingsRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+## ListDeliveryProcedureDocuments
+You can execute the `ListDeliveryProcedureDocuments` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
+```typescript
+listDeliveryProcedureDocuments(vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+
+interface ListDeliveryProcedureDocumentsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+}
+export const listDeliveryProcedureDocumentsRef: ListDeliveryProcedureDocumentsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listDeliveryProcedureDocuments(dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+
+interface ListDeliveryProcedureDocumentsRef {
+  ...
+  (dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+}
+export const listDeliveryProcedureDocumentsRef: ListDeliveryProcedureDocumentsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listDeliveryProcedureDocumentsRef:
+```typescript
+const name = listDeliveryProcedureDocumentsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListDeliveryProcedureDocuments` query has an optional argument of type `ListDeliveryProcedureDocumentsVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ListDeliveryProcedureDocumentsVariables {
+  limit?: number;
+  offset?: number;
+}
+```
+### Return Type
+Recall that executing the `ListDeliveryProcedureDocuments` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListDeliveryProcedureDocumentsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListDeliveryProcedureDocumentsData {
+  membership?: {
+    business: {
+      documents: ({
+        id: string;
+        documentId: string;
+        title: string;
+        document: {
+          documentCode: string;
+          activeVersionId?: string | null;
+        };
+      } & KnowledgeVersion_Key)[];
+    };
+  };
+}
+```
+### Using `ListDeliveryProcedureDocuments`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listDeliveryProcedureDocuments, ListDeliveryProcedureDocumentsVariables } from '@barberhq/browser';
+
+// The `ListDeliveryProcedureDocuments` query has an optional argument of type `ListDeliveryProcedureDocumentsVariables`:
+const listDeliveryProcedureDocumentsVars: ListDeliveryProcedureDocumentsVariables = {
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listDeliveryProcedureDocuments()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listDeliveryProcedureDocuments(listDeliveryProcedureDocumentsVars);
+// Variables can be defined inline as well.
+const { data } = await listDeliveryProcedureDocuments({ limit: ..., offset: ..., });
+// Since all variables are optional for this query, you can omit the `ListDeliveryProcedureDocumentsVariables` argument.
+const { data } = await listDeliveryProcedureDocuments();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listDeliveryProcedureDocuments(dataConnect, listDeliveryProcedureDocumentsVars);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+listDeliveryProcedureDocuments(listDeliveryProcedureDocumentsVars).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
+### Using `ListDeliveryProcedureDocuments`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listDeliveryProcedureDocumentsRef, ListDeliveryProcedureDocumentsVariables } from '@barberhq/browser';
+
+// The `ListDeliveryProcedureDocuments` query has an optional argument of type `ListDeliveryProcedureDocumentsVariables`:
+const listDeliveryProcedureDocumentsVars: ListDeliveryProcedureDocumentsVariables = {
+  limit: ..., // optional
+  offset: ..., // optional
+};
+
+// Call the `listDeliveryProcedureDocumentsRef()` function to get a reference to the query.
+const ref = listDeliveryProcedureDocumentsRef(listDeliveryProcedureDocumentsVars);
+// Variables can be defined inline as well.
+const ref = listDeliveryProcedureDocumentsRef({ limit: ..., offset: ..., });
+// Since all variables are optional for this query, you can omit the `ListDeliveryProcedureDocumentsVariables` argument.
+const ref = listDeliveryProcedureDocumentsRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listDeliveryProcedureDocumentsRef(dataConnect, listDeliveryProcedureDocumentsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.membership);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.membership);
+});
+```
+
 ## GetDeliveryReceipt
 You can execute the `GetDeliveryReceipt` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
 ```typescript
@@ -1108,249 +1351,6 @@ const ref = listDeliveryIssuesRef({ allSalons: ..., salonId: ..., statuses: ...,
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = listDeliveryIssuesRef(dataConnect, listDeliveryIssuesVars);
-
-// Call `executeQuery()` on the reference to execute the query.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await executeQuery(ref);
-
-console.log(data.membership);
-
-// Or, you can use the `Promise` API.
-executeQuery(ref).then((response) => {
-  const data = response.data;
-  console.log(data.membership);
-});
-```
-
-## GetDeliveryProcedureBindings
-You can execute the `GetDeliveryProcedureBindings` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
-```typescript
-getDeliveryProcedureBindings(options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
-
-interface GetDeliveryProcedureBindingsRef {
-  ...
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
-}
-export const getDeliveryProcedureBindingsRef: GetDeliveryProcedureBindingsRef;
-```
-You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
-```typescript
-getDeliveryProcedureBindings(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
-
-interface GetDeliveryProcedureBindingsRef {
-  ...
-  (dc: DataConnect): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
-}
-export const getDeliveryProcedureBindingsRef: GetDeliveryProcedureBindingsRef;
-```
-
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDeliveryProcedureBindingsRef:
-```typescript
-const name = getDeliveryProcedureBindingsRef.operationName;
-console.log(name);
-```
-
-### Variables
-The `GetDeliveryProcedureBindings` query has no variables.
-### Return Type
-Recall that executing the `GetDeliveryProcedureBindings` query returns a `QueryPromise` that resolves to an object with a `data` property.
-
-The `data` property is an object of type `GetDeliveryProcedureBindingsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
-```typescript
-export interface GetDeliveryProcedureBindingsData {
-  membership?: {
-    businessId: string;
-    business: {
-      bindings: ({
-        kind: DeliveryProblemKind;
-        documentId?: string | null;
-        revision: number;
-        updatedAt: TimestampString;
-        document?: {
-          id: string;
-          businessId: string;
-          documentCode: string;
-          activeVersionId?: string | null;
-          versions: ({
-            id: string;
-            title: string;
-            businessId: string;
-            status: KnowledgeProcessingStatus;
-            publishedAt?: TimestampString | null;
-            revokedAt?: TimestampString | null;
-          } & KnowledgeVersion_Key)[];
-        } & KnowledgeDocument_Key;
-      })[];
-    };
-  };
-}
-```
-### Using `GetDeliveryProcedureBindings`'s action shortcut function
-
-```typescript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, getDeliveryProcedureBindings } from '@barberhq/browser';
-
-
-// Call the `getDeliveryProcedureBindings()` function to execute the query.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await getDeliveryProcedureBindings();
-
-// You can also pass in a `DataConnect` instance to the action shortcut function.
-const dataConnect = getDataConnect(connectorConfig);
-const { data } = await getDeliveryProcedureBindings(dataConnect);
-
-console.log(data.membership);
-
-// Or, you can use the `Promise` API.
-getDeliveryProcedureBindings().then((response) => {
-  const data = response.data;
-  console.log(data.membership);
-});
-```
-
-### Using `GetDeliveryProcedureBindings`'s `QueryRef` function
-
-```typescript
-import { getDataConnect, executeQuery } from 'firebase/data-connect';
-import { connectorConfig, getDeliveryProcedureBindingsRef } from '@barberhq/browser';
-
-
-// Call the `getDeliveryProcedureBindingsRef()` function to get a reference to the query.
-const ref = getDeliveryProcedureBindingsRef();
-
-// You can also pass in a `DataConnect` instance to the `QueryRef` function.
-const dataConnect = getDataConnect(connectorConfig);
-const ref = getDeliveryProcedureBindingsRef(dataConnect);
-
-// Call `executeQuery()` on the reference to execute the query.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await executeQuery(ref);
-
-console.log(data.membership);
-
-// Or, you can use the `Promise` API.
-executeQuery(ref).then((response) => {
-  const data = response.data;
-  console.log(data.membership);
-});
-```
-
-## ListDeliveryProcedureDocuments
-You can execute the `ListDeliveryProcedureDocuments` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [generated/index.d.ts](./index.d.ts):
-```typescript
-listDeliveryProcedureDocuments(vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-
-interface ListDeliveryProcedureDocumentsRef {
-  ...
-  /* Allow users to create refs without passing in DataConnect */
-  (vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-}
-export const listDeliveryProcedureDocumentsRef: ListDeliveryProcedureDocumentsRef;
-```
-You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
-```typescript
-listDeliveryProcedureDocuments(dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-
-interface ListDeliveryProcedureDocumentsRef {
-  ...
-  (dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-}
-export const listDeliveryProcedureDocumentsRef: ListDeliveryProcedureDocumentsRef;
-```
-
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listDeliveryProcedureDocumentsRef:
-```typescript
-const name = listDeliveryProcedureDocumentsRef.operationName;
-console.log(name);
-```
-
-### Variables
-The `ListDeliveryProcedureDocuments` query has an optional argument of type `ListDeliveryProcedureDocumentsVariables`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
-
-```typescript
-export interface ListDeliveryProcedureDocumentsVariables {
-  limit?: number;
-  offset?: number;
-}
-```
-### Return Type
-Recall that executing the `ListDeliveryProcedureDocuments` query returns a `QueryPromise` that resolves to an object with a `data` property.
-
-The `data` property is an object of type `ListDeliveryProcedureDocumentsData`, which is defined in [generated/index.d.ts](./index.d.ts). It has the following fields:
-```typescript
-export interface ListDeliveryProcedureDocumentsData {
-  membership?: {
-    business: {
-      documents: ({
-        id: string;
-        documentId: string;
-        title: string;
-        document: {
-          documentCode: string;
-          activeVersionId?: string | null;
-        };
-      } & KnowledgeVersion_Key)[];
-    };
-  };
-}
-```
-### Using `ListDeliveryProcedureDocuments`'s action shortcut function
-
-```typescript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, listDeliveryProcedureDocuments, ListDeliveryProcedureDocumentsVariables } from '@barberhq/browser';
-
-// The `ListDeliveryProcedureDocuments` query has an optional argument of type `ListDeliveryProcedureDocumentsVariables`:
-const listDeliveryProcedureDocumentsVars: ListDeliveryProcedureDocumentsVariables = {
-  limit: ..., // optional
-  offset: ..., // optional
-};
-
-// Call the `listDeliveryProcedureDocuments()` function to execute the query.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await listDeliveryProcedureDocuments(listDeliveryProcedureDocumentsVars);
-// Variables can be defined inline as well.
-const { data } = await listDeliveryProcedureDocuments({ limit: ..., offset: ..., });
-// Since all variables are optional for this query, you can omit the `ListDeliveryProcedureDocumentsVariables` argument.
-const { data } = await listDeliveryProcedureDocuments();
-
-// You can also pass in a `DataConnect` instance to the action shortcut function.
-const dataConnect = getDataConnect(connectorConfig);
-const { data } = await listDeliveryProcedureDocuments(dataConnect, listDeliveryProcedureDocumentsVars);
-
-console.log(data.membership);
-
-// Or, you can use the `Promise` API.
-listDeliveryProcedureDocuments(listDeliveryProcedureDocumentsVars).then((response) => {
-  const data = response.data;
-  console.log(data.membership);
-});
-```
-
-### Using `ListDeliveryProcedureDocuments`'s `QueryRef` function
-
-```typescript
-import { getDataConnect, executeQuery } from 'firebase/data-connect';
-import { connectorConfig, listDeliveryProcedureDocumentsRef, ListDeliveryProcedureDocumentsVariables } from '@barberhq/browser';
-
-// The `ListDeliveryProcedureDocuments` query has an optional argument of type `ListDeliveryProcedureDocumentsVariables`:
-const listDeliveryProcedureDocumentsVars: ListDeliveryProcedureDocumentsVariables = {
-  limit: ..., // optional
-  offset: ..., // optional
-};
-
-// Call the `listDeliveryProcedureDocumentsRef()` function to get a reference to the query.
-const ref = listDeliveryProcedureDocumentsRef(listDeliveryProcedureDocumentsVars);
-// Variables can be defined inline as well.
-const ref = listDeliveryProcedureDocumentsRef({ limit: ..., offset: ..., });
-// Since all variables are optional for this query, you can omit the `ListDeliveryProcedureDocumentsVariables` argument.
-const ref = listDeliveryProcedureDocumentsRef();
-
-// You can also pass in a `DataConnect` instance to the `QueryRef` function.
-const dataConnect = getDataConnect(connectorConfig);
-const ref = listDeliveryProcedureDocumentsRef(dataConnect, listDeliveryProcedureDocumentsVars);
 
 // Call `executeQuery()` on the reference to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.

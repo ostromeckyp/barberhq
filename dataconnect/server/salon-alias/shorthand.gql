@@ -23,6 +23,7 @@ mutation IssueReplenishmentChoiceReceipts(
     params: [$uid, $businessId, $salonId, $catalogRevision, $receiptsJson]
   ) @check(expr: "this > 0", message: "STALE_STATE")
 }
+
 query ReadSalonShorthandConfirmation(
   $uid: String!
   $businessId: String!
@@ -47,6 +48,7 @@ query ReadSalonShorthandConfirmation(
     params: [$uid, $businessId, $salonId, $receiptIdsJson]
   )
 }
+
 # One fenced batch: fresh salon scope (salon staff or HQ of the business), unchanged salon revision, live receipts, per-alias revision CAS.
 mutation ConfirmSalonShorthand(
   $uid: String!
@@ -104,12 +106,14 @@ mutation ConfirmSalonShorthand(
     params: [$uid, $businessId, $salonId, $expectedSalonRevision, $writesJson, $consumeJson]
   ) @check(expr: "this == 1", message: "STALE_STATE")
 }
+
 query ReadSalonAliasOperation($uid: String!, $key: String!) @auth(level: NO_ACCESS) {
   salonAliasOperations(where: { actorUid: { eq: $uid }, idempotencyKey: { eq: $key } }, limit: 2) {
     payloadHash
     result
   }
 }
+
 query ReadSalonShorthandScope($uid: String!, $salonId: String!, $aliasId: String!)
 @auth(level: NO_ACCESS) {
   membership(key: { uid: $uid }) {
@@ -127,6 +131,7 @@ query ReadSalonShorthandScope($uid: String!, $salonId: String!, $aliasId: String
     revision
   }
 }
+
 mutation RemoveSalonShorthand(
   $uid: String!
   $salonId: String!

@@ -1,0 +1,103 @@
+query ReadResetCounts($businessId: String!) @auth(level: NO_ACCESS) {
+  deliveryReceipts: deliveryReceipts(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  deliveryItems: deliveryReceiptItems(where: { receipt: { businessId: { eq: $businessId } } }) {
+    _count
+  }
+  deliveryIssues: deliveryIssues(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  deliveryIssueItems: deliveryIssueItems(where: { issue: { businessId: { eq: $businessId } } }) {
+    _count
+  }
+  deliveryEvents: deliveryIssueEvents(where: { issue: { businessId: { eq: $businessId } } }) {
+    _count
+  }
+  deliveryReferences: deliveryReceiptProcedures(
+    where: { receipt: { businessId: { eq: $businessId } } }
+  ) {
+    _count
+  }
+  deliveryKeys: deliveryActionKeys(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  deliveryCommands: deliveryCommandReceipts(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  requests: replenishmentRequests(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  active: activeRequests(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  items: requestItems(where: { request: { businessId: { eq: $businessId } } }) {
+    _count
+  }
+  transferItems(where: { transfer: { businessId: { eq: $businessId } } }) {
+    _count
+  }
+  transfers(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  movements: stockMovements(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  receipts: actionReceipts(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  keys: actionKeys(where: { businessId: { eq: $businessId } }) {
+    _count
+  }
+  inventories(where: { location: { businessId: { eq: $businessId } } }) {
+    _count
+  }
+}
+
+# Operator only. Caller validates an explicit demo target and quiescent confirmation.
+mutation ResetDemoStock($businessId: String!, $productIds: [String!]!)
+@auth(level: NO_ACCESS)
+@transaction {
+  deliveryKeys: deliveryActionKey_deleteMany(where: { businessId: { eq: $businessId } })
+  deliveryCommands: deliveryCommandReceipt_deleteMany(where: { businessId: { eq: $businessId } })
+
+  deliveryEvents: deliveryIssueEvent_deleteMany(
+    where: { issue: { businessId: { eq: $businessId } } }
+  )
+  deliveryIssueItems: deliveryIssueItem_deleteMany(
+    where: { issue: { businessId: { eq: $businessId } } }
+  )
+  deliveryIssues: deliveryIssue_deleteMany(where: { businessId: { eq: $businessId } })
+  deliveryReferences: deliveryReceiptProcedure_deleteMany(
+    where: { receipt: { businessId: { eq: $businessId } } }
+  )
+  deliveryItems: deliveryReceiptItem_deleteMany(
+    where: { receipt: { businessId: { eq: $businessId } } }
+  )
+  deliveryReceipts: deliveryReceipt_deleteMany(where: { businessId: { eq: $businessId } })
+  keys: actionKey_deleteMany(where: { businessId: { eq: $businessId } })
+  receipts: actionReceipt_deleteMany(where: { businessId: { eq: $businessId } })
+  movements: stockMovement_deleteMany(where: { businessId: { eq: $businessId } })
+  transferItems: transferItem_deleteMany(where: { transfer: { businessId: { eq: $businessId } } })
+  transfers: transfer_deleteMany(where: { businessId: { eq: $businessId } })
+  active: activeRequest_deleteMany(where: { businessId: { eq: $businessId } })
+  items: requestItem_deleteMany(where: { request: { businessId: { eq: $businessId } } })
+  requests: replenishmentRequest_deleteMany(where: { businessId: { eq: $businessId } })
+  hq: inventory_updateMany(
+    where: {
+      location: { businessId: { eq: $businessId }, key: { eq: "hq" } }
+      productId: { in: $productIds }
+    }
+    data: { onHand: 18, reserved: 0, version_update: { inc: 1 } }
+  ) @check(expr: "this == 6", message: "Unexpected demo inventory; reset rolled back")
+  salons: inventory_updateMany(
+    where: {
+      location: {
+        businessId: { eq: $businessId }
+        key: { in: ["legnicka", "lodzka", "zakladowa"] }
+      }
+      productId: { in: $productIds }
+    }
+    data: { onHand: 2, reserved: 0, version_update: { inc: 1 } }
+  ) @check(expr: "this == 18", message: "Unexpected demo inventory; reset rolled back")
+}

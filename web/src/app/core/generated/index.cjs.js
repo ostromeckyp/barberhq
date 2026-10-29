@@ -103,6 +103,36 @@ exports.getHqInventory = function getHqInventory(dcOrVars, varsOrOptions, option
 }
 ;
 
+const getDeliveryProcedureBindingsRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDeliveryProcedureBindings');
+}
+getDeliveryProcedureBindingsRef.operationName = 'GetDeliveryProcedureBindings';
+exports.getDeliveryProcedureBindingsRef = getDeliveryProcedureBindingsRef;
+
+exports.getDeliveryProcedureBindings = function getDeliveryProcedureBindings(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(getDeliveryProcedureBindingsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const listDeliveryProcedureDocumentsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListDeliveryProcedureDocuments', inputVars);
+}
+listDeliveryProcedureDocumentsRef.operationName = 'ListDeliveryProcedureDocuments';
+exports.listDeliveryProcedureDocumentsRef = listDeliveryProcedureDocumentsRef;
+
+exports.listDeliveryProcedureDocuments = function listDeliveryProcedureDocuments(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
+  return executeQuery(listDeliveryProcedureDocumentsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
 const getDeliveryReceiptRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -145,36 +175,6 @@ exports.listDeliveryIssues = function listDeliveryIssues(dcOrVars, varsOrOptions
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(listDeliveryIssuesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const getDeliveryProcedureBindingsRef = (dc) => {
-  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'GetDeliveryProcedureBindings');
-}
-getDeliveryProcedureBindingsRef.operationName = 'GetDeliveryProcedureBindings';
-exports.getDeliveryProcedureBindingsRef = getDeliveryProcedureBindingsRef;
-
-exports.getDeliveryProcedureBindings = function getDeliveryProcedureBindings(dcOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
-  return executeQuery(getDeliveryProcedureBindingsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
-}
-;
-
-const listDeliveryProcedureDocumentsRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
-  dcInstance._useGeneratedSdk();
-  return queryRef(dcInstance, 'ListDeliveryProcedureDocuments', inputVars);
-}
-listDeliveryProcedureDocumentsRef.operationName = 'ListDeliveryProcedureDocuments';
-exports.listDeliveryProcedureDocumentsRef = listDeliveryProcedureDocumentsRef;
-
-exports.listDeliveryProcedureDocuments = function listDeliveryProcedureDocuments(dcOrVars, varsOrOptions, options) {
-  
-  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, false);
-  return executeQuery(listDeliveryProcedureDocumentsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 

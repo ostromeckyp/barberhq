@@ -1,0 +1,96 @@
+# Explicit reviewed alias seed (scripts/seed/product-aliases.ts). Never run at application startup.
+query ReadProductAliasSeedState($businessId: String!) @auth(level: NO_ACCESS) {
+  business(id: $businessId) {
+    productKnowledgeRevision
+  }
+  products(where: { businessId: { eq: $businessId } }, orderBy: { id: ASC }, limit: 201) {
+    id
+    demoId
+    seedType
+    keywords
+    typeSourceVersionId
+  }
+  productAliases(
+    where: { businessId: { eq: $businessId }, source: { eq: SEED } }
+    orderBy: { id: ASC }
+    limit: 5001
+  ) {
+    id
+    productId
+    phrase
+    normalized
+    kind
+    lang
+    source
+    status
+    overriddenByHq
+  }
+}
+
+# One fenced transaction: only SEED rows change; a current document type is never overwritten.
+mutation ApplyProductAliasSeed(
+  $businessId: String!
+  $expectedRevision: Int!
+  $aliasesJson: String!
+  $retireJson: String!
+  $productsJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH guard AS MATERIALIZED (
+    SELECT id FROM business WHERE id=$1 AND product_knowledge_revision=$2 AND product_knowledge_revision<2147483647 FOR UPDATE
+    ), upserted AS (
+    INSERT INTO product_alias SELECT x.* FROM jsonb_populate_recordset(NULL::product_alias,$3::jsonb) x
+    JOIN product p ON p.id=x.product_id AND p.business_id=$1
+    WHERE x.business_id=$1 AND x.source::text='SEED' AND x.status::text='ACTIVE' AND x.salon_id IS NULL
+    AND x.source_document_version_id IS NULL AND x.id LIKE 'seed:%' AND EXISTS(SELECT 1 FROM guard)
+    ON CONFLICT (id) DO UPDATE SET phrase=EXCLUDED.phrase,status='ACTIVE',ambiguous=false,revision=product_alias.revision+1
+    WHERE product_alias.business_id=$1 AND product_alias.source::text='SEED' AND NOT product_alias.overridden_by_hq
+    AND product_alias.salon_id IS NULL
+    AND product_alias.source_document_version_id IS NULL RETURNING id
+    ), retired AS (
+    UPDATE product_alias a SET status='RETIRED',ambiguous=false,revision=a.revision+1
+    WHERE a.business_id=$1 AND a.source::text='SEED' AND a.status::text<>'RETIRED' AND NOT a.overridden_by_hq
+    AND a.id IN (SELECT jsonb_array_elements_text($4::jsonb)) AND EXISTS(SELECT 1 FROM guard) RETURNING a.id
+    ), seeded AS (
+    UPDATE product p SET seed_type=x->>'seedType',keywords=ARRAY(SELECT jsonb_array_elements_text(x->'keywords')),
+    type=CASE WHEN p.type_source_version_id IS NULL THEN x->>'seedType' ELSE p.type END
+    FROM jsonb_array_elements($5::jsonb) x WHERE p.id=x->>'id' AND p.business_id=$1 AND EXISTS(SELECT 1 FROM guard) RETURNING p.id
+    )
+    UPDATE business SET product_knowledge_revision=product_knowledge_revision+1
+    WHERE id IN (SELECT id FROM guard)
+    AND (SELECT count(*) FROM upserted)=jsonb_array_length($3::jsonb)
+    AND (SELECT count(*) FROM retired)=jsonb_array_length($4::jsonb)
+    AND (SELECT count(*) FROM seeded)=jsonb_array_length($5::jsonb)
+    """
+    params: [$businessId, $expectedRevision, $aliasesJson, $retireJson, $productsJson]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+# Demo reset of HQ product administration: back to the seeded baseline (alias seed re-applies after).
+mutation ResetProductAdmin($businessId: String!, $seedProductIdsJson: String!)
+@auth(level: NO_ACCESS)
+@transaction {
+  result: _execute(
+    sql: """
+    WITH extra AS MATERIALIZED (
+    SELECT id FROM product WHERE business_id=$1 AND id NOT IN (SELECT jsonb_array_elements_text($2::jsonb))
+    ), att AS (DELETE FROM product_card_attachment WHERE business_id=$1 RETURNING product_id),
+    adj AS (DELETE FROM hq_stock_adjustment WHERE business_id=$1 RETURNING id),
+    ops AS (DELETE FROM product_admin_operation WHERE business_id=$1 RETURNING id),
+    hq_aliases AS (
+    DELETE FROM product_alias WHERE business_id=$1 AND source::text='HQ' AND source_document_version_id IS NULL RETURNING id
+    ), overrides AS (UPDATE product_alias SET overridden_by_hq=false WHERE business_id=$1 AND overridden_by_hq RETURNING id),
+    inv AS (DELETE FROM inventory WHERE product_id IN (SELECT id FROM extra) RETURNING product_id),
+    removed AS (
+    DELETE FROM product WHERE id IN (SELECT id FROM extra) AND (SELECT count(*) FROM inv)>=0
+    AND (SELECT count(*) FROM att)>=0 AND (SELECT count(*) FROM hq_aliases)>=0 RETURNING id
+    )
+    UPDATE product SET hq_updated_at=NULL,hq_updated_by=NULL
+    WHERE business_id=$1 AND id NOT IN (SELECT id FROM extra)
+    AND (SELECT count(*) FROM removed)>=0 AND (SELECT count(*) FROM adj)>=0 AND (SELECT count(*) FROM ops)>=0
+    AND (SELECT count(*) FROM overrides)>=0
+    """
+    params: [$businessId, $seedProductIdsJson]
+  )
+}

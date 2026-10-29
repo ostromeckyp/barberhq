@@ -57,6 +57,7 @@ query GetDeliveryReceipt($requestId: String!) @auth(level: USER) {
     }
   }
 }
+
 query GetDeliveryIssue(
   $issueId: String!
   $eventLimit: Int! = 50
@@ -158,6 +159,7 @@ query GetDeliveryIssue(
     }
   }
 }
+
 query ListDeliveryIssues(
   $allSalons: Boolean!
   $salonId: String
@@ -242,66 +244,6 @@ query ListDeliveryIssues(
           id
           state
           createdAt
-        }
-      }
-    }
-  }
-}
-query GetDeliveryProcedureBindings @auth(level: USER) {
-  membership(key: { uid_expr: "auth.uid" })
-    @check(expr: "this != null && this.role == 'HQ'", message: "FORBIDDEN") {
-    businessId
-    role @redact
-    business {
-      bindings: deliveryProcedureBindings_on_business(orderBy: { kind: ASC }, limit: 2) {
-        kind
-        documentId
-        revision
-        updatedAt
-        document {
-          id
-          businessId
-          documentCode
-          activeVersionId
-          versions: knowledgeVersions_on_document(where: { isActive: { eq: true } }, limit: 2) {
-            id
-            title
-            businessId
-            status
-            publishedAt
-            revokedAt
-          }
-        }
-      }
-    }
-  }
-}
-
-query ListDeliveryProcedureDocuments($limit: Int! = 20, $offset: Int! = 0) @auth(level: USER) {
-  membership(key: { uid_expr: "auth.uid" })
-    @check(
-      expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 50 && vars.offset >= 0"
-      message: "FORBIDDEN"
-    ) {
-    role @redact
-    business {
-      documents: knowledgeVersions_on_business(
-        where: {
-          isActive: { eq: true }
-          status: { eq: READY }
-          publishedAt: { isNull: false }
-          revokedAt: { isNull: true }
-        }
-        orderBy: [{ createdAt: DESC }, { id: ASC }]
-        limit: $limit
-        offset: $offset
-      ) {
-        id
-        documentId
-        title
-        document {
-          documentCode
-          activeVersionId
         }
       }
     }

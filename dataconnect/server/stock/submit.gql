@@ -1,0 +1,177 @@
+mutation SubmitStock(
+  $uid: String!
+  $businessId: String!
+  $requestId: String!
+  $receiptId: String!
+  $key: String!
+  $payloadHash: String!
+  $semanticHash: String!
+  $salonId: String!
+  $productIds: [String!]!
+  $itemIds: [String!]!
+  $quantities: [Int!]!
+  $count: Int!
+  $use0: Boolean!
+  $use1: Boolean!
+  $use2: Boolean!
+  $use3: Boolean!
+  $use4: Boolean!
+  $use5: Boolean!
+) @auth(level: NO_ACCESS) @transaction {
+  query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && (this.role == 'HQ' || (this.role == 'SALON' && this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId)))"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+      salonAccesses_on_membership {
+        locationId
+      }
+    }
+    location(id: $salonId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.kind == 'SALON'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      kind
+    }
+    products(where: { id: { in: $productIds }, businessId: { eq: $businessId } }, limit: 6)
+      @check(
+        expr: "vars.count >= 1 && vars.count <= 6 && vars.productIds.size() == vars.count && vars.itemIds.size() == vars.count && vars.quantities.size() == vars.count && this.size() == vars.count && vars.quantities.all(q,q >= 1 && q <= 99) && vars.use0 == (vars.count > 0) && vars.use1 == (vars.count > 1) && vars.use2 == (vars.count > 2) && vars.use3 == (vars.count > 3) && vars.use4 == (vars.count > 4) && vars.use5 == (vars.count > 5)"
+        message: "VALIDATION_ERROR"
+      ) {
+      id
+    }
+  }
+  replenishmentRequest_insert(
+    data: {
+      id: $requestId
+      businessId: $businessId
+      salonId: $salonId
+      state: PENDING_APPROVAL
+      revision: 1
+    }
+  )
+  item0: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 0 ? 0 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 0 ? 0 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 0 ? 0 : 0]"
+    }
+  ) @include(if: $use0)
+  active0: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 0 ? 0 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use0)
+  item1: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 1 ? 1 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 1 ? 1 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 1 ? 1 : 0]"
+    }
+  ) @include(if: $use1)
+  active1: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 1 ? 1 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use1)
+  item2: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 2 ? 2 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 2 ? 2 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 2 ? 2 : 0]"
+    }
+  ) @include(if: $use2)
+  active2: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 2 ? 2 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use2)
+  item3: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 3 ? 3 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 3 ? 3 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 3 ? 3 : 0]"
+    }
+  ) @include(if: $use3)
+  active3: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 3 ? 3 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use3)
+  item4: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 4 ? 4 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 4 ? 4 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 4 ? 4 : 0]"
+    }
+  ) @include(if: $use4)
+  active4: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 4 ? 4 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use4)
+  item5: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 5 ? 5 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 5 ? 5 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 5 ? 5 : 0]"
+    }
+  ) @include(if: $use5)
+  active5: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 5 ? 5 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use5)
+  actionReceipt_insert(
+    data: {
+      id: $receiptId
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      requestId: $requestId
+      action: SUBMIT
+      payloadHash: $payloadHash
+      semanticHash: $semanticHash
+      state: PENDING_APPROVAL
+      revision_expr: "1"
+    }
+  )
+  actionKey_insert(
+    data: {
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      receiptId: $receiptId
+      payloadHash: $payloadHash
+    }
+  )
+}

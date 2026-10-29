@@ -1,0 +1,296 @@
+mutation ChangeDeliveryIssue(
+  $uid: String!
+  $businessId: String!
+  $issueId: String!
+  $revision: Int!
+  $commandId: String!
+  $key: String!
+  $payloadHash: String!
+  $result: Any!
+  $type: DeliveryCommandType!
+  $eventType: DeliveryIssueEventType!
+  $status: DeliveryIssueStatus!
+  $note: String
+) @auth(level: NO_ACCESS) @transaction {
+  actor: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+  }
+  issueGuard: query @redact {
+    deliveryIssue(id: $issueId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.revision == vars.revision && ((vars.type == 'START_REVIEW' && this.status == 'OPEN' && vars.status == 'IN_REVIEW' && vars.eventType == 'REVIEW_STARTED' && vars.note == null) || (vars.type == 'ADD_NOTE' && this.status != 'RESOLVED' && vars.status == this.status && vars.eventType == 'NOTE_ADDED' && vars.note != null && vars.note.size() >= 1 && vars.note.size() <= 1000))"
+        message: "STALE_STATE"
+      ) {
+      id
+      businessId
+      revision
+      status
+    }
+  }
+  changed: deliveryIssue_updateMany(
+    where: {
+      id: { eq: $issueId }
+      businessId: { eq: $businessId }
+      revision: { eq: $revision }
+      status: { ne: RESOLVED }
+    }
+    data: { revision_update: { inc: 1 }, status: $status }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+  deliveryIssueEvent_insert(
+    data: {
+      id: $commandId
+      issueId: $issueId
+      revision_expr: "vars.revision + 1"
+      actorUid: $uid
+      type: $eventType
+      status: $status
+      note: $note
+      quantities: []
+    }
+  )
+  deliveryCommandReceipt_insert(
+    data: {
+      id: $commandId
+      businessId: $businessId
+      actorUid: $uid
+      type: $type
+      target: $issueId
+      payloadHash: $payloadHash
+      result: $result
+    }
+  )
+  deliveryActionKey_insert(
+    data: {
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      commandId: $commandId
+      payloadHash: $payloadHash
+    }
+  )
+}
+
+mutation CreateDeliveryReplacement(
+  $uid: String!
+  $businessId: String!
+  $issueId: String!
+  $revision: Int!
+  $salonId: String!
+  $requestId: String!
+  $commandId: String!
+  $key: String!
+  $payloadHash: String!
+  $result: Any!
+  $productIds: [String!]!
+  $itemIds: [String!]!
+  $quantities: [Int!]!
+  $count: Int!
+  $use0: Boolean!
+  $use1: Boolean!
+  $use2: Boolean!
+  $use3: Boolean!
+  $use4: Boolean!
+  $use5: Boolean!
+) @auth(level: NO_ACCESS) @transaction {
+  actor: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+  }
+  issueGuard: query @redact {
+    deliveryIssue(id: $issueId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.salonId == vars.salonId && this.revision == vars.revision && this.status in ['OPEN','IN_REVIEW'] && this.activeReplacementRequestId == null && vars.count >= 1 && vars.count <= 6 && vars.productIds.size() == vars.count && vars.itemIds.size() == vars.count && vars.quantities.size() == vars.count && vars.productIds == this.items.filter(i,i.initialAffectedQuantity > i.replacementAcceptedQuantity).map(i,i.productId) && vars.quantities == this.items.filter(i,i.initialAffectedQuantity > i.replacementAcceptedQuantity).map(i,i.initialAffectedQuantity - i.replacementAcceptedQuantity) && vars.quantities.all(q,q >= 1 && q <= 99) && vars.use0 == (vars.count > 0) && vars.use1 == (vars.count > 1) && vars.use2 == (vars.count > 2) && vars.use3 == (vars.count > 3) && vars.use4 == (vars.count > 4) && vars.use5 == (vars.count > 5)"
+        message: "STALE_STATE"
+      ) {
+      id
+      businessId
+      salonId
+      revision
+      status
+      activeReplacementRequestId
+      items: deliveryIssueItems_on_issue(orderBy: { productId: ASC }, limit: 6) {
+        productId
+        initialAffectedQuantity
+        replacementAcceptedQuantity
+      }
+    }
+  }
+  claim: deliveryIssue_updateMany(
+    where: {
+      id: { eq: $issueId }
+      businessId: { eq: $businessId }
+      revision: { eq: $revision }
+      status: { in: [OPEN, IN_REVIEW] }
+      activeReplacementRequestId: { isNull: true }
+    }
+    data: { revision_update: { inc: 1 }, status: REPLACEMENT_IN_PROGRESS }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+  replenishmentRequest_insert(
+    data: {
+      id: $requestId
+      businessId: $businessId
+      salonId: $salonId
+      state: PENDING_APPROVAL
+      revision: 1
+      replacementIssueId: $issueId
+    }
+  )
+
+  item0: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 0 ? 0 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 0 ? 0 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 0 ? 0 : 0]"
+    }
+  ) @include(if: $use0)
+  active0: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 0 ? 0 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use0)
+
+  item1: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 1 ? 1 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 1 ? 1 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 1 ? 1 : 0]"
+    }
+  ) @include(if: $use1)
+  active1: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 1 ? 1 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use1)
+
+  item2: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 2 ? 2 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 2 ? 2 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 2 ? 2 : 0]"
+    }
+  ) @include(if: $use2)
+  active2: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 2 ? 2 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use2)
+
+  item3: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 3 ? 3 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 3 ? 3 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 3 ? 3 : 0]"
+    }
+  ) @include(if: $use3)
+  active3: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 3 ? 3 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use3)
+
+  item4: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 4 ? 4 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 4 ? 4 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 4 ? 4 : 0]"
+    }
+  ) @include(if: $use4)
+  active4: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 4 ? 4 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use4)
+
+  item5: requestItem_insert(
+    data: {
+      id_expr: "vars.itemIds[vars.count > 5 ? 5 : 0]"
+      requestId: $requestId
+      productId_expr: "vars.productIds[vars.count > 5 ? 5 : 0]"
+      quantity_expr: "vars.quantities[vars.count > 5 ? 5 : 0]"
+    }
+  ) @include(if: $use5)
+  active5: activeRequest_insert(
+    data: {
+      businessId: $businessId
+      salonId: $salonId
+      productId_expr: "vars.productIds[vars.count > 5 ? 5 : 0]"
+      requestId: $requestId
+    }
+  ) @include(if: $use5)
+
+  pointer: deliveryIssue_updateMany(
+    where: {
+      id: { eq: $issueId }
+      businessId: { eq: $businessId }
+      revision: { eq_expr: "vars.revision + 1" }
+      status: { eq: REPLACEMENT_IN_PROGRESS }
+      activeReplacementRequestId: { isNull: true }
+    }
+    data: { activeReplacementRequestId: $requestId }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+  deliveryIssueEvent_insert(
+    data: {
+      id: $commandId
+      issueId: $issueId
+      revision_expr: "vars.revision + 1"
+      actorUid: $uid
+      type: REPLACEMENT_CREATED
+      status: REPLACEMENT_IN_PROGRESS
+      requestId: $requestId
+      quantities: []
+    }
+  )
+  deliveryCommandReceipt_insert(
+    data: {
+      id: $commandId
+      businessId: $businessId
+      actorUid: $uid
+      type: CREATE_REPLACEMENT
+      target: $issueId
+      payloadHash: $payloadHash
+      result: $result
+    }
+  )
+  deliveryActionKey_insert(
+    data: {
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      commandId: $commandId
+      payloadHash: $payloadHash
+    }
+  )
+}

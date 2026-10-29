@@ -1,0 +1,72 @@
+query KnowledgeCursorDocuments($businessId: String!, $after: String!, $limit: Int!)
+@auth(level: NO_ACCESS) {
+  knowledgeDocuments(
+    where: { businessId: { eq: $businessId }, id: { gt: $after } }
+    orderBy: { id: ASC }
+    limit: $limit
+  ) {
+    id
+    businessId
+    nextVersionNumber
+  }
+}
+
+query KnowledgeCursorBusiness($businessId: String!) @auth(level: NO_ACCESS) {
+  business(id: $businessId) {
+    id
+  }
+}
+
+query KnowledgeCursorLabels($documentId: String!, $after: String!, $limit: Int!)
+@auth(level: NO_ACCESS) {
+  knowledgeVersions(
+    where: { documentId: { eq: $documentId }, versionLabel: { gt: $after } }
+    orderBy: { versionLabel: ASC }
+    limit: $limit
+  ) {
+    versionLabel
+  }
+}
+
+mutation BackfillKnowledgeCursor(
+  $businessId: String!
+  $documentId: String!
+  $expected: Int
+  $target: Int!
+  $initialize: Boolean!
+  $advance: Boolean!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    business(id: $businessId)
+      @check(
+        expr: "this != null && vars.target >= 1 && vars.target <= 2147483647 && vars.initialize != vars.advance"
+        message: "VERSION_CONFLICT"
+      ) {
+      id
+    }
+    knowledgeDocument(id: $documentId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && ((vars.initialize && this.nextVersionNumber == null && vars.expected == null) || (vars.advance && this.nextVersionNumber == vars.expected && vars.target > vars.expected))"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      nextVersionNumber
+    }
+  }
+  initial: knowledgeDocument_updateMany(
+    where: {
+      id: { eq: $documentId }
+      businessId: { eq: $businessId }
+      nextVersionNumber: { isNull: true }
+    }
+    data: { nextVersionNumber: $target }
+  ) @include(if: $initialize) @check(expr: "this == 1", message: "STALE_STATE")
+  progressed: knowledgeDocument_updateMany(
+    where: {
+      id: { eq: $documentId }
+      businessId: { eq: $businessId }
+      nextVersionNumber: { eq: $expected }
+    }
+    data: { nextVersionNumber: $target }
+  ) @include(if: $advance) @check(expr: "this == 1", message: "STALE_STATE")
+}

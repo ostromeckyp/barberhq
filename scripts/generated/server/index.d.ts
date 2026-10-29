@@ -2432,6 +2432,36 @@ export function readAiCurrentWindow(dc: DataConnect, vars: ReadAiCurrentWindowVa
 /** Generated Node Admin SDK operation action function for the 'ReadAiCurrentWindow' Query. Allow users to pass in custom DataConnect instances. */
 export function readAiCurrentWindow(vars: ReadAiCurrentWindowVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadAiCurrentWindowData>>;
 
+/** Generated Node Admin SDK operation action function for the 'ChangeDeliveryIssue' Mutation. Allow users to execute without passing in DataConnect. */
+export function changeDeliveryIssue(dc: DataConnect, vars: ChangeDeliveryIssueVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ChangeDeliveryIssueData>>;
+/** Generated Node Admin SDK operation action function for the 'ChangeDeliveryIssue' Mutation. Allow users to pass in custom DataConnect instances. */
+export function changeDeliveryIssue(vars: ChangeDeliveryIssueVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ChangeDeliveryIssueData>>;
+
+/** Generated Node Admin SDK operation action function for the 'CreateDeliveryReplacement' Mutation. Allow users to execute without passing in DataConnect. */
+export function createDeliveryReplacement(dc: DataConnect, vars: CreateDeliveryReplacementVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CreateDeliveryReplacementData>>;
+/** Generated Node Admin SDK operation action function for the 'CreateDeliveryReplacement' Mutation. Allow users to pass in custom DataConnect instances. */
+export function createDeliveryReplacement(vars: CreateDeliveryReplacementVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CreateDeliveryReplacementData>>;
+
+/** Generated Node Admin SDK operation action function for the 'InsertLegacyDeliveryReceipt' Mutation. Allow users to execute without passing in DataConnect. */
+export function insertLegacyDeliveryReceipt(dc: DataConnect, vars: InsertLegacyDeliveryReceiptVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertLegacyDeliveryReceiptData>>;
+/** Generated Node Admin SDK operation action function for the 'InsertLegacyDeliveryReceipt' Mutation. Allow users to pass in custom DataConnect instances. */
+export function insertLegacyDeliveryReceipt(vars: InsertLegacyDeliveryReceiptVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertLegacyDeliveryReceiptData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ReadDeliveryBindings' Query. Allow users to execute without passing in DataConnect. */
+export function readDeliveryBindings(dc: DataConnect, vars: ReadDeliveryBindingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryBindingsData>>;
+/** Generated Node Admin SDK operation action function for the 'ReadDeliveryBindings' Query. Allow users to pass in custom DataConnect instances. */
+export function readDeliveryBindings(vars: ReadDeliveryBindingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryBindingsData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ReadDeliveryProcedureDocument' Query. Allow users to execute without passing in DataConnect. */
+export function readDeliveryProcedureDocument(dc: DataConnect, vars: ReadDeliveryProcedureDocumentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryProcedureDocumentData>>;
+/** Generated Node Admin SDK operation action function for the 'ReadDeliveryProcedureDocument' Query. Allow users to pass in custom DataConnect instances. */
+export function readDeliveryProcedureDocument(vars: ReadDeliveryProcedureDocumentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryProcedureDocumentData>>;
+
+/** Generated Node Admin SDK operation action function for the 'SetDeliveryProcedure' Mutation. Allow users to execute without passing in DataConnect. */
+export function setDeliveryProcedure(dc: DataConnect, vars: SetDeliveryProcedureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SetDeliveryProcedureData>>;
+/** Generated Node Admin SDK operation action function for the 'SetDeliveryProcedure' Mutation. Allow users to pass in custom DataConnect instances. */
+export function setDeliveryProcedure(vars: SetDeliveryProcedureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SetDeliveryProcedureData>>;
+
 /** Generated Node Admin SDK operation action function for the 'ReadDeliveryContext' Query. Allow users to execute without passing in DataConnect. */
 export function readDeliveryContext(dc: DataConnect, vars: ReadDeliveryContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryContextData>>;
 /** Generated Node Admin SDK operation action function for the 'ReadDeliveryContext' Query. Allow users to pass in custom DataConnect instances. */
@@ -2452,60 +2482,10 @@ export function readIssueContext(dc: DataConnect, vars: ReadIssueContextVariable
 /** Generated Node Admin SDK operation action function for the 'ReadIssueContext' Query. Allow users to pass in custom DataConnect instances. */
 export function readIssueContext(vars: ReadIssueContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadIssueContextData>>;
 
-/** Generated Node Admin SDK operation action function for the 'InsertLegacyDeliveryReceipt' Mutation. Allow users to execute without passing in DataConnect. */
-export function insertLegacyDeliveryReceipt(dc: DataConnect, vars: InsertLegacyDeliveryReceiptVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertLegacyDeliveryReceiptData>>;
-/** Generated Node Admin SDK operation action function for the 'InsertLegacyDeliveryReceipt' Mutation. Allow users to pass in custom DataConnect instances. */
-export function insertLegacyDeliveryReceipt(vars: InsertLegacyDeliveryReceiptVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertLegacyDeliveryReceiptData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ReadDeliveryBindings' Query. Allow users to execute without passing in DataConnect. */
-export function readDeliveryBindings(dc: DataConnect, vars: ReadDeliveryBindingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryBindingsData>>;
-/** Generated Node Admin SDK operation action function for the 'ReadDeliveryBindings' Query. Allow users to pass in custom DataConnect instances. */
-export function readDeliveryBindings(vars: ReadDeliveryBindingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryBindingsData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ReadDeliveryProcedureDocument' Query. Allow users to execute without passing in DataConnect. */
-export function readDeliveryProcedureDocument(dc: DataConnect, vars: ReadDeliveryProcedureDocumentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryProcedureDocumentData>>;
-/** Generated Node Admin SDK operation action function for the 'ReadDeliveryProcedureDocument' Query. Allow users to pass in custom DataConnect instances. */
-export function readDeliveryProcedureDocument(vars: ReadDeliveryProcedureDocumentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadDeliveryProcedureDocumentData>>;
-
 /** Generated Node Admin SDK operation action function for the 'RecordDeliveryTransaction' Mutation. Allow users to execute without passing in DataConnect. */
 export function recordDeliveryTransaction(dc: DataConnect, vars: RecordDeliveryTransactionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordDeliveryTransactionData>>;
 /** Generated Node Admin SDK operation action function for the 'RecordDeliveryTransaction' Mutation. Allow users to pass in custom DataConnect instances. */
 export function recordDeliveryTransaction(vars: RecordDeliveryTransactionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordDeliveryTransactionData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ChangeDeliveryIssue' Mutation. Allow users to execute without passing in DataConnect. */
-export function changeDeliveryIssue(dc: DataConnect, vars: ChangeDeliveryIssueVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ChangeDeliveryIssueData>>;
-/** Generated Node Admin SDK operation action function for the 'ChangeDeliveryIssue' Mutation. Allow users to pass in custom DataConnect instances. */
-export function changeDeliveryIssue(vars: ChangeDeliveryIssueVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ChangeDeliveryIssueData>>;
-
-/** Generated Node Admin SDK operation action function for the 'CreateDeliveryReplacement' Mutation. Allow users to execute without passing in DataConnect. */
-export function createDeliveryReplacement(dc: DataConnect, vars: CreateDeliveryReplacementVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CreateDeliveryReplacementData>>;
-/** Generated Node Admin SDK operation action function for the 'CreateDeliveryReplacement' Mutation. Allow users to pass in custom DataConnect instances. */
-export function createDeliveryReplacement(vars: CreateDeliveryReplacementVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CreateDeliveryReplacementData>>;
-
-/** Generated Node Admin SDK operation action function for the 'SetDeliveryProcedure' Mutation. Allow users to execute without passing in DataConnect. */
-export function setDeliveryProcedure(dc: DataConnect, vars: SetDeliveryProcedureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SetDeliveryProcedureData>>;
-/** Generated Node Admin SDK operation action function for the 'SetDeliveryProcedure' Mutation. Allow users to pass in custom DataConnect instances. */
-export function setDeliveryProcedure(vars: SetDeliveryProcedureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SetDeliveryProcedureData>>;
-
-/** Generated Node Admin SDK operation action function for the 'SearchEligibleProcedureChunks' Query. Allow users to execute without passing in DataConnect. */
-export function searchEligibleProcedureChunks(dc: DataConnect, vars: SearchEligibleProcedureChunksVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SearchEligibleProcedureChunksData>>;
-/** Generated Node Admin SDK operation action function for the 'SearchEligibleProcedureChunks' Query. Allow users to pass in custom DataConnect instances. */
-export function searchEligibleProcedureChunks(vars: SearchEligibleProcedureChunksVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SearchEligibleProcedureChunksData>>;
-
-/** Generated Node Admin SDK operation action function for the 'RecheckProcedureSources' Query. Allow users to execute without passing in DataConnect. */
-export function recheckProcedureSources(dc: DataConnect, vars: RecheckProcedureSourcesVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecheckProcedureSourcesData>>;
-/** Generated Node Admin SDK operation action function for the 'RecheckProcedureSources' Query. Allow users to pass in custom DataConnect instances. */
-export function recheckProcedureSources(vars: RecheckProcedureSourcesVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecheckProcedureSourcesData>>;
-
-/** Generated Node Admin SDK operation action function for the 'KnowledgeVersionState' Query. Allow users to execute without passing in DataConnect. */
-export function knowledgeVersionState(dc: DataConnect, vars: KnowledgeVersionStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeVersionStateData>>;
-/** Generated Node Admin SDK operation action function for the 'KnowledgeVersionState' Query. Allow users to pass in custom DataConnect instances. */
-export function knowledgeVersionState(vars: KnowledgeVersionStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeVersionStateData>>;
-
-/** Generated Node Admin SDK operation action function for the 'KnowledgeDocumentState' Query. Allow users to execute without passing in DataConnect. */
-export function knowledgeDocumentState(dc: DataConnect, vars: KnowledgeDocumentStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeDocumentStateData>>;
-/** Generated Node Admin SDK operation action function for the 'KnowledgeDocumentState' Query. Allow users to pass in custom DataConnect instances. */
-export function knowledgeDocumentState(vars: KnowledgeDocumentStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeDocumentStateData>>;
 
 /** Generated Node Admin SDK operation action function for the 'KnowledgeCursorDocuments' Query. Allow users to execute without passing in DataConnect. */
 export function knowledgeCursorDocuments(dc: DataConnect, vars: KnowledgeCursorDocumentsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeCursorDocumentsData>>;
@@ -2527,21 +2507,6 @@ export function backfillKnowledgeCursor(dc: DataConnect, vars: BackfillKnowledge
 /** Generated Node Admin SDK operation action function for the 'BackfillKnowledgeCursor' Mutation. Allow users to pass in custom DataConnect instances. */
 export function backfillKnowledgeCursor(vars: BackfillKnowledgeCursorVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BackfillKnowledgeCursorData>>;
 
-/** Generated Node Admin SDK operation action function for the 'KnowledgeCommandContext' Query. Allow users to execute without passing in DataConnect. */
-export function knowledgeCommandContext(dc: DataConnect, vars: KnowledgeCommandContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeCommandContextData>>;
-/** Generated Node Admin SDK operation action function for the 'KnowledgeCommandContext' Query. Allow users to pass in custom DataConnect instances. */
-export function knowledgeCommandContext(vars: KnowledgeCommandContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeCommandContextData>>;
-
-/** Generated Node Admin SDK operation action function for the 'RegisterKnowledgeVersion' Mutation. Allow users to execute without passing in DataConnect. */
-export function registerKnowledgeVersion(dc: DataConnect, vars: RegisterKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RegisterKnowledgeVersionData>>;
-/** Generated Node Admin SDK operation action function for the 'RegisterKnowledgeVersion' Mutation. Allow users to pass in custom DataConnect instances. */
-export function registerKnowledgeVersion(vars: RegisterKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RegisterKnowledgeVersionData>>;
-
-/** Generated Node Admin SDK operation action function for the 'BindKnowledgeOriginal' Mutation. Allow users to execute without passing in DataConnect. */
-export function bindKnowledgeOriginal(dc: DataConnect, vars: BindKnowledgeOriginalVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BindKnowledgeOriginalData>>;
-/** Generated Node Admin SDK operation action function for the 'BindKnowledgeOriginal' Mutation. Allow users to pass in custom DataConnect instances. */
-export function bindKnowledgeOriginal(vars: BindKnowledgeOriginalVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BindKnowledgeOriginalData>>;
-
 /** Generated Node Admin SDK operation action function for the 'SetKnowledgeDispatchFailure' Mutation. Allow users to execute without passing in DataConnect. */
 export function setKnowledgeDispatchFailure(dc: DataConnect, vars: SetKnowledgeDispatchFailureVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SetKnowledgeDispatchFailureData>>;
 /** Generated Node Admin SDK operation action function for the 'SetKnowledgeDispatchFailure' Mutation. Allow users to pass in custom DataConnect instances. */
@@ -2562,15 +2527,25 @@ export function completeKnowledgeRetry(dc: DataConnect, vars: CompleteKnowledgeR
 /** Generated Node Admin SDK operation action function for the 'CompleteKnowledgeRetry' Mutation. Allow users to pass in custom DataConnect instances. */
 export function completeKnowledgeRetry(vars: CompleteKnowledgeRetryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CompleteKnowledgeRetryData>>;
 
-/** Generated Node Admin SDK operation action function for the 'StartKnowledgeReview' Mutation. Allow users to execute without passing in DataConnect. */
-export function startKnowledgeReview(dc: DataConnect, vars: StartKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StartKnowledgeReviewData>>;
-/** Generated Node Admin SDK operation action function for the 'StartKnowledgeReview' Mutation. Allow users to pass in custom DataConnect instances. */
-export function startKnowledgeReview(vars: StartKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StartKnowledgeReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'SaveKnowledgeExtraction' Mutation. Allow users to execute without passing in DataConnect. */
+export function saveKnowledgeExtraction(dc: DataConnect, vars: SaveKnowledgeExtractionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveKnowledgeExtractionData>>;
+/** Generated Node Admin SDK operation action function for the 'SaveKnowledgeExtraction' Mutation. Allow users to pass in custom DataConnect instances. */
+export function saveKnowledgeExtraction(vars: SaveKnowledgeExtractionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveKnowledgeExtractionData>>;
 
-/** Generated Node Admin SDK operation action function for the 'CompleteKnowledgeReview' Mutation. Allow users to execute without passing in DataConnect. */
-export function completeKnowledgeReview(dc: DataConnect, vars: CompleteKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CompleteKnowledgeReviewData>>;
-/** Generated Node Admin SDK operation action function for the 'CompleteKnowledgeReview' Mutation. Allow users to pass in custom DataConnect instances. */
-export function completeKnowledgeReview(vars: CompleteKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CompleteKnowledgeReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'InsertKnowledgePage' Mutation. Allow users to execute without passing in DataConnect. */
+export function insertKnowledgePage(dc: DataConnect, vars: InsertKnowledgePageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertKnowledgePageData>>;
+/** Generated Node Admin SDK operation action function for the 'InsertKnowledgePage' Mutation. Allow users to pass in custom DataConnect instances. */
+export function insertKnowledgePage(vars: InsertKnowledgePageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertKnowledgePageData>>;
+
+/** Generated Node Admin SDK operation action function for the 'KnowledgeMetadataPage' Query. Allow users to execute without passing in DataConnect. */
+export function knowledgeMetadataPage(dc: DataConnect, vars: KnowledgeMetadataPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeMetadataPageData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeMetadataPage' Query. Allow users to pass in custom DataConnect instances. */
+export function knowledgeMetadataPage(vars: KnowledgeMetadataPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeMetadataPageData>>;
+
+/** Generated Node Admin SDK operation action function for the 'BackfillKnowledgeMetadata' Mutation. Allow users to execute without passing in DataConnect. */
+export function backfillKnowledgeMetadata(dc: DataConnect, vars: BackfillKnowledgeMetadataVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BackfillKnowledgeMetadataData>>;
+/** Generated Node Admin SDK operation action function for the 'BackfillKnowledgeMetadata' Mutation. Allow users to pass in custom DataConnect instances. */
+export function backfillKnowledgeMetadata(vars: BackfillKnowledgeMetadataVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BackfillKnowledgeMetadataData>>;
 
 /** Generated Node Admin SDK operation action function for the 'SetKnowledgePublishIntent' Mutation. Allow users to execute without passing in DataConnect. */
 export function setKnowledgePublishIntent(dc: DataConnect, vars: SetKnowledgePublishIntentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SetKnowledgePublishIntentData>>;
@@ -2586,6 +2561,56 @@ export function setOperatorKnowledgePublishIntent(vars: SetOperatorKnowledgePubl
 export function markKnowledgePublishStale(dc: DataConnect, vars: MarkKnowledgePublishStaleVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgePublishStaleData>>;
 /** Generated Node Admin SDK operation action function for the 'MarkKnowledgePublishStale' Mutation. Allow users to pass in custom DataConnect instances. */
 export function markKnowledgePublishStale(vars: MarkKnowledgePublishStaleVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgePublishStaleData>>;
+
+/** Generated Node Admin SDK operation action function for the 'PublishKnowledgeVersion' Mutation. Allow users to execute without passing in DataConnect. */
+export function publishKnowledgeVersion(dc: DataConnect, vars: PublishKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<PublishKnowledgeVersionData>>;
+/** Generated Node Admin SDK operation action function for the 'PublishKnowledgeVersion' Mutation. Allow users to pass in custom DataConnect instances. */
+export function publishKnowledgeVersion(vars: PublishKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<PublishKnowledgeVersionData>>;
+
+/** Generated Node Admin SDK operation action function for the 'RegisterKnowledgeVersion' Mutation. Allow users to execute without passing in DataConnect. */
+export function registerKnowledgeVersion(dc: DataConnect, vars: RegisterKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RegisterKnowledgeVersionData>>;
+/** Generated Node Admin SDK operation action function for the 'RegisterKnowledgeVersion' Mutation. Allow users to pass in custom DataConnect instances. */
+export function registerKnowledgeVersion(vars: RegisterKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RegisterKnowledgeVersionData>>;
+
+/** Generated Node Admin SDK operation action function for the 'BindKnowledgeOriginal' Mutation. Allow users to execute without passing in DataConnect. */
+export function bindKnowledgeOriginal(dc: DataConnect, vars: BindKnowledgeOriginalVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BindKnowledgeOriginalData>>;
+/** Generated Node Admin SDK operation action function for the 'BindKnowledgeOriginal' Mutation. Allow users to pass in custom DataConnect instances. */
+export function bindKnowledgeOriginal(vars: BindKnowledgeOriginalVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BindKnowledgeOriginalData>>;
+
+/** Generated Node Admin SDK operation action function for the 'SearchEligibleProcedureChunks' Query. Allow users to execute without passing in DataConnect. */
+export function searchEligibleProcedureChunks(dc: DataConnect, vars: SearchEligibleProcedureChunksVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SearchEligibleProcedureChunksData>>;
+/** Generated Node Admin SDK operation action function for the 'SearchEligibleProcedureChunks' Query. Allow users to pass in custom DataConnect instances. */
+export function searchEligibleProcedureChunks(vars: SearchEligibleProcedureChunksVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SearchEligibleProcedureChunksData>>;
+
+/** Generated Node Admin SDK operation action function for the 'RecheckProcedureSources' Query. Allow users to execute without passing in DataConnect. */
+export function recheckProcedureSources(dc: DataConnect, vars: RecheckProcedureSourcesVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecheckProcedureSourcesData>>;
+/** Generated Node Admin SDK operation action function for the 'RecheckProcedureSources' Query. Allow users to pass in custom DataConnect instances. */
+export function recheckProcedureSources(vars: RecheckProcedureSourcesVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecheckProcedureSourcesData>>;
+
+/** Generated Node Admin SDK operation action function for the 'StartKnowledgeReview' Mutation. Allow users to execute without passing in DataConnect. */
+export function startKnowledgeReview(dc: DataConnect, vars: StartKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StartKnowledgeReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'StartKnowledgeReview' Mutation. Allow users to pass in custom DataConnect instances. */
+export function startKnowledgeReview(vars: StartKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StartKnowledgeReviewData>>;
+
+/** Generated Node Admin SDK operation action function for the 'CompleteKnowledgeReview' Mutation. Allow users to execute without passing in DataConnect. */
+export function completeKnowledgeReview(dc: DataConnect, vars: CompleteKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CompleteKnowledgeReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'CompleteKnowledgeReview' Mutation. Allow users to pass in custom DataConnect instances. */
+export function completeKnowledgeReview(vars: CompleteKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<CompleteKnowledgeReviewData>>;
+
+/** Generated Node Admin SDK operation action function for the 'RecordKnowledgeReview' Mutation. Allow users to execute without passing in DataConnect. */
+export function recordKnowledgeReview(dc: DataConnect, vars: RecordKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordKnowledgeReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'RecordKnowledgeReview' Mutation. Allow users to pass in custom DataConnect instances. */
+export function recordKnowledgeReview(vars: RecordKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordKnowledgeReviewData>>;
+
+/** Generated Node Admin SDK operation action function for the 'MarkKnowledgePageReviewed' Mutation. Allow users to execute without passing in DataConnect. */
+export function markKnowledgePageReviewed(dc: DataConnect, vars: MarkKnowledgePageReviewedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgePageReviewedData>>;
+/** Generated Node Admin SDK operation action function for the 'MarkKnowledgePageReviewed' Mutation. Allow users to pass in custom DataConnect instances. */
+export function markKnowledgePageReviewed(vars: MarkKnowledgePageReviewedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgePageReviewedData>>;
+
+/** Generated Node Admin SDK operation action function for the 'MarkKnowledgeReady' Mutation. Allow users to execute without passing in DataConnect. */
+export function markKnowledgeReady(dc: DataConnect, vars: MarkKnowledgeReadyVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgeReadyData>>;
+/** Generated Node Admin SDK operation action function for the 'MarkKnowledgeReady' Mutation. Allow users to pass in custom DataConnect instances. */
+export function markKnowledgeReady(vars: MarkKnowledgeReadyVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgeReadyData>>;
 
 /** Generated Node Admin SDK operation action function for the 'RevokeKnowledgeVersion' Mutation. Allow users to execute without passing in DataConnect. */
 export function revokeKnowledgeVersion(dc: DataConnect, vars: RevokeKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RevokeKnowledgeVersionData>>;
@@ -2612,60 +2637,25 @@ export function failKnowledgeExtraction(dc: DataConnect, vars: FailKnowledgeExtr
 /** Generated Node Admin SDK operation action function for the 'FailKnowledgeExtraction' Mutation. Allow users to pass in custom DataConnect instances. */
 export function failKnowledgeExtraction(vars: FailKnowledgeExtractionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<FailKnowledgeExtractionData>>;
 
-/** Generated Node Admin SDK operation action function for the 'SaveKnowledgeExtraction' Mutation. Allow users to execute without passing in DataConnect. */
-export function saveKnowledgeExtraction(dc: DataConnect, vars: SaveKnowledgeExtractionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveKnowledgeExtractionData>>;
-/** Generated Node Admin SDK operation action function for the 'SaveKnowledgeExtraction' Mutation. Allow users to pass in custom DataConnect instances. */
-export function saveKnowledgeExtraction(vars: SaveKnowledgeExtractionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveKnowledgeExtractionData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeVersionState' Query. Allow users to execute without passing in DataConnect. */
+export function knowledgeVersionState(dc: DataConnect, vars: KnowledgeVersionStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeVersionStateData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeVersionState' Query. Allow users to pass in custom DataConnect instances. */
+export function knowledgeVersionState(vars: KnowledgeVersionStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeVersionStateData>>;
 
-/** Generated Node Admin SDK operation action function for the 'InsertKnowledgePage' Mutation. Allow users to execute without passing in DataConnect. */
-export function insertKnowledgePage(dc: DataConnect, vars: InsertKnowledgePageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertKnowledgePageData>>;
-/** Generated Node Admin SDK operation action function for the 'InsertKnowledgePage' Mutation. Allow users to pass in custom DataConnect instances. */
-export function insertKnowledgePage(vars: InsertKnowledgePageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertKnowledgePageData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeDocumentState' Query. Allow users to execute without passing in DataConnect. */
+export function knowledgeDocumentState(dc: DataConnect, vars: KnowledgeDocumentStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeDocumentStateData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeDocumentState' Query. Allow users to pass in custom DataConnect instances. */
+export function knowledgeDocumentState(vars: KnowledgeDocumentStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeDocumentStateData>>;
 
-/** Generated Node Admin SDK operation action function for the 'RecordKnowledgeReview' Mutation. Allow users to execute without passing in DataConnect. */
-export function recordKnowledgeReview(dc: DataConnect, vars: RecordKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordKnowledgeReviewData>>;
-/** Generated Node Admin SDK operation action function for the 'RecordKnowledgeReview' Mutation. Allow users to pass in custom DataConnect instances. */
-export function recordKnowledgeReview(vars: RecordKnowledgeReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordKnowledgeReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeCommandContext' Query. Allow users to execute without passing in DataConnect. */
+export function knowledgeCommandContext(dc: DataConnect, vars: KnowledgeCommandContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeCommandContextData>>;
+/** Generated Node Admin SDK operation action function for the 'KnowledgeCommandContext' Query. Allow users to pass in custom DataConnect instances. */
+export function knowledgeCommandContext(vars: KnowledgeCommandContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeCommandContextData>>;
 
-/** Generated Node Admin SDK operation action function for the 'MarkKnowledgePageReviewed' Mutation. Allow users to execute without passing in DataConnect. */
-export function markKnowledgePageReviewed(dc: DataConnect, vars: MarkKnowledgePageReviewedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgePageReviewedData>>;
-/** Generated Node Admin SDK operation action function for the 'MarkKnowledgePageReviewed' Mutation. Allow users to pass in custom DataConnect instances. */
-export function markKnowledgePageReviewed(vars: MarkKnowledgePageReviewedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgePageReviewedData>>;
-
-/** Generated Node Admin SDK operation action function for the 'MarkKnowledgeReady' Mutation. Allow users to execute without passing in DataConnect. */
-export function markKnowledgeReady(dc: DataConnect, vars: MarkKnowledgeReadyVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgeReadyData>>;
-/** Generated Node Admin SDK operation action function for the 'MarkKnowledgeReady' Mutation. Allow users to pass in custom DataConnect instances. */
-export function markKnowledgeReady(vars: MarkKnowledgeReadyVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<MarkKnowledgeReadyData>>;
-
-/** Generated Node Admin SDK operation action function for the 'PublishKnowledgeVersion' Mutation. Allow users to execute without passing in DataConnect. */
-export function publishKnowledgeVersion(dc: DataConnect, vars: PublishKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<PublishKnowledgeVersionData>>;
-/** Generated Node Admin SDK operation action function for the 'PublishKnowledgeVersion' Mutation. Allow users to pass in custom DataConnect instances. */
-export function publishKnowledgeVersion(vars: PublishKnowledgeVersionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<PublishKnowledgeVersionData>>;
-
-/** Generated Node Admin SDK operation action function for the 'KnowledgeMetadataPage' Query. Allow users to execute without passing in DataConnect. */
-export function knowledgeMetadataPage(dc: DataConnect, vars: KnowledgeMetadataPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeMetadataPageData>>;
-/** Generated Node Admin SDK operation action function for the 'KnowledgeMetadataPage' Query. Allow users to pass in custom DataConnect instances. */
-export function knowledgeMetadataPage(vars: KnowledgeMetadataPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<KnowledgeMetadataPageData>>;
-
-/** Generated Node Admin SDK operation action function for the 'BackfillKnowledgeMetadata' Mutation. Allow users to execute without passing in DataConnect. */
-export function backfillKnowledgeMetadata(dc: DataConnect, vars: BackfillKnowledgeMetadataVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BackfillKnowledgeMetadataData>>;
-/** Generated Node Admin SDK operation action function for the 'BackfillKnowledgeMetadata' Mutation. Allow users to pass in custom DataConnect instances. */
-export function backfillKnowledgeMetadata(vars: BackfillKnowledgeMetadataVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BackfillKnowledgeMetadataData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeState' Query. Allow users to execute without passing in DataConnect. */
-export function productKnowledgeState(dc: DataConnect, vars: ProductKnowledgeStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeStateData>>;
-/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeState' Query. Allow users to pass in custom DataConnect instances. */
-export function productKnowledgeState(vars: ProductKnowledgeStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeStateData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeCatalogPage' Query. Allow users to execute without passing in DataConnect. */
-export function productKnowledgeCatalogPage(dc: DataConnect, vars: ProductKnowledgeCatalogPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeCatalogPageData>>;
-/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeCatalogPage' Query. Allow users to pass in custom DataConnect instances. */
-export function productKnowledgeCatalogPage(vars: ProductKnowledgeCatalogPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeCatalogPageData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeActiveAliasPage' Query. Allow users to execute without passing in DataConnect. */
-export function productKnowledgeActiveAliasPage(dc: DataConnect, vars: ProductKnowledgeActiveAliasPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeActiveAliasPageData>>;
-/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeActiveAliasPage' Query. Allow users to pass in custom DataConnect instances. */
-export function productKnowledgeActiveAliasPage(vars: ProductKnowledgeActiveAliasPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeActiveAliasPageData>>;
+/** Generated Node Admin SDK operation action function for the 'RecordOperatorProductReview' Mutation. Allow users to execute without passing in DataConnect. */
+export function recordOperatorProductReview(dc: DataConnect, vars: RecordOperatorProductReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordOperatorProductReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'RecordOperatorProductReview' Mutation. Allow users to pass in custom DataConnect instances. */
+export function recordOperatorProductReview(vars: RecordOperatorProductReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordOperatorProductReviewData>>;
 
 /** Generated Node Admin SDK operation action function for the 'SaveProductKnowledgeSnapshot' Mutation. Allow users to execute without passing in DataConnect. */
 export function saveProductKnowledgeSnapshot(dc: DataConnect, vars: SaveProductKnowledgeSnapshotVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveProductKnowledgeSnapshotData>>;
@@ -2687,10 +2677,20 @@ export function acceptProductKnowledgeSnapshot(dc: DataConnect, vars: AcceptProd
 /** Generated Node Admin SDK operation action function for the 'AcceptProductKnowledgeSnapshot' Mutation. Allow users to pass in custom DataConnect instances. */
 export function acceptProductKnowledgeSnapshot(vars: AcceptProductKnowledgeSnapshotVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<AcceptProductKnowledgeSnapshotData>>;
 
-/** Generated Node Admin SDK operation action function for the 'RecordOperatorProductReview' Mutation. Allow users to execute without passing in DataConnect. */
-export function recordOperatorProductReview(dc: DataConnect, vars: RecordOperatorProductReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordOperatorProductReviewData>>;
-/** Generated Node Admin SDK operation action function for the 'RecordOperatorProductReview' Mutation. Allow users to pass in custom DataConnect instances. */
-export function recordOperatorProductReview(vars: RecordOperatorProductReviewVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RecordOperatorProductReviewData>>;
+/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeState' Query. Allow users to execute without passing in DataConnect. */
+export function productKnowledgeState(dc: DataConnect, vars: ProductKnowledgeStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeStateData>>;
+/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeState' Query. Allow users to pass in custom DataConnect instances. */
+export function productKnowledgeState(vars: ProductKnowledgeStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeStateData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeCatalogPage' Query. Allow users to execute without passing in DataConnect. */
+export function productKnowledgeCatalogPage(dc: DataConnect, vars: ProductKnowledgeCatalogPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeCatalogPageData>>;
+/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeCatalogPage' Query. Allow users to pass in custom DataConnect instances. */
+export function productKnowledgeCatalogPage(vars: ProductKnowledgeCatalogPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeCatalogPageData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeActiveAliasPage' Query. Allow users to execute without passing in DataConnect. */
+export function productKnowledgeActiveAliasPage(dc: DataConnect, vars: ProductKnowledgeActiveAliasPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeActiveAliasPageData>>;
+/** Generated Node Admin SDK operation action function for the 'ProductKnowledgeActiveAliasPage' Query. Allow users to pass in custom DataConnect instances. */
+export function productKnowledgeActiveAliasPage(vars: ProductKnowledgeActiveAliasPageVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ProductKnowledgeActiveAliasPageData>>;
 
 /** Generated Node Admin SDK operation action function for the 'ReadProductAdmin' Query. Allow users to execute without passing in DataConnect. */
 export function readProductAdmin(dc: DataConnect, vars: ReadProductAdminVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadProductAdminData>>;
@@ -2812,6 +2812,21 @@ export function removeSalonShorthand(dc: DataConnect, vars: RemoveSalonShorthand
 /** Generated Node Admin SDK operation action function for the 'RemoveSalonShorthand' Mutation. Allow users to pass in custom DataConnect instances. */
 export function removeSalonShorthand(vars: RemoveSalonShorthandVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RemoveSalonShorthandData>>;
 
+/** Generated Node Admin SDK operation action function for the 'ReadProductAliasSeedState' Query. Allow users to execute without passing in DataConnect. */
+export function readProductAliasSeedState(dc: DataConnect, vars: ReadProductAliasSeedStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadProductAliasSeedStateData>>;
+/** Generated Node Admin SDK operation action function for the 'ReadProductAliasSeedState' Query. Allow users to pass in custom DataConnect instances. */
+export function readProductAliasSeedState(vars: ReadProductAliasSeedStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadProductAliasSeedStateData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ApplyProductAliasSeed' Mutation. Allow users to execute without passing in DataConnect. */
+export function applyProductAliasSeed(dc: DataConnect, vars: ApplyProductAliasSeedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ApplyProductAliasSeedData>>;
+/** Generated Node Admin SDK operation action function for the 'ApplyProductAliasSeed' Mutation. Allow users to pass in custom DataConnect instances. */
+export function applyProductAliasSeed(vars: ApplyProductAliasSeedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ApplyProductAliasSeedData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ResetProductAdmin' Mutation. Allow users to execute without passing in DataConnect. */
+export function resetProductAdmin(dc: DataConnect, vars: ResetProductAdminVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetProductAdminData>>;
+/** Generated Node Admin SDK operation action function for the 'ResetProductAdmin' Mutation. Allow users to pass in custom DataConnect instances. */
+export function resetProductAdmin(vars: ResetProductAdminVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetProductAdminData>>;
+
 /** Generated Node Admin SDK operation action function for the 'ReadSeedState' Query. Allow users to execute without passing in DataConnect. */
 export function readSeedState(dc: DataConnect, vars: ReadSeedStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadSeedStateData>>;
 /** Generated Node Admin SDK operation action function for the 'ReadSeedState' Query. Allow users to pass in custom DataConnect instances. */
@@ -2852,35 +2867,10 @@ export function upsertSalonAccess(dc: DataConnect, vars: UpsertSalonAccessVariab
 /** Generated Node Admin SDK operation action function for the 'UpsertSalonAccess' Mutation. Allow users to pass in custom DataConnect instances. */
 export function upsertSalonAccess(vars: UpsertSalonAccessVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpsertSalonAccessData>>;
 
-/** Generated Node Admin SDK operation action function for the 'ReadResetCounts' Query. Allow users to execute without passing in DataConnect. */
-export function readResetCounts(dc: DataConnect, vars: ReadResetCountsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadResetCountsData>>;
-/** Generated Node Admin SDK operation action function for the 'ReadResetCounts' Query. Allow users to pass in custom DataConnect instances. */
-export function readResetCounts(vars: ReadResetCountsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadResetCountsData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ResetDemoStock' Mutation. Allow users to execute without passing in DataConnect. */
-export function resetDemoStock(dc: DataConnect, vars: ResetDemoStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetDemoStockData>>;
-/** Generated Node Admin SDK operation action function for the 'ResetDemoStock' Mutation. Allow users to pass in custom DataConnect instances. */
-export function resetDemoStock(vars: ResetDemoStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetDemoStockData>>;
-
 /** Generated Node Admin SDK operation action function for the 'InsertSalonSettings' Mutation. Allow users to execute without passing in DataConnect. */
 export function insertSalonSettings(dc: DataConnect, vars: InsertSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertSalonSettingsData>>;
 /** Generated Node Admin SDK operation action function for the 'InsertSalonSettings' Mutation. Allow users to pass in custom DataConnect instances. */
 export function insertSalonSettings(vars: InsertSalonSettingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<InsertSalonSettingsData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ReadProductAliasSeedState' Query. Allow users to execute without passing in DataConnect. */
-export function readProductAliasSeedState(dc: DataConnect, vars: ReadProductAliasSeedStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadProductAliasSeedStateData>>;
-/** Generated Node Admin SDK operation action function for the 'ReadProductAliasSeedState' Query. Allow users to pass in custom DataConnect instances. */
-export function readProductAliasSeedState(vars: ReadProductAliasSeedStateVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadProductAliasSeedStateData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ApplyProductAliasSeed' Mutation. Allow users to execute without passing in DataConnect. */
-export function applyProductAliasSeed(dc: DataConnect, vars: ApplyProductAliasSeedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ApplyProductAliasSeedData>>;
-/** Generated Node Admin SDK operation action function for the 'ApplyProductAliasSeed' Mutation. Allow users to pass in custom DataConnect instances. */
-export function applyProductAliasSeed(vars: ApplyProductAliasSeedVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ApplyProductAliasSeedData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ResetProductAdmin' Mutation. Allow users to execute without passing in DataConnect. */
-export function resetProductAdmin(dc: DataConnect, vars: ResetProductAdminVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetProductAdminData>>;
-/** Generated Node Admin SDK operation action function for the 'ResetProductAdmin' Mutation. Allow users to pass in custom DataConnect instances. */
-export function resetProductAdmin(vars: ResetProductAdminVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetProductAdminData>>;
 
 /** Generated Node Admin SDK operation action function for the 'ReadKnowledgeWipeCounts' Query. Allow users to execute without passing in DataConnect. */
 export function readKnowledgeWipeCounts(dc: DataConnect, vars: ReadKnowledgeWipeCountsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadKnowledgeWipeCountsData>>;
@@ -2902,33 +2892,43 @@ export function seedDeliveryProcedureBindings(dc: DataConnect, vars: SeedDeliver
 /** Generated Node Admin SDK operation action function for the 'SeedDeliveryProcedureBindings' Mutation. Allow users to pass in custom DataConnect instances. */
 export function seedDeliveryProcedureBindings(vars: SeedDeliveryProcedureBindingsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SeedDeliveryProcedureBindingsData>>;
 
-/** Generated Node Admin SDK operation action function for the 'StockContext' Query. Allow users to execute without passing in DataConnect. */
-export function stockContext(dc: DataConnect, vars: StockContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StockContextData>>;
-/** Generated Node Admin SDK operation action function for the 'StockContext' Query. Allow users to pass in custom DataConnect instances. */
-export function stockContext(vars: StockContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StockContextData>>;
+/** Generated Node Admin SDK operation action function for the 'ReadResetCounts' Query. Allow users to execute without passing in DataConnect. */
+export function readResetCounts(dc: DataConnect, vars: ReadResetCountsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadResetCountsData>>;
+/** Generated Node Admin SDK operation action function for the 'ReadResetCounts' Query. Allow users to pass in custom DataConnect instances. */
+export function readResetCounts(vars: ReadResetCountsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadResetCountsData>>;
 
-/** Generated Node Admin SDK operation action function for the 'SubmitStock' Mutation. Allow users to execute without passing in DataConnect. */
-export function submitStock(dc: DataConnect, vars: SubmitStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitStockData>>;
-/** Generated Node Admin SDK operation action function for the 'SubmitStock' Mutation. Allow users to pass in custom DataConnect instances. */
-export function submitStock(vars: SubmitStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitStockData>>;
+/** Generated Node Admin SDK operation action function for the 'ResetDemoStock' Mutation. Allow users to execute without passing in DataConnect. */
+export function resetDemoStock(dc: DataConnect, vars: ResetDemoStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetDemoStockData>>;
+/** Generated Node Admin SDK operation action function for the 'ResetDemoStock' Mutation. Allow users to pass in custom DataConnect instances. */
+export function resetDemoStock(vars: ResetDemoStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ResetDemoStockData>>;
 
 /** Generated Node Admin SDK operation action function for the 'ApproveStock' Mutation. Allow users to execute without passing in DataConnect. */
 export function approveStock(dc: DataConnect, vars: ApproveStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ApproveStockData>>;
 /** Generated Node Admin SDK operation action function for the 'ApproveStock' Mutation. Allow users to pass in custom DataConnect instances. */
 export function approveStock(vars: ApproveStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ApproveStockData>>;
 
-/** Generated Node Admin SDK operation action function for the 'RejectStock' Mutation. Allow users to execute without passing in DataConnect. */
-export function rejectStock(dc: DataConnect, vars: RejectStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RejectStockData>>;
-/** Generated Node Admin SDK operation action function for the 'RejectStock' Mutation. Allow users to pass in custom DataConnect instances. */
-export function rejectStock(vars: RejectStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RejectStockData>>;
+/** Generated Node Admin SDK operation action function for the 'StockContext' Query. Allow users to execute without passing in DataConnect. */
+export function stockContext(dc: DataConnect, vars: StockContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StockContextData>>;
+/** Generated Node Admin SDK operation action function for the 'StockContext' Query. Allow users to pass in custom DataConnect instances. */
+export function stockContext(vars: StockContextVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<StockContextData>>;
 
 /** Generated Node Admin SDK operation action function for the 'DispatchStock' Mutation. Allow users to execute without passing in DataConnect. */
 export function dispatchStock(dc: DataConnect, vars: DispatchStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<DispatchStockData>>;
 /** Generated Node Admin SDK operation action function for the 'DispatchStock' Mutation. Allow users to pass in custom DataConnect instances. */
 export function dispatchStock(vars: DispatchStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<DispatchStockData>>;
 
+/** Generated Node Admin SDK operation action function for the 'RejectStock' Mutation. Allow users to execute without passing in DataConnect. */
+export function rejectStock(dc: DataConnect, vars: RejectStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RejectStockData>>;
+/** Generated Node Admin SDK operation action function for the 'RejectStock' Mutation. Allow users to pass in custom DataConnect instances. */
+export function rejectStock(vars: RejectStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<RejectStockData>>;
+
 /** Generated Node Admin SDK operation action function for the 'BindReplayKey' Mutation. Allow users to execute without passing in DataConnect. */
 export function bindReplayKey(dc: DataConnect, vars: BindReplayKeyVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BindReplayKeyData>>;
 /** Generated Node Admin SDK operation action function for the 'BindReplayKey' Mutation. Allow users to pass in custom DataConnect instances. */
 export function bindReplayKey(vars: BindReplayKeyVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<BindReplayKeyData>>;
+
+/** Generated Node Admin SDK operation action function for the 'SubmitStock' Mutation. Allow users to execute without passing in DataConnect. */
+export function submitStock(dc: DataConnect, vars: SubmitStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitStockData>>;
+/** Generated Node Admin SDK operation action function for the 'SubmitStock' Mutation. Allow users to pass in custom DataConnect instances. */
+export function submitStock(vars: SubmitStockVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SubmitStockData>>;
 

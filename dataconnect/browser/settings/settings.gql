@@ -23,6 +23,7 @@ query GetSalonSettings($salonId: String!) @auth(level: USER) {
     updatedAt
   }
 }
+
 mutation SaveSalonSettings($salonId: String!, $lowStockThreshold: Int!, $expectedVersion: Int!)
 @auth(level: USER)
 @transaction {

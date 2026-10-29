@@ -1,0 +1,25 @@
+# Admin-only primitive for verified historical backfill; never a callable command.
+mutation InsertLegacyDeliveryReceipt(
+  $id: String!
+  $businessId: String!
+  $requestId: String!
+  $transferRequestId: String!
+  $salonId: String!
+  $actorUid: String!
+  $recordedAt: Timestamp!
+  $legacyActionReceiptId: String!
+) @auth(level: NO_ACCESS) @transaction {
+  deliveryReceipt_insert(
+    data: {
+      id: $id
+      businessId: $businessId
+      requestId: $requestId
+      transferRequestId: $transferRequestId
+      salonId: $salonId
+      actorUid: $actorUid
+      recordedAt: $recordedAt
+      origin: LEGACY
+      legacyActionReceiptId: $legacyActionReceiptId
+    }
+  )
+}

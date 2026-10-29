@@ -1,0 +1,106 @@
+mutation SaveKnowledgeExtraction(
+  $versionId: String!
+  $revision: Int!
+  $pdfSha256: String!
+  $leaseId: String
+  $parserVersion: String!
+  $extractionHash: String!
+  $expectedPageCount: Int!
+  $expectedChunkCount: Int!
+  $status: KnowledgeProcessingStatus!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.pdfSha256 == vars.pdfSha256 && this.status == 'STAGED' && this.publishedAt == null && this.revokedAt == null && ((vars.leaseId == null && this.processingLeaseId == null) || (vars.leaseId != null && this.processingLeaseId == vars.leaseId)) && this.pages.size() == this.pageCount && this.pageCount == vars.expectedPageCount && this.pages.all(p,p.physicalPage >= 1 && p.physicalPage <= this.pageCount) && ((vars.status == 'EXTRACTED' && this.chunks.size() == vars.expectedChunkCount && this.pages.all(p,p.quality == 'COMPLETE')) || (vars.status == 'NEEDS_REVIEW' && vars.expectedChunkCount == 0 && this.chunks.size() == 0))"
+        message: "EXTRACTION_INCOMPLETE"
+      ) {
+      revision
+      status
+      pdfSha256
+      pageCount
+      processingLeaseId
+      publishedAt
+      revokedAt
+      pages: knowledgePages_on_version {
+        physicalPage
+        quality
+      }
+      chunks: knowledgeChunks_on_version {
+        id
+      }
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      revision: { eq: $revision }
+      status: { eq: STAGED }
+      pdfSha256: { eq: $pdfSha256 }
+      processingLeaseId: { eq: $leaseId }
+      publishedAt: { isNull: true }
+      revokedAt: { isNull: true }
+    }
+    data: {
+      status: $status
+      revision_update: { inc: 1 }
+      parserVersion: $parserVersion
+      extractionHash: $extractionHash
+      expectedChunkCount: $expectedChunkCount
+      reviewedBy: null
+      reviewedAt: null
+      reviewedPageCount: 0
+      embeddingConfigHash: null
+      processingError: null
+      processingLeaseId: null
+      processingLeaseExpiresAt: null
+      pendingStage: null
+      pendingDocumentRevision: null
+      pendingExtractionHash: null
+    }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+mutation InsertKnowledgePage(
+  $versionId: String!
+  $revision: Int!
+  $pdfSha256: String!
+  $leaseId: String
+  $physicalPage: Int!
+  $text: String!
+  $markdown: String!
+  $spans: Any!
+  $quality: KnowledgePageQuality!
+  $viewBox: Any!
+  $userUnit: Float!
+  $rotation: Int!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.pdfSha256 == vars.pdfSha256 && this.status == 'STAGED' && this.publishedAt == null && this.revokedAt == null && ((vars.leaseId == null && this.processingLeaseId == null) || (vars.leaseId != null && this.processingLeaseId == vars.leaseId))"
+        message: "STALE_STATE"
+      ) {
+      revision
+      status
+      publishedAt
+      revokedAt
+      pdfSha256
+      processingLeaseId
+    }
+  }
+  knowledgePage_insert(
+    data: {
+      versionId: $versionId
+      physicalPage: $physicalPage
+      text: $text
+      markdown: $markdown
+      spans: $spans
+      quality: $quality
+      reviewed: false
+      viewBox: $viewBox
+      userUnit: $userUnit
+      rotation: $rotation
+    }
+  )
+}

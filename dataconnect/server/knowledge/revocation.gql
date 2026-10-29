@@ -1,0 +1,62 @@
+mutation RevokeKnowledgeVersion(
+  $uid: String!
+  $businessId: String!
+  $documentId: String!
+  $versionId: String!
+  $expectedDocumentRevision: Int!
+  $expectedVersionRevision: Int!
+  $active: Boolean!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (SELECT uid FROM membership WHERE uid=$8 AND business_id=$1 AND role::text='HQ' FOR SHARE),
+    business_snapshot AS MATERIALIZED (SELECT product_knowledge_revision FROM business WHERE id=$1),
+    business_lock AS (UPDATE business SET product_knowledge_revision=product_knowledge_revision+CASE WHEN EXISTS(SELECT 1 FROM knowledge_product_profile WHERE version_id=$2) OR EXISTS(SELECT 1 FROM product_alias WHERE source_document_version_id=$2) THEN 1 ELSE 0 END WHERE id=$1 AND product_knowledge_revision=(SELECT product_knowledge_revision FROM business_snapshot) AND product_knowledge_revision<2147483647 AND EXISTS(SELECT 1 FROM actor) RETURNING id),
+    guard AS MATERIALIZED (
+    SELECT v.id FROM knowledge_version v JOIN knowledge_document d ON d.id=v.document_id
+    WHERE v.id=$2 AND v.business_id=$1 AND v.document_id=$3 AND v.revision=$5 AND v.revoked_at IS NULL
+    AND d.business_id=$1 AND d.revision=$4 AND (($6 AND d.active_version_id=$2) OR (NOT $6 AND d.active_version_id IS DISTINCT FROM $2))
+    AND EXISTS(SELECT 1 FROM business_lock) FOR UPDATE OF v,d
+    ), version_cas AS (
+    UPDATE knowledge_version SET revoked_at=transaction_timestamp(),revision=revision+1,is_active=false,pending_stage=NULL,pending_document_revision=NULL,pending_extraction_hash=NULL,processing_lease_id=NULL,processing_lease_expires_at=NULL,pending_product_knowledge_reviewed_hash=NULL,pending_product_knowledge_revision=NULL,pending_product_knowledge_catalog_revision=NULL
+    WHERE id=$2 AND EXISTS(SELECT 1 FROM guard) RETURNING id
+    ), document_cas AS (
+    UPDATE knowledge_document SET active_version_id=NULL,revision=revision+1 WHERE id=$3 AND $6 AND EXISTS(SELECT 1 FROM version_cas) RETURNING id
+    ), retired AS (
+    UPDATE product_alias a SET status='RETIRED',ambiguous=false WHERE a.business_id=$1 AND a.source_document_version_id=$2
+    AND a.status::text IN ('ACTIVE','PROPOSED') AND EXISTS(SELECT 1 FROM guard) RETURNING a.id
+    ), eligible AS MATERIALIZED (
+    SELECT a.product_id,a.normalized FROM product_alias a JOIN product p ON p.id=a.product_id AND p.business_id=$1
+    JOIN knowledge_version v ON v.id=a.source_document_version_id JOIN knowledge_document d ON d.id=v.document_id
+    WHERE a.business_id=$1 AND a.salon_id IS NULL AND v.business_id=$1 AND d.business_id=$1 AND v.id<>$2 AND v.is_active AND v.published_at IS NOT NULL AND v.revoked_at IS NULL AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id AND a.status::text='ACTIVE'
+    ),  collisions AS (
+    UPDATE product_alias a SET ambiguous=(SELECT count(DISTINCT e.product_id)>1 FROM eligible e WHERE e.normalized=a.normalized)
+    WHERE a.business_id=$1 AND a.source_document_version_id<>$2 AND a.kind::text='NAME' AND a.status::text='ACTIVE'
+    AND a.id NOT IN (SELECT id FROM retired) AND EXISTS(SELECT 1 FROM guard) RETURNING a.id
+    ), projection AS (
+    UPDATE product p SET type=COALESCE((SELECT kp.approved_type FROM knowledge_product_profile kp JOIN knowledge_version v ON v.id=kp.version_id JOIN knowledge_document d ON d.id=v.document_id WHERE kp.product_id=p.id AND kp.business_id=$1 AND kp.approved_type IS NOT NULL AND kp.reviewed_at IS NOT NULL AND v.business_id=$1 AND d.business_id=$1 AND v.id<>$2 AND v.is_active AND v.published_at IS NOT NULL AND v.revoked_at IS NULL AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id ORDER BY v.published_at DESC,v.id DESC LIMIT 1),p.seed_type),type_source_version_id=(SELECT kp.version_id FROM knowledge_product_profile kp JOIN knowledge_version v ON v.id=kp.version_id JOIN knowledge_document d ON d.id=v.document_id WHERE kp.product_id=p.id AND kp.business_id=$1 AND kp.approved_type IS NOT NULL AND kp.reviewed_at IS NOT NULL AND v.business_id=$1 AND d.business_id=$1 AND v.id<>$2 AND v.is_active AND v.published_at IS NOT NULL AND v.revoked_at IS NULL AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id ORDER BY v.published_at DESC,v.id DESC LIMIT 1)
+    WHERE p.business_id=$1 AND p.id IN (SELECT kp.product_id FROM knowledge_product_profile kp JOIN knowledge_version v ON v.id=kp.version_id WHERE v.document_id=$3 AND kp.business_id=$1)
+    AND EXISTS(SELECT 1 FROM guard) RETURNING p.id
+    )
+    INSERT INTO knowledge_operation(id,business_id,actor_uid,idempotency_key,action,payload_hash,document_id,version_id,completed_at,created_at)
+    SELECT $7,$1,$8,$9,'DELETE',$10,$3,$2,transaction_timestamp(),transaction_timestamp()
+    WHERE EXISTS(SELECT 1 FROM version_cas) AND (NOT $6 OR EXISTS(SELECT 1 FROM document_cas))
+    AND (SELECT count(*) FROM retired)>=0 AND (SELECT count(*) FROM collisions)>=0 AND (SELECT count(*) FROM projection)>=0
+    """
+    params: [
+      $businessId
+      $versionId
+      $documentId
+      $expectedDocumentRevision
+      $expectedVersionRevision
+      $active
+      $operationId
+      $uid
+      $key
+      $payloadHash
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

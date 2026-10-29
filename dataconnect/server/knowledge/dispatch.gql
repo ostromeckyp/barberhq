@@ -1,0 +1,189 @@
+mutation SetKnowledgeDispatchFailure(
+  $versionId: String!
+  $revision: Int!
+  $stage: KnowledgePendingStage!
+  $status: KnowledgeProcessingStatus!
+  $errorCode: String!
+  $expectedDocumentRevision: Int
+  $extractionHash: String
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.pendingStage == vars.stage && this.pendingDocumentRevision == vars.expectedDocumentRevision && this.pendingExtractionHash == vars.extractionHash && this.publishedAt == null && this.revokedAt == null && ((vars.stage == 'EXTRACT' && vars.status == 'FAILED' && (this.status == 'STAGED' || this.status == 'FAILED')) || (vars.stage == 'PUBLISH' && vars.status == 'READY' && this.status == 'READY'))"
+        message: "STALE_STATE"
+      ) {
+      revision
+      pendingStage
+      pendingDocumentRevision
+      pendingExtractionHash
+      publishedAt
+      revokedAt
+      status
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      revision: { eq: $revision }
+      pendingStage: { eq: $stage }
+      revokedAt: { isNull: true }
+      publishedAt: { isNull: true }
+    }
+    data: { status: $status, processingError: $errorCode, revision_update: { inc: 1 } }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+mutation SetKnowledgeDispatchPending(
+  $uid: String!
+  $businessId: String!
+  $versionId: String!
+  $revision: Int!
+  $stage: KnowledgePendingStage!
+  $expectedDocumentRevision: Int
+  $extractionHash: String
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.revision == vars.revision && this.publishedAt == null && this.revokedAt == null && this.bucket != null && this.objectPath != null && this.objectGeneration != null && this.objectGeneration.matches('^[1-9][0-9]*$') && (this.objectGeneration.size() < 16 || (this.objectGeneration.size() == 16 && this.objectGeneration <= '9007199254740991')) && this.pdfSha256.matches('^[a-f0-9]{64}$') && this.contentType == 'application/pdf' && this.byteSize >= 5 && this.byteSize <= 10485760 && this.pageCount >= 1 && this.pageCount <= 30 && this.processingLeaseId == null && ((vars.stage == 'EXTRACT' && (this.status == 'STAGED' || this.status == 'FAILED') && this.pendingStage == 'EXTRACT' && this.uploadedAt != null && vars.expectedDocumentRevision == this.document.revision && vars.extractionHash == null) || (vars.stage == 'PUBLISH' && this.status == 'READY' && this.reviewedAt != null && this.extractionHash == vars.extractionHash && ((this.pendingStage == null && this.pendingDocumentRevision == null && this.pendingExtractionHash == null) || (this.pendingStage == 'PUBLISH' && this.pendingDocumentRevision == vars.expectedDocumentRevision && this.pendingExtractionHash == vars.extractionHash))))"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      revision
+      publishedAt
+      revokedAt
+      bucket
+      objectPath
+      objectGeneration
+      pdfSha256
+      contentType
+      byteSize
+      pageCount
+      uploadedAt
+      processingLeaseId
+      status
+      pendingStage
+      reviewedAt
+      extractionHash
+      pendingDocumentRevision
+      pendingExtractionHash
+      document {
+        revision
+      }
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      businessId: { eq: $businessId }
+      revision: { eq: $revision }
+      revokedAt: { isNull: true }
+      publishedAt: { isNull: true }
+    }
+    data: {
+      pendingStage: $stage
+      pendingDocumentRevision: $expectedDocumentRevision
+      pendingExtractionHash: $extractionHash
+      processingError: null
+      revision_update: { inc: 1 }
+    }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+mutation StartKnowledgeRetry(
+  $uid: String!
+  $businessId: String!
+  $versionId: String!
+  $documentId: String!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+  $pdfSha256: String!
+  $retryStage: KnowledgePendingStage!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.documentId == vars.documentId && this.pdfSha256 == vars.pdfSha256 && this.pdfSha256.matches('^[a-f0-9]{64}$') && this.publishedAt == null && this.revokedAt == null && this.bucket != null && this.objectPath != null && this.objectGeneration != null && this.objectGeneration.matches('^[1-9][0-9]*$') && (this.objectGeneration.size() < 16 || (this.objectGeneration.size() == 16 && this.objectGeneration <= '9007199254740991')) && this.contentType == 'application/pdf' && this.byteSize >= 5 && this.byteSize <= 10485760 && this.pageCount >= 1 && this.pageCount <= 30 && this.processingLeaseId == null && this.pendingStage == vars.retryStage && ((this.pendingStage == 'EXTRACT' && (this.status == 'STAGED' || this.status == 'FAILED')) || (this.pendingStage == 'PUBLISH' && this.status == 'READY' && this.reviewedAt != null && this.pendingDocumentRevision != null && this.pendingExtractionHash == this.extractionHash))"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      documentId
+      pdfSha256
+      publishedAt
+      revokedAt
+      bucket
+      objectPath
+      objectGeneration
+      contentType
+      byteSize
+      pageCount
+      processingLeaseId
+      pendingStage
+      status
+      reviewedAt
+      pendingDocumentRevision
+      pendingExtractionHash
+      extractionHash
+    }
+  }
+  knowledgeOperation_insert(
+    data: {
+      id: $operationId
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      action: RETRY
+      retryStage: $retryStage
+      payloadHash: $payloadHash
+      documentId: $documentId
+      versionId: $versionId
+    }
+  )
+}
+
+mutation CompleteKnowledgeRetry(
+  $uid: String!
+  $businessId: String!
+  $operationId: String!
+  $versionId: String!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+  }
+  knowledgeOperation_updateMany(
+    where: {
+      id: { eq: $operationId }
+      businessId: { eq: $businessId }
+      actorUid: { eq: $uid }
+      versionId: { eq: $versionId }
+      action: { eq: RETRY }
+      completedAt: { isNull: true }
+    }
+    data: { completedAt_expr: "request.time" }
+  )
+}

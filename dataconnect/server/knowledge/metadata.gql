@@ -1,0 +1,59 @@
+query KnowledgeMetadataPage($businessId: String!, $after: String!, $limit: Int!)
+@auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT v.id, v.business_id AS "businessId", v.source_type::text AS "sourceType", v.synthetic,
+      v.kind::text AS kind, v.origin::text AS origin,
+      to_jsonb(v) - 'kind' - 'origin' AS version_proof,
+      to_jsonb(d) AS document_proof,
+      COALESCE((SELECT jsonb_agg(to_jsonb(p) ORDER BY p.physical_page) FROM knowledge_page p WHERE p.version_id=v.id), '[]'::jsonb) AS pages_proof,
+      COALESCE((SELECT jsonb_agg(to_jsonb(c) ORDER BY c.id) FROM knowledge_chunk c WHERE c.version_id=v.id), '[]'::jsonb) AS chunks_proof,
+      COALESCE((SELECT jsonb_agg(to_jsonb(o) ORDER BY o.id) FROM knowledge_operation o WHERE o.version_id=v.id), '[]'::jsonb) AS operations_proof
+    FROM knowledge_version v JOIN knowledge_document d ON d.id=v.document_id
+    WHERE v.business_id=$1 AND v.id>$2 ORDER BY v.id LIMIT $3
+    """
+    params: [$businessId, $after, $limit]
+  )
+}
+
+mutation BackfillKnowledgeMetadata(
+  $businessId: String!
+  $versionId: String!
+  $expectedSourceType: KnowledgeSourceType
+  $expectedSynthetic: Boolean!
+  $kind: KnowledgeDocumentKind!
+  $origin: KnowledgeOrigin!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.sourceType == vars.expectedSourceType && this.synthetic == vars.expectedSynthetic && ((this.kind == null && this.origin == null) || (this.kind == vars.kind && this.origin == vars.origin))"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      sourceType
+      synthetic
+      kind
+      origin
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      _and: [
+        {
+          id: { eq: $versionId }
+          businessId: { eq: $businessId }
+          synthetic: { eq: $expectedSynthetic }
+          sourceType: { eq: $expectedSourceType }
+        }
+        {
+          _or: [
+            { kind: { isNull: true }, origin: { isNull: true } }
+            { kind: { eq: $kind }, origin: { eq: $origin } }
+          ]
+        }
+      ]
+    }
+    data: { kind: $kind, origin: $origin }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

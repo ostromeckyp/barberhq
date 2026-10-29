@@ -1,0 +1,97 @@
+# Server connector only. Operator identity and business scope are checked by the caller.
+query SearchEligibleProcedureChunks(
+  $uid: String!
+  $businessId: String!
+  $vectorText: String!
+  $configHash: String!
+  $model: String!
+  $kindsJson: String!
+) @auth(level: NO_ACCESS) {
+  result: _selectFirst(
+    sql: """
+    WITH actor AS (
+      SELECT m.uid FROM membership AS m
+      WHERE m.uid = $1 AND m.business_id = $2
+        AND (m.role::text = 'HQ' OR (m.role::text = 'SALON' AND EXISTS (
+          SELECT 1 FROM salon_access AS a JOIN location AS l ON l.id = a.location_id
+          WHERE a.membership_uid = m.uid AND l.business_id = $2 AND l.kind::text = 'SALON'
+        )))
+    ), ranked AS (
+    SELECT c.id AS chunk_id, c.version_id, c.section_id, c.text AS excerpt,
+           c.physical_page, c.rects, c.geometry_status::text AS geometry_status,
+           c.embedding_config_hash,
+           v.document_id, v.version_label, v.title, v.language, v.synthetic,
+           v.source_type::text AS source_type, v.kind::text AS kind, v.origin::text AS origin, v.page_count,
+           d.revision AS document_revision,
+           p.view_box, p.user_unit, p.rotation,
+           c.embedding <=> $3::vector(768) AS cosine_distance
+    FROM knowledge_chunk AS c
+    JOIN knowledge_version AS v ON v.id = c.version_id
+    JOIN knowledge_document AS d ON d.id = v.document_id
+    JOIN knowledge_page AS p ON p.version_id = v.id AND p.physical_page = c.physical_page
+    JOIN actor ON TRUE
+    WHERE v.business_id = $2 AND d.business_id = $2
+      AND d.active_version_id = v.id
+      AND v.publication_status::text = 'DEMO_CURRENT'
+      AND v.status::text = 'READY' AND v.is_active = TRUE
+      AND v.published_at IS NOT NULL AND v.revoked_at IS NULL
+      AND v.embedding_config_hash = $4
+      AND c.embedding_config_hash = $4
+      AND c.embedding_model = $5 AND c.embedding_dimension = 768
+      AND COALESCE(v.kind::text, CASE WHEN v.kind IS NULL AND v.origin IS NULL THEN CASE v.source_type::text WHEN 'SYNTHETIC_PROCEDURE' THEN 'PROCEDURE' WHEN 'PUBLIC_PRODUCT_SUMMARY' THEN 'PRODUCT_CATALOG' END END) IN (SELECT jsonb_array_elements_text($6::jsonb))
+    ORDER BY c.embedding <=> $3::vector(768), c.id
+    LIMIT 3
+    )
+    SELECT EXISTS (SELECT 1 FROM actor) AS authorized,
+      COALESCE((SELECT jsonb_agg(to_jsonb(r) ORDER BY r.cosine_distance, r.chunk_id)
+                FROM ranked AS r), '[]'::jsonb) AS chunks
+    """
+    params: [$uid, $businessId, $vectorText, $configHash, $model, $kindsJson]
+  )
+}
+
+# Server-only final source check after model generation. Fresh actor and source state share one SQL snapshot.
+query RecheckProcedureSources(
+  $uid: String!
+  $businessId: String!
+  $role: String!
+  $sourceJson: String!
+  $salonJson: String!
+  $kindsJson: String!
+) @auth(level: NO_ACCESS) {
+  result: _selectFirst(
+    sql: """
+    WITH actor AS (
+      SELECT m.uid FROM membership AS m
+      WHERE m.uid = $1 AND m.business_id = $2 AND m.role::text = $3
+        AND (m.role::text = 'HQ' OR (m.role::text = 'SALON' AND
+          COALESCE((SELECT jsonb_agg(a.location_id ORDER BY a.location_id)
+            FROM salon_access AS a JOIN location AS l ON l.id = a.location_id
+            WHERE a.membership_uid = m.uid AND l.business_id = $2 AND l.kind::text = 'SALON'), '[]'::jsonb) = $5::jsonb
+          AND $5::jsonb <> '[]'::jsonb))
+    ), expected AS (
+      SELECT * FROM jsonb_to_recordset($4::jsonb) AS x(
+        chunk_id text, document_id text, version_id text, document_revision integer, config_hash text, kind text, origin text, synthetic boolean)
+    )
+    SELECT EXISTS (SELECT 1 FROM actor) AS authorized,
+      (SELECT COUNT(*)::integer FROM expected AS e
+       JOIN knowledge_chunk AS c ON c.id = e.chunk_id AND c.version_id = e.version_id
+       JOIN knowledge_version AS v ON v.id = e.version_id AND v.document_id = e.document_id
+       JOIN knowledge_document AS d ON d.id = e.document_id
+       JOIN actor ON TRUE
+       WHERE d.business_id = $2 AND v.business_id = $2
+         AND d.revision = e.document_revision AND d.active_version_id = v.id
+         AND v.publication_status::text = 'DEMO_CURRENT' AND v.status::text = 'READY'
+         AND v.is_active = TRUE AND v.published_at IS NOT NULL AND v.revoked_at IS NULL
+         AND COALESCE(v.kind::text, CASE WHEN v.kind IS NULL AND v.origin IS NULL THEN CASE v.source_type::text WHEN 'SYNTHETIC_PROCEDURE' THEN 'PROCEDURE' WHEN 'PUBLIC_PRODUCT_SUMMARY' THEN 'PRODUCT_CATALOG' END END) = e.kind
+         AND COALESCE(v.origin::text, CASE WHEN v.kind IS NULL AND v.origin IS NULL THEN CASE v.source_type::text WHEN 'SYNTHETIC_PROCEDURE' THEN 'SYNTHETIC' WHEN 'PUBLIC_PRODUCT_SUMMARY' THEN 'PUBLIC_COMPILATION' END END) = e.origin
+         AND v.synthetic = e.synthetic AND e.synthetic = (e.origin = 'SYNTHETIC')
+         AND (v.source_type IS NULL OR (v.source_type::text = 'SYNTHETIC_PROCEDURE' AND e.kind = 'PROCEDURE' AND e.origin = 'SYNTHETIC') OR (v.source_type::text = 'PUBLIC_PRODUCT_SUMMARY' AND e.kind = 'PRODUCT_CATALOG' AND e.origin = 'PUBLIC_COMPILATION'))
+         AND v.embedding_config_hash = e.config_hash AND c.embedding_config_hash = e.config_hash
+         AND c.embedding_model = 'gemini-embedding-001' AND c.embedding_dimension = 768
+         AND COALESCE(v.kind::text, CASE WHEN v.kind IS NULL AND v.origin IS NULL THEN CASE v.source_type::text WHEN 'SYNTHETIC_PROCEDURE' THEN 'PROCEDURE' WHEN 'PUBLIC_PRODUCT_SUMMARY' THEN 'PRODUCT_CATALOG' END END) IN (SELECT jsonb_array_elements_text($6::jsonb))
+      ) AS eligible_count
+    """
+    params: [$uid, $businessId, $role, $sourceJson, $salonJson, $kindsJson]
+  )
+}

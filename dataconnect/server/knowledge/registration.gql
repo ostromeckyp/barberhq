@@ -1,0 +1,168 @@
+mutation RegisterKnowledgeVersion(
+  $uid: String!
+  $businessId: String!
+  $documentId: String!
+  $documentCode: String!
+  $versionId: String!
+  $versionLabel: String!
+  $nextVersionNumber: Int!
+  $expectedDocumentRevision: Int!
+  $newDocument: Boolean!
+  $existingDocument: Boolean!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+  $title: String!
+  $language: String!
+  $sourceType: KnowledgeSourceType
+  $kind: KnowledgeDocumentKind!
+  $origin: KnowledgeOrigin!
+  $synthetic: Boolean!
+  $sourceUrls: Any!
+  $observedOn: Date
+  $pdfSha256: String!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+    business(id: $businessId)
+      @check(
+        expr: "this != null && vars.nextVersionNumber > 1 && vars.documentId == vars.businessId + ':' + vars.documentCode && vars.versionId == vars.documentId + ':' + vars.versionLabel && vars.versionLabel == 'v' + string(vars.nextVersionNumber - 1)"
+        message: "INVALID_VERSION_IDENTITY"
+      ) {
+      id
+    }
+    cursor: knowledgeDocument(id: $documentId)
+      @check(expr: "this == null || this.nextVersionNumber != null", message: "VERSION_CONFLICT") {
+      nextVersionNumber
+    }
+    knowledgeDocument(id: $documentId)
+      @check(
+        expr: "(vars.newDocument && !vars.existingDocument && this == null && vars.expectedDocumentRevision == 0 && vars.nextVersionNumber == 2) || (!vars.newDocument && vars.existingDocument && this != null && this.businessId == vars.businessId && this.documentCode == vars.documentCode && this.revision == vars.expectedDocumentRevision && this.nextVersionNumber + 1 == vars.nextVersionNumber)"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      documentCode
+      revision
+      nextVersionNumber
+    }
+  }
+  knowledgeDocument_insert(
+    data: {
+      id: $documentId
+      businessId: $businessId
+      documentCode: $documentCode
+      nextVersionNumber: 2
+    }
+  ) @include(if: $newDocument)
+  knowledgeDocument_updateMany(
+    where: {
+      id: { eq: $documentId }
+      businessId: { eq: $businessId }
+      revision: { eq: $expectedDocumentRevision }
+      nextVersionNumber: { eq_expr: "vars.nextVersionNumber - 1" }
+    }
+    data: { nextVersionNumber: $nextVersionNumber }
+  ) @include(if: $existingDocument) @check(expr: "this == 1", message: "STALE_STATE")
+  knowledgeVersion_insert(
+    data: {
+      id: $versionId
+      documentId: $documentId
+      businessId: $businessId
+      versionLabel: $versionLabel
+      title: $title
+      language: $language
+      sourceType: $sourceType
+      kind: $kind
+      origin: $origin
+      publicationStatus: DEMO_CURRENT
+      synthetic: $synthetic
+      sourceUrls: $sourceUrls
+      observedOn: $observedOn
+      status: STAGED
+      revision: 1
+      pdfSha256: $pdfSha256
+    }
+  )
+  knowledgeOperation_insert(
+    data: {
+      id: $operationId
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      action: CREATE
+      payloadHash: $payloadHash
+      documentId: $documentId
+      versionId: $versionId
+      completedAt_expr: "request.time"
+    }
+  )
+}
+
+mutation BindKnowledgeOriginal(
+  $uid: String!
+  $businessId: String!
+  $versionId: String!
+  $pdfSha256: String!
+  $bucket: String!
+  $objectPath: String!
+  $objectGeneration: String!
+  $byteSize: Int!
+  $pageCount: Int!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+    }
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.pdfSha256 == vars.pdfSha256 && vars.pdfSha256.matches('^[a-f0-9]{64}$') && vars.bucket.matches('^[A-Za-z0-9][A-Za-z0-9._-]*$') && vars.objectGeneration.matches('^[1-9][0-9]*$') && (vars.objectGeneration.size() < 16 || (vars.objectGeneration.size() == 16 && vars.objectGeneration <= '9007199254740991')) && vars.byteSize >= 5 && vars.byteSize <= 10485760 && vars.pageCount >= 1 && vars.pageCount <= 30 && vars.objectPath == 'knowledge/' + vars.businessId + '/' + this.document.documentCode + '/' + this.versionLabel + '/' + vars.pdfSha256 + '.pdf'"
+        message: "VERSION_CONFLICT"
+      ) {
+      businessId
+      pdfSha256
+      versionLabel
+      document {
+        documentCode
+      }
+    }
+  }
+  knowledgeVersion_updateMany(
+    where: {
+      id: { eq: $versionId }
+      businessId: { eq: $businessId }
+      pdfSha256: { eq: $pdfSha256 }
+      status: { eq: STAGED }
+      revokedAt: { isNull: true }
+      publishedAt: { isNull: true }
+      bucket: { isNull: true }
+      objectPath: { isNull: true }
+      objectGeneration: { isNull: true }
+      contentType: { isNull: true }
+      byteSize: { isNull: true }
+      pageCount: { isNull: true }
+      uploadedAt: { isNull: true }
+    }
+    data: {
+      bucket: $bucket
+      objectPath: $objectPath
+      objectGeneration: $objectGeneration
+      contentType: "application/pdf"
+      byteSize: $byteSize
+      pageCount: $pageCount
+      uploadedAt_expr: "request.time"
+      pendingStage: EXTRACT
+    }
+  ) @check(expr: "this == 1", message: "VERSION_CONFLICT")
+}

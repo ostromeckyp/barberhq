@@ -50,6 +50,7 @@ mutation InsertKnowledgeChunk(
     }
   )
 }
+
 query SearchKnowledgeChunks($businessId: String!, $vector: Vector!, $configHash: String!)
 @auth(level: NO_ACCESS) {
   knowledgeChunks_embedding_similarity(

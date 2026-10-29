@@ -44,6 +44,7 @@ query ListSalonShorthand($salonId: String!, $after: String!) @auth(level: USER) 
     }
   }
 }
+
 query ListHqShorthand($businessId: String!, $after: String!) @auth(level: USER) {
   membership(key: { uid_expr: "auth.uid" })
     @redact

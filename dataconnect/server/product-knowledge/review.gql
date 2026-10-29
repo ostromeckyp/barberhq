@@ -1,0 +1,41 @@
+# Demo reset: product review recorded from the owner's approval receipt, without an HQ member.
+# A card links its whole first passage to one product; a catalog acknowledges empty knowledge.
+mutation RecordOperatorProductReview(
+  $businessId: String!
+  $versionId: String!
+  $extractionHash: String!
+  $catalogRevision: Int!
+  $reviewedHash: String!
+  $stateJson: String!
+  $linksJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH business_lock AS (
+    UPDATE business SET product_knowledge_revision=product_knowledge_revision
+    WHERE id=$1 AND product_knowledge_revision=$4 RETURNING id
+    ), links AS (
+    INSERT INTO knowledge_product_link SELECT x.* FROM jsonb_populate_recordset(NULL::knowledge_product_link,$7::jsonb) x
+    JOIN knowledge_chunk c ON c.id=x.chunk_id AND c.version_id=$2
+    JOIN product p ON p.id=x.product_id AND p.business_id=$1
+    WHERE x.version_id=$2 AND x.business_id=$1 AND x.extraction_hash=$3 AND EXISTS(SELECT 1 FROM business_lock) RETURNING id
+    )
+    UPDATE knowledge_version SET product_knowledge_revision=1,product_knowledge_state=$6::jsonb,
+    product_knowledge_reviewed_hash=$5,product_knowledge_catalog_revision=$4
+    WHERE id=$2 AND business_id=$1 AND extraction_hash=$3 AND product_knowledge_revision=0
+    AND reviewed_by LIKE 'operator:%' AND published_at IS NULL AND revoked_at IS NULL AND pending_stage IS NULL
+    AND kind::text IN ('PRODUCT_CARD','PRODUCT_CATALOG') AND EXISTS(SELECT 1 FROM business_lock)
+    AND NOT EXISTS(SELECT 1 FROM knowledge_product_link l WHERE l.version_id=$2 AND l.id NOT IN (SELECT id FROM links))
+    AND (SELECT count(*) FROM links)=jsonb_array_length($7::jsonb)
+    """
+    params: [
+      $businessId
+      $versionId
+      $extractionHash
+      $catalogRevision
+      $reviewedHash
+      $stateJson
+      $linksJson
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

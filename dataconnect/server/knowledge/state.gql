@@ -1,0 +1,153 @@
+query KnowledgeVersionState($versionId: String!) @auth(level: NO_ACCESS) {
+  knowledgeVersion(id: $versionId) {
+    id
+    documentId
+    businessId
+    versionLabel
+    title
+    language
+    sourceType
+    kind
+    origin
+    synthetic
+    sourceUrls
+    observedOn
+    status
+    publicationStatus
+    revision
+    isActive
+    bucket
+    objectPath
+    objectGeneration
+    pdfSha256
+    contentType
+    byteSize
+    pageCount
+    uploadedAt
+    pendingStage
+    pendingDocumentRevision
+    pendingExtractionHash
+    productKnowledgeRevision
+    productKnowledgeReviewedHash
+    productKnowledgeCatalogRevision
+    pendingProductKnowledgeRevision
+    pendingProductKnowledgeReviewedHash
+    pendingProductKnowledgeCatalogRevision
+    processingLeaseId
+    processingLeaseExpiresAt
+    parserVersion
+    extractionHash
+    embeddingConfigHash
+    expectedChunkCount
+    reviewedBy
+    reviewedAt
+    reviewedPageCount
+    publishedAt
+    revokedAt
+    processingError
+    processingAttempt
+    document {
+      id
+      businessId
+      documentCode
+      activeVersionId
+      revision
+      nextVersionNumber
+    }
+    pages: knowledgePages_on_version(orderBy: { physicalPage: ASC }, limit: 30) {
+      physicalPage
+      text
+      markdown
+      spans
+      quality
+      reviewed
+      viewBox
+      userUnit
+      rotation
+    }
+    chunks: knowledgeChunks_on_version(
+      orderBy: [{ physicalPage: ASC }, { ordinal: ASC }]
+      limit: 300
+    ) {
+      id
+      physicalPage
+      ordinal
+      sectionId
+      heading
+      text
+      start
+      end
+      rects
+      geometryStatus
+      embeddingModel
+      embeddingDimension
+      embeddingConfigHash
+    }
+  }
+}
+
+query KnowledgeDocumentState($documentId: String!) @auth(level: NO_ACCESS) {
+  knowledgeDocument(id: $documentId) {
+    id
+    businessId
+    documentCode
+    activeVersionId
+    revision
+    nextVersionNumber
+  }
+}
+
+query KnowledgeCommandContext(
+  $uid: String!
+  $key: String!
+  $documentId: String!
+  $versionId: String!
+) @auth(level: NO_ACCESS) {
+  membership(key: { uid: $uid }) {
+    businessId
+    role
+    business {
+      operations: knowledgeOperations_on_business(
+        where: { actorUid: { eq: $uid }, idempotencyKey: { eq: $key } }
+        limit: 1
+      ) {
+        id
+        businessId
+        actorUid
+        idempotencyKey
+        action
+        retryStage
+        payloadHash
+        documentId
+        versionId
+        completedAt
+      }
+    }
+  }
+  knowledgeDocument(id: $documentId) {
+    id
+    businessId
+    documentCode
+    activeVersionId
+    revision
+    nextVersionNumber
+  }
+  knowledgeVersion(id: $versionId) {
+    id
+    businessId
+    documentId
+    versionLabel
+    status
+    revision
+    revokedAt
+    publishedAt
+    isActive
+    pdfSha256
+    pendingStage
+    processingError
+    document {
+      activeVersionId
+      revision
+    }
+  }
+}

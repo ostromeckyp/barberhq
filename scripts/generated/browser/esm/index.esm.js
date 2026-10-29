@@ -61,6 +61,18 @@ export function getHqInventory(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeQuery('GetHqInventory', inputVars, inputOpts);
 }
 
+export function getDeliveryProcedureBindings(dcOrOptions, options) {
+  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('GetDeliveryProcedureBindings', undefined, inputOpts);
+}
+
+export function listDeliveryProcedureDocuments(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, false);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ListDeliveryProcedureDocuments', inputVars, inputOpts);
+}
+
 export function getDeliveryReceipt(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
@@ -77,18 +89,6 @@ export function listDeliveryIssues(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeQuery('ListDeliveryIssues', inputVars, inputOpts);
-}
-
-export function getDeliveryProcedureBindings(dcOrOptions, options) {
-  const { dc: dcInstance, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrOptions, options, undefined);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('GetDeliveryProcedureBindings', undefined, inputOpts);
-}
-
-export function listDeliveryProcedureDocuments(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, false);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ListDeliveryProcedureDocuments', inputVars, inputOpts);
 }
 
 export function getSourceSection(dcOrVarsOrOptions, varsOrOptions, options) {

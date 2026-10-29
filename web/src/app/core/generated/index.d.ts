@@ -1207,6 +1207,30 @@ export const getHqInventoryRef: GetHqInventoryRef;
 export function getHqInventory(vars?: GetHqInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetHqInventoryData, GetHqInventoryVariables>;
 export function getHqInventory(dc: DataConnect, vars?: GetHqInventoryVariables, options?: ExecuteQueryOptions): QueryPromise<GetHqInventoryData, GetHqInventoryVariables>;
 
+interface GetDeliveryProcedureBindingsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
+  operationName: string;
+}
+export const getDeliveryProcedureBindingsRef: GetDeliveryProcedureBindingsRef;
+
+export function getDeliveryProcedureBindings(options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
+export function getDeliveryProcedureBindings(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
+
+interface ListDeliveryProcedureDocumentsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+  operationName: string;
+}
+export const listDeliveryProcedureDocumentsRef: ListDeliveryProcedureDocumentsRef;
+
+export function listDeliveryProcedureDocuments(vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+export function listDeliveryProcedureDocuments(dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
+
 interface GetDeliveryReceiptRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: GetDeliveryReceiptVariables): QueryRef<GetDeliveryReceiptData, GetDeliveryReceiptVariables>;
@@ -1242,30 +1266,6 @@ export const listDeliveryIssuesRef: ListDeliveryIssuesRef;
 
 export function listDeliveryIssues(vars: ListDeliveryIssuesVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryIssuesData, ListDeliveryIssuesVariables>;
 export function listDeliveryIssues(dc: DataConnect, vars: ListDeliveryIssuesVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryIssuesData, ListDeliveryIssuesVariables>;
-
-interface GetDeliveryProcedureBindingsRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect): QueryRef<GetDeliveryProcedureBindingsData, undefined>;
-  operationName: string;
-}
-export const getDeliveryProcedureBindingsRef: GetDeliveryProcedureBindingsRef;
-
-export function getDeliveryProcedureBindings(options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
-export function getDeliveryProcedureBindings(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetDeliveryProcedureBindingsData, undefined>;
-
-interface ListDeliveryProcedureDocumentsRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables): QueryRef<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-  operationName: string;
-}
-export const listDeliveryProcedureDocumentsRef: ListDeliveryProcedureDocumentsRef;
-
-export function listDeliveryProcedureDocuments(vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
-export function listDeliveryProcedureDocuments(dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables, options?: ExecuteQueryOptions): QueryPromise<ListDeliveryProcedureDocumentsData, ListDeliveryProcedureDocumentsVariables>;
 
 interface GetSourceSectionRef {
   /* Allow users to create refs without passing in DataConnect */

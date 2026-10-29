@@ -1,0 +1,46 @@
+query ReadProductCardAttachment($uid: String!, $productId: String!) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT c.document_id AS "documentId",c.version_id AS "versionId",c.status,c.suggestions,c.revision,
+    d.revision AS "documentRevision",c.updated_at<clock_timestamp()-interval '2 minutes' AS "staleGenerating"
+    FROM membership m JOIN product_card_attachment c ON c.business_id=m.business_id AND c.product_id=$2
+    LEFT JOIN knowledge_document d ON d.id=c.document_id
+    WHERE m.uid=$1 AND m.role::text='HQ' LIMIT 1
+    """
+    params: [$uid, $productId]
+  )
+}
+
+mutation SaveProductCardAttachment(
+  $uid: String!
+  $productId: String!
+  $expectedRevision: Int!
+  $documentId: String!
+  $versionId: String!
+  $status: String!
+  $suggestionsJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (
+    SELECT m.business_id FROM membership m JOIN product p ON p.business_id=m.business_id AND p.id=$2
+    WHERE m.uid=$1 AND m.role::text='HQ' FOR SHARE OF m
+    )
+    INSERT INTO product_card_attachment(product_id,business_id,document_id,version_id,status,suggestions,actor_uid,revision,updated_at)
+    SELECT $2,a.business_id,$4,$5,$6,$7::jsonb,$1,$3+1,transaction_timestamp() FROM actor a
+    WHERE $3=COALESCE((SELECT c.revision FROM product_card_attachment c WHERE c.product_id=$2),0)
+    ON CONFLICT (product_id) DO UPDATE SET document_id=EXCLUDED.document_id,version_id=EXCLUDED.version_id,
+    status=EXCLUDED.status,suggestions=EXCLUDED.suggestions,actor_uid=EXCLUDED.actor_uid,revision=EXCLUDED.revision,
+    updated_at=EXCLUDED.updated_at WHERE product_card_attachment.revision=EXCLUDED.revision-1
+    """
+    params: [
+      $uid
+      $productId
+      $expectedRevision
+      $documentId
+      $versionId
+      $status
+      $suggestionsJson
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

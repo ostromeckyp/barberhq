@@ -1172,6 +1172,16 @@ export function getHqInventory(dc: DataConnect, vars?: GetHqInventoryVariables, 
 /** Generated Node Admin SDK operation action function for the 'GetHqInventory' Query. Allow users to pass in custom DataConnect instances. */
 export function getHqInventory(vars?: GetHqInventoryVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetHqInventoryData>>;
 
+/** Generated Node Admin SDK operation action function for the 'GetDeliveryProcedureBindings' Query. Allow users to execute without passing in DataConnect. */
+export function getDeliveryProcedureBindings(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<GetDeliveryProcedureBindingsData>>;
+/** Generated Node Admin SDK operation action function for the 'GetDeliveryProcedureBindings' Query. Allow users to pass in custom DataConnect instances. */
+export function getDeliveryProcedureBindings(options?: OperationOptions): Promise<ExecuteOperationResponse<GetDeliveryProcedureBindingsData>>;
+
+/** Generated Node Admin SDK operation action function for the 'ListDeliveryProcedureDocuments' Query. Allow users to execute without passing in DataConnect. */
+export function listDeliveryProcedureDocuments(dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListDeliveryProcedureDocumentsData>>;
+/** Generated Node Admin SDK operation action function for the 'ListDeliveryProcedureDocuments' Query. Allow users to pass in custom DataConnect instances. */
+export function listDeliveryProcedureDocuments(vars?: ListDeliveryProcedureDocumentsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListDeliveryProcedureDocumentsData>>;
+
 /** Generated Node Admin SDK operation action function for the 'GetDeliveryReceipt' Query. Allow users to execute without passing in DataConnect. */
 export function getDeliveryReceipt(dc: DataConnect, vars: GetDeliveryReceiptVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetDeliveryReceiptData>>;
 /** Generated Node Admin SDK operation action function for the 'GetDeliveryReceipt' Query. Allow users to pass in custom DataConnect instances. */
@@ -1186,16 +1196,6 @@ export function getDeliveryIssue(vars: GetDeliveryIssueVariables, options?: Oper
 export function listDeliveryIssues(dc: DataConnect, vars: ListDeliveryIssuesVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListDeliveryIssuesData>>;
 /** Generated Node Admin SDK operation action function for the 'ListDeliveryIssues' Query. Allow users to pass in custom DataConnect instances. */
 export function listDeliveryIssues(vars: ListDeliveryIssuesVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListDeliveryIssuesData>>;
-
-/** Generated Node Admin SDK operation action function for the 'GetDeliveryProcedureBindings' Query. Allow users to execute without passing in DataConnect. */
-export function getDeliveryProcedureBindings(dc: DataConnect, options?: OperationOptions): Promise<ExecuteOperationResponse<GetDeliveryProcedureBindingsData>>;
-/** Generated Node Admin SDK operation action function for the 'GetDeliveryProcedureBindings' Query. Allow users to pass in custom DataConnect instances. */
-export function getDeliveryProcedureBindings(options?: OperationOptions): Promise<ExecuteOperationResponse<GetDeliveryProcedureBindingsData>>;
-
-/** Generated Node Admin SDK operation action function for the 'ListDeliveryProcedureDocuments' Query. Allow users to execute without passing in DataConnect. */
-export function listDeliveryProcedureDocuments(dc: DataConnect, vars?: ListDeliveryProcedureDocumentsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListDeliveryProcedureDocumentsData>>;
-/** Generated Node Admin SDK operation action function for the 'ListDeliveryProcedureDocuments' Query. Allow users to pass in custom DataConnect instances. */
-export function listDeliveryProcedureDocuments(vars?: ListDeliveryProcedureDocumentsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ListDeliveryProcedureDocumentsData>>;
 
 /** Generated Node Admin SDK operation action function for the 'GetSourceSection' Query. Allow users to execute without passing in DataConnect. */
 export function getSourceSection(dc: DataConnect, vars: GetSourceSectionVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<GetSourceSectionData>>;

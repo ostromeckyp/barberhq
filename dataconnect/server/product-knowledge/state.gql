@@ -1,0 +1,57 @@
+# HQ-only native snapshot. Business identity is derived from the membership row.
+query ProductKnowledgeState($uid: String!, $versionId: String!, $key: String!)
+@auth(level: NO_ACCESS) {
+  result: _selectFirst(
+    sql: """
+    SELECT v.id AS "versionId", v.document_id AS "documentId", (SELECT d.active_version_id FROM knowledge_document d WHERE d.id=v.document_id) AS "replacesVersionId", v.business_id AS "businessId", v.extraction_hash AS "extractionHash",
+    v.product_knowledge_revision AS revision, b.product_knowledge_revision AS "catalogRevision",
+    v.product_knowledge_reviewed_hash AS "reviewedHash", v.product_knowledge_state AS state,
+    v.kind::text AS kind, v.status::text AS status, v.pending_stage::text AS "pendingStage",
+    v.published_at AS "publishedAt", v.revoked_at AS "revokedAt",
+    COALESCE((SELECT jsonb_agg(to_jsonb(l) ORDER BY l.id) FROM knowledge_product_link l WHERE l.version_id=v.id),'[]') AS links,
+    COALESCE((SELECT jsonb_agg(to_jsonb(p) ORDER BY p.product_id) FROM knowledge_product_profile p WHERE p.version_id=v.id),'[]') AS profiles,
+    COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY a.id) FROM product_alias a WHERE a.source_document_version_id=v.id),'[]') AS aliases,
+    COALESCE((SELECT jsonb_agg(jsonb_build_object('id',c.id,'text',c.text,'physicalPage',c.physical_page) ORDER BY c.id) FROM knowledge_chunk c WHERE c.version_id=v.id),'[]') AS chunks,
+    (SELECT to_jsonb(o) FROM product_knowledge_operation o WHERE o.business_id=b.id AND o.actor_uid=$1 AND o.idempotency_key=$3) AS operation
+    FROM membership m JOIN business b ON b.id=m.business_id JOIN knowledge_version v ON v.business_id=b.id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND v.id=$2
+    """
+    params: [$uid, $versionId, $key]
+  )
+}
+
+query ProductKnowledgeCatalogPage($uid: String!, $versionId: String!, $after: String!, $limit: Int!)
+@auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT p.id,p.name,p.source_code AS "sourceCode",p.type,p.category,p.summary_en AS "summaryEn",p.scent_pl AS "scentPl"
+    FROM product p JOIN membership m ON m.business_id=p.business_id
+    JOIN knowledge_version v ON v.business_id=m.business_id AND v.id=$2
+    WHERE m.uid=$1 AND m.role::text='HQ' AND p.id>$3 ORDER BY p.id LIMIT LEAST($4,101)
+    """
+    params: [$uid, $versionId, $after, $limit]
+  )
+}
+
+query ProductKnowledgeActiveAliasPage(
+  $uid: String!
+  $versionId: String!
+  $after: String!
+  $limit: Int!
+) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.product_id AS "productId",a.normalized,lower(a.kind::text) AS kind,a.lang,a.source_document_version_id AS "sourceVersionId"
+    FROM product_alias a JOIN membership m ON m.business_id=a.business_id
+    JOIN knowledge_version target ON target.business_id=m.business_id AND target.id=$2
+    JOIN product p ON p.id=a.product_id AND p.business_id=m.business_id
+    JOIN knowledge_version v ON v.id=a.source_document_version_id AND v.business_id=m.business_id
+    JOIN knowledge_document d ON d.id=v.document_id AND d.business_id=m.business_id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND a.id>$3 AND a.status::text='ACTIVE'
+    AND a.salon_id IS NULL AND v.published_at IS NOT NULL AND v.revoked_at IS NULL
+    AND v.is_active AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id
+    ORDER BY a.id LIMIT LEAST($4,1001)
+    """
+    params: [$uid, $versionId, $after, $limit]
+  )
+}

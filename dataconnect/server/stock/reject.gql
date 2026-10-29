@@ -1,0 +1,120 @@
+mutation RejectStock(
+  $uid: String!
+  $businessId: String!
+  $requestId: String!
+  $receiptId: String!
+  $key: String!
+  $payloadHash: String!
+  $semanticHash: String!
+  $revision: Int!
+  $count: Int!
+  $reason: String!
+  $isReplacement: Boolean! = false
+  $replacementIssueId: String
+  $issueRevision: Int
+) @auth(level: NO_ACCESS) @transaction {
+  requestGuard: query @redact {
+    replenishmentRequest(id: $requestId)
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.state == 'PENDING_APPROVAL' && this.revision == vars.revision && vars.count >= 1 && vars.count <= 6 && this.items.size() == vars.count && vars.reason.size() >= 1 && vars.reason.size() <= 500 && vars.isReplacement == (this.replacementIssueId != null) && (!vars.isReplacement || this.replacementIssueId == vars.replacementIssueId)"
+        message: "STALE_STATE"
+      ) {
+      businessId
+      salonId
+      state
+      revision
+      replacementIssueId
+      items: requestItems_on_request(orderBy: { productId: ASC }) {
+        id
+        productId
+        quantity
+      }
+    }
+  }
+  actor: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == 'HQ'"
+        message: "FORBIDDEN"
+      ) {
+      businessId
+      role
+      salonAccesses_on_membership {
+        locationId
+      }
+    }
+  }
+  changed: replenishmentRequest_updateMany(
+    where: {
+      id: { eq: $requestId }
+      businessId: { eq: $businessId }
+      state: { eq: PENDING_APPROVAL }
+      revision: { eq: $revision }
+    }
+    data: { state: REJECTED, revision_update: { inc: 1 } }
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+
+  issueGuard: query @redact @include(if: $isReplacement) {
+    deliveryIssue(first: { where: { id: { eq: $replacementIssueId } } })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.activeReplacementRequestId == vars.requestId && this.status == 'REPLACEMENT_IN_PROGRESS' && this.revision == vars.issueRevision"
+        message: "STALE_STATE"
+      ) {
+      id
+      businessId
+      status
+      revision
+      activeReplacementRequestId
+    }
+  }
+  issueChanged: deliveryIssue_updateMany(
+    where: {
+      id: { eq: $replacementIssueId }
+      businessId: { eq: $businessId }
+      revision: { eq: $issueRevision }
+      status: { eq: REPLACEMENT_IN_PROGRESS }
+      activeReplacementRequestId: { eq: $requestId }
+    }
+    data: { revision_update: { inc: 1 }, status: IN_REVIEW, activeReplacementRequestId: null }
+  ) @include(if: $isReplacement) @check(expr: "this == 1", message: "STALE_STATE")
+  deliveryIssueEvent_insert(
+    data: {
+      id: $receiptId
+      issueId_expr: "vars.isReplacement ? vars.replacementIssueId : ''"
+      revision_expr: "vars.issueRevision != null ? vars.issueRevision + 1 : 0"
+      actorUid: $uid
+      type: REPLACEMENT_REJECTED
+      status: IN_REVIEW
+      requestId: $requestId
+      note: $reason
+      quantities: []
+    }
+  ) @include(if: $isReplacement)
+  activeRequest_deleteMany(
+    where: { requestId: { eq: $requestId }, businessId: { eq: $businessId } }
+  ) @check(expr: "this == vars.count", message: "INVALID_TRANSITION")
+  actionReceipt_insert(
+    data: {
+      id: $receiptId
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      requestId: $requestId
+      action: REJECT
+      payloadHash: $payloadHash
+      semanticHash: $semanticHash
+      state: REJECTED
+      revision_expr: "vars.revision + 1"
+      reason: $reason
+    }
+  )
+  actionKey_insert(
+    data: {
+      businessId: $businessId
+      actorUid: $uid
+      idempotencyKey: $key
+      receiptId: $receiptId
+      payloadHash: $payloadHash
+    }
+  )
+}
