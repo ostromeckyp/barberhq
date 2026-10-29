@@ -1,8 +1,12 @@
 # Implementation phases
 
-**Updated 30 September 2026 · increment 1 implemented and verified locally; cloud acceptance remains blocked on owner setup.**
+**Updated 24 October 2026 · The ordering assistant is published on `foundation`; its approved Flash-Lite EU update passed five hosted calls in 0.98–2.48 s, including product/quantity clarification and preservation of manual edits. Earlier real signed-in single-/multi-product preparations passed Auth/App Check and runtime SQL/Vertex checks, with unchanged operational data. See [4A evidence](handoffs/increment-4a.md); full hosted fulfillment rehearsal remains separate. AI-0, procedure retrieval, answer backend and Angular RAG preview are also published. RAG now has five real Auth/App Check verified hosted calls and working highlighted PDF citations; the owner confirmed all five rehearsed instructions against their source on 24 October. One known replacement-decision retrieval miss remains visible. See [RAG acceptance](rag-hosted-acceptance-2026-10-24.md). The earlier browser App Check connection failure was not reproduced, without a claimed root-cause fix.**
 
 See [current evidence](handoffs/increment-1.md) and [Angular architecture / customization](angular-architecture.md).
+
+Plan 5 has started: [UI state coverage](ui-state-coverage.md) and [increment 5 handoff](handoffs/increment-5.md) record the local PDF-return/hint fixes, 125 Angular tests, desktop/mobile browser checks and the [prepared preview update](ui-state-preview-review.md). Final visual acceptance, same-version release/rollback and two timed rehearsals remain outstanding.
+
+Owner follow-up: [Task 1A UX/UI comparison](ux-ui-design-review.md) passed 20 browser/125 Angular checks and was published to `foundation` after “publikuj”. Hosted version `f97f1aa60feaf08c` expires 31 October; exact files, real Auth/App Check, cited PDF return, examples and 320px sheet scrolling passed scoped smoke. Polish input returned a grounded answer and an abstention on the backend; output remains English. The new product-knowledge/alias/dictation design remains a separate implementation stream.
 
 ## Approved delivery approach
 
@@ -70,4 +74,17 @@ Every completion report must contain: status (`READY` or `BLOCKED`), implemented
 
 These phase specs refine the [application requirements](../../.claude/specs/barberhq-replenishment-assistant.md) and [architecture](../05-architecture-how.md). If a concrete feasibility check requires a contract change, record it and update dependent specs before continuing. Do not silently weaken the stock or authorization guarantees.
 
-Current local increment: [manual replenishment handoff](handoffs/increment-2.md). Cloud acceptance remains blocked; do not label local emulator evidence as deployed proof.
+Current evidence: [PDF publication and source handoff](handoffs/increment-3a.md), [document library](handoffs/document-library.md), [cloud replenishment](handoffs/replenishment-cloud.md), [AI-0 foundation](handoffs/ai-foundation.md), [procedure retrieval/calibration](handoffs/rag-retrieval.md), [grounded procedure backend](handoffs/rag-flow.md), and [procedure UI / remaining acceptance](handoffs/increment-4b.md). The [UI preview review](rag-ui-preview-review.md) describes the prepared release. Earlier increment reports retain their own verification dates and scope.
+
+## Follow-up notes, 25 October
+
+- [Local demo verification and prepared contrast fix](demo-local-verification-2026-10-25.md).
+- [Delivery exceptions and Firebase status notifications](future-work.md): new owner requirements and proposals, not implemented.
+
+## Product knowledge expansion, 28 October
+
+[Product links, alias generation and HQ review](product-document-alias-review.md) are implemented and verified locally. No cloud rollout; the current replenishment matcher is unchanged until increment3.
+
+[SQL-backed lookup and salon shorthand (increment 3)](alias-backed-replenishment.md) are implemented and verified locally from the [increment 3 plan](../superpowers/plans/2026-10-28-alias-backed-replenishment-and-salon-shorthand.md). No cloud rollout or seed apply.
+
+[HQ product management](hq-product-management.md): add/edit products, HQ quantity, product-owned aliases and product cards from HQ stock — implemented and verified locally; production rollout pending owner approval.

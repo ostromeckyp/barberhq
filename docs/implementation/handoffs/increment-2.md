@@ -29,23 +29,23 @@ The completed code is on `codex/foundation`; no merge, push or cloud deployment 
 npm ci
 npm --prefix web ci
 npm --prefix functions ci
-npm run configure:emulators
-npm run start:emulators
+npm run dev:configure
+npm run dev:emulators
 ```
 
 Keep emulators running. In another terminal:
 
 ```sh
-npm run demo:local
-npm run start:local
+npm run dev:seed
+npm run dev:web
 ```
 
-Open http://127.0.0.1:4200. Local demo credentials remain in ignored `config/demo-accounts.local.json`; do not commit them. A fresh Auth emulator needs `demo:local` again.
+Open http://127.0.0.1:4200. Local demo credentials remain in ignored `config/demo-accounts.local.json`; do not commit them. A fresh Auth emulator needs `dev:seed` again.
 
 Tests (while local services are running):
 
 ```sh
-npm test
+npm run test:unit
 npm run test:web
 npm run typecheck
 BARBERHQ_TEST_MODE=emulator npm run test:integration
@@ -57,10 +57,10 @@ BARBERHQ_TEST_MODE=emulator npm run test:e2e
 Close demo sessions and finish all in-flight requests before resetting. This is an operator declaration of quiescence, not a distributed maintenance lock. Reset deletes requests, active slots, transfers, movements, receipts and key bindings for the demo business, restores the 24 inventory rows, and increases inventory versions. It preserves products and memberships; it does not touch future knowledge tables. Old request links cease to exist. Clear pending browser state before the next rehearsal.
 
 ```sh
-DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 npm run demo:reset -- --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --dry-run
+npm run dev:reset -- --dry-run
 ```
 
-Replace `--dry-run` with `--apply` only when ready; apply also prints its dry-run summary first. Cloud mode permits only `notbad-6be95` and refuses an emulator environment. No reset route/callable exists in the app.
+Replace `--dry-run` with `--apply` only when ready (`dev:reset` targets the local emulator; cloud reset runs `scripts/seed/reset.ts` directly with `--project notbad-6be95`); apply also prints its dry-run summary first. Cloud mode permits only `notbad-6be95` and refuses an emulator environment. No reset route/callable exists in the app.
 
 ## Remaining cloud gate
 

@@ -13,7 +13,7 @@
 
 **Spec:** [Approved delivery design](../specs/2026-09-29-barberhq-delivery-design.md), increment 4A; phase5 and approved extensions §1; AI limits in shared contracts.
 
-**Status:** Ready for user review; execution not authorized by this file. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
+**Status (24 October 2026):** Task 1 AI-0 is published. Tasks 2–3 are implemented, reviewed and published through the explicitly owner-approved scoped release on `foundation`. The latest full operator evaluation passed 12/12. Real signed-in single-/multi-product preparation, active exclusion, valid Auth/App Check, runtime SQL/Vertex and unchanged operational hashes are verified. The owner-approved Flash-Lite EU update is published; five hosted calls passed product/quantity clarification, manual-edit preservation and three-product preparation in 0.98–2.48 s. Full hosted fulfillment and remaining edge-case rehearsal stay open. See the [current handoff](../../implementation/handoffs/increment-4a.md). Existing checkout and no-commit instructions supersede the historical commit/workspace steps below. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
 
 ## Global Constraints
 

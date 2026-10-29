@@ -42,7 +42,7 @@ Task 1 complete locally. Tasks 2–4 have local implementation; their cloud acce
 
 ## Data layer — local proof
 
-Compiled `dataconnect/` using Firebase CLI 15.32.0, generated browser and Admin SDKs. Proposed local service/instance/database `barberhq`, region `europe-west1`; these are not provisioned resources. Owner must confirm before deployment. Commands: `npx firebase dataconnect:compile --project notbad-6be95`; regeneration via `npm run generate:sdk`.
+Compiled `dataconnect/` using Firebase CLI 15.32.0, generated browser and Admin SDKs. Proposed local service/instance/database `barberhq`, region `europe-west1`; these are not provisioned resources. Owner must confirm before deployment. Commands: `npx firebase dataconnect:compile --project notbad-6be95`; regeneration via `npm run generate:sdk -- --project demo-barberhq`.
 
 `npx firebase emulators:start --only dataconnect,auth --project demo-barberhq` starts isolated local services. `BARBERHQ_TEST_MODE=emulator npm run test:integration` passed 2 tests with actual email/password emulator accounts and generated operations: unassigned/cross-salon/cross-business reads denied; operator write denied; repeated seed preserves modified 16-unit HQ inventory and 24 rows. Seed dry-run leaves modified inventory unchanged. Root suite: 16 passed; TypeScript passed.
 

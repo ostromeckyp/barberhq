@@ -10,7 +10,7 @@
 
 **Spec:** [Approved delivery design](../specs/2026-09-29-barberhq-delivery-design.md), increment 3B; phase1 remaining PDFs, phase2 document APIs, phase3 worker and phase4 library; approved extensions §2.
 
-**Status:** Ready for user review; execution not authorized by this file. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
+**Status (20 October 2026): READY for the demo and subsequent AI work.** Implementation, independent reviews, authenticated HQ lifecycle and dedicated SALON browser checks passed. Actual late/repeated tasks reached the private deployed worker; all three lifecycle suites passed against deployed SQL (74 checks), with the local integration suite passing 149 checks. Existing corpus/stock remain unchanged and no test-namespace rows remain. Acceptance adjustment: the planned automated library E2E file was not added; real signed-in browser workflow checks supply the hosted UI evidence. SQL conflict tests use local orchestration, deterministic vectors and in-memory Storage; they are not hosted active-worker lease tests. See [library handoff](../../implementation/handoffs/document-library.md) and [increment handoff](../../implementation/handoffs/increment-3b.md) for exact evidence/limits. The historical task checklist below is not a record of executed commands or commits. User authorized execution in conversation; this file alone is not authorization. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
 
 ## Global Constraints
 

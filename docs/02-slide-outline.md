@@ -2,7 +2,7 @@
 
 ## Agentic AI in minutes with Firebase
 
-Markdown content brief for a future deck. Audience: technical developers. Duration: **20 minutes including a six-minute demo, excluding Q&A**. This is a planned presentation; screenshots, timings and results must come from the later implementation.
+Markdown content brief for a future deck. Audience: technical developers. Duration target: **20 minutes including a six-minute demo, excluding Q&A**. Implementation is deployed; one scoped browser rehearsal passed in 5:23 and the second exposed a real RAG timeout. [Three genuine offline fallback images](implementation/demo-rehearsal-2026-10-25.md#genuine-offline-fallback) are available. Two successful full repetitions, presenter narration and the full talk timing remain unverified. The slide schedule below is planned, not measured elapsed time. See the [acceptance index](implementation/acceptance-coverage.md).
 
 ## Editorial direction
 
@@ -115,7 +115,7 @@ Zakładowa: a separate damaged-delivery question.
 
 “Application actions make the stock movements exact. RAG helps us find operating knowledge when the next question is about a procedure.”
 
-Follow the [runbook](03-demo-runbook.md): 3:45 replenishment, 1:45 knowledge assistance, 0:30 wrap-up. Physical movement is simulated with explicit confirmations. Use a labeled recording if live execution fails.
+Follow the [runbook](03-demo-runbook.md): target 3:45 replenishment, 1:45 knowledge assistance, 0:30 wrap-up. Physical movement is simulated with explicit confirmations. Use a clearly labeled verified offline fallback if available; otherwise explain the unavailable path. No recording is currently promised.
 
 ## Slide 5 — Where the AI helped
 
@@ -184,7 +184,7 @@ Offer a starter brief: “Our salon managers message HQ for cosmetics. Turn one 
 
 Then explain the domain details a code generator cannot invent responsibly: jars versus packs, stock freshness, substitutes and who can approve. These details determine whether the app helps.
 
-The approved UI also supports multi-product drafts (separate requests per product), low-stock indicators and an HQ-managed PDF library. Treat these as supporting capabilities; retain the two-unit stock proof and damaged-delivery question as the timed live narrative. Only claim them as working after phase-07 verification.
+The approved UI supports a shared multi-product draft submitted as one atomic request, low-stock indicators and an HQ-managed PDF library. Keep the two-unit stock proof and independent damaged-delivery question as the stage narrative. Distinguish already recorded feature evidence from the still-pending final timed rehearsal.
 
 If implementation timing was recorded, show the actual timeline with its scope. Otherwise say that fast experimentation is the ambition and omit numerical build-time claims. No live scaffolding is planned.
 

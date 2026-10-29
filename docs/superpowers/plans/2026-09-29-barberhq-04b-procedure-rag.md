@@ -10,7 +10,7 @@
 
 **Spec:** [Approved delivery design](../specs/2026-09-29-barberhq-delivery-design.md), increment 4B; phase6, shared knowledge contract and approved citation/revocation behavior.
 
-**Status:** Ready for user review; execution not authorized by this file. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
+**Status (24 October 2026):** Tasks 1–2 and the reviewed UI are published. Task 3 now has five real signed-in HTTP 200/Auth/App Check calls, verified highlighted PDFs, no-write hashes and recorded answer-level results (4/5 expected behaviors; known replacement-decision miss retained). Human support review of all five rehearsed steps remains pending. See [current handoff](../../implementation/handoffs/increment-4b.md). The ledgered hosted-UI evaluation ruling replaces a new automated answer CLI mode; strict retrieval replay remains separate. Existing no-commit/no-workspace-removal instructions supersede historical steps below. Read [execution index](2026-09-29-barberhq-execution-index.md) for command conventions and shared types.
 
 ## Global Constraints
 

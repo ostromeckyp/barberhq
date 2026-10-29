@@ -1,6 +1,6 @@
 # DevFest demo: BarberHQ
 
-Increments 1–2 are implemented locally: Angular login, scoped inventory and manual replenishment. No cloud deployment has been performed. [Local run / Hosting guide](docs/implementation/deployment-runbook.md) · [current handoff](docs/implementation/handoffs/increment-2.md).
+Updated 25 October 2026: login, inventory, manual replenishment, the document library, both AI assistants and unified Back buttons are published on [production](https://notbad-6be95.web.app), version `4b833190c12b9244`. The foundation preview serves the same verified version. Controlled rollback/restoration preserved scoped data. Two authorized reset-based rehearsals completed stock correctly; the first full run passed in 5:23, while the second hit a real RAG timeout twice. Knowledge and seven original PDF metadata snapshots survived both resets unchanged. Three genuine offline fallback images now exist. [Single-function diagnostics are published](docs/implementation/rag-phase-diagnostics-2026-10-25.md): one production question passed in5.32s. Timeout cause, preview App Check and an unset→20 max-instance difference remain open, along with final demo acceptance. [Rehearsal report](docs/implementation/demo-rehearsal-2026-10-25.md) · [Current handoff](docs/implementation/handoffs/increment-5.md) · [59-item acceptance index](docs/implementation/acceptance-coverage.md) · [Local72/72 verification and prepared contrast fix](docs/implementation/demo-local-verification-2026-10-25.md) · [Delivery exceptions / Firebase notifications](docs/implementation/future-work.md).
 
 **Confirmed demo: two use cases for Not Bad Stuff.**
 
@@ -33,7 +33,7 @@ For implementation, read the master specification and delivery design first, the
 ## Confirmed context and proposed technical decisions
 
 - Angular, Firebase Authentication, Firebase SQL Connect / Cloud SQL PostgreSQL, pgvector, Gemini through Genkit, Cloud Functions, Firebase Hosting.
-- Real cosmetics brand: **Not Bad Stuff**. Real salons: **Legnicka, Łódzka, Zakładowa**. Scope: one demo warehouse; multi-product drafts create one independent request per product.
+- Real cosmetics brand: **Not Bad Stuff**. Real salons: **Legnicka, Łódzka, Zakładowa**. Scope: one demo warehouse; multi-product drafts create one atomic request containing all items.
 - AI interprets language, selects read tools, and explains evidence. Ordinary code calculates quantities. Staff explicitly approve, dispatch and receive the transfer. RAG supports the separate procedure question; it is not required for stock arithmetic.
 - Store original procedure PDFs in private Firebase Storage; normalize extracted PDF text to page-aware Markdown, then keep indexed text and embeddings in PostgreSQL. Preloaded text PDFs and HQ upload/review/replacement/deletion are in scope. Preserve page geometry for citation highlights; OCR remains deferred.
 - Use SQL Connect's vector search to match the supplied abstract. Firestore Vector is a documented alternative, not a second required database.
@@ -45,7 +45,7 @@ Replenishment is confirmed as the demo. Validate the remaining operational rules
 
 Research checked on **22 September 2026** using Context7 and official Firebase/Genkit documentation. Feasibility is documentation-based; deployment, model availability, and concurrency behavior still need the small validation steps listed in the research.
 
-The phased handoffs and owner setup guide were added on **27 September 2026**. Canonical PDF generation, cloud setup, ingestion and later application increments remain future work; reuse the existing six-product snapshot without another scrape. On **29 September 2026**, the Claude Design handoff and its intentional product extensions were incorporated into the specs. Its sample PDF remains a design reference pending phase-01 review.
+The phased handoffs and owner setup guide were added on **27 September 2026**. On **29 September 2026**, the Claude Design handoff and its intentional product extensions were incorporated into the specs. Canonical PDFs, ingestion and application increments have since been implemented; dated verification records are in the [handoff index](docs/implementation/README.md). Reuse the existing six-product snapshot without another scrape. The handoff sample PDF remains a visual reference; actual citations use the reviewed corpus and extracted physical pages.
 
 ## Local implementation
 
@@ -53,4 +53,8 @@ The phased handoffs and owner setup guide were added on **27 September 2026**. C
 
 `web/` contains the Angular SPA; `dataconnect/` owns schema and generated GraphQL operations; `scripts/` prepares fixtures, seeds safely and checks builds; `shared/contracts/` contains browser-safe types.
 
-Follow the [runbook](docs/implementation/deployment-runbook.md) for clean installs, emulator startup, generated private local accounts and verification commands. The [owner checklist](docs/implementation/firebase-owner-checklist.md) describes the missing cloud prerequisites. Manual replenishment startup now includes the Functions emulator; see the [increment 2 run instructions](docs/implementation/handoffs/increment-2.md). PDFs and RAG are later increments.
+Follow the [runbook](docs/implementation/deployment-runbook.md) for clean installs, emulator startup, generated private local accounts and verification commands. The [owner checklist](docs/implementation/firebase-owner-checklist.md) records environment setup. Manual replenishment startup includes the Functions emulator; see the [increment 2 run instructions](docs/implementation/handoffs/increment-2.md). Current deployed feature evidence is linked from the [implementation index](docs/implementation/README.md).
+
+### Delivery inspection and linked replacements
+
+The local delivery upgrade lets salons accept good units and report damaged/missing units independently; HQ handles the issue through linked ordinary replacement requests. See [upgrade and recovery sequence](docs/implementation/delivery-upgrade.md) and [release handoff](docs/implementation/handoffs/delivery-receipts.md). Cloud migration/publication needs its own approval; this feature is prepared as one coordinated release.

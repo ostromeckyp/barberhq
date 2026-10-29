@@ -10,8 +10,8 @@ Use an ignored private directory, for example `artifacts/replenishment-upgrade/`
 
 ```sh
 mkdir -p artifacts/replenishment-upgrade
-DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 npm run migrate:replenishment -- --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --export --backup artifacts/replenishment-upgrade/before.json
-npm run migrate:replenishment -- --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --verify --backup artifacts/replenishment-upgrade/before.json
+DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 node --import tsx scripts/migrations/replenishment-items.ts --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --export --backup artifacts/replenishment-upgrade/before.json
+node --import tsx scripts/migrations/replenishment-items.ts --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --verify --backup artifacts/replenishment-upgrade/before.json
 ```
 
 Export reads every page, writes mode0600 with exclusive creation, records counts/checksum and validates references, states, audit, movements and reservations. Verification is read-only. Restore requires the same project/business and preserved unchanged parent tables. Never apply a schema change before verifying the backup. The --apply mode imports missing target records in one transaction, refuses conflicting records or changed inventory, then verifies all tables. Repeating the same verified import inserts zero rows.
@@ -21,7 +21,7 @@ Export reads every page, writes mode0600 with exclusive creation, records counts
 Before closing each demo browser, inspect sessionStorage `barberhq.pending.v1`. If present, save its JSON to a private file; never paste passwords or auth tokens. Do not delete the entry merely to unblock the new app.
 
 ```sh
-npm run reconcile:legacy-pending -- --journal artifacts/replenishment-upgrade/session.json --backup artifacts/replenishment-upgrade/before.json --report artifacts/replenishment-upgrade/session-report.json
+node --import tsx scripts/migrations/legacy-pending.ts --journal artifacts/replenishment-upgrade/session.json --backup artifacts/replenishment-upgrade/before.json --report artifacts/replenishment-upgrade/session-report.json
 ```
 
 The tool only reads files and writes a new report; it never sends stock commands. COMMITTED means the actor/key/payload match a retained receipt and request. Keep that request link. NOT_COMMITTED requires complete quiescent evidence with no matching key; manually recreate that line in the new draft only after the upgrade and explicit review. UNRESOLVED means mismatched or incomplete evidence: stop reconciliation and investigate. Unknown journal formats fail closed. The owner may clear the old entry only after the report is saved and every row resolved. A checksum detects corruption, not malicious tampering; keep backup files private.
@@ -33,7 +33,7 @@ Existing request IDs/states/timestamps remain. Stable item IDs hash the request/
 Install the target schema only while writers are stopped, import the verified conversion, compare all reconstructed records and inventory values, create missing salon settings at2 without overwriting existing settings, then deploy/rebuild matching Functions and Angular. Remove obsolete `lowStockThreshold` from private web config before rebuilding after Settings is implemented. Reload every client and verify the same history/stock. Partial import is not a successful upgrade; remain offline and resume using the same verified backup or restore the old schema/data. After starting the new schema with writers stopped, use:
 
 ```sh
-DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 npm run migrate:replenishment -- --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --apply --backup artifacts/replenishment-upgrade/before.json
+DATA_CONNECT_EMULATOR_HOST=127.0.0.1:9399 node --import tsx scripts/migrations/replenishment-items.ts --project demo-barberhq --business not-bad-stuff-demo --confirm not-bad-stuff-demo --quiescent --apply --backup artifacts/replenishment-upgrade/before.json
 ```
 
 StockMovement now maps to physical `stock_item_movement`; changing a populated table's primary key in place failed in the emulator rehearsal. The additive table receives the backed-up movements. Keep the old table/backup until verification; never use the old table for new writes. SQL Connect may retire old schema columns as it synchronizes, so the verified backup is mandatory before loading the new schema.
