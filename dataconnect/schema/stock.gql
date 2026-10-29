@@ -1,12 +1,29 @@
-enum RequestState { PENDING_APPROVAL RESERVED DISPATCHED RECEIVED REJECTED }
-enum StockActionType { SUBMIT APPROVE REJECT DISPATCH RECEIVE }
-enum MovementType { DISPATCH RECEIPT }
+enum RequestState {
+  PENDING_APPROVAL
+  RESERVED
+  DISPATCHED
+  RECEIVED
+  REJECTED
+  RECEIVED_WITH_ISSUE
+}
+enum StockActionType {
+  SUBMIT
+  APPROVE
+  REJECT
+  DISPATCH
+  RECEIVE
+}
+enum MovementType {
+  DISPATCH
+  RECEIPT
+}
 type ReplenishmentRequest @table(key: "id") @index(fields: ["businessId", "state", "createdAt"]) {
   id: String!
   business: Business!
   salon: Location!
   state: RequestState!
   revision: Int!
+  replacementIssue: DeliveryIssue
   createdAt: Timestamp! @default(expr: "request.time")
 }
 type ActiveRequest @table(key: ["business", "salon", "product"]) {
@@ -39,14 +56,18 @@ type TransferItem @table(key: "requestItemId") {
 }
 type StockMovement @table(name: "stock_item_movement", key: ["transferItemRequestItemId", "type"]) {
   transferItemRequestItemId: String!
-  transferItem: TransferItem! @ref(fields: ["transferItemRequestItemId"], references: ["requestItemId"])
+  transferItem: TransferItem!
+    @ref(fields: ["transferItemRequestItemId"], references: ["requestItemId"])
   business: Business!
   type: MovementType!
   quantity: Int!
   actorUid: String!
   createdAt: Timestamp! @default(expr: "request.time")
 }
-type ActionReceipt @table(key: "id") @unique(fields: ["business", "actorUid", "idempotencyKey"]) @unique(fields: ["request", "action"]) {
+type ActionReceipt
+  @table(key: "id")
+  @unique(fields: ["business", "actorUid", "idempotencyKey"])
+  @unique(fields: ["request", "action"]) {
   id: String!
   business: Business!
   actorUid: String!
@@ -61,7 +82,7 @@ type ActionReceipt @table(key: "id") @unique(fields: ["business", "actorUid", "i
   createdAt: Timestamp! @default(expr: "request.time")
 }
 # Every attempted action key binds to one immutable result, including semantic retries.
-type ActionKey @table(key:["business","actorUid","idempotencyKey"]) {
+type ActionKey @table(key: ["business", "actorUid", "idempotencyKey"]) {
   business: Business!
   actorUid: String!
   idempotencyKey: String!

@@ -1,0 +1,7 @@
+# One shared admission counter for both AI endpoints. UTC hour comes from PostgreSQL.
+type AiUsageWindow @table(key: ["uid", "hourStart"]) {
+  uid: String!
+  hourStart: Timestamp!
+  businessId: String!
+  count: Int!
+}

@@ -1,26 +1,16 @@
-import { applyItemsSnapshot } from "./items-import.ts";
-import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
-import { z } from "zod";
-import {
-  initializeApp,
-  deleteApp,
-  applicationDefault,
-} from "firebase-admin/app";
-import { getDataConnect, type DataConnect } from "firebase-admin/data-connect";
+import { applyItemsSnapshot } from './items-import.ts';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
+import { z } from 'zod';
+import { initializeApp, deleteApp, applicationDefault } from 'firebase-admin/app';
+import { getDataConnect, type DataConnect } from 'firebase-admin/data-connect';
 const id = z.string().min(1),
   integer = z.number().int().nonnegative(),
   qty = z.number().int().min(1).max(99);
-const state = z.enum([
-  "PENDING_APPROVAL",
-  "RESERVED",
-  "DISPATCHED",
-  "RECEIVED",
-  "REJECTED",
-]);
+const state = z.enum(['PENDING_APPROVAL', 'RESERVED', 'DISPATCHED', 'RECEIVED', 'REJECTED']);
 const timestamp = z.string().refine((v) => Number.isFinite(Date.parse(v)));
 const scope = { businessId: id };
 const request = z.strictObject({
@@ -46,7 +36,7 @@ const transfer = z.strictObject({
 const movement = z.strictObject({
   transferRequestId: id,
   ...scope,
-  type: z.enum(["DISPATCH", "RECEIPT"]),
+  type: z.enum(['DISPATCH', 'RECEIPT']),
   quantity: qty,
   actorUid: id,
   createdAt: timestamp,
@@ -57,7 +47,7 @@ const receipt = z.strictObject({
   actorUid: id,
   idempotencyKey: id,
   requestId: id,
-  action: z.enum(["SUBMIT", "APPROVE", "REJECT", "DISPATCH", "RECEIVE"]),
+  action: z.enum(['SUBMIT', 'APPROVE', 'REJECT', 'DISPATCH', 'RECEIVE']),
   payloadHash: id,
   semanticHash: id,
   state,
@@ -81,9 +71,7 @@ const snapshotSchema = z.strictObject({
   complete: z.boolean(),
   exportedAt: timestamp,
   requests: z.array(request),
-  active: z.array(
-    z.strictObject({ ...scope, salonId: id, productId: id, requestId: id }),
-  ),
+  active: z.array(z.strictObject({ ...scope, salonId: id, productId: id, requestId: id })),
   transfers: z.array(transfer),
   movements: z.array(movement),
   receipts: z.array(receipt),
@@ -102,8 +90,7 @@ export type LegacySnapshot = z.infer<typeof snapshotSchema>;
 export function parseLegacySnapshot(input: unknown): LegacySnapshot {
   return snapshotSchema.parse(input);
 }
-const digest = (value: unknown) =>
-  createHash("sha256").update(JSON.stringify(value)).digest("hex");
+const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 export const requestItemId = (requestId: string, productId: string) =>
   `item:${digest([requestId, productId])}`;
 function assert(value: unknown, message: string): asserts value {
@@ -111,20 +98,12 @@ function assert(value: unknown, message: string): asserts value {
 }
 function unique<T>(rows: T[], keyOf: (row: T) => string) {
   const keys = rows.map(keyOf);
-  assert(new Set(keys).size === keys.length, "Duplicate record in snapshot");
+  assert(new Set(keys).size === keys.length, 'Duplicate record in snapshot');
 }
 export function validateLegacySnapshot(s: LegacySnapshot): void {
-  assert(s.complete && s.quiescent, "Complete quiescent snapshot required");
-  for (const rows of [
-    s.requests,
-    s.active,
-    s.transfers,
-    s.movements,
-    s.receipts,
-    s.actionKeys,
-  ])
-    for (const r of rows)
-      assert(r.businessId === s.businessId, "Mixed-business snapshot");
+  assert(s.complete && s.quiescent, 'Complete quiescent snapshot required');
+  for (const rows of [s.requests, s.active, s.transfers, s.movements, s.receipts, s.actionKeys])
+    for (const r of rows) assert(r.businessId === s.businessId, 'Mixed-business snapshot');
   unique(s.requests, (r) => r.id);
   unique(s.active, (r) => JSON.stringify([r.salonId, r.productId]));
   unique(s.transfers, (r) => r.requestId);
@@ -139,85 +118,69 @@ export function validateLegacySnapshot(s: LegacySnapshot): void {
     const active = s.active.filter((a) => a.requestId === r.id),
       t = s.transfers.find((t) => t.requestId === r.id);
     assert(
-      active.length ===
-        (["PENDING_APPROVAL", "RESERVED", "DISPATCHED"].includes(r.state)
-          ? 1
-          : 0),
-      "Incorrect active slots",
+      active.length === (['PENDING_APPROVAL', 'RESERVED', 'DISPATCHED'].includes(r.state) ? 1 : 0),
+      'Incorrect active slots',
     );
     assert(
-      active.every(
-        (a) => a.productId === r.productId && a.salonId === r.salonId,
-      ),
-      "Active slot mismatch",
+      active.every((a) => a.productId === r.productId && a.salonId === r.salonId),
+      'Active slot mismatch',
     );
     assert(
-      Boolean(t) === ["RESERVED", "DISPATCHED", "RECEIVED"].includes(r.state),
-      "Transfer missing or unexpected",
+      Boolean(t) === ['RESERVED', 'DISPATCHED', 'RECEIVED'].includes(r.state),
+      'Transfer missing or unexpected',
     );
     if (t) {
       assert(
-        t.productId === r.productId &&
-          t.quantity === r.quantity &&
-          t.destinationId === r.salonId,
-        "Transfer mismatch",
+        t.productId === r.productId && t.quantity === r.quantity && t.destinationId === r.salonId,
+        'Transfer mismatch',
       );
       assert(
-        t.dispatchedQuantity ===
-          (["DISPATCHED", "RECEIVED"].includes(r.state) ? r.quantity : 0),
-        "Dispatch quantity mismatch",
+        t.dispatchedQuantity === (['DISPATCHED', 'RECEIVED'].includes(r.state) ? r.quantity : 0),
+        'Dispatch quantity mismatch',
       );
       assert(
-        t.receivedQuantity === (r.state === "RECEIVED" ? r.quantity : 0),
-        "Receipt quantity mismatch",
+        t.receivedQuantity === (r.state === 'RECEIVED' ? r.quantity : 0),
+        'Receipt quantity mismatch',
       );
     }
     const audits = s.receipts
       .filter((a) => a.requestId === r.id)
       .sort((a, b) => a.revision - b.revision);
     const actions =
-      r.state === "REJECTED"
-        ? ["SUBMIT", "REJECT"]
-        : ["SUBMIT", "APPROVE", "DISPATCH", "RECEIVE"].slice(0, r.revision);
+      r.state === 'REJECTED'
+        ? ['SUBMIT', 'REJECT']
+        : ['SUBMIT', 'APPROVE', 'DISPATCH', 'RECEIVE'].slice(0, r.revision);
     assert(
       audits.length === r.revision &&
         audits.every((a, i) => a.revision === i + 1 && a.action === actions[i]),
-      "Incomplete audit sequence",
+      'Incomplete audit sequence',
     );
-    assert(audits.at(-1)?.state === r.state, "Audit state mismatch");
-    if (r.state === "REJECTED")
-      assert(audits.at(-1)?.reason?.trim(), "Missing rejection reason");
-    for (const type of ["DISPATCH", "RECEIPT"] as const) {
-      const moves = s.movements.filter(
-        (m) => m.transferRequestId === r.id && m.type === type,
-      );
+    assert(audits.at(-1)?.state === r.state, 'Audit state mismatch');
+    if (r.state === 'REJECTED') assert(audits.at(-1)?.reason?.trim(), 'Missing rejection reason');
+    for (const type of ['DISPATCH', 'RECEIPT'] as const) {
+      const moves = s.movements.filter((m) => m.transferRequestId === r.id && m.type === type);
       const expected =
-        type === "DISPATCH"
-          ? ["DISPATCHED", "RECEIVED"].includes(r.state)
-          : r.state === "RECEIVED";
+        type === 'DISPATCH' ? ['DISPATCHED', 'RECEIVED'].includes(r.state) : r.state === 'RECEIVED';
       assert(
-        moves.length === (expected ? 1 : 0) &&
-          moves.every((m) => m.quantity === r.quantity),
-        "Movement mismatch",
+        moves.length === (expected ? 1 : 0) && moves.every((m) => m.quantity === r.quantity),
+        'Movement mismatch',
       );
     }
     assert(
-      s.inventory.some(
-        (i) => i.locationId === r.salonId && i.productId === r.productId,
-      ),
-      "Missing salon inventory",
+      s.inventory.some((i) => i.locationId === r.salonId && i.productId === r.productId),
+      'Missing salon inventory',
     );
   }
   for (const a of [...s.active, ...s.transfers, ...s.receipts])
-    assert(requests.has(a.requestId), "Orphan request reference");
+    assert(requests.has(a.requestId), 'Orphan request reference');
   for (const m of s.movements)
     assert(
       s.transfers.some((t) => t.requestId === m.transferRequestId),
-      "Orphan movement",
+      'Orphan movement',
     );
   for (const k of s.actionKeys) {
     const r = receipts.get(k.receiptId);
-    assert(r && r.businessId === k.businessId, "Orphan action key");
+    assert(r && r.businessId === k.businessId, 'Orphan action key');
   }
   for (const r of s.receipts)
     assert(
@@ -228,7 +191,7 @@ export function validateLegacySnapshot(s: LegacySnapshot): void {
           k.receiptId === r.id &&
           k.payloadHash === r.payloadHash,
       ),
-      "Missing original action key",
+      'Missing original action key',
     );
   for (const i of s.inventory) {
     const reserved = s.transfers
@@ -236,13 +199,10 @@ export function validateLegacySnapshot(s: LegacySnapshot): void {
         (t) =>
           t.warehouseId === i.locationId &&
           t.productId === i.productId &&
-          requests.get(t.requestId)?.state === "RESERVED",
+          requests.get(t.requestId)?.state === 'RESERVED',
       )
       .reduce((sum, t) => sum + t.quantity, 0);
-    assert(
-      i.reserved === reserved && i.onHand >= i.reserved,
-      "Inventory reservation mismatch",
-    );
+    assert(i.reserved === reserved && i.onHand >= i.reserved, 'Inventory reservation mismatch');
   }
 }
 export function convertLegacySnapshot(input: LegacySnapshot) {
@@ -259,13 +219,7 @@ export function convertLegacySnapshot(input: LegacySnapshot) {
       quantity: r.quantity,
     })),
     transfers: s.transfers.map(
-      ({
-        productId,
-        quantity,
-        dispatchedQuantity,
-        receivedQuantity,
-        ...header
-      }) => header,
+      ({ productId, quantity, dispatchedQuantity, receivedQuantity, ...header }) => header,
     ),
     transferItems: s.transfers.map((t) => ({
       requestItemId: requestItemId(t.requestId, t.productId),
@@ -291,24 +245,18 @@ export function assertMigrationTarget(v: {
   quiescent: boolean;
 }) {
   assert(
-    ["demo-barberhq", "notbad-6be95"].includes(v.projectId) &&
-      v.businessId === "not-bad-stuff-demo" &&
+    ['demo-barberhq', 'notbad-6be95'].includes(v.projectId) &&
+      v.businessId === 'not-bad-stuff-demo' &&
       v.confirm === v.businessId &&
       v.quiescent,
-    "Explicit approved target, confirmation and quiescence required",
+    'Explicit approved target, confirmation and quiescence required',
   );
 }
 const counts = (s: LegacySnapshot) =>
   Object.fromEntries(
-    [
-      "requests",
-      "active",
-      "transfers",
-      "movements",
-      "receipts",
-      "actionKeys",
-      "inventory",
-    ].map((k) => [k, (s[k as keyof LegacySnapshot] as unknown[]).length]),
+    ['requests', 'active', 'transfers', 'movements', 'receipts', 'actionKeys', 'inventory'].map(
+      (k) => [k, (s[k as keyof LegacySnapshot] as unknown[]).length],
+    ),
   );
 export function encodeBackup(input: LegacySnapshot) {
   const snapshot = parseLegacySnapshot(input);
@@ -323,53 +271,49 @@ export function decodeBackup(input: unknown): LegacySnapshot {
       snapshot: snapshotSchema,
     })
     .parse(input);
+  assert(digest(envelope.snapshot) === envelope.checksum, 'Backup checksum mismatch');
   assert(
-    digest(envelope.snapshot) === envelope.checksum,
-    "Backup checksum mismatch",
-  );
-  assert(
-    JSON.stringify(counts(envelope.snapshot)) ===
-      JSON.stringify(envelope.counts),
-    "Backup counts mismatch",
+    JSON.stringify(counts(envelope.snapshot)) === JSON.stringify(envelope.counts),
+    'Backup counts mismatch',
   );
   validateLegacySnapshot(envelope.snapshot);
   return envelope.snapshot;
 }
 const selections = {
   requests: [
-    "replenishmentRequests",
-    "id businessId salonId productId quantity state revision createdAt",
-    "{id:ASC}",
+    'replenishmentRequests',
+    'id businessId salonId productId quantity state revision createdAt',
+    '{id:ASC}',
   ],
   active: [
-    "activeRequests",
-    "businessId salonId productId requestId",
-    "[{salonId:ASC},{productId:ASC}]",
+    'activeRequests',
+    'businessId salonId productId requestId',
+    '[{salonId:ASC},{productId:ASC}]',
   ],
   transfers: [
-    "transfers",
-    "requestId businessId warehouseId destinationId productId quantity dispatchedQuantity receivedQuantity",
-    "{requestId:ASC}",
+    'transfers',
+    'requestId businessId warehouseId destinationId productId quantity dispatchedQuantity receivedQuantity',
+    '{requestId:ASC}',
   ],
   movements: [
-    "stockMovements",
-    "transferRequestId businessId type quantity actorUid createdAt",
-    "[{transferRequestId:ASC},{type:ASC}]",
+    'stockMovements',
+    'transferRequestId businessId type quantity actorUid createdAt',
+    '[{transferRequestId:ASC},{type:ASC}]',
   ],
   receipts: [
-    "actionReceipts",
-    "id businessId actorUid idempotencyKey requestId action payloadHash semanticHash state revision reason createdAt",
-    "{id:ASC}",
+    'actionReceipts',
+    'id businessId actorUid idempotencyKey requestId action payloadHash semanticHash state revision reason createdAt',
+    '{id:ASC}',
   ],
   actionKeys: [
-    "actionKeys",
-    "businessId actorUid idempotencyKey receiptId payloadHash",
-    "[{actorUid:ASC},{idempotencyKey:ASC}]",
+    'actionKeys',
+    'businessId actorUid idempotencyKey receiptId payloadHash',
+    '[{actorUid:ASC},{idempotencyKey:ASC}]',
   ],
   inventory: [
-    "inventories",
-    "locationId productId onHand reserved version",
-    "[{locationId:ASC},{productId:ASC}]",
+    'inventories',
+    'locationId productId onHand reserved version',
+    '[{locationId:ASC},{productId:ASC}]',
   ],
 } as const;
 export async function exportLegacySnapshot(
@@ -382,9 +326,9 @@ export async function exportLegacySnapshot(
     const rows: unknown[] = [];
     for (let offset = 0; ; offset += 100) {
       const where =
-        key === "inventory"
-          ? "{location:{businessId:{eq:$businessId}}}"
-          : "{businessId:{eq:$businessId}}";
+        key === 'inventory'
+          ? '{location:{businessId:{eq:$businessId}}}'
+          : '{businessId:{eq:$businessId}}';
       const response = await dc.executeGraphql<
         { rows: unknown[] },
         { businessId: string; offset: number }
@@ -401,84 +345,73 @@ export async function exportLegacySnapshot(
     format: 1,
     projectId,
     businessId,
-    schemaCommit: "197f93c",
+    schemaCommit: '197f93c',
     quiescent: true,
     complete: true,
     exportedAt: new Date().toISOString(),
     ...tables,
   });
 }
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
-) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const { values: v } = parseArgs({
     options: {
-      project: { type: "string" },
-      business: { type: "string" },
-      confirm: { type: "string" },
-      quiescent: { type: "boolean" },
-      backup: { type: "string" },
-      export: { type: "boolean" },
-      verify: { type: "boolean" },
-      apply: { type: "boolean" },
+      project: { type: 'string' },
+      business: { type: 'string' },
+      confirm: { type: 'string' },
+      quiescent: { type: 'boolean' },
+      backup: { type: 'string' },
+      export: { type: 'boolean' },
+      verify: { type: 'boolean' },
+      apply: { type: 'boolean' },
     },
   });
   const target = {
-    projectId: v.project ?? "",
-    businessId: v.business ?? "",
-    confirm: v.confirm ?? "",
+    projectId: v.project ?? '',
+    businessId: v.business ?? '',
+    confirm: v.confirm ?? '',
     quiescent: !!v.quiescent,
   };
   assertMigrationTarget(target);
   assert(
     v.backup && [v.export, v.verify, v.apply].filter(Boolean).length === 1,
-    "Choose --export, --verify or --apply and an explicit --backup file",
+    'Choose --export, --verify or --apply and an explicit --backup file',
   );
   if (v.verify) {
-    const s = decodeBackup(JSON.parse(readFileSync(v.backup, "utf8")));
+    const s = decodeBackup(JSON.parse(readFileSync(v.backup, 'utf8')));
     assert(
       s.projectId === target.projectId && s.businessId === target.businessId,
-      "Backup target mismatch",
+      'Backup target mismatch',
     );
     console.log({ verified: true, counts: counts(s) });
   } else {
-    const local = target.projectId === "demo-barberhq";
+    const local = target.projectId === 'demo-barberhq';
     assert(
       local
-        ? process.env.DATA_CONNECT_EMULATOR_HOST === "127.0.0.1:9399"
+        ? process.env.DATA_CONNECT_EMULATOR_HOST === '127.0.0.1:9399'
         : !process.env.DATA_CONNECT_EMULATOR_HOST,
-      "Emulator configuration must match target",
+      'Emulator configuration must match target',
     );
     const app = initializeApp(
       {
         projectId: target.projectId,
         ...(!local ? { credential: applicationDefault() } : {}),
       },
-      "replenishment-export",
+      'replenishment-export',
     );
     try {
-      const dc = getDataConnect(
-        { serviceId: "barberhq", location: "europe-west1" },
-        app,
-      );
+      const dc = getDataConnect({ serviceId: 'barberhq', location: 'europe-west1' }, app);
       if (v.apply) {
-        const backup = decodeBackup(JSON.parse(readFileSync(v.backup, "utf8")));
+        const backup = decodeBackup(JSON.parse(readFileSync(v.backup, 'utf8')));
         assert(
-          backup.projectId === target.projectId &&
-            backup.businessId === target.businessId,
-          "Backup target mismatch",
+          backup.projectId === target.projectId && backup.businessId === target.businessId,
+          'Backup target mismatch',
         );
         console.log(await applyItemsSnapshot(dc, backup));
       } else {
-        const s = await exportLegacySnapshot(
-          dc,
-          target.projectId,
-          target.businessId,
-        );
+        const s = await exportLegacySnapshot(dc, target.projectId, target.businessId);
         const envelope = encodeBackup(s);
-        writeFileSync(v.backup, JSON.stringify(envelope, null, 2) + "\n", {
-          flag: "wx",
+        writeFileSync(v.backup, JSON.stringify(envelope, null, 2) + '\n', {
+          flag: 'wx',
           mode: 0o600,
         });
         console.log({ exported: true, counts: envelope.counts });

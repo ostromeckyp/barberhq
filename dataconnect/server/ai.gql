@@ -1,0 +1,64 @@
+# Server connector only. Never expose AI admission through the browser connector.
+query ReadAiActor($uid: String!) @auth(level: NO_ACCESS) {
+  membership(key: { uid: $uid }) {
+    uid
+    businessId
+    role
+    salonAccesses_on_membership {
+      locationId
+      location {
+        businessId
+        kind
+      }
+    }
+  }
+}
+
+mutation AdmitAiWindow($uid: String!, $businessId: String!, $role: MemberRole!)
+@auth(level: NO_ACCESS)
+@transaction {
+  actor: query @redact {
+    membership(key: { uid: $uid })
+      @check(
+        expr: "this != null && this.businessId == vars.businessId && this.role == vars.role && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.location.businessId == vars.businessId && a.location.kind == 'SALON'))"
+        message: "FORBIDDEN"
+      ) {
+      uid
+      businessId
+      role
+      salonAccesses_on_membership {
+        location {
+          businessId
+          kind
+        }
+      }
+    }
+  }
+  admitted: _executeReturningFirst(
+    sql: """
+    INSERT INTO ai_usage_window (uid, hour_start, business_id, count)
+    SELECT $1, date_trunc('hour', CURRENT_TIMESTAMP AT TIME ZONE 'UTC') AT TIME ZONE 'UTC', $2, 1
+    FROM membership AS m
+    WHERE m.uid = $1 AND m.business_id = $2 AND m.role = $3
+      AND (m.role::text = 'HQ' OR EXISTS (
+        SELECT 1 FROM salon_access AS a JOIN location AS l ON l.id = a.location_id
+        WHERE a.membership_uid = m.uid AND l.business_id = m.business_id AND l.kind::text = 'SALON'
+      ))
+    ON CONFLICT (uid, hour_start) DO UPDATE
+      SET count = ai_usage_window.count + 1
+    WHERE ai_usage_window.count < 10
+    RETURNING count
+    """
+    params: [$uid, $businessId, $role]
+  )
+}
+
+query ReadAiCurrentWindow($uid: String!) @auth(level: NO_ACCESS) {
+  window: _selectFirst(
+    sql: """
+    SELECT count FROM ai_usage_window
+    WHERE uid = $1 AND hour_start = date_trunc('hour', CURRENT_TIMESTAMP AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+    """
+    params: [$uid]
+  )
+}

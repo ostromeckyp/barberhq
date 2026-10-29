@@ -14,7 +14,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getMyMembership, listProducts, getSalonInventory, getHqInventory, getSalonSettings, saveSalonSettings, listActiveRequests, listHqQueue, getRequestDetail, listSalonRequests } from '@barberhq/browser';
+import { getMyMembership, listProducts, getSalonInventory, getHqInventory, getDeliveryReceipt, getDeliveryIssue, listDeliveryIssues, getDeliveryProcedureBindings, listDeliveryProcedureDocuments, getSourceSection } from '@barberhq/browser';
 
 
 // Operation GetMyMembership: 
@@ -29,23 +29,23 @@ const { data } = await GetSalonInventory(dataConnect, getSalonInventoryVars);
 // Operation GetHqInventory:  For variables, look at type GetHqInventoryVars in ../index.d.ts
 const { data } = await GetHqInventory(dataConnect, getHqInventoryVars);
 
-// Operation GetSalonSettings:  For variables, look at type GetSalonSettingsVars in ../index.d.ts
-const { data } = await GetSalonSettings(dataConnect, getSalonSettingsVars);
+// Operation GetDeliveryReceipt:  For variables, look at type GetDeliveryReceiptVars in ../index.d.ts
+const { data } = await GetDeliveryReceipt(dataConnect, getDeliveryReceiptVars);
 
-// Operation SaveSalonSettings:  For variables, look at type SaveSalonSettingsVars in ../index.d.ts
-const { data } = await SaveSalonSettings(dataConnect, saveSalonSettingsVars);
+// Operation GetDeliveryIssue:  For variables, look at type GetDeliveryIssueVars in ../index.d.ts
+const { data } = await GetDeliveryIssue(dataConnect, getDeliveryIssueVars);
 
-// Operation ListActiveRequests:  For variables, look at type ListActiveRequestsVars in ../index.d.ts
-const { data } = await ListActiveRequests(dataConnect, listActiveRequestsVars);
+// Operation ListDeliveryIssues:  For variables, look at type ListDeliveryIssuesVars in ../index.d.ts
+const { data } = await ListDeliveryIssues(dataConnect, listDeliveryIssuesVars);
 
-// Operation ListHQQueue:  For variables, look at type ListHqQueueVars in ../index.d.ts
-const { data } = await ListHqQueue(dataConnect, listHqQueueVars);
+// Operation GetDeliveryProcedureBindings: 
+const { data } = await GetDeliveryProcedureBindings(dataConnect);
 
-// Operation GetRequestDetail:  For variables, look at type GetRequestDetailVars in ../index.d.ts
-const { data } = await GetRequestDetail(dataConnect, getRequestDetailVars);
+// Operation ListDeliveryProcedureDocuments:  For variables, look at type ListDeliveryProcedureDocumentsVars in ../index.d.ts
+const { data } = await ListDeliveryProcedureDocuments(dataConnect, listDeliveryProcedureDocumentsVars);
 
-// Operation ListSalonRequests:  For variables, look at type ListSalonRequestsVars in ../index.d.ts
-const { data } = await ListSalonRequests(dataConnect, listSalonRequestsVars);
+// Operation GetSourceSection:  For variables, look at type GetSourceSectionVars in ../index.d.ts
+const { data } = await GetSourceSection(dataConnect, getSourceSectionVars);
 
 
 ```

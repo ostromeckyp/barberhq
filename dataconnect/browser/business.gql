@@ -1,53 +1,126 @@
 query GetMyMembership @auth(level: USER) {
-  membership(key: {uid_expr: "auth.uid"}) {
-    uid businessId role
-    salonAccesses_on_membership { location { id name key kind businessId } }
-    business { locations_on_business(where: {kind: {eq: SALON}}, orderBy: {id: ASC}, limit: 100) { id name key } }
-  }
-}
-
-query ListProducts($limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
-  membership(key: {uid_expr: "auth.uid"}) @check(expr: "this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0", message: "No access or invalid pagination") {
+  membership(key: { uid_expr: "auth.uid" }) {
+    uid
+    businessId
+    role
+    salonAccesses_on_membership {
+      location {
+        id
+        name
+        key
+        kind
+        businessId
+      }
+    }
     business {
-      products_on_business(orderBy: {id: ASC}, limit: $limit, offset: $offset) {
-        id demoId name brand category summaryEn scentPl sourceCode netContentMl retailPriceGrosz sourceUrl observedOn
+      locations_on_business(where: { kind: { eq: SALON } }, orderBy: { id: ASC }, limit: 100) {
+        id
+        name
+        key
       }
     }
   }
 }
 
-query GetSalonInventory($salonId: String!, $limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
-  membership(key: {uid_expr: "auth.uid"})
-    @check(expr: "this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))", message: "No salon access") {
-    role @redact
-    salonAccesses_on_membership @redact { locationId }
+query ListProducts($limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0"
+      message: "No access or invalid pagination"
+    ) {
     business {
-      salon: locations_on_business(where: {id: {eq: $salonId}, kind: {eq: SALON}}, limit: 1)
+      products_on_business(orderBy: { id: ASC }, limit: $limit, offset: $offset) {
+        id
+        demoId
+        name
+        brand
+        category
+        summaryEn
+        scentPl
+        sourceCode
+        netContentMl
+        retailPriceGrosz
+        sourceUrl
+        observedOn
+      }
+    }
+  }
+}
+
+query GetSalonInventory($salonId: String!, $limit: Int! = 50, $offset: Int! = 0)
+@auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))"
+      message: "No salon access"
+    ) {
+    role @redact
+    salonAccesses_on_membership @redact {
+      locationId
+    }
+    business {
+      salon: locations_on_business(where: { id: { eq: $salonId }, kind: { eq: SALON } }, limit: 1)
         @check(expr: "this.size() == 1", message: "No salon access") {
-        id name
-        inventory: inventories_on_location(orderBy: {productId: ASC}, limit: $limit, offset: $offset) {
-          onHand reserved version
-          product { id demoId name netContentMl }
+        id
+        name
+        inventory: inventories_on_location(
+          orderBy: { productId: ASC }
+          limit: $limit
+          offset: $offset
+        ) {
+          onHand
+          reserved
+          version
+          product {
+            id
+            demoId
+            name
+            netContentMl
+          }
         }
       }
-      hq: locations_on_business(where: {kind: {eq: HQ}}, limit: 1) {
-        inventory: inventories_on_location(orderBy: {productId: ASC}, limit: $limit, offset: $offset) { productId onHand reserved version }
+      hq: locations_on_business(where: { kind: { eq: HQ } }, limit: 1) {
+        inventory: inventories_on_location(
+          orderBy: { productId: ASC }
+          limit: $limit
+          offset: $offset
+        ) {
+          productId
+          onHand
+          reserved
+          version
+        }
       }
     }
   }
 }
 
 query GetHqInventory($limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
-  membership(key: {uid_expr: "auth.uid"})
-    @check(expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0", message: "No HQ access or invalid pagination") {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0"
+      message: "No HQ access or invalid pagination"
+    ) {
     role @redact
     business {
-      hq: locations_on_business(where: {kind: {eq: HQ}}, limit: 1)
+      hq: locations_on_business(where: { kind: { eq: HQ } }, limit: 1)
         @check(expr: "this.size() == 1", message: "No HQ access") {
-        id name
-        inventory: inventories_on_location(orderBy: {productId: ASC}, limit: $limit, offset: $offset) {
-          onHand reserved version
-          product { id demoId name netContentMl }
+        id
+        name
+        inventory: inventories_on_location(
+          orderBy: { productId: ASC }
+          limit: $limit
+          offset: $offset
+        ) {
+          onHand
+          reserved
+          version
+          product {
+            id
+            demoId
+            name
+            netContentMl
+          }
         }
       }
     }

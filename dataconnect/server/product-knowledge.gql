@@ -1,0 +1,251 @@
+# HQ-only native snapshot. Business identity is derived from the membership row.
+query ProductKnowledgeState($uid: String!, $versionId: String!, $key: String!)
+@auth(level: NO_ACCESS) {
+  result: _selectFirst(
+    sql: """
+    SELECT v.id AS "versionId", v.document_id AS "documentId", (SELECT d.active_version_id FROM knowledge_document d WHERE d.id=v.document_id) AS "replacesVersionId", v.business_id AS "businessId", v.extraction_hash AS "extractionHash",
+    v.product_knowledge_revision AS revision, b.product_knowledge_revision AS "catalogRevision",
+    v.product_knowledge_reviewed_hash AS "reviewedHash", v.product_knowledge_state AS state,
+    v.kind::text AS kind, v.status::text AS status, v.pending_stage::text AS "pendingStage",
+    v.published_at AS "publishedAt", v.revoked_at AS "revokedAt",
+    COALESCE((SELECT jsonb_agg(to_jsonb(l) ORDER BY l.id) FROM knowledge_product_link l WHERE l.version_id=v.id),'[]') AS links,
+    COALESCE((SELECT jsonb_agg(to_jsonb(p) ORDER BY p.product_id) FROM knowledge_product_profile p WHERE p.version_id=v.id),'[]') AS profiles,
+    COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY a.id) FROM product_alias a WHERE a.source_document_version_id=v.id),'[]') AS aliases,
+    COALESCE((SELECT jsonb_agg(jsonb_build_object('id',c.id,'text',c.text,'physicalPage',c.physical_page) ORDER BY c.id) FROM knowledge_chunk c WHERE c.version_id=v.id),'[]') AS chunks,
+    (SELECT to_jsonb(o) FROM product_knowledge_operation o WHERE o.business_id=b.id AND o.actor_uid=$1 AND o.idempotency_key=$3) AS operation
+    FROM membership m JOIN business b ON b.id=m.business_id JOIN knowledge_version v ON v.business_id=b.id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND v.id=$2
+    """
+    params: [$uid, $versionId, $key]
+  )
+}
+query ProductKnowledgeCatalogPage($uid: String!, $versionId: String!, $after: String!, $limit: Int!)
+@auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT p.id,p.name,p.source_code AS "sourceCode",p.type,p.category,p.summary_en AS "summaryEn",p.scent_pl AS "scentPl"
+    FROM product p JOIN membership m ON m.business_id=p.business_id
+    JOIN knowledge_version v ON v.business_id=m.business_id AND v.id=$2
+    WHERE m.uid=$1 AND m.role::text='HQ' AND p.id>$3 ORDER BY p.id LIMIT LEAST($4,101)
+    """
+    params: [$uid, $versionId, $after, $limit]
+  )
+}
+query ProductKnowledgeActiveAliasPage(
+  $uid: String!
+  $versionId: String!
+  $after: String!
+  $limit: Int!
+) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.product_id AS "productId",a.normalized,lower(a.kind::text) AS kind,a.lang,a.source_document_version_id AS "sourceVersionId"
+    FROM product_alias a JOIN membership m ON m.business_id=a.business_id
+    JOIN knowledge_version target ON target.business_id=m.business_id AND target.id=$2
+    JOIN product p ON p.id=a.product_id AND p.business_id=m.business_id
+    JOIN knowledge_version v ON v.id=a.source_document_version_id AND v.business_id=m.business_id
+    JOIN knowledge_document d ON d.id=v.document_id AND d.business_id=m.business_id
+    WHERE m.uid=$1 AND m.role::text='HQ' AND a.id>$3 AND a.status::text='ACTIVE'
+    AND a.salon_id IS NULL AND v.published_at IS NOT NULL AND v.revoked_at IS NULL
+    AND v.is_active AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id
+    ORDER BY a.id LIMIT LEAST($4,1001)
+    """
+    params: [$uid, $versionId, $after, $limit]
+  )
+}
+mutation SaveProductKnowledgeSnapshot(
+  $uid: String!
+  $businessId: String!
+  $versionId: String!
+  $extractionHash: String!
+  $revision: Int!
+  $catalogRevision: Int!
+  $stateJson: String!
+  $linksJson: String!
+  $profilesJson: String!
+  $aliasesJson: String!
+  $operationJson: String!
+  $generationId: String = null
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (
+    SELECT uid FROM membership WHERE uid=$1 AND business_id=$2 AND role::text='HQ' FOR SHARE
+    ), business_lock AS (
+    UPDATE business SET product_knowledge_revision=product_knowledge_revision
+    WHERE id=$2 AND product_knowledge_revision=$3 AND EXISTS(SELECT 1 FROM actor) RETURNING id
+    ), cas AS (
+    UPDATE knowledge_version SET product_knowledge_revision=product_knowledge_revision+1,
+    product_knowledge_reviewed_hash=NULL, product_knowledge_state=$7::jsonb
+    WHERE id=$4 AND business_id=$2 AND extraction_hash=$5 AND product_knowledge_revision=$6
+    AND product_knowledge_revision<2147483647 AND published_at IS NULL AND revoked_at IS NULL
+    AND (pending_stage IS NULL OR pending_stage::text<>'PUBLISH') AND status::text IN ('EXTRACTED','REVIEWED','READY')
+    AND kind::text IN ('PRODUCT_CARD','PRODUCT_CATALOG') AND EXISTS(SELECT 1 FROM business_lock)
+    AND ($12::text IS NULL OR EXISTS(SELECT 1 FROM product_knowledge_operation o WHERE o.business_id=$2 AND o.actor_uid=$1 AND o.idempotency_key=($11::jsonb->0->>'idempotency_key') AND o.generation_id=$12 AND o.completed_at IS NULL AND o.lease_expires_at>clock_timestamp())) RETURNING id
+    ), old_links AS (DELETE FROM knowledge_product_link WHERE version_id=$4 AND EXISTS(SELECT 1 FROM cas) RETURNING id),
+    old_profiles AS (DELETE FROM knowledge_product_profile WHERE version_id=$4 AND EXISTS(SELECT 1 FROM cas) RETURNING product_id),
+    old_aliases AS (DELETE FROM product_alias WHERE source_document_version_id=$4 AND status::text IN ('PROPOSED','REJECTED') AND EXISTS(SELECT 1 FROM cas) RETURNING id),
+    links AS (
+    INSERT INTO knowledge_product_link SELECT x.* FROM jsonb_populate_recordset(NULL::knowledge_product_link,$8::jsonb) x
+    JOIN knowledge_chunk c ON c.id=x.chunk_id AND c.version_id=$4
+    WHERE x.version_id=$4 AND x.business_id=$2 AND x.extraction_hash=$5 AND EXISTS(SELECT 1 FROM cas)
+    AND (SELECT count(*) FROM old_links)>=0
+    AND (x.product_id IS NULL OR EXISTS(SELECT 1 FROM product p WHERE p.id=x.product_id AND p.business_id=$2)) RETURNING id
+    ), profiles AS (
+    INSERT INTO knowledge_product_profile SELECT x.* FROM jsonb_populate_recordset(NULL::knowledge_product_profile,$9::jsonb) x
+    JOIN product p ON p.id=x.product_id AND p.business_id=$2
+    WHERE x.version_id=$4 AND x.business_id=$2 AND EXISTS(SELECT 1 FROM cas)
+    AND (SELECT count(*) FROM old_profiles)>=0 RETURNING product_id
+    ), aliases AS (
+    INSERT INTO product_alias SELECT x.* FROM jsonb_populate_recordset(NULL::product_alias,
+    (SELECT COALESCE(jsonb_agg(jsonb_build_object('revision',1,'overridden_by_hq',false)||e),'[]'::jsonb) FROM jsonb_array_elements($10::jsonb) e)) x
+    JOIN product p ON p.id=x.product_id AND p.business_id=$2
+    WHERE x.source_document_version_id=$4 AND x.business_id=$2 AND x.status::text IN ('PROPOSED','REJECTED') AND x.source::text IN ('HQ','GENERATED')
+    AND EXISTS(SELECT 1 FROM cas) AND (SELECT count(*) FROM old_aliases)>=0 RETURNING id
+    )
+    INSERT INTO product_knowledge_operation SELECT x.* FROM jsonb_populate_recordset(NULL::product_knowledge_operation,$11::jsonb) x
+    WHERE x.version_id=$4 AND x.business_id=$2 AND x.actor_uid=$1 AND EXISTS(SELECT 1 FROM cas)
+    AND (SELECT count(*) FROM links)=jsonb_array_length($8::jsonb)
+    AND (SELECT count(*) FROM profiles)=jsonb_array_length($9::jsonb)
+    AND (SELECT count(*) FROM aliases)=jsonb_array_length($10::jsonb)
+    ON CONFLICT (business_id,actor_uid,idempotency_key) DO UPDATE SET result=EXCLUDED.result,completed_at=EXCLUDED.completed_at,lease_expires_at=NULL
+    WHERE product_knowledge_operation.generation_id=$12 AND product_knowledge_operation.completed_at IS NULL
+    """
+    params: [
+      $uid
+      $businessId
+      $catalogRevision
+      $versionId
+      $extractionHash
+      $revision
+      $stateJson
+      $linksJson
+      $profilesJson
+      $aliasesJson
+      $operationJson
+      $generationId
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+mutation ClaimProductKnowledgeGeneration(
+  $uid: String!
+  $businessId: String!
+  $versionId: String!
+  $revision: Int!
+  $catalogRevision: Int!
+  $extractionHash: String!
+  $operationJson: String!
+  $leaseSeconds: Int!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (SELECT uid FROM membership WHERE uid=$1 AND business_id=$2 AND role::text='HQ' FOR SHARE)
+    INSERT INTO product_knowledge_operation
+    SELECT x.* FROM jsonb_populate_recordset(NULL::product_knowledge_operation,$7::jsonb) x
+    JOIN knowledge_version v ON v.id=$3 AND v.business_id=$2
+    JOIN business b ON b.id=$2
+    WHERE EXISTS(SELECT 1 FROM actor) AND v.product_knowledge_revision=$4 AND b.product_knowledge_revision=$5
+    AND v.extraction_hash=$6 AND v.published_at IS NULL AND v.revoked_at IS NULL AND (v.pending_stage IS NULL OR v.pending_stage::text<>'PUBLISH')
+    AND v.kind::text IN ('PRODUCT_CARD','PRODUCT_CATALOG') AND v.status::text IN ('EXTRACTED','REVIEWED','READY')
+    AND x.actor_uid=$1 AND x.business_id=$2 AND x.version_id=$3 AND $8>0 AND $8<=25
+    ON CONFLICT (business_id,actor_uid,idempotency_key) DO UPDATE
+    SET generation_id=EXCLUDED.generation_id,lease_expires_at=EXCLUDED.lease_expires_at
+    WHERE product_knowledge_operation.completed_at IS NULL
+    AND product_knowledge_operation.lease_expires_at<=clock_timestamp()
+    AND product_knowledge_operation.payload_hash=EXCLUDED.payload_hash AND product_knowledge_operation.action=EXCLUDED.action
+    """
+    params: [
+      $uid
+      $businessId
+      $versionId
+      $revision
+      $catalogRevision
+      $extractionHash
+      $operationJson
+      $leaseSeconds
+    ]
+  ) @check(expr: "this == 1", message: "IN_PROGRESS")
+}
+mutation ReleaseProductKnowledgeGeneration($uid: String!, $generationId: String!)
+@auth(level: NO_ACCESS) {
+  result: _execute(
+    sql: "UPDATE product_knowledge_operation SET lease_expires_at=clock_timestamp() WHERE actor_uid=$1 AND generation_id=$2 AND completed_at IS NULL"
+    params: [$uid, $generationId]
+  )
+}
+mutation AcceptProductKnowledgeSnapshot(
+  $uid: String!
+  $businessId: String!
+  $versionId: String!
+  $extractionHash: String!
+  $revision: Int!
+  $catalogRevision: Int!
+  $reviewedHash: String!
+  $operationJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (SELECT uid FROM membership WHERE uid=$1 AND business_id=$2 AND role::text='HQ' FOR SHARE),
+    business_lock AS (UPDATE business SET product_knowledge_revision=product_knowledge_revision WHERE id=$2 AND product_knowledge_revision=$6 AND EXISTS(SELECT 1 FROM actor) RETURNING id),
+    cas AS (UPDATE knowledge_version SET product_knowledge_reviewed_hash=$7,product_knowledge_catalog_revision=$6
+    WHERE id=$3 AND business_id=$2 AND extraction_hash=$4 AND product_knowledge_revision=$5
+    AND published_at IS NULL AND revoked_at IS NULL AND (pending_stage IS NULL OR pending_stage::text<>'PUBLISH')
+    AND kind::text IN ('PRODUCT_CARD','PRODUCT_CATALOG') AND EXISTS(SELECT 1 FROM business_lock) RETURNING id),
+    profiles AS (UPDATE knowledge_product_profile SET approved_type=proposed_type,reviewed_by=$1,reviewed_at=clock_timestamp() WHERE version_id=$3 AND business_id=$2 AND EXISTS(SELECT 1 FROM cas) RETURNING product_id)
+    INSERT INTO product_knowledge_operation SELECT x.* FROM jsonb_populate_recordset(NULL::product_knowledge_operation,$8::jsonb) x
+    WHERE x.business_id=$2 AND x.version_id=$3 AND x.actor_uid=$1 AND EXISTS(SELECT 1 FROM cas) AND (SELECT count(*) FROM profiles)>=0
+    """
+    params: [
+      $uid
+      $businessId
+      $versionId
+      $extractionHash
+      $revision
+      $catalogRevision
+      $reviewedHash
+      $operationJson
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+
+# Demo reset: product review recorded from the owner's approval receipt, without an HQ member.
+# A card links its whole first passage to one product; a catalog acknowledges empty knowledge.
+mutation RecordOperatorProductReview(
+  $businessId: String!
+  $versionId: String!
+  $extractionHash: String!
+  $catalogRevision: Int!
+  $reviewedHash: String!
+  $stateJson: String!
+  $linksJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH business_lock AS (
+    UPDATE business SET product_knowledge_revision=product_knowledge_revision
+    WHERE id=$1 AND product_knowledge_revision=$4 RETURNING id
+    ), links AS (
+    INSERT INTO knowledge_product_link SELECT x.* FROM jsonb_populate_recordset(NULL::knowledge_product_link,$7::jsonb) x
+    JOIN knowledge_chunk c ON c.id=x.chunk_id AND c.version_id=$2
+    JOIN product p ON p.id=x.product_id AND p.business_id=$1
+    WHERE x.version_id=$2 AND x.business_id=$1 AND x.extraction_hash=$3 AND EXISTS(SELECT 1 FROM business_lock) RETURNING id
+    )
+    UPDATE knowledge_version SET product_knowledge_revision=1,product_knowledge_state=$6::jsonb,
+    product_knowledge_reviewed_hash=$5,product_knowledge_catalog_revision=$4
+    WHERE id=$2 AND business_id=$1 AND extraction_hash=$3 AND product_knowledge_revision=0
+    AND reviewed_by LIKE 'operator:%' AND published_at IS NULL AND revoked_at IS NULL AND pending_stage IS NULL
+    AND kind::text IN ('PRODUCT_CARD','PRODUCT_CATALOG') AND EXISTS(SELECT 1 FROM business_lock)
+    AND NOT EXISTS(SELECT 1 FROM knowledge_product_link l WHERE l.version_id=$2 AND l.id NOT IN (SELECT id FROM links))
+    AND (SELECT count(*) FROM links)=jsonb_array_length($7::jsonb)
+    """
+    params: [
+      $businessId
+      $versionId
+      $extractionHash
+      $catalogRevision
+      $reviewedHash
+      $stateJson
+      $linksJson
+    ]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

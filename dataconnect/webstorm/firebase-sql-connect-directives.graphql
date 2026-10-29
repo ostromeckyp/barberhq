@@ -1,0 +1,74 @@
+# Editor-only SQL Connect directive declarations.
+# This file is outside dataconnect/schema, so Firebase does not deploy it as schema SDL.
+
+scalar Any
+scalar Any_Expr
+scalar Any_SQL
+scalar Date
+scalar Int64
+scalar Timestamp
+scalar UUID
+scalar Vector
+
+enum IndexFieldOrder {
+  ASC
+  DESC
+}
+
+enum IndexType {
+  BTREE
+  GIN
+  HNSW
+  IVFFLAT
+}
+
+enum VectorSimilarityMethod {
+  COSINE
+  L2
+  INNER_PRODUCT
+}
+
+directive @table(
+  name: String
+  singular: String
+  plural: String
+  key: [String!]
+) on OBJECT
+
+directive @unique(
+  indexName: String
+  fields: [String!]
+) repeatable on FIELD_DEFINITION | OBJECT
+
+directive @index(
+  name: String
+  fields: [String!]
+  order: [IndexFieldOrder!]
+  type: IndexType
+  vector_method: VectorSimilarityMethod
+) on FIELD_DEFINITION | OBJECT
+
+directive @default(
+  value: Any
+  expr: Any_Expr
+  sql: Any_SQL
+) on FIELD_DEFINITION
+
+directive @col(
+  name: String
+  dataType: String
+  size: Int
+) on FIELD_DEFINITION
+
+directive @ref(
+  constraintName: String
+  fields: [String!]
+  references: [String!]
+) on FIELD_DEFINITION
+
+directive @view(
+  name: String
+  singular: String
+  plural: String
+  sql: String
+) on OBJECT

@@ -1,0 +1,165 @@
+# Server-only salon shorthand: receipts, learning and removal. No stock, request or document writes.
+mutation IssueReplenishmentChoiceReceipts(
+  $uid: String!
+  $businessId: String!
+  $salonId: String!
+  $catalogRevision: Int!
+  $receiptsJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (
+    SELECT m.uid FROM membership m JOIN location l ON l.id=$3 AND l.business_id=$2 AND l.kind::text='SALON'
+    WHERE m.uid=$1 AND m.business_id=$2 AND (m.role::text='HQ' OR (m.role::text='SALON' AND EXISTS(
+    SELECT 1 FROM salon_access sa WHERE sa.membership_uid=m.uid AND sa.location_id=$3))) FOR SHARE OF m
+    ), fence AS MATERIALIZED (SELECT id FROM business WHERE id=$2 AND product_knowledge_revision=$4)
+    INSERT INTO replenishment_choice_receipt(id,business_id,salon_id,actor_uid,message_hash,line_id,product_query,alias_id,
+    allowed_product_ids,catalog_revision,expected_alias_revision,expires_at,created_at)
+    SELECT x->>'id',$2,$3,$1,x->>'messageHash',x->>'lineId',x->>'productQuery',x->>'aliasId',x->'allowedProductIds',$4,
+    COALESCE((SELECT a.revision FROM product_alias a WHERE a.id=x->>'aliasId' AND a.business_id=$2 AND a.salon_id=$3),0),
+    transaction_timestamp()+interval '10 minutes',transaction_timestamp()
+    FROM jsonb_array_elements($5::jsonb) x WHERE EXISTS(SELECT 1 FROM actor) AND EXISTS(SELECT 1 FROM fence)
+    """
+    params: [$uid, $businessId, $salonId, $catalogRevision, $receiptsJson]
+  ) @check(expr: "this > 0", message: "STALE_STATE")
+}
+query ReadSalonShorthandConfirmation(
+  $uid: String!
+  $businessId: String!
+  $salonId: String!
+  $receiptIdsJson: String!
+) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT r.id,r.line_id AS "lineId",r.message_hash AS "messageHash",r.product_query AS "productQuery",r.alias_id AS "aliasId",
+    r.allowed_product_ids AS "allowedProductIds",r.catalog_revision AS "catalogRevision",
+    r.expected_alias_revision AS "expectedAliasRevision",r.expires_at>clock_timestamp() AS live,
+    r.consumed_product_id AS "consumedProductId",a.revision AS "aliasRevision",a.status::text AS "aliasStatus",
+    a.product_id AS "aliasProductId",b.product_knowledge_revision AS "businessRevision",l.product_alias_revision AS "salonRevision",
+    (SELECT count(*)::int FROM product_alias x WHERE x.business_id=$2 AND x.salon_id=$3 AND x.status::text='ACTIVE'
+    AND x.source::text='SALON_CONFIRMED') AS "activeCount"
+    FROM replenishment_choice_receipt r JOIN business b ON b.id=r.business_id
+    JOIN location l ON l.id=r.salon_id AND l.business_id=r.business_id
+    LEFT JOIN product_alias a ON a.id=r.alias_id AND a.business_id=r.business_id AND a.salon_id=r.salon_id
+    WHERE r.id IN (SELECT jsonb_array_elements_text($4::jsonb)) AND r.business_id=$2 AND r.salon_id=$3 AND r.actor_uid=$1
+    ORDER BY r.id LIMIT 6
+    """
+    params: [$uid, $businessId, $salonId, $receiptIdsJson]
+  )
+}
+# One fenced batch: fresh salon scope (salon staff or HQ of the business), unchanged salon revision, live receipts, per-alias revision CAS.
+mutation ConfirmSalonShorthand(
+  $uid: String!
+  $businessId: String!
+  $salonId: String!
+  $expectedSalonRevision: Int!
+  $writesJson: String!
+  $consumeJson: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (
+    SELECT m.uid FROM membership m
+    WHERE m.uid=$1 AND m.business_id=$2 AND (m.role::text='HQ' OR (m.role::text='SALON' AND EXISTS(
+    SELECT 1 FROM salon_access sa WHERE sa.membership_uid=m.uid AND sa.location_id=$3))) FOR SHARE OF m
+    ), salon_lock AS MATERIALIZED (
+    SELECT id FROM location WHERE id=$3 AND business_id=$2 AND kind::text='SALON' AND product_alias_revision=$4
+    AND product_alias_revision<2147483647 AND EXISTS(SELECT 1 FROM actor) FOR UPDATE
+    ), receipts AS MATERIALIZED (
+    SELECT r.id,r.alias_id,r.expected_alias_revision,c->>'productId' AS product_id FROM jsonb_array_elements($6::jsonb) c
+    JOIN replenishment_choice_receipt r ON r.id=c->>'receiptId'
+    JOIN business b ON b.id=$2 AND b.product_knowledge_revision=r.catalog_revision
+    JOIN product p ON p.id=c->>'productId' AND p.business_id=$2
+    WHERE r.business_id=$2 AND r.salon_id=$3 AND r.actor_uid=$1 AND r.expires_at>transaction_timestamp()
+    AND r.consumed_product_id IS NULL AND r.allowed_product_ids @> jsonb_build_array(c->>'productId')
+    AND EXISTS(SELECT 1 FROM salon_lock) FOR UPDATE OF r
+    ), written AS (
+    INSERT INTO product_alias(id,business_id,product_id,salon_id,phrase,normalized,kind,lang,source,status,ambiguous,
+    created_by,created_at,reviewed_by,reviewed_at,revision)
+    SELECT w->>'aliasId',$2,w->>'productId',$3,w->>'phrase',w->>'phrase','NAME','und','SALON_CONFIRMED','ACTIVE',false,
+    'salon:'||$1,transaction_timestamp(),'salon:'||$1,transaction_timestamp(),(w->>'expectedRevision')::int+1
+    FROM jsonb_array_elements($5::jsonb) w
+    WHERE EXISTS(SELECT 1 FROM receipts r WHERE r.id=w->>'receiptId' AND r.product_id=w->>'productId'
+    AND r.alias_id=w->>'aliasId' AND r.expected_alias_revision=(w->>'expectedRevision')::int)
+    AND (w->>'expectedRevision')::int=COALESCE((SELECT a.revision FROM product_alias a WHERE a.id=w->>'aliasId'),0)
+    AND (w->>'expectedRevision')::int<2147483647
+    ON CONFLICT (id) DO UPDATE SET product_id=EXCLUDED.product_id,phrase=EXCLUDED.phrase,normalized=EXCLUDED.normalized,
+    status='ACTIVE',ambiguous=false,reviewed_by=EXCLUDED.reviewed_by,reviewed_at=EXCLUDED.reviewed_at,revision=EXCLUDED.revision
+    WHERE product_alias.business_id=$2 AND product_alias.salon_id=$3 AND product_alias.source::text='SALON_CONFIRMED'
+    AND product_alias.revision=EXCLUDED.revision-1
+    RETURNING id
+    ), consumed AS (
+    UPDATE replenishment_choice_receipt r SET consumed_product_id=x.product_id,consumed_at=transaction_timestamp()
+    FROM receipts x WHERE r.id=x.id RETURNING r.id
+    )
+    UPDATE location SET product_alias_revision=product_alias_revision+CASE WHEN jsonb_array_length($5::jsonb)>0 THEN 1 ELSE 0 END
+    WHERE id IN (SELECT id FROM salon_lock)
+    AND (SELECT count(*) FROM receipts)=jsonb_array_length($6::jsonb)
+    AND (SELECT count(*) FROM written)=jsonb_array_length($5::jsonb)
+    AND (SELECT count(*) FROM consumed)=jsonb_array_length($6::jsonb)
+    AND (SELECT count(*) FROM product_alias a WHERE a.business_id=$2 AND a.salon_id=$3 AND a.status::text='ACTIVE'
+    AND a.source::text='SALON_CONFIRMED')+(SELECT count(*) FROM jsonb_array_elements($5::jsonb) w WHERE NOT EXISTS(
+    SELECT 1 FROM product_alias a WHERE a.id=w->>'aliasId' AND a.status::text='ACTIVE'))<=200
+    """
+    params: [$uid, $businessId, $salonId, $expectedSalonRevision, $writesJson, $consumeJson]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}
+query ReadSalonAliasOperation($uid: String!, $key: String!) @auth(level: NO_ACCESS) {
+  salonAliasOperations(where: { actorUid: { eq: $uid }, idempotencyKey: { eq: $key } }, limit: 2) {
+    payloadHash
+    result
+  }
+}
+query ReadSalonShorthandScope($uid: String!, $salonId: String!, $aliasId: String!)
+@auth(level: NO_ACCESS) {
+  membership(key: { uid: $uid }) {
+    businessId
+    role
+    salonAccesses_on_membership(where: { locationId: { eq: $salonId } }) {
+      locationId
+    }
+  }
+  productAlias(id: $aliasId) {
+    businessId
+    salonId
+    source
+    status
+    revision
+  }
+}
+mutation RemoveSalonShorthand(
+  $uid: String!
+  $salonId: String!
+  $aliasId: String!
+  $expectedRevision: Int!
+  $operationId: String!
+  $key: String!
+  $payloadHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  result: _execute(
+    sql: """
+    WITH actor AS MATERIALIZED (
+    SELECT m.uid,m.business_id FROM membership m
+    WHERE m.uid=$1 AND (m.role::text='HQ' OR (m.role::text='SALON' AND EXISTS(
+    SELECT 1 FROM salon_access sa WHERE sa.membership_uid=m.uid AND sa.location_id=$2))) FOR SHARE OF m
+    ), salon_lock AS MATERIALIZED (
+    SELECT l.id,l.name,l.business_id FROM location l JOIN actor a ON a.business_id=l.business_id
+    WHERE l.id=$2 AND l.kind::text='SALON' AND l.product_alias_revision<2147483647 FOR UPDATE OF l
+    ), retired AS (
+    UPDATE product_alias a SET status='RETIRED',ambiguous=false,revision=a.revision+1,reviewed_by='salon:'||$1,
+    reviewed_at=transaction_timestamp()
+    FROM salon_lock s WHERE a.id=$3 AND a.business_id=s.business_id AND a.salon_id=$2 AND a.source::text='SALON_CONFIRMED'
+    AND a.status::text='ACTIVE' AND a.revision=$4 AND a.revision<2147483647
+    RETURNING a.id,a.product_id,a.phrase,a.revision,a.reviewed_at,s.name,s.business_id
+    ), bump AS (
+    UPDATE location SET product_alias_revision=product_alias_revision+1 WHERE id=$2 AND EXISTS(SELECT 1 FROM retired) RETURNING id
+    )
+    INSERT INTO salon_alias_operation(id,business_id,actor_uid,idempotency_key,action,payload_hash,result,created_at)
+    SELECT $5,r.business_id,$1,$6,'REMOVE',$7,jsonb_build_object('id',r.id,'salonId',$2,'salonName',r.name,'productId',r.product_id,
+    'productName',(SELECT p.name FROM product p WHERE p.id=r.product_id),'phrase',r.phrase,'revision',r.revision,
+    'status','retired','updatedAt',r.reviewed_at),transaction_timestamp()
+    FROM retired r WHERE EXISTS(SELECT 1 FROM bump)
+    """
+    params: [$uid, $salonId, $aliasId, $expectedRevision, $operationId, $key, $payloadHash]
+  ) @check(expr: "this == 1", message: "STALE_STATE")
+}

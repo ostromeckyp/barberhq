@@ -1,0 +1,93 @@
+# Server-only reads for the stateless ordering assistant. No stock mutations.
+# A snapshot is header → product/alias pages → header; changed revisions reject it.
+query ReadReplenishmentSnapshotHeader(
+  $uid: String!
+  $businessId: String!
+  $role: MemberRole!
+  $salonId: String!
+) @auth(level: NO_ACCESS) {
+  membership(key: { uid: $uid })
+    @check(
+      expr: "this != null && this.businessId == vars.businessId && this.role == vars.role && (this.role == 'HQ' || (this.role == 'SALON' && this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId)))"
+      message: "FORBIDDEN"
+    ) {
+    businessId
+    role
+    salonAccesses_on_membership {
+      locationId
+    }
+  }
+  location(id: $salonId)
+    @check(
+      expr: "this != null && this.businessId == vars.businessId && this.kind == 'SALON'"
+      message: "FORBIDDEN"
+    ) {
+    id
+    businessId
+    kind
+    productAliasRevision
+  }
+  business(id: $businessId) {
+    productKnowledgeRevision
+  }
+}
+# Exact HQ + selected-salon balances and that salon's active request per product.
+query ReadReplenishmentProductPage(
+  $businessId: String!
+  $salonId: String!
+  $after: String!
+  $limit: Int!
+) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT p.id,p.name,p.source_code AS "sourceCode",p.type,p.category,p.summary_en AS "summaryEn",
+    p.scent_pl AS "scentPl",COALESCE(to_jsonb(p.keywords),'[]'::jsonb) AS keywords,
+    COALESCE((SELECT jsonb_agg(jsonb_build_object('locationId',i.location_id,'kind',l.kind::text,'onHand',i.on_hand,'reserved',i.reserved,'version',i.version))
+      FROM inventory i JOIN location l ON l.id=i.location_id
+      WHERE i.product_id=p.id AND l.business_id=$1 AND (l.kind::text='HQ' OR l.id=$2)),'[]'::jsonb) AS inventories,
+    COALESCE((SELECT jsonb_agg(ar.request_id) FROM active_request ar
+      WHERE ar.product_id=p.id AND ar.business_id=$1 AND ar.salon_id=$2),'[]'::jsonb) AS "activeRequestIds"
+    FROM product p WHERE p.business_id=$1 AND p.id>$3 ORDER BY p.id LIMIT LEAST($4,101)
+    """
+    params: [$businessId, $salonId, $after, $limit]
+  )
+}
+# Eligible business-global aliases: SEED without a source, or GENERATED/HQ from a current publication.
+query ReadReplenishmentAliasPage($businessId: String!, $after: String!, $limit: Int!)
+@auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.product_id AS "productId",a.phrase,a.normalized,a.kind::text AS kind,a.source::text AS source,
+    a.salon_id AS "salonId",a.source_document_version_id AS "sourceVersionId",a.ambiguous,a.revision
+    FROM product_alias a JOIN product p ON p.id=a.product_id AND p.business_id=$1
+    LEFT JOIN knowledge_version v ON v.id=a.source_document_version_id
+    LEFT JOIN knowledge_document d ON d.id=v.document_id
+    WHERE a.business_id=$1 AND a.status::text='ACTIVE' AND a.salon_id IS NULL AND a.id>$2 AND (
+    (a.source::text IN ('SEED','HQ') AND a.source_document_version_id IS NULL) OR
+    (a.source::text IN ('GENERATED','HQ') AND v.business_id=$1 AND d.business_id=$1 AND v.published_at IS NOT NULL
+    AND v.revoked_at IS NULL AND v.is_active AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT'
+    AND d.active_version_id=v.id))
+    ORDER BY a.id LIMIT LEAST($3,1001)
+    """
+    params: [$businessId, $after, $limit]
+  )
+}
+query ReadReplenishmentSalonAliasPage(
+  $businessId: String!
+  $salonId: String!
+  $after: String!
+  $limit: Int!
+) @auth(level: NO_ACCESS) {
+  rows: _select(
+    sql: """
+    SELECT a.id,a.product_id AS "productId",a.phrase,a.normalized,a.kind::text AS kind,a.source::text AS source,
+    a.salon_id AS "salonId",a.source_document_version_id AS "sourceVersionId",a.ambiguous,a.revision
+    FROM product_alias a JOIN product p ON p.id=a.product_id AND p.business_id=$1
+    JOIN location l ON l.id=a.salon_id AND l.business_id=$1 AND l.kind::text='SALON'
+    WHERE a.business_id=$1 AND a.salon_id=$2 AND a.source::text='SALON_CONFIRMED' AND a.status::text='ACTIVE'
+    AND a.source_document_version_id IS NULL AND a.id>$3
+    ORDER BY a.id LIMIT LEAST($4,201)
+    """
+    params: [$businessId, $salonId, $after, $limit]
+  )
+}

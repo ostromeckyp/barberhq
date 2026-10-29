@@ -1,0 +1,80 @@
+# The current Admin SDK generator cannot represent Vector variables. These two
+# compiled server-only operations are invoked by the repository through GraphQL.
+mutation InsertKnowledgeChunk(
+  $id: String!
+  $versionId: String!
+  $revision: Int!
+  $physicalPage: Int!
+  $ordinal: Int!
+  $sectionId: String!
+  $heading: String!
+  $text: String!
+  $start: Int!
+  $end: Int!
+  $rects: Any!
+  $geometryStatus: KnowledgeGeometryStatus!
+  $embedding: Vector!
+  $embeddingModel: String!
+  $embeddingDimension: Int!
+  $embeddingConfigHash: String!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    knowledgeVersion(id: $versionId)
+      @check(
+        expr: "this != null && this.revision == vars.revision && this.status == 'STAGED' && this.publishedAt == null && this.revokedAt == null"
+        message: "STALE_STATE"
+      ) {
+      revision
+      status
+      publishedAt
+      revokedAt
+    }
+  }
+  knowledgeChunk_insert(
+    data: {
+      id: $id
+      versionId: $versionId
+      physicalPage: $physicalPage
+      ordinal: $ordinal
+      sectionId: $sectionId
+      heading: $heading
+      text: $text
+      start: $start
+      end: $end
+      rects: $rects
+      geometryStatus: $geometryStatus
+      embedding: $embedding
+      embeddingModel: $embeddingModel
+      embeddingDimension: $embeddingDimension
+      embeddingConfigHash: $embeddingConfigHash
+    }
+  )
+}
+query SearchKnowledgeChunks($businessId: String!, $vector: Vector!, $configHash: String!)
+@auth(level: NO_ACCESS) {
+  knowledgeChunks_embedding_similarity(
+    compare: $vector
+    method: COSINE
+    limit: 3
+    where: {
+      version: {
+        businessId: { eq: $businessId }
+        publicationStatus: { eq: DEMO_CURRENT }
+        status: { eq: READY }
+        isActive: { eq: true }
+        revokedAt: { isNull: true }
+        publishedAt: { isNull: false }
+        embeddingConfigHash: { eq: $configHash }
+      }
+    }
+  ) {
+    id
+    versionId
+    physicalPage
+    sectionId
+    text
+    _metadata {
+      distance
+    }
+  }
+}

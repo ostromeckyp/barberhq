@@ -1,48 +1,220 @@
-query ListActiveRequests($salonId:String!, $limit:Int! = 50, $offset:Int! = 0) @auth(level:USER) {
-  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))",message:"FORBIDDEN") {
+query ListActiveRequests($salonId: String!, $limit: Int! = 50, $offset: Int! = 0)
+@auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))"
+      message: "FORBIDDEN"
+    ) {
     role @redact
-    salonAccesses_on_membership @redact { locationId }
-    business {
-      requests: replenishmentRequests_on_business(where:{salonId:{eq:$salonId},state:{in:[PENDING_APPROVAL,RESERVED,DISPATCHED]}},orderBy:[{createdAt:DESC},{id:ASC}],limit:$limit,offset:$offset) {
-        id salonId state revision createdAt salon { name }
-        items: requestItems_on_request(orderBy:{productId:ASC}) { id productId quantity product {name} transferItem:transferItem_on_requestItem {dispatchedQuantity receivedQuantity} }
-      }
+    salonAccesses_on_membership @redact {
+      locationId
     }
-  }
-}
-query ListHQQueue($limit:Int! = 50, $offset:Int! = 0) @auth(level:USER) {
-  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0",message:"FORBIDDEN") {
-    role @redact
     business {
-      requests: replenishmentRequests_on_business(orderBy:[{createdAt:DESC},{id:ASC}],limit:$limit,offset:$offset) {
-        id salonId state revision createdAt salon { name }
-        items: requestItems_on_request(orderBy:{productId:ASC}) { id productId quantity product {name} transferItem:transferItem_on_requestItem {dispatchedQuantity receivedQuantity} }
-      }
-    }
-  }
-}
-query GetRequestDetail($requestId:String!) @auth(level:USER) {
-  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && this.business.requests.size() == 1 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == this.business.requests[0].salonId))",message:"FORBIDDEN") {
-    role @redact
-    salonAccesses_on_membership @redact { locationId }
-    business {
-      requests: replenishmentRequests_on_business(where:{id:{eq:$requestId}},limit:1) {
-        id salonId state revision createdAt salon { name }
-        items: requestItems_on_request(orderBy:{productId:ASC}) { id productId quantity product {name} transferItem:transferItem_on_requestItem {dispatchedQuantity receivedQuantity} }
-        timeline: actionReceipts_on_request(orderBy:{revision:ASC},limit:10) { state createdAt action reason }
+      requests: replenishmentRequests_on_business(
+        where: {
+          salonId: { eq: $salonId }
+          state: { in: [PENDING_APPROVAL, RESERVED, DISPATCHED] }
+        }
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) {
+        id
+        salonId
+        state
+        revision
+        createdAt
+        salon {
+          name
+        }
+        items: requestItems_on_request(orderBy: { productId: ASC }) {
+          id
+          productId
+          quantity
+          product {
+            name
+          }
+          transferItem: transferItem_on_requestItem {
+            dispatchedQuantity
+            receivedQuantity
+          }
+        }
       }
     }
   }
 }
 
-query ListSalonRequests($salonId:String!, $states:[RequestState!]!, $limit:Int! = 50, $offset:Int! = 0) @auth(level:USER) {
-  membership(key:{uid_expr:"auth.uid"}) @check(expr:"this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))",message:"FORBIDDEN") {
+query ListHQQueue($limit: Int! = 50, $offset: Int! = 0) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0"
+      message: "FORBIDDEN"
+    ) {
     role @redact
-    salonAccesses_on_membership @redact { locationId }
     business {
-      requests: replenishmentRequests_on_business(where:{salonId:{eq:$salonId},state:{in:$states}},orderBy:[{createdAt:DESC},{id:ASC}],limit:$limit,offset:$offset) {
-        id salonId state revision createdAt salon { name }
-        items: requestItems_on_request(orderBy:{productId:ASC}) { id productId quantity product {name} transferItem:transferItem_on_requestItem {dispatchedQuantity receivedQuantity} }
+      requests: replenishmentRequests_on_business(
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) {
+        id
+        salonId
+        state
+        revision
+        createdAt
+        salon {
+          name
+        }
+        items: requestItems_on_request(orderBy: { productId: ASC }) {
+          id
+          productId
+          quantity
+          product {
+            name
+          }
+          transferItem: transferItem_on_requestItem {
+            dispatchedQuantity
+            receivedQuantity
+          }
+        }
+      }
+    }
+  }
+}
+query GetRequestDetail($requestId: String!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.business.requests.size() == 1 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == this.business.requests[0].salonId))"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    salonAccesses_on_membership @redact {
+      locationId
+    }
+    business {
+      requests: replenishmentRequests_on_business(where: { id: { eq: $requestId } }, limit: 1) {
+        id
+        salonId
+        state
+        revision
+        createdAt
+        replacementIssueId
+        replacementIssue {
+          id
+          status
+          revision
+        }
+        replacementCreation: deliveryIssueEvents_on_request(
+          where: { type: { eq: REPLACEMENT_CREATED } }
+          orderBy: { revision: ASC }
+          limit: 1
+        ) {
+          id
+          recordedAt
+        }
+        receipt: deliveryReceipt_on_request {
+          id
+          requestId
+          recordedAt
+          actorUid
+          origin
+          legacyActionReceiptId
+          description
+          batchIdentifier
+          rootIssueId
+          items: deliveryReceiptItems_on_receipt(orderBy: { productId: ASC }, limit: 6) {
+            productId
+            goodQuantity
+            damagedQuantity
+            missingQuantity
+            product {
+              name
+            }
+          }
+          procedureReferences: deliveryReceiptProcedures_on_receipt(
+            orderBy: { kind: ASC }
+            limit: 2
+          ) {
+            kind
+            versionId
+            chunkId
+          }
+          rootIssue {
+            id
+            status
+            revision
+          }
+        }
+        salon {
+          name
+        }
+        items: requestItems_on_request(orderBy: { productId: ASC }) {
+          id
+          productId
+          quantity
+          product {
+            name
+          }
+          transferItem: transferItem_on_requestItem {
+            dispatchedQuantity
+            receivedQuantity
+          }
+        }
+        timeline: actionReceipts_on_request(orderBy: { revision: ASC }, limit: 10) {
+          id
+          revision
+          state
+          createdAt
+          action
+          reason
+        }
+      }
+    }
+  }
+}
+
+query ListSalonRequests(
+  $salonId: String!
+  $states: [RequestState!]!
+  $limit: Int! = 50
+  $offset: Int! = 0
+) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.limit > 0 && vars.limit <= 100 && vars.offset >= 0 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a, a.locationId == vars.salonId))"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    salonAccesses_on_membership @redact {
+      locationId
+    }
+    business {
+      requests: replenishmentRequests_on_business(
+        where: { salonId: { eq: $salonId }, state: { in: $states } }
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) {
+        id
+        salonId
+        state
+        revision
+        createdAt
+        salon {
+          name
+        }
+        items: requestItems_on_request(orderBy: { productId: ASC }) {
+          id
+          productId
+          quantity
+          product {
+            name
+          }
+          transferItem: transferItem_on_requestItem {
+            dispatchedQuantity
+            receivedQuantity
+          }
+        }
       }
     }
   }

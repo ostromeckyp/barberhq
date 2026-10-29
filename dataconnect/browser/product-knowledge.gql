@@ -1,0 +1,83 @@
+query GetKnowledgeProductReview($versionId: String!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.role == 'HQ' && this.business.versions.size() == 1"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    business {
+      productKnowledgeRevision
+      products: products_on_business(orderBy: { id: ASC }, limit: 201) {
+        id
+        name
+        sourceCode
+        type
+        category
+        summaryEn
+        scentPl
+      }
+      versions: knowledgeVersions_on_business(where: { id: { eq: $versionId } }, limit: 1) {
+        id
+        kind
+        extractionHash
+        publishedAt
+        revokedAt
+        pendingStage
+        productKnowledgeRevision
+        productKnowledgeReviewedHash
+        productKnowledgeCatalogRevision
+        productKnowledgeState
+        document {
+          activeVersionId
+        }
+        chunks: knowledgeChunks_on_version(orderBy: { id: ASC }, limit: 301) {
+          id
+          text
+          physicalPage
+        }
+        links: knowledgeProductLinks_on_version(limit: 201) {
+          id
+          productId
+          chunkId
+          start
+          end
+          method
+          confirmed
+          candidateProductIds
+          extractionHash
+        }
+        profiles: knowledgeProductProfiles_on_version(limit: 201) {
+          productId
+          proposedType
+          approvedType
+          reviewedBy
+          reviewedAt
+        }
+        aliases: productAliases_on_sourceDocumentVersion(limit: 6401) {
+          id
+          productId
+          phrase
+          kind
+          lang
+          source
+          status
+          reviewedAt
+        }
+      }
+    }
+  }
+  activeAliases: _select(
+    sql: """
+    SELECT a.product_id AS "productId",a.normalized,lower(a.kind::text) AS kind,a.lang,a.source_document_version_id AS "sourceVersionId"
+    FROM product_alias a JOIN membership m ON m.business_id=a.business_id
+    JOIN knowledge_version target ON target.business_id=m.business_id AND target.id=$1
+    JOIN knowledge_version v ON v.id=a.source_document_version_id AND v.business_id=m.business_id
+    JOIN knowledge_document d ON d.id=v.document_id AND d.business_id=m.business_id
+    WHERE m.uid=$2 AND m.role::text='HQ' AND a.status::text='ACTIVE' AND a.salon_id IS NULL
+    AND v.is_active AND v.published_at IS NOT NULL AND v.revoked_at IS NULL
+    AND v.status::text='READY' AND v.publication_status::text='DEMO_CURRENT' AND d.active_version_id=v.id
+    ORDER BY a.id LIMIT 5001
+    """
+    params: [$versionId, { _expr: "auth.uid" }]
+  )
+}

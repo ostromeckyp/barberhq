@@ -1,0 +1,84 @@
+# Read-only salon shorthand lists. Writes go through the removeSalonShorthand callable only.
+query ListSalonShorthand($salonId: String!, $after: String!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @redact
+    @check(
+      expr: "this != null && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a,a.locationId == vars.salonId)) && this.business.locations_on_business.size() == 1"
+      message: "FORBIDDEN"
+    ) {
+    role
+    salonAccesses_on_membership {
+      locationId
+    }
+    business {
+      locations_on_business(where: { id: { eq: $salonId }, kind: { eq: SALON } }, limit: 1) {
+        id
+      }
+    }
+  }
+  productAliases(
+    where: {
+      salonId: { eq: $salonId }
+      source: { eq: SALON_CONFIRMED }
+      status: { eq: ACTIVE }
+      id: { gt: $after }
+    }
+    orderBy: { id: ASC }
+    limit: 50
+  ) {
+    id
+    businessId
+    phrase
+    revision
+    reviewedAt
+    createdAt
+    salon {
+      id
+      name
+      businessId
+    }
+    product {
+      id
+      name
+      businessId
+    }
+  }
+}
+query ListHqShorthand($businessId: String!, $after: String!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @redact
+    @check(
+      expr: "this != null && this.role == 'HQ' && this.businessId == vars.businessId"
+      message: "FORBIDDEN"
+    ) {
+    role
+    businessId
+  }
+  productAliases(
+    where: {
+      businessId: { eq: $businessId }
+      source: { eq: SALON_CONFIRMED }
+      status: { eq: ACTIVE }
+      id: { gt: $after }
+    }
+    orderBy: { id: ASC }
+    limit: 50
+  ) {
+    id
+    businessId
+    phrase
+    revision
+    reviewedAt
+    createdAt
+    salon {
+      id
+      name
+      businessId
+    }
+    product {
+      id
+      name
+      businessId
+    }
+  }
+}

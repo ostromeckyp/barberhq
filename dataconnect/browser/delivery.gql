@@ -1,0 +1,309 @@
+query GetDeliveryReceipt($requestId: String!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.business.requests.size() == 1 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a,a.locationId == this.business.requests[0].salonId))"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    salonAccesses_on_membership @redact {
+      locationId
+    }
+    business {
+      requests: replenishmentRequests_on_business(where: { id: { eq: $requestId } }, limit: 1) {
+        id
+        salonId
+        state
+        revision
+        replacementIssueId
+        receipt: deliveryReceipt_on_request {
+          id
+          requestId
+          recordedAt
+          actorUid
+          origin
+          legacyActionReceiptId
+          description
+          batchIdentifier
+          rootIssueId
+          items: deliveryReceiptItems_on_receipt(orderBy: { productId: ASC }, limit: 6) {
+            productId
+            goodQuantity
+            damagedQuantity
+            missingQuantity
+            product {
+              name
+            }
+          }
+          procedureReferences: deliveryReceiptProcedures_on_receipt(
+            orderBy: { kind: ASC }
+            limit: 2
+          ) {
+            kind
+            versionId
+            chunkId
+          }
+          rootIssue {
+            id
+            status
+            revision
+          }
+        }
+        replacementIssue {
+          id
+          status
+          revision
+        }
+      }
+    }
+  }
+}
+query GetDeliveryIssue(
+  $issueId: String!
+  $eventLimit: Int! = 50
+  $eventOffset: Int! = 0
+  $replacementLimit: Int! = 50
+  $replacementOffset: Int! = 0
+) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.eventLimit > 0 && vars.eventLimit <= 50 && vars.eventOffset >= 0 && vars.replacementLimit > 0 && vars.replacementLimit <= 50 && vars.replacementOffset >= 0 && this.business.issues.size() == 1 && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a,a.locationId == this.business.issues[0].salonId))"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    salonAccesses_on_membership @redact {
+      locationId
+    }
+    business {
+      issues: deliveryIssues_on_business(where: { id: { eq: $issueId } }, limit: 1) {
+        id
+        rootRequestId
+        salonId
+        status
+        revision
+        createdAt
+        salon {
+          name
+        }
+        items: deliveryIssueItems_on_issue(orderBy: { productId: ASC }, limit: 6) {
+          productId
+          initialAffectedQuantity
+          replacementAcceptedQuantity
+          product {
+            name
+          }
+        }
+        activeReplacement: activeReplacementRequest {
+          id
+          state
+          createdAt
+        }
+        rootReceipt {
+          id
+          requestId
+          recordedAt
+          actorUid
+          origin
+          legacyActionReceiptId
+          description
+          batchIdentifier
+          rootIssueId
+          items: deliveryReceiptItems_on_receipt(orderBy: { productId: ASC }, limit: 6) {
+            productId
+            goodQuantity
+            damagedQuantity
+            missingQuantity
+            product {
+              name
+            }
+          }
+          procedureReferences: deliveryReceiptProcedures_on_receipt(
+            orderBy: { kind: ASC }
+            limit: 2
+          ) {
+            kind
+            versionId
+            chunkId
+          }
+          rootIssue {
+            id
+            status
+            revision
+          }
+        }
+        events: deliveryIssueEvents_on_issue(
+          orderBy: [{ revision: DESC }, { id: ASC }]
+          limit: $eventLimit
+          offset: $eventOffset
+        ) {
+          id
+          revision
+          actorUid
+          recordedAt
+          type
+          status
+          requestId
+          note
+          quantities
+        }
+        replacements: replenishmentRequests_on_replacementIssue(
+          orderBy: [{ createdAt: DESC }, { id: ASC }]
+          limit: $replacementLimit
+          offset: $replacementOffset
+        ) {
+          id
+          state
+          createdAt
+        }
+      }
+    }
+  }
+}
+query ListDeliveryIssues(
+  $allSalons: Boolean!
+  $salonId: String
+  $statuses: [DeliveryIssueStatus!]!
+  $limit: Int! = 50
+  $offset: Int! = 0
+) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.limit > 0 && vars.limit <= 50 && vars.offset >= 0 && (vars.allSalons ? this.role == 'HQ' : vars.salonId != null && (this.role == 'HQ' || this.salonAccesses_on_membership.exists(a,a.locationId == vars.salonId)))"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    salonAccesses_on_membership @redact {
+      locationId
+    }
+    business {
+      openCounts: deliveryIssues_on_business(where: { status: { ne: RESOLVED } }, limit: 1)
+        @include(if: $allSalons) {
+        _count
+      }
+      salonOpenCounts: deliveryIssues_on_business(
+        where: { salonId: { eq: $salonId }, status: { ne: RESOLVED } }
+        limit: 1
+      ) @skip(if: $allSalons) {
+        _count
+      }
+
+      issues: deliveryIssues_on_business(
+        where: { status: { in: $statuses } }
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) @include(if: $allSalons) {
+        id
+        rootRequestId
+        salonId
+        status
+        revision
+        createdAt
+        salon {
+          name
+        }
+        items: deliveryIssueItems_on_issue(orderBy: { productId: ASC }, limit: 6) {
+          productId
+          initialAffectedQuantity
+          replacementAcceptedQuantity
+          product {
+            name
+          }
+        }
+        activeReplacement: activeReplacementRequest {
+          id
+          state
+          createdAt
+        }
+      }
+      salonIssues: deliveryIssues_on_business(
+        where: { salonId: { eq: $salonId }, status: { in: $statuses } }
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) @skip(if: $allSalons) {
+        id
+        rootRequestId
+        salonId
+        status
+        revision
+        createdAt
+        salon {
+          name
+        }
+        items: deliveryIssueItems_on_issue(orderBy: { productId: ASC }, limit: 6) {
+          productId
+          initialAffectedQuantity
+          replacementAcceptedQuantity
+          product {
+            name
+          }
+        }
+        activeReplacement: activeReplacementRequest {
+          id
+          state
+          createdAt
+        }
+      }
+    }
+  }
+}
+query GetDeliveryProcedureBindings @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(expr: "this != null && this.role == 'HQ'", message: "FORBIDDEN") {
+    businessId
+    role @redact
+    business {
+      bindings: deliveryProcedureBindings_on_business(orderBy: { kind: ASC }, limit: 2) {
+        kind
+        documentId
+        revision
+        updatedAt
+        document {
+          id
+          businessId
+          documentCode
+          activeVersionId
+          versions: knowledgeVersions_on_document(where: { isActive: { eq: true } }, limit: 2) {
+            id
+            title
+            businessId
+            status
+            publishedAt
+            revokedAt
+          }
+        }
+      }
+    }
+  }
+}
+
+query ListDeliveryProcedureDocuments($limit: Int! = 20, $offset: Int! = 0) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 50 && vars.offset >= 0"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    business {
+      documents: knowledgeVersions_on_business(
+        where: {
+          isActive: { eq: true }
+          status: { eq: READY }
+          publishedAt: { isNull: false }
+          revokedAt: { isNull: true }
+        }
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) {
+        id
+        documentId
+        title
+        document {
+          documentCode
+          activeVersionId
+        }
+      }
+    }
+  }
+}

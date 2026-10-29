@@ -1,9 +1,16 @@
 type Business @table(key: "id") {
   id: String!
   name: String!
+  productKnowledgeRevision: Int! @default(value: 0)
 }
-enum MemberRole { HQ SALON }
-enum LocationKind { HQ SALON }
+enum MemberRole {
+  HQ
+  SALON
+}
+enum LocationKind {
+  HQ
+  SALON
+}
 type Membership @table(key: "uid") {
   uid: String!
   business: Business!
@@ -15,6 +22,8 @@ type Location @table(key: "id") @unique(fields: ["business", "key"]) {
   key: String!
   name: String!
   kind: LocationKind!
+  "Salon shorthand revision; bumped whenever this salon's learned meanings change."
+  productAliasRevision: Int! @default(value: 0)
 }
 type SalonAccess @table(key: ["membership", "location"]) {
   membership: Membership!
@@ -25,6 +34,17 @@ type Product @table(key: "id") @unique(fields: ["business", "demoId"]) {
   business: Business!
   demoId: String!
   name: String!
+  type: String
+  typeSourceVersionId: String
+  "Reviewed seed type; projected into type when no current document assertion exists."
+  seedType: String
+  "Reviewed seed keywords; null reads as an empty list."
+  keywords: [String!]
+  "Set when HQ created or edited the product in the app; seed never overwrites such fields."
+  hqUpdatedAt: Timestamp
+  "Per-product revision for HQ field edits (CAS), independent of catalog-wide changes."
+  adminRevision: Int! @default(value: 0)
+  hqUpdatedBy: String
   brand: String!
   category: String!
   summaryEn: String!

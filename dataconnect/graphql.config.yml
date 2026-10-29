@@ -1,2 +1,10 @@
-schema: schema.graphql
-documents: '**/*.graphql'
+schema:
+  - './schema/**/*.gql'
+  - './.dataconnect/schema/prelude.gql'
+  - './.dataconnect/schema/main/*.gql'
+  - './webstorm/firebase-sql-connect-directives.graphql'
+documents:
+  - './browser/**/*.gql'
+  - './server/**/*.gql'
+  - './vector/**/*.gql'
+  - './*_read.gql'

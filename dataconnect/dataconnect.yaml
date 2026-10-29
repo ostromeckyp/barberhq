@@ -10,4 +10,4 @@ schema:
       database: barberhq
       cloudSql:
         instanceId: barberhq
-connectorDirs: [./browser, ./server]
+connectorDirs: [./browser, ./server, ./vector]

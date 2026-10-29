@@ -1,0 +1,196 @@
+query GetSourceSection($versionId: String!, $chunkId: String = null) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.business.versions.size() == 1 && this.business.versions[0].revokedAt == null && ((this.business.versions[0].status == 'READY' && this.business.versions[0].publishedAt != null) || (this.role == 'HQ' && this.business.versions[0].publishedAt == null)) && (vars.chunkId == null || this.business.versions[0].chunks.size() == 1)"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    business {
+      versions: knowledgeVersions_on_business(where: { id: { eq: $versionId } }, limit: 1) {
+        id
+        documentId
+        businessId
+        versionLabel
+        title
+        language
+        sourceUrls
+        observedOn
+        sourceType
+        kind
+        origin
+        synthetic
+        isActive
+        pageCount
+        publishedAt
+        status
+        revokedAt
+        document {
+          documentCode
+        }
+        chunks: knowledgeChunks_on_version(where: { id: { eq: $chunkId } }, limit: 1) {
+          id
+          sectionId
+          physicalPage
+          text
+          rects
+          geometryStatus
+        }
+        pages: knowledgePages_on_version(orderBy: { physicalPage: ASC }, limit: 30) {
+          physicalPage
+          text
+          viewBox
+          userUnit
+          rotation
+        }
+      }
+    }
+  }
+}
+
+query ListPublishedKnowledgeDocuments($limit: Int!, $offset: Int!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && vars.limit > 0 && vars.limit <= 51 && vars.offset >= 0"
+      message: "FORBIDDEN"
+    ) {
+    business {
+      versions: knowledgeVersions_on_business(
+        where: {
+          status: { eq: READY }
+          publicationStatus: { eq: DEMO_CURRENT }
+          publishedAt: { isNull: false }
+          revokedAt: { isNull: true }
+        }
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) {
+        id
+        documentId
+        businessId
+        versionLabel
+        title
+        language
+        sourceUrls
+        observedOn
+        sourceType
+        kind
+        origin
+        synthetic
+        publicationStatus
+        isActive
+        pageCount
+        status
+        revision
+        document {
+          activeVersionId
+          revision
+        }
+        revokedAt
+        pdfSha256
+        publishedAt
+        pendingStage
+        createdAt
+      }
+    }
+  }
+}
+
+query ListHqKnowledgeDocuments($limit: Int!, $offset: Int!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.role == 'HQ' && vars.limit > 0 && vars.limit <= 51 && vars.offset >= 0"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    business {
+      versions: knowledgeVersions_on_business(
+        orderBy: [{ createdAt: DESC }, { id: ASC }]
+        limit: $limit
+        offset: $offset
+      ) {
+        id
+        documentId
+        businessId
+        versionLabel
+        title
+        language
+        sourceUrls
+        observedOn
+        sourceType
+        kind
+        origin
+        synthetic
+        publicationStatus
+        isActive
+        pageCount
+        status
+        revision
+        document {
+          activeVersionId
+          revision
+        }
+        revokedAt
+        pdfSha256
+        publishedAt
+        pendingStage
+        processingError
+        createdAt
+      }
+    }
+  }
+}
+
+query GetKnowledgeReview($versionId: String!) @auth(level: USER) {
+  membership(key: { uid_expr: "auth.uid" })
+    @check(
+      expr: "this != null && this.role == 'HQ' && this.business.versions.size() == 1 && this.business.versions[0].pageCount != null && this.business.versions[0].pageCount >= 1 && this.business.versions[0].pageCount <= 30 && this.business.versions[0].pages.size() == this.business.versions[0].pageCount"
+      message: "FORBIDDEN"
+    ) {
+    role @redact
+    business {
+      versions: knowledgeVersions_on_business(where: { id: { eq: $versionId } }, limit: 1) {
+        id
+        documentId
+        businessId
+        versionLabel
+        title
+        language
+        sourceUrls
+        observedOn
+        sourceType
+        kind
+        origin
+        synthetic
+        publicationStatus
+        isActive
+        pageCount
+        status
+        revision
+        document {
+          activeVersionId
+          revision
+        }
+        revokedAt
+        pdfSha256
+        publishedAt
+        pendingStage
+        processingError
+        extractionHash
+        createdAt
+        pages: knowledgePages_on_version(orderBy: { physicalPage: ASC }, limit: 30) {
+          physicalPage
+          text
+          markdown
+          spans
+          printedLabel
+          quality
+          reviewed
+          viewBox
+          userUnit
+          rotation
+        }
+      }
+    }
+  }
+}
