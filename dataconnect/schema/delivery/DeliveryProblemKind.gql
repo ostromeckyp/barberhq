@@ -1,0 +1,4 @@
+enum DeliveryProblemKind {
+  DAMAGED
+  MISSING
+}

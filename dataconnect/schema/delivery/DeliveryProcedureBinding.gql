@@ -1,0 +1,7 @@
+type DeliveryProcedureBinding @table(key: ["business", "kind"]) {
+  business: Business!
+  kind: DeliveryProblemKind!
+  document: KnowledgeDocument
+  revision: Int!
+  updatedAt: Timestamp! @default(expr: "request.time")
+}

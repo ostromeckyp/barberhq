@@ -1,0 +1,7 @@
+type Inventory @table(key: ["location", "product"]) {
+  location: Location!
+  product: Product!
+  onHand: Int!
+  reserved: Int! @default(value: 0)
+  version: Int! @default(value: 1)
+}

@@ -1,0 +1,16 @@
+type ProductKnowledgeOperation
+  @table(key: "id")
+  @unique(fields: ["business", "actorUid", "idempotencyKey"]) {
+  id: String!
+  business: Business!
+  version: KnowledgeVersion!
+  actorUid: String!
+  idempotencyKey: String!
+  action: String!
+  payloadHash: String!
+  result: Any
+  generationId: String
+  leaseExpiresAt: Timestamp
+  completedAt: Timestamp
+  createdAt: Timestamp!
+}

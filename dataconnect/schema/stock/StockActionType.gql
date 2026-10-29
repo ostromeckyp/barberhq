@@ -1,0 +1,7 @@
+enum StockActionType {
+  SUBMIT
+  APPROVE
+  REJECT
+  DISPATCH
+  RECEIVE
+}

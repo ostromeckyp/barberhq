@@ -1,0 +1,18 @@
+# Server-only binding of one final clarification to the extracted phrase; no full message is stored.
+type ReplenishmentChoiceReceipt @table(key: "id") {
+  id: String!
+  business: Business!
+  salon: Location!
+  actorUid: String!
+  messageHash: String!
+  lineId: String!
+  productQuery: String!
+  aliasId: String!
+  allowedProductIds: Any!
+  catalogRevision: Int!
+  expectedAliasRevision: Int!
+  expiresAt: Timestamp!
+  consumedProductId: String
+  consumedAt: Timestamp
+  createdAt: Timestamp!
+}

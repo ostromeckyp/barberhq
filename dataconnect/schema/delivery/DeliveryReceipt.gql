@@ -1,0 +1,14 @@
+type DeliveryReceipt @table(key: "id") @unique(fields: ["request"]) @unique(fields: ["transfer"]) {
+  id: String!
+  business: Business!
+  request: ReplenishmentRequest!
+  transfer: Transfer!
+  salon: Location!
+  actorUid: String!
+  recordedAt: Timestamp! @default(expr: "request.time")
+  origin: DeliveryReceiptOrigin!
+  legacyActionReceiptId: String
+  description: String
+  batchIdentifier: String
+  rootIssue: DeliveryIssue
+}

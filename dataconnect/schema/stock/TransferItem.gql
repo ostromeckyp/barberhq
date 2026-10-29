@@ -1,0 +1,9 @@
+type TransferItem @table(key: "requestItemId") {
+  requestItemId: String!
+  requestItem: RequestItem! @ref(fields: ["requestItemId"], references: ["id"])
+  transferRequestId: String!
+  transfer: Transfer! @ref(fields: ["transferRequestId"], references: ["requestId"])
+  quantity: Int!
+  dispatchedQuantity: Int! @default(value: 0)
+  receivedQuantity: Int! @default(value: 0)
+}

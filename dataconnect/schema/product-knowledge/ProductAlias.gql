@@ -1,0 +1,24 @@
+type ProductAlias
+  @table(key: "id")
+  @unique(fields: ["sourceDocumentVersion", "product", "kind", "normalized", "lang", "source"]) {
+  id: String!
+  business: Business!
+  product: Product!
+  salon: Location
+  phrase: String!
+  normalized: String!
+  kind: ProductAliasKind!
+  lang: String!
+  source: ProductAliasSource!
+  status: ProductAliasStatus!
+  ambiguous: Boolean!
+  sourceDocumentVersion: KnowledgeVersion
+  createdBy: String!
+  createdAt: Timestamp!
+  reviewedBy: String
+  reviewedAt: Timestamp
+  generationId: String
+  revision: Int! @default(value: 1)
+  "True when HQ edited or removed this SEED row; the seed never reactivates it."
+  overriddenByHq: Boolean! @default(value: false)
+}

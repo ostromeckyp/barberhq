@@ -1,0 +1,13 @@
+# Server-only journal of salon shorthand removals, independent of document journals.
+type SalonAliasOperation
+  @table(key: "id")
+  @unique(fields: ["business", "actorUid", "idempotencyKey"]) {
+  id: String!
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  action: String!
+  payloadHash: String!
+  result: Any!
+  createdAt: Timestamp!
+}

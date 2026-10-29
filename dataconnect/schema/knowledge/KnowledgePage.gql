@@ -1,0 +1,13 @@
+type KnowledgePage @table(key: ["version", "physicalPage"]) {
+  version: KnowledgeVersion!
+  physicalPage: Int!
+  text: String!
+  markdown: String!
+  spans: Any!
+  printedLabel: String
+  quality: KnowledgePageQuality!
+  reviewed: Boolean! @default(value: false)
+  viewBox: Any!
+  userUnit: Float!
+  rotation: Int!
+}

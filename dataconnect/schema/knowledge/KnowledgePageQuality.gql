@@ -1,0 +1,4 @@
+enum KnowledgePageQuality {
+  COMPLETE
+  NEEDS_REVIEW
+}

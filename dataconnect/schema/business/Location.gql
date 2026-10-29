@@ -1,0 +1,9 @@
+type Location @table(key: "id") @unique(fields: ["business", "key"]) {
+  id: String!
+  business: Business!
+  key: String!
+  name: String!
+  kind: LocationKind!
+  "Salon shorthand revision; bumped whenever this salon's learned meanings change."
+  productAliasRevision: Int! @default(value: 0)
+}

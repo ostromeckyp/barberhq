@@ -1,0 +1,9 @@
+type KnowledgeProductProfile @table(key: ["version", "product"]) {
+  business: Business!
+  version: KnowledgeVersion!
+  product: Product!
+  proposedType: String
+  approvedType: String
+  reviewedBy: String
+  reviewedAt: Timestamp
+}

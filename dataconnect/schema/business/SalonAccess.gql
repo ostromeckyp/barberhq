@@ -1,0 +1,4 @@
+type SalonAccess @table(key: ["membership", "location"]) {
+  membership: Membership!
+  location: Location!
+}

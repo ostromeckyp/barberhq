@@ -1,0 +1,5 @@
+type Business @table(key: "id") {
+  id: String!
+  name: String!
+  productKnowledgeRevision: Int! @default(value: 0)
+}

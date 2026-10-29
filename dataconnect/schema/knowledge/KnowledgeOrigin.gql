@@ -1,0 +1,5 @@
+enum KnowledgeOrigin {
+  OFFICIAL
+  PUBLIC_COMPILATION
+  SYNTHETIC
+}

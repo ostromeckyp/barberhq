@@ -1,0 +1,7 @@
+type DeliveryActionKey @table(key: ["business", "actorUid", "idempotencyKey"]) {
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  command: DeliveryCommandReceipt!
+  payloadHash: String!
+}

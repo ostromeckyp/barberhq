@@ -1,0 +1,10 @@
+type DeliveryCommandReceipt @table(key: "id") {
+  id: String!
+  business: Business!
+  actorUid: String!
+  type: DeliveryCommandType!
+  target: String!
+  payloadHash: String!
+  result: Any!
+  createdAt: Timestamp! @default(expr: "request.time")
+}

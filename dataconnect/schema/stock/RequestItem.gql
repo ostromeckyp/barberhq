@@ -1,0 +1,6 @@
+type RequestItem @table(key: "id") @unique(fields: ["request", "product"]) {
+  id: String!
+  request: ReplenishmentRequest!
+  product: Product!
+  quantity: Int!
+}

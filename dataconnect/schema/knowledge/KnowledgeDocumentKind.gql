@@ -1,0 +1,6 @@
+enum KnowledgeDocumentKind {
+  PROCEDURE
+  POLICY
+  PRODUCT_CARD
+  PRODUCT_CATALOG
+}

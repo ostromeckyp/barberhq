@@ -1,0 +1,7 @@
+type Transfer @table(key: "requestId") {
+  requestId: String!
+  request: ReplenishmentRequest! @ref(fields: ["requestId"], references: ["id"])
+  business: Business!
+  warehouse: Location!
+  destination: Location!
+}

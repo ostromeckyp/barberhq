@@ -1,0 +1,12 @@
+# Current card attached from the product screen (one per product). Suggestions are HQ-review input only.
+type ProductCardAttachment @table(key: "product") {
+  product: Product!
+  business: Business!
+  documentId: String!
+  versionId: String!
+  status: String!
+  suggestions: Any!
+  actorUid: String!
+  revision: Int!
+  updatedAt: Timestamp!
+}

@@ -1,0 +1,17 @@
+type ActionReceipt
+  @table(key: "id")
+  @unique(fields: ["business", "actorUid", "idempotencyKey"])
+  @unique(fields: ["request", "action"]) {
+  id: String!
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  request: ReplenishmentRequest!
+  action: StockActionType!
+  payloadHash: String!
+  semanticHash: String!
+  state: RequestState!
+  revision: Int!
+  reason: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}

@@ -1,0 +1,6 @@
+type DeliveryIssueItem @table(key: ["issue", "product"]) {
+  issue: DeliveryIssue!
+  product: Product!
+  initialAffectedQuantity: Int!
+  replacementAcceptedQuantity: Int! @default(value: 0)
+}

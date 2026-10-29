@@ -1,0 +1,10 @@
+type StockMovement @table(name: "stock_item_movement", key: ["transferItemRequestItemId", "type"]) {
+  transferItemRequestItemId: String!
+  transferItem: TransferItem!
+    @ref(fields: ["transferItemRequestItemId"], references: ["requestItemId"])
+  business: Business!
+  type: MovementType!
+  quantity: Int!
+  actorUid: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}

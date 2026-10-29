@@ -1,0 +1,15 @@
+type KnowledgeProductLink @table(key: "id") {
+  id: String!
+  business: Business!
+  version: KnowledgeVersion!
+  product: Product
+  chunk: KnowledgeChunk!
+  start: Int!
+  end: Int!
+  extractionHash: String!
+  candidateProductIds: Any!
+  method: String!
+  confirmed: Boolean!
+  createdBy: String!
+  createdAt: Timestamp!
+}

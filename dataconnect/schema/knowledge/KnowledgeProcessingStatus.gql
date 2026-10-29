@@ -1,0 +1,9 @@
+enum KnowledgeProcessingStatus {
+  STAGED
+  EXTRACTED
+  REVIEWED
+  EMBEDDED
+  READY
+  NEEDS_REVIEW
+  FAILED
+}

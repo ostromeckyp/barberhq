@@ -1,0 +1,15 @@
+type KnowledgeOperation
+  @table(key: "id")
+  @unique(fields: ["business", "actorUid", "idempotencyKey"]) {
+  id: String!
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  action: KnowledgeOperationAction!
+  retryStage: KnowledgePendingStage
+  payloadHash: String!
+  documentId: String!
+  versionId: String!
+  completedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time")
+}

@@ -1,0 +1,4 @@
+enum KnowledgePublicationStatus {
+  DEMO_CURRENT
+  RETIRED
+}

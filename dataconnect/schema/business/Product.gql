@@ -1,0 +1,29 @@
+type Product @table(key: "id") @unique(fields: ["business", "demoId"]) {
+  id: String!
+  business: Business!
+  demoId: String!
+  name: String!
+  type: String
+  typeSourceVersionId: String
+  "Reviewed seed type; projected into type when no current document assertion exists."
+  seedType: String
+  "Reviewed seed keywords; null reads as an empty list."
+  keywords: [String!]
+  "Set when HQ created or edited the product in the app; seed never overwrites such fields."
+  hqUpdatedAt: Timestamp
+  "Per-product revision for HQ field edits (CAS), independent of catalog-wide changes."
+  adminRevision: Int! @default(value: 0)
+  hqUpdatedBy: String
+  brand: String!
+  category: String!
+  summaryEn: String!
+  scentPl: String
+  sourceCode: String!
+  netContentMl: Int!
+  retailPriceGrosz: Int!
+  sourceUrl: String!
+  observedOn: Date!
+  transferPackSize: Int
+  packageDimensionsMm: Any
+  shippingWeightGrams: Int
+}

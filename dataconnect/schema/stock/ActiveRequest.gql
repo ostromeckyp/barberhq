@@ -1,0 +1,6 @@
+type ActiveRequest @table(key: ["business", "salon", "product"]) {
+  business: Business!
+  salon: Location!
+  product: Product!
+  request: ReplenishmentRequest!
+}

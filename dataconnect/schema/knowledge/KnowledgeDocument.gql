@@ -1,0 +1,8 @@
+type KnowledgeDocument @table(key: "id") @unique(fields: ["business", "documentCode"]) {
+  id: String!
+  business: Business!
+  documentCode: String!
+  activeVersionId: String
+  revision: Int! @default(value: 0)
+  nextVersionNumber: Int
+}

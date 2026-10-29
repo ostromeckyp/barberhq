@@ -24,7 +24,9 @@ export function addOutputOnlyEnumTypes(declarations, schema) {
 }
 
 export async function postprocessSdkEnums(schemaDir, declarationPaths) {
-  const schemaFiles = (await readdir(schemaDir)).filter((name) => name.endsWith('.gql')).sort();
+  const schemaFiles = (await readdir(schemaDir, { recursive: true }))
+    .filter((name) => name.endsWith('.gql'))
+    .sort();
   const schema = (
     await Promise.all(schemaFiles.map((name) => readFile(new URL(name, schemaDir), 'utf8')))
   ).join('\n');

@@ -1,0 +1,6 @@
+type SalonSettings @table(key: "salon") {
+  salon: Location!
+  lowStockThreshold: Int! @default(value: 2)
+  version: Int! @default(value: 1)
+  updatedAt: Timestamp! @default(expr: "request.time")
+}

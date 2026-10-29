@@ -1,0 +1,4 @@
+enum KnowledgeSourceType {
+  SYNTHETIC_PROCEDURE
+  PUBLIC_PRODUCT_SUMMARY
+}

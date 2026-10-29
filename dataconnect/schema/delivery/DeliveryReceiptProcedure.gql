@@ -1,0 +1,6 @@
+type DeliveryReceiptProcedure @table(key: ["receipt", "kind"]) {
+  receipt: DeliveryReceipt!
+  kind: DeliveryProblemKind!
+  version: KnowledgeVersion!
+  chunk: KnowledgeChunk
+}

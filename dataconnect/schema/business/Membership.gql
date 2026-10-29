@@ -1,0 +1,5 @@
+type Membership @table(key: "uid") {
+  uid: String!
+  business: Business!
+  role: MemberRole!
+}

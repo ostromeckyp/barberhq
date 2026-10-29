@@ -1,0 +1,7 @@
+type DeliveryReceiptItem @table(name: "delivery_item", key: ["receipt", "product"]) {
+  receipt: DeliveryReceipt!
+  product: Product!
+  goodQuantity: Int!
+  damagedQuantity: Int!
+  missingQuantity: Int!
+}

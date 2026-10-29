@@ -1,0 +1,12 @@
+type DeliveryIssueEvent @table(key: "id") @unique(fields: ["issue", "revision"]) {
+  id: String!
+  issue: DeliveryIssue!
+  revision: Int!
+  actorUid: String!
+  recordedAt: Timestamp! @default(expr: "request.time")
+  type: DeliveryIssueEventType!
+  status: DeliveryIssueStatus!
+  request: ReplenishmentRequest
+  note: String
+  quantities: Any!
+}

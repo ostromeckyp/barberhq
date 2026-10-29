@@ -1,0 +1,17 @@
+type KnowledgeChunk @table(key: "id") @unique(fields: ["version", "physicalPage", "ordinal"]) {
+  id: String!
+  version: KnowledgeVersion!
+  physicalPage: Int!
+  ordinal: Int!
+  sectionId: String!
+  heading: String!
+  text: String!
+  start: Int!
+  end: Int!
+  rects: Any!
+  geometryStatus: KnowledgeGeometryStatus!
+  embedding: Vector! @col(size: 768)
+  embeddingModel: String!
+  embeddingDimension: Int!
+  embeddingConfigHash: String!
+}

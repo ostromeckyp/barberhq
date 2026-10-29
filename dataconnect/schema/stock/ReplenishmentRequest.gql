@@ -1,0 +1,9 @@
+type ReplenishmentRequest @table(key: "id") @index(fields: ["businessId", "state", "createdAt"]) {
+  id: String!
+  business: Business!
+  salon: Location!
+  state: RequestState!
+  revision: Int!
+  replacementIssue: DeliveryIssue
+  createdAt: Timestamp! @default(expr: "request.time")
+}

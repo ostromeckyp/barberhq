@@ -1,0 +1,6 @@
+enum ProductAliasSource {
+  GENERATED
+  HQ
+  SALON_CONFIRMED
+  SEED
+}

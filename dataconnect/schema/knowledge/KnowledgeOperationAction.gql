@@ -1,0 +1,6 @@
+enum KnowledgeOperationAction {
+  CREATE
+  DELETE
+  REVIEW
+  RETRY
+}

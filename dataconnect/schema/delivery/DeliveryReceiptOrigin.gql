@@ -1,0 +1,4 @@
+enum DeliveryReceiptOrigin {
+  RECORDED
+  LEGACY
+}

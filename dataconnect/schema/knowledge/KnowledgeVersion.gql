@@ -1,0 +1,50 @@
+type KnowledgeVersion @table(key: "id") @unique(fields: ["document", "versionLabel"]) {
+  id: String!
+  document: KnowledgeDocument!
+  business: Business!
+  versionLabel: String!
+  productKnowledgeRevision: Int! @default(value: 0)
+  productKnowledgeCatalogRevision: Int
+  pendingProductKnowledgeRevision: Int
+  pendingProductKnowledgeReviewedHash: String
+  pendingProductKnowledgeCatalogRevision: Int
+  productKnowledgeReviewedHash: String
+  productKnowledgeState: Any
+  title: String!
+  language: String!
+  sourceType: KnowledgeSourceType
+  kind: KnowledgeDocumentKind
+  origin: KnowledgeOrigin
+  publicationStatus: KnowledgePublicationStatus! @default(value: DEMO_CURRENT)
+  synthetic: Boolean!
+  sourceUrls: Any!
+  observedOn: Date
+  status: KnowledgeProcessingStatus!
+  revision: Int! @default(value: 1)
+  bucket: String
+  objectPath: String
+  objectGeneration: String
+  pdfSha256: String!
+  contentType: String
+  byteSize: Int
+  pageCount: Int
+  uploadedAt: Timestamp
+  pendingStage: KnowledgePendingStage
+  pendingDocumentRevision: Int
+  pendingExtractionHash: String
+  processingLeaseId: String
+  processingLeaseExpiresAt: Timestamp
+  parserVersion: String
+  extractionHash: String
+  embeddingConfigHash: String
+  expectedChunkCount: Int
+  reviewedBy: String
+  reviewedAt: Timestamp
+  reviewedPageCount: Int! @default(value: 0)
+  publishedAt: Timestamp
+  isActive: Boolean! @default(value: false)
+  revokedAt: Timestamp
+  processingError: String
+  processingAttempt: Int! @default(value: 0)
+  createdAt: Timestamp! @default(expr: "request.time")
+}

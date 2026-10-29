@@ -1,0 +1,8 @@
+# Every attempted action key binds to one immutable result, including semantic retries.
+type ActionKey @table(key: ["business", "actorUid", "idempotencyKey"]) {
+  business: Business!
+  actorUid: String!
+  idempotencyKey: String!
+  receipt: ActionReceipt!
+  payloadHash: String!
+}

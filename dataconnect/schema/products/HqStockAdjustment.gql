@@ -1,0 +1,11 @@
+# HQ product administration: quantity journal and idempotent command journal. Server-only.
+type HqStockAdjustment @table(key: "id") {
+  id: String!
+  business: Business!
+  product: Product!
+  location: Location!
+  before: Int!
+  after: Int!
+  actorUid: String!
+  createdAt: Timestamp!
+}

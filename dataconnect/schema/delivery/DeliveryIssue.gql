@@ -1,0 +1,14 @@
+type DeliveryIssue
+  @table(key: "id")
+  @unique(fields: ["rootReceipt"])
+  @index(fields: ["businessId", "status", "createdAt"]) {
+  id: String!
+  business: Business!
+  salon: Location!
+  rootReceipt: DeliveryReceipt!
+  rootRequest: ReplenishmentRequest!
+  status: DeliveryIssueStatus!
+  revision: Int!
+  activeReplacementRequest: ReplenishmentRequest
+  createdAt: Timestamp! @default(expr: "request.time")
+}

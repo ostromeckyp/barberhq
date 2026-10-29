@@ -1,0 +1,5 @@
+enum ProductAliasKind {
+  NAME
+  TYPE
+  PHONETIC
+}
