@@ -49,6 +49,8 @@ The phased handoffs and owner setup guide were added on **27 September 2026**. O
 
 ## Local implementation
 
+**[Command guide](docs/commands.md):** run locally, test, and publish each part to production.
+
 [Angular facades, data-access boundaries and UI customization](docs/implementation/angular-architecture.md) describe the current frontend structure.
 
 `web/` contains the Angular SPA; `dataconnect/` owns schema and generated GraphQL operations; `scripts/` prepares fixtures, seeds safely and checks builds; `shared/contracts/` contains browser-safe types.

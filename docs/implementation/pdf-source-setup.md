@@ -40,7 +40,7 @@ Publiczna konfiguracja Web została pobrana przez CLI do ignorowanego `artifacts
 
 ## Konfiguracja endpointu
 
-Parametry Functions są publicznymi identyfikatorami zasobów, nie sekretami:
+Od 29 października te wartości są w śledzonym pliku `functions/config/cloud.json` (bez parametrów wdrożeniowych). Tabela poniżej jest historyczna:
 
 | Parametr | Domyślna wartość produkcyjna |
 |---|---|
