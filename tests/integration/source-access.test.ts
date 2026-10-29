@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   createSourceHandler,
-  readSourceOriginal,
   resolveSourceIdentity,
 } from '../../functions/src/knowledge/source.ts';
+import { readSourceOriginal } from '../../functions/src/knowledge/source-storage.ts';
 import { createKnowledgeHarness } from '../support/knowledge.ts';
 
 describe('source PDF transport', () => {

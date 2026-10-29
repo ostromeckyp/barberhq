@@ -1,10 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { expect, it } from 'vitest';
 import { createEmbeddingConfig } from '../../functions/src/knowledge/embedding.ts';
-import {
-  createProcedureRetriever,
-  createSqlProcedureRepository,
-} from '../../functions/src/ai/retrieval.ts';
+import { createProcedureRetriever } from '../../functions/src/ai/retrieval.ts';
+import { createSqlProcedureRepository } from '../../functions/src/ai/procedure-repository.ts';
 import type { RetrievedChunk } from '../../functions/src/ai/models/retrieved-chunk.ts';
 import { createKnowledgeHarness } from '../support/knowledge.ts';
 import { AiError } from '../../functions/src/ai/budget.ts';

@@ -9,7 +9,7 @@ import { MAX_PDF_BYTES, PdfValidationError, validatePdf } from './pdf-validation
 import { DispatchService } from './queue.js';
 import { KnowledgeError, KnowledgeRepository } from './repository.js';
 import type { VersionState } from './models/version-state.js';
-import { sourceStorageBucket } from './source.js';
+import { sourceStorageBucket } from './source-storage.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from './runtime.js';
 import { CLOUD } from '../cloud-config.js';
 import type { UploadRequest } from './models/upload-request.js';

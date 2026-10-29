@@ -9,51 +9,12 @@ import { KnowledgeError } from './repository.js';
 import type { VersionState } from './models/version-state.js';
 import { knowledgePayloadHash, parseReviewDocument } from './schemas.js';
 import { status } from './document-commands.js';
-import { enqueueKnowledge } from './queue.js';
+import { pagesAreExact, sameOperation } from './review-checks.js';
+import { enqueueKnowledge } from './enqueue.js';
 import type { EnqueueKnowledge } from './models/enqueue-knowledge.js';
 import type { ReviewPublishDependencies } from './models/review-publish-dependencies.js';
 
 type Context = sql.KnowledgeCommandContextData;
-
-function pagesAreExact(
-  version: VersionState,
-  input: ReviewDocumentInput,
-  requireReviewed = false,
-): boolean {
-  const expected = Array.from({ length: version.pageCount ?? 0 }, (_, index) => index + 1);
-  const actual = [...input.reviewedPhysicalPages].sort((a, b) => a - b);
-  const extractedPages = version.pages.map((page) => page.physicalPage).sort((a, b) => a - b);
-  return (
-    version.extractionHash === input.extractionHash &&
-    actual.length === input.reviewedPhysicalPages.length &&
-    JSON.stringify(actual) === JSON.stringify(expected) &&
-    version.pages.length === expected.length &&
-    JSON.stringify(extractedPages) === JSON.stringify(expected) &&
-    version.pages.every(
-      (page) => page.quality === 'COMPLETE' && (!requireReviewed || page.reviewed),
-    )
-  );
-}
-
-function sameOperation(
-  context: Context,
-  uid: string,
-  key: string,
-  hash: string,
-  versionId: string,
-) {
-  const operation = context.membership?.business.operations[0];
-  if (
-    operation &&
-    (operation.actorUid !== uid ||
-      operation.idempotencyKey !== key ||
-      operation.action !== 'REVIEW' ||
-      operation.payloadHash !== hash ||
-      operation.versionId !== versionId)
-  )
-    throw new KnowledgeError('IDEMPOTENCY_CONFLICT');
-  return operation;
-}
 
 /** HQ review receipt and publication intent orchestration. All durable transitions are SQL guarded. */
 export class ReviewPublishService {

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, it } from 'vitest';
 import { createAiBudget } from '../../functions/src/ai/budget.ts';
 import { createProcedureAnswerer, recheckEligibility } from '../../functions/src/ai/procedure.ts';
-import { createSqlProcedureRepository } from '../../functions/src/ai/retrieval.ts';
+import { createSqlProcedureRepository } from '../../functions/src/ai/procedure-repository.ts';
 import { createKnowledgeHarness } from '../support/knowledge.ts';
 
 type Harness = Awaited<ReturnType<typeof createKnowledgeHarness>>;
