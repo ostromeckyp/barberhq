@@ -10,6 +10,7 @@ export class LoginFacade {
   private readonly submitting = signal(false);
   private readonly failure = signal('');
   readonly error = this.failure.asReadonly();
+  readonly signInErrorMessage = 'Could not sign in. Check your email and password, then try again.';
   readonly checkingAccess = computed(() => this.session.state().status === 'LOADING');
   readonly busy = computed(() => this.submitting() || this.checkingAccess());
 
@@ -38,7 +39,7 @@ export class LoginFacade {
     try {
       await this.session.signIn(email.trim(), password);
     } catch {
-      this.failure.set('Could not sign in. Check your email and password, then try again.');
+      this.failure.set(this.signInErrorMessage);
     } finally {
       this.submitting.set(false);
     }

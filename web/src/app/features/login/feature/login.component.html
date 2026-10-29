@@ -1,6 +1,13 @@
 <main class="login-page">
-  <mat-card class="login-card"
-    ><mat-card-content
+  <mat-card class="login-card">
+    <div class="login-progress">
+      <mat-progress-bar
+        *appDelayedLoading="facade.busy()"
+        mode="indeterminate"
+        aria-label="Signing in"
+      />
+    </div>
+    <mat-card-content
       ><app-brand [large]="true" />
       <p class="eyebrow">[ NOT BAD STUFF · INTERNAL ]</p>
       <h1>Sign in with your work account.</h1>
@@ -9,7 +16,7 @@
           appearance="outline"
           floatLabel="always"
           hideRequiredMarker
-          subscriptSizing="dynamic"
+          subscriptSizing="fixed"
           ><mat-label>Email address</mat-label
           ><input matInput type="email" autocomplete="username" [formField]="fields.email" />
           @if (fields.email().invalid() && fields.email().touched()) {
@@ -20,7 +27,7 @@
           appearance="outline"
           floatLabel="always"
           hideRequiredMarker
-          subscriptSizing="dynamic"
+          subscriptSizing="fixed"
           ><mat-label>Password</mat-label
           ><input
             matInput
@@ -40,20 +47,31 @@
             <mat-error>Password is required.</mat-error>
           }
         </mat-form-field>
-        @if (facade.error()) {
-          <p class="error-message" role="alert"><mat-icon>error</mat-icon>{{ facade.error() }}</p>
-        }
         <button mat-flat-button type="submit" [disabled]="facade.busy()">
           {{
             facade.checkingAccess() ? 'Checking access…' : facade.busy() ? 'Signing in…' : 'Sign in'
           }}
         </button>
-        @if (facade.busy()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Signing in" />
-        }
       </form>
       <footer class="login-help">
-        Demo environment · synthetic inventory.<br />Access is managed by your HQ team.
+        <p
+          class="login-help-copy"
+          [class.feedback-placeholder]="!!facade.error()"
+          [attr.aria-hidden]="facade.error() ? 'true' : null"
+        >
+          Demo environment · synthetic inventory.<br />Access is managed by your HQ team.
+        </p>
+        <div class="login-feedback">
+          <p
+            class="error-message"
+            [class.feedback-placeholder]="!facade.error()"
+            [attr.role]="facade.error() ? 'alert' : null"
+            [attr.aria-hidden]="facade.error() ? null : 'true'"
+          >
+            <mat-icon aria-hidden="true">error</mat-icon
+            >{{ facade.error() || facade.signInErrorMessage }}
+          </p>
+        </div>
       </footer></mat-card-content
     ></mat-card
   >

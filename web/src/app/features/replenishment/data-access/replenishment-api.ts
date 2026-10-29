@@ -71,7 +71,9 @@ export class ReplenishmentApi {
               sdk.RequestState.RESERVED,
               sdk.RequestState.DISPATCHED,
             ]
-          : [sdk.RequestState[filter]];
+          : filter === 'RECEIVED'
+            ? [sdk.RequestState.RECEIVED, sdk.RequestState.RECEIVED_WITH_ISSUE]
+            : [sdk.RequestState[filter]];
     const { data } = await sdk.listSalonRequests(
       this.firebase.data,
       { salonId, states, ...page },

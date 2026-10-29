@@ -58,3 +58,26 @@ describe('SessionFacade', () => {
     expect(h.session.state().status).toBe('ERROR');
   });
 });
+
+it('explicit sign-out removes only the current user delivery recovery data', async () => {
+  const h = setup();
+  h.changed('one');
+  h.resolve(member);
+  await Promise.resolve();
+  await Promise.resolve();
+  const owned =
+    'barberhq.delivery.v1.' +
+    encodeURIComponent(JSON.stringify(['one', 'demo', 'legnicka', 'request']));
+  const other =
+    'barberhq.delivery.v1.' +
+    encodeURIComponent(JSON.stringify(['two', 'demo', 'legnicka', 'request']));
+  localStorage.setItem(owned, 'saved');
+  localStorage.setItem(other, 'keep');
+  localStorage.setItem('unrelated', 'keep');
+  await h.session.signOut();
+  expect(localStorage.getItem(owned)).toBeNull();
+  expect(localStorage.getItem(other)).toBe('keep');
+  expect(localStorage.getItem('unrelated')).toBe('keep');
+  localStorage.removeItem(other);
+  localStorage.removeItem('unrelated');
+});

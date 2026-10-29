@@ -1,0 +1,125 @@
+:host {
+  display: block;
+  color: var(--ink);
+}
+h1 {
+  font-size: 28px;
+  margin: 16px 0;
+}
+h2 {
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+h3 {
+  font-size: 16px;
+  margin: 12px 0 8px;
+}
+p {
+  line-height: 1.55;
+}
+a,
+button {
+  max-width: 100%;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.issue-status {
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 8px 14px;
+  background: var(--surface);
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 24px;
+  align-items: start;
+}
+.card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.remaining {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+.progress-item + .progress-item {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.replacement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding: 16px 0;
+}
+.muted,
+.reference {
+  font-size: 13px;
+  color: var(--muted);
+}
+.actions {
+  position: sticky;
+  top: 24px;
+}
+.actions > button,
+mat-form-field {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.actions > button {
+  height: auto;
+  min-height: 44px;
+  padding-block: 12px;
+}
+.actions p {
+  font-size: 14px;
+}
+ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+li {
+  border-top: 1px solid var(--border);
+  padding: 12px 0;
+}
+.note-text {
+  white-space: pre-wrap;
+}
+nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .actions {
+    position: static;
+    grid-row: 1;
+  }
+  .card {
+    padding: 16px;
+  }
+}
+.app-back-navigation > button:first-child {
+  --mat-button-text-label-text-color: var(--ink);
+}

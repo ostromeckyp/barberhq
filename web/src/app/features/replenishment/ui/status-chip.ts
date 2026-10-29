@@ -7,6 +7,7 @@ export const STATUSES: Record<RequestState, { label: string; icon: string }> = {
   RESERVED: { label: 'Approved · reserved', icon: 'lock' },
   DISPATCHED: { label: 'Dispatched', icon: 'local_shipping' },
   RECEIVED: { label: 'Received', icon: 'check_circle' },
+  RECEIVED_WITH_ISSUE: { label: 'Delivery with issue', icon: 'error_outline' },
   REJECTED: { label: 'Rejected', icon: 'cancel' },
 };
 @Component({
@@ -31,6 +32,10 @@ export const STATUSES: Record<RequestState, { label: string; icon: string }> = {
       .RECEIVED {
         --mat-chip-elevated-container-color: #dcebdc;
         --mat-chip-label-text-color: #1f4d23;
+      }
+      .RECEIVED_WITH_ISSUE {
+        --mat-chip-elevated-container-color: #fbefd6;
+        --mat-chip-label-text-color: #5c3700;
       }
       .REJECTED {
         --mat-chip-elevated-container-color: #f9dedc;

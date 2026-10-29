@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { ShellFacade } from './shell.facade';
 import { Brand } from '../shared/ui/brand/brand';
+import { runtimeConfig } from '../core/public-config';
 @Component({
   selector: 'app-shell',
   providers: [ShellFacade],
@@ -34,6 +35,10 @@ export class ShellComponent {
   private readonly drawer = viewChild(MatSidenav);
   readonly facade = inject(ShellFacade);
   readonly mobile = toSignal(inject(BreakpointObserver).observe('(max-width: 759px)'));
+  readonly knowledgeEnabled = () => runtimeConfig.publicConfig?.knowledgeEnabled === true;
+  readonly assistantEnabled = () =>
+    runtimeConfig.publicConfig?.knowledgeEnabled === true &&
+    runtimeConfig.publicConfig?.ragEnabled === true;
   closeDrawer() {
     if (this.mobile()?.matches) void this.drawer()?.close();
   }

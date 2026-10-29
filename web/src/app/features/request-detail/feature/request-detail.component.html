@@ -1,17 +1,24 @@
-@if (facade.back()) {
-  <button mat-button class="back-link" (click)="facade.goBack()">← Back to requests</button>
-}
-<app-page-header
-  eyebrow="REPLENISHMENT REQUEST"
-  [title]="facade.request() ? 'Request ' + facade.request()!.id.slice(0, 8) : 'Request details'"
-  [description]="facade.request()?.salonName ?? ''"
-  ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-    Refresh
-  </button></app-page-header
->
-@if (facade.loading()) {
-  <mat-progress-bar mode="indeterminate" aria-label="Loading request" />
-}
+<div class="app-back-navigation">
+  <button
+    mat-button
+    type="button"
+    class="refresh"
+    (click)="facade.refresh()"
+    [disabled]="facade.loading()"
+  >
+    <mat-icon aria-hidden="true">refresh</mat-icon>Refresh
+  </button>
+  @if (facade.back(); as context) {
+    <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
+      Back to {{ context.kind === 'HQ' ? 'request queue' : 'requests' }}
+    </button>
+  }
+</div>
+<mat-progress-bar
+  *appDelayedLoading="facade.loading()"
+  mode="indeterminate"
+  aria-label="Loading request"
+/>
 @if (facade.message()) {
   <p role="status" class="message">{{ facade.message() }}</p>
 }
@@ -23,87 +30,217 @@
   </section>
 }
 @if (facade.request(); as request) {
+  <header class="request-header">
+    <div class="request-heading">
+      <p class="reference">{{ request.id.slice(0, 8) }} · HQ → {{ request.salonName }}</p>
+      <h1>
+        @if (request.items.length === 1) {
+          {{ request.items[0].productName }}
+          <span class="title-quantity">× {{ request.items[0].quantity }}</span>
+        } @else {
+          {{ request.itemCount }} products
+          <span class="title-quantity">· {{ request.totalUnits }} pcs</span>
+        }
+      </h1>
+    </div>
+    <app-status-chip [state]="request.state" />
+  </header>
+  @if (issueLink(); as link) {
+    <p>
+      <a mat-button [routerLink]="link">{{
+        request.delivery?.replacementForIssueId
+          ? 'Replacement for delivery issue'
+          : 'View delivery issue'
+      }}</a>
+    </p>
+  }
   <div class="layout">
-    <div>
-      <section class="card">
-        <app-status-chip [state]="request.state" />
-        <h2>Delivery quantities</h2>
-        <p class="muted">Reference: {{ request.id }}</p>
-        @for (item of request.items; track item.productId) {
-          <h3>{{ item.productName }}</h3>
-          <div class="figures">
-            <div>
-              Ordered<strong>{{ item.quantity }}</strong>
-            </div>
-            <div>
-              Dispatched<strong>{{ item.dispatchedQuantity }}</strong>
-            </div>
-            <div>
-              Received<strong>{{ item.receivedQuantity }}</strong>
-            </div>
-          </div>
-        }
-        <h2>Next step</h2>
-        @switch (request.state) {
-          @case ('PENDING_APPROVAL') {
-            <p>HQ reviews availability before reserving stock.</p>
-          }
-          @case ('RESERVED') {
-            <p>Stock is reserved. HQ can now pack and dispatch it.</p>
-          }
-          @case ('DISPATCHED') {
-            <p>Confirm receipt only when all products have arrived intact.</p>
-          }
-          @case ('RECEIVED') {
-            <p>Delivery complete. The products are now in salon stock.</p>
-          }
-          @case ('REJECTED') {
-            <p>This request was rejected. You can prepare a new request from salon inventory.</p>
-          }
-        }
-        <div class="actions">
-          @for (action of facade.availableActions(); track action) {
-            <button mat-stroked-button (click)="facade.act(action)" [disabled]="facade.loading()">
-              {{ labels[action] }}
-            </button>
+    <div class="main-column">
+      <section class="card next-step" aria-labelledby="next-step-title">
+        <div class="next-copy">
+          <p class="eyebrow">NEXT STEP</p>
+          <h2 id="next-step-title">{{ nextTitle() }}</h2>
+          @switch (request.state) {
+            @case ('PENDING_APPROVAL') {
+              <p>
+                HQ checks availability, then approves or rejects the whole request. Nothing is
+                reserved yet.
+              </p>
+            }
+            @case ('RESERVED') {
+              <p>
+                The products are reserved at HQ. Confirm dispatch only once the complete parcel has
+                left HQ.
+              </p>
+            }
+            @case ('DISPATCHED') {
+              <p>Inspect the delivery and record good, damaged and missing products.</p>
+            }
+            @case ('RECEIVED') {
+              <p>Delivery complete. The products are now in salon stock.</p>
+            }
+            @case ('RECEIVED_WITH_ISSUE') {
+              <p>
+                The delivery was inspected. Good products entered salon stock; HQ handles the
+                reported problem.
+              </p>
+            }
+            @case ('REJECTED') {
+              <p>This request was rejected. You can prepare a new request from salon inventory.</p>
+            }
           }
         </div>
+        @if (actions().length) {
+          <div class="actions">
+            @for (action of actions(); track action) {
+              @if (action === 'REJECT') {
+                <button
+                  mat-stroked-button
+                  (click)="facade.act(action)"
+                  [disabled]="facade.loading()"
+                >
+                  {{ labels[action] }}
+                </button>
+              } @else {
+                <button mat-flat-button (click)="facade.act(action)" [disabled]="facade.loading()">
+                  {{ labels[action] }}
+                </button>
+              }
+            }
+          </div>
+        }
       </section>
-      <section class="card">
-        <h2>Timeline</h2>
-        <ol>
-          @for (event of request.timeline; track event.state) {
-            <li>
-              <strong>{{ statuses[event.state].label }}</strong>
-              <p>
-                {{ event.actorLabel }} · {{ event.at | date: 'd MMM, HH:mm' }}
-                @if (event.reason) {
-                  <br />{{ event.reason }}
+      <section class="card delivery" aria-labelledby="delivery-title">
+        <h2 id="delivery-title">Delivery quantities</h2>
+        @for (item of request.items; track item.productId) {
+          <div class="delivery-item">
+            @if (request.items.length > 1) {
+              <h3>{{ item.productName }}</h3>
+            }
+            <div class="figures">
+              <div>
+                <span>Ordered</span><strong>{{ item.quantity }}</strong
+                ><small>pcs</small>
+              </div>
+              <div>
+                <span>Dispatched</span>
+                @if (
+                  request.state === 'DISPATCHED' ||
+                  request.state === 'RECEIVED' ||
+                  request.state === 'RECEIVED_WITH_ISSUE'
+                ) {
+                  <strong>{{ item.dispatchedQuantity }}</strong
+                  ><small>pcs</small>
+                } @else {
+                  <strong class="pending-value">—</strong
+                  ><small>{{ request.state === 'REJECTED' ? 'Not shipped' : 'Pending' }}</small>
                 }
+              </div>
+              <div>
+                <span>{{
+                  request.state === 'RECEIVED_WITH_ISSUE' ? 'Good units' : 'Received'
+                }}</span>
+                @if (request.state === 'RECEIVED' || request.state === 'RECEIVED_WITH_ISSUE') {
+                  <strong>{{ item.receivedQuantity }}</strong
+                  ><small>pcs</small>
+                } @else {
+                  <strong class="pending-value">—</strong
+                  ><small>{{ request.state === 'REJECTED' ? 'Not received' : 'Pending' }}</small>
+                }
+              </div>
+            </div>
+            @if (request.state === 'RECEIVED_WITH_ISSUE' && item.delivery) {
+              <p
+                class="muted"
+                [attr.aria-label]="'Delivery problem quantities · ' + item.productName"
+              >
+                Damaged: {{ item.delivery.damagedQuantity }} · Missing:
+                {{ item.delivery.missingQuantity }}
               </p>
+            }
+          </div>
+        }
+      </section>
+      <section class="card history-card" aria-labelledby="history-title">
+        <h2 id="history-title">Status history</h2>
+        <ol class="status-history" aria-label="Request status history" role="list">
+          @for (step of history(); track step.state) {
+            <li
+              [class.recorded]="step.kind === 'RECORDED'"
+              [class.pending]="step.kind === 'PENDING'"
+              [class.unavailable]="step.kind === 'UNAVAILABLE'"
+              [class.rejected]="step.state === 'REJECTED'"
+            >
+              <div class="history-marker" aria-hidden="true">
+                <mat-icon>{{
+                  step.kind === 'RECORDED'
+                    ? step.state === 'REJECTED'
+                      ? 'cancel'
+                      : 'check_circle'
+                    : 'radio_button_unchecked'
+                }}</mat-icon>
+                @if (!$last) {
+                  <span
+                    class="history-line"
+                    [class.complete]="
+                      step.kind === 'RECORDED' && history()[$index + 1].kind === 'RECORDED'
+                    "
+                  ></span>
+                }
+              </div>
+              <div class="history-copy">
+                <strong>{{ step.label }}</strong>
+                @if (step.event; as event) {
+                  <p>{{ event.actorLabel }} · {{ event.at | date: 'd MMM, HH:mm' }}</p>
+                  @if (event.reason) {
+                    <p class="rejection-reason">{{ event.reason }}</p>
+                  }
+                } @else {
+                  <p>{{ step.kind === 'PENDING' ? 'Pending' : 'History record unavailable' }}</p>
+                }
+              </div>
             </li>
           }
         </ol>
       </section>
     </div>
-    <aside class="card">
-      <h2>Stock now</h2>
+    <aside class="card stock" aria-labelledby="stock-title">
+      <h2 id="stock-title">Stock now</h2>
       @for (item of request.items; track item.productId) {
-        <h3>{{ item.productName }}</h3>
-        <dl>
-          <dt>HQ on hand</dt>
-          <dd data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</dd>
-          <dt>HQ reserved</dt>
-          <dd>{{ item.stock.hqReserved }}</dd>
-          <dt>HQ available</dt>
-          <dd>{{ item.stock.hqAvailable }}</dd>
-          <dt>In transit · this product</dt>
-          <dd data-testid="in-transit">{{ item.dispatchedQuantity - item.receivedQuantity }}</dd>
-          <dt>{{ request.salonName }} on hand</dt>
-          <dd data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</dd>
-        </dl>
+        <section class="stock-item">
+          <h3>{{ item.productName }}</h3>
+          <dl>
+            <div>
+              <dt>HQ stock<small>On the shelf</small></dt>
+              <dd data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</dd>
+            </div>
+            <div>
+              <dt>Reserved at HQ<small>Approved, not yet shipped</small></dt>
+              <dd>{{ item.stock.hqReserved }}</dd>
+            </div>
+            <div>
+              <dt>HQ available<small>Stock − reserved</small></dt>
+              <dd>{{ item.stock.hqAvailable }}</dd>
+            </div>
+            <div>
+              <dt>In transit<small>This product in this request</small></dt>
+              <dd data-testid="in-transit">
+                {{
+                  item.delivery?.inTransit ??
+                    (request.state === 'RECEIVED' || request.state === 'RECEIVED_WITH_ISSUE'
+                      ? 0
+                      : item.dispatchedQuantity - item.receivedQuantity)
+                }}
+              </dd>
+            </div>
+            <div>
+              <dt>{{ request.salonName }} stock<small>In salon</small></dt>
+              <dd data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</dd>
+            </div>
+          </dl>
+        </section>
       }
-      <p class="muted">Synthetic demo quantities. Refreshed from the database.</p>
+      <p class="muted stock-note">Synthetic demo quantities. Refreshed from the database.</p>
     </aside>
   </div>
 }

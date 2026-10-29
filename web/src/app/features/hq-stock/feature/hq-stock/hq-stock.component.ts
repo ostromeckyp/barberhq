@@ -1,5 +1,7 @@
+import { DelayedLoadingDirective } from '../../../../shared/ui/delayed-loading/delayed-loading';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ResponsiveLayout } from '../../../../core/responsive-layout';
@@ -7,7 +9,14 @@ import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { HqStockFacade } from '../hq-stock.facade';
 
 @Component({
-  imports: [MatButtonModule, MatTableModule, MatProgressBarModule, PageHeader],
+  imports: [
+    DelayedLoadingDirective,
+    MatButtonModule,
+    MatTableModule,
+    MatProgressBarModule,
+    PageHeader,
+    RouterLink,
+  ],
   providers: [HqStockFacade],
   selector: 'app-hq-stock',
   templateUrl: './hq-stock.component.html',

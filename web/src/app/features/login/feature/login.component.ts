@@ -1,3 +1,4 @@
+import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField, required, email } from '@angular/forms/signals';
 import { MatCardModule } from '@angular/material/card';
@@ -13,6 +14,7 @@ import { Brand } from '../../../shared/ui/brand/brand';
   providers: [LoginFacade],
   imports: [
     Brand,
+    DelayedLoadingDirective,
     FormField,
     MatCardModule,
     MatFormFieldModule,
@@ -40,7 +42,7 @@ export class LoginComponent {
     try {
       await this.facade.signIn(this.model().email, this.model().password);
     } finally {
-      this.model.update((m) => ({ ...m, password: '' }));
+      this.fields.password().reset('');
     }
   }
 }

@@ -1,5 +1,5 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
-<mat-toolbar class="toolbar">
+<mat-toolbar class="toolbar" role="banner">
   @if (mobile()?.matches) {
     <button mat-icon-button aria-label="Open navigation" (click)="drawer.toggle()">
       <mat-icon>menu</mat-icon>
@@ -35,6 +35,8 @@
 <mat-sidenav-container
   ><mat-sidenav
     #drawer
+    role="navigation"
+    aria-label="Workspace navigation"
     [mode]="mobile()?.matches ? 'over' : 'side'"
     [opened]="!mobile()?.matches"
     [style.width.px]="mobile()?.matches ? 280 : 220"
@@ -52,6 +54,13 @@
         >
         <a mat-list-item routerLink="/hq/stock" routerLinkActive="active" (click)="closeDrawer()"
           ><mat-icon matListItemIcon>inventory_2</mat-icon>HQ stock</a
+        >
+        <a
+          mat-list-item
+          routerLink="/hq/shorthand"
+          routerLinkActive="active"
+          (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>translate</mat-icon>Salon shorthand</a
         >
       }
       @if (facade.salonContext.salonId(); as salonId) {
@@ -78,6 +87,23 @@
           routerLinkActive="active"
           (click)="closeDrawer()"
           ><mat-icon matListItemIcon>settings</mat-icon>Settings</a
+        >
+      }
+      @if (knowledgeEnabled()) {
+        <a
+          mat-list-item
+          routerLink="/procedures"
+          [queryParams]="assistantEnabled() ? {} : { tab: 'documents' }"
+          routerLinkActive="active"
+          (click)="closeDrawer()"
+          ><mat-icon matListItemIcon>description</mat-icon
+          >{{
+            assistantEnabled()
+              ? 'Procedures'
+              : facade.isHqWorkspace()
+                ? 'Procedure docs'
+                : 'Documents'
+          }}</a
         >
       }
     </mat-nav-list>

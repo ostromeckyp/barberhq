@@ -46,3 +46,15 @@ it('recovery_preserves_products_that_cannot_be_resolved_from_inventory', () => {
   expect(store.lines()[0]).toMatchObject({ status: 'NEEDS_CLARIFICATION', quantity: 3 });
   expect(store.canSubmit()).toBe(false);
 });
+it('assistant_merge_is_atomic_when_there_is_no_room_for_all_lines', () => {
+  const store = new DraftStore();
+  for (let i = 0; i < 5; i++) store.add({ ...line(1), lineId: String(i), productId: String(i) });
+  const before = store.lines();
+  expect(
+    store.mergeProposal([
+      { ...line(2), productId: 'new-1' },
+      { ...line(3), productId: 'new-2' },
+    ]),
+  ).toBe(false);
+  expect(store.lines()).toEqual(before);
+});

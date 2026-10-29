@@ -56,3 +56,11 @@ p {
 mat-progress-bar {
   margin-bottom: 16px;
 }
+a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+a:hover,
+a:focus-visible {
+  text-decoration: underline;
+}

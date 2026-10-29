@@ -10,7 +10,7 @@ export const ACTION_LABELS: Record<TransitionType, string> = {
   APPROVE: 'Approve request',
   REJECT: 'Reject request',
   DISPATCH: 'Confirm dispatch',
-  RECEIVE: 'Confirm receipt',
+  RECEIVE: 'Check delivery',
 };
 export function availableRequestActions(
   membership: Membership,

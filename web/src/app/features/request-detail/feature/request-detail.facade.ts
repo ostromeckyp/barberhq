@@ -91,11 +91,31 @@ export class RequestDetailFacade {
   });
   readonly transit = computed(() => {
     const r = this.request();
-    return r ? r.items.reduce((sum, i) => sum + i.dispatchedQuantity - i.receivedQuantity, 0) : 0;
+    return r
+      ? r.items.reduce(
+          (sum, i) =>
+            sum +
+            (i.delivery?.inTransit ??
+              (['RECEIVED', 'RECEIVED_WITH_ISSUE'].includes(r.state)
+                ? 0
+                : i.dispatchedQuantity - i.receivedQuantity)),
+          0,
+        )
+      : 0;
   });
   async act(type: TransitionType) {
     const r = this.request();
     if (!r || !this.availableActions().includes(type)) return;
+    if (type === 'RECEIVE') {
+      const context = this.back();
+      await this.router.navigate(['/salons', r.salonId, 'requests', r.id, 'receipt'], {
+        queryParams:
+          context?.kind === 'SALON' && (context.filter !== 'ALL' || context.offset !== 0)
+            ? { filter: context.filter, offset: context.offset }
+            : undefined,
+      });
+      return;
+    }
     const identity = this.session.state();
     const outcome = await this.actions.open(r, type);
     if (this.id() !== r.id || this.session.state() !== identity) return;

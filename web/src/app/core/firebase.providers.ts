@@ -19,6 +19,7 @@ export function createFirebase() {
   const auth = getAuth(app);
   const functions = getFunctions(app, c.functionsRegion);
   const data = getDataConnect(app, connectorConfig);
+  let appCheck = null;
   if (runtimeConfig.useEmulators) {
     if (!c.projectId.startsWith('demo-') || !['localhost', '127.0.0.1'].includes(location.hostname))
       throw new Error('Emulators require an explicit local demo project.');
@@ -26,11 +27,11 @@ export function createFirebase() {
     connectDataConnectEmulator(data, '127.0.0.1', 9399);
     connectFunctionsEmulator(functions, '127.0.0.1', 5001);
   } else
-    initializeAppCheck(app, {
+    appCheck = initializeAppCheck(app, {
       provider: new ReCaptchaEnterpriseProvider(c.appCheck.siteKey),
       isTokenAutoRefreshEnabled: true,
     });
-  return { auth, data, functions };
+  return { auth, data, functions, appCheck };
 }
 export const FIREBASE = new InjectionToken<ReturnType<typeof createFirebase>>('Firebase', {
   providedIn: 'root',

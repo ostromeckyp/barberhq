@@ -1,0 +1,117 @@
+<section class="library" [class.embedded]="embedded()" aria-labelledby="library-title">
+  <header class="page-header">
+    <div>
+      @if (embedded()) {
+        <h2 id="library-title">
+          Documents
+          <span class="document-count" aria-hidden="true">{{ facade.rows().length }}</span>
+        </h2>
+      } @else {
+        <p class="eyebrow">PROCEDURE DOCUMENTS</p>
+        <h1 id="library-title">Documents</h1>
+        <p class="intro">
+          Open authorized procedure and product reference PDFs for this workspace.
+        </p>
+      }
+    </div>
+    @if (facade.isHqWorkspace()) {
+      <button mat-flat-button type="button" (click)="add()">
+        <mat-icon aria-hidden="true">upload_file</mat-icon>Add document
+      </button>
+    }
+  </header>
+  <p *appDelayedLoading="facade.loading()" class="state" role="status">Loading documents…</p>
+  @if (facade.error()) {
+    <div class="error" role="alert">
+      <p>{{ facade.error() }}</p>
+      <button mat-stroked-button type="button" (click)="facade.refresh()">Retry</button>
+    </div>
+  }
+  @if (facade.notice()) {
+    <p class="notice" role="status">{{ facade.notice() }}</p>
+  }
+  @if (!facade.loading() && !facade.rows().length && !facade.error()) {
+    <div class="empty-state">
+      <h2>No documents yet</h2>
+      <p>
+        @if (facade.isHqWorkspace()) {
+          Add a supported PDF to begin a new immutable document version.
+        } @else {
+          No published documents are available in this salon workspace.
+        }
+      </p>
+      @if (facade.isHqWorkspace()) {
+        <button mat-flat-button type="button" (click)="add()">
+          <mat-icon aria-hidden="true">upload_file</mat-icon>Add document
+        </button>
+      }
+    </div>
+  }
+  @if (facade.rows().length) {
+    <div
+      class="list"
+      aria-label="Document versions"
+      style="--document-library-columns: minmax(0, 1.5fr) minmax(210px, 0.9fr) minmax(0, 1fr)"
+    >
+      @for (row of facade.rows(); track row.versionId) {
+        <app-document-row [row]="row">
+          <div class="actions">
+            @if (row.publishedAt && !row.revokedAt) {
+              <button mat-stroked-button type="button" (click)="openPdf(row)">
+                <mat-icon aria-hidden="true">visibility</mat-icon>Open PDF
+              </button>
+            }
+            @if (facade.isHqWorkspace()) {
+              <button mat-stroked-button type="button" (click)="replace(row)">Replace PDF</button>
+              @if (
+                row.status === 'EXTRACTED' ||
+                (row.status === 'READY' && row.errorCode === 'STALE_STATE' && !row.publishedAt)
+              ) {
+                <a mat-flat-button [routerLink]="reviewUrl(row)">Review and publish</a>
+              }
+              @if (row.retryable) {
+                <button
+                  mat-stroked-button
+                  type="button"
+                  [disabled]="facade.busyVersion() === row.versionId"
+                  (click)="retry(row)"
+                >
+                  Retry processing
+                </button>
+              }
+              @if (row.status === 'STAGED' && !row.revokedAt) {
+                <button mat-stroked-button type="button" (click)="resume(row)">
+                  Resume PDF upload
+                </button>
+              }
+              @if (!row.revokedAt) {
+                <button mat-button type="button" class="withdraw" (click)="withdraw(row)">
+                  Withdraw
+                </button>
+              }
+            }
+          </div>
+        </app-document-row>
+      }
+    </div>
+    <nav class="pagination" aria-label="Document pages">
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="facade.offset() === 0 || facade.loading()"
+        (click)="facade.previous()"
+      >
+        Previous
+      </button>
+      <span>Versions {{ facade.offset() + 1 }}–{{ facade.offset() + facade.rows().length }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="!facade.hasMore() || facade.loading()"
+        (click)="facade.next()"
+      >
+        Next
+      </button>
+    </nav>
+  }
+</section>

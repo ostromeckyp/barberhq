@@ -25,76 +25,170 @@
       operator. Your saved data has been preserved.
     </p>
   }
-  <fieldset [disabled]="facade.locked()">
-    <legend class="sr-only">Add a product</legend>
-    <mat-form-field appearance="outline"
-      ><mat-label>Product</mat-label
-      ><mat-select [formField]="fields.productId">
-        @for (row of facade.inventory.rows(); track row.productId) {
-          <mat-option [value]="row.productId" [disabled]="!!facade.activeFor(row.productId)"
-            >{{ row.productName
-            }}{{ facade.activeFor(row.productId) ? ' · already requested' : '' }}</mat-option
-          >
-        }
-      </mat-select></mat-form-field
-    >
-    <div class="add-row">
+  @if (assistantEnabled) {
+    <mat-tab-group [selectedIndex]="1" [preserveContent]="true" dynamicHeight>
+      <mat-tab
+        ><ng-template mat-tab-label
+          ><mat-icon aria-hidden="true">auto_awesome</mat-icon>Assistant</ng-template
+        ><app-assistant-input
+      /></mat-tab>
+      <mat-tab
+        ><ng-template mat-tab-label
+          ><mat-icon aria-hidden="true">list_alt</mat-icon>Manual</ng-template
+        ><ng-container [ngTemplateOutlet]="manualForm"
+      /></mat-tab>
+    </mat-tab-group>
+  } @else {
+    <ng-container [ngTemplateOutlet]="manualForm" />
+  }
+  <ng-template #manualForm
+    ><fieldset [disabled]="facade.locked()">
+      <legend class="sr-only">Add a product</legend>
       <mat-form-field appearance="outline"
-        ><mat-label>Quantity</mat-label
-        ><input matInput type="number" step="1" [formField]="fields.quantity" /></mat-form-field
-      ><button
-        mat-stroked-button
-        (click)="facade.add()"
-        [disabled]="facade.locked() || fields().invalid()"
+        ><mat-label>Product</mat-label
+        ><mat-select [formField]="fields.productId">
+          @for (row of facade.inventory.rows(); track row.productId) {
+            <mat-option [value]="row.productId" [disabled]="!!facade.activeFor(row.productId)"
+              >{{ row.productName
+              }}{{ facade.activeFor(row.productId) ? ' · already requested' : '' }}</mat-option
+            >
+          }
+        </mat-select></mat-form-field
       >
-        Add to list
-      </button>
-    </div>
-  </fieldset>
+      <div class="add-row">
+        <mat-form-field appearance="outline"
+          ><mat-label>Quantity</mat-label
+          ><input
+            matInput
+            type="number"
+            inputmode="numeric"
+            step="1"
+            [formField]="fields.quantity" /></mat-form-field
+        ><button
+          mat-stroked-button
+          (click)="facade.add()"
+          [disabled]="facade.locked() || fields().invalid()"
+        >
+          Add to list
+        </button>
+      </div>
+    </fieldset></ng-template
+  >
   @if (facade.notice()) {
     <p role="status">{{ facade.notice() }}</p>
   }
+  <h3 class="request-list-heading">
+    Request list <span>{{ facade.draft.lines().length }}</span>
+  </h3>
   @for (line of facade.draft.lines(); track line.lineId) {
     <article class="draft-line">
+      <div class="line-header">
+        <mat-icon class="origin-icon" aria-hidden="true">{{
+          line.origin === 'manual' ? 'edit' : 'auto_awesome'
+        }}</mat-icon>
+        <div class="line-name">
+          <strong>{{ line.status === 'READY' ? line.productName : line.originalWording }}</strong
+          ><small>{{ line.origin === 'manual' ? 'Added manually' : 'From assistant' }}</small>
+        </div>
+        <button
+          mat-icon-button
+          [attr.aria-label]="
+            'Remove ' + (line.status === 'READY' ? line.productName : line.originalWording)
+          "
+          (click)="facade.draft.remove(line.lineId)"
+          [disabled]="facade.locked()"
+        >
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </div>
       @if (line.status === 'READY') {
-        <strong>{{ line.productName }}</strong
-        ><small>{{ line.origin === 'manual' ? 'Added manually' : 'From assistant' }}</small>
         <div class="line-controls">
-          <mat-form-field appearance="outline"
-            ><mat-label>Units for {{ line.productName }}</mat-label
-            ><input
-              matInput
+          <div
+            class="quantity-stepper"
+            role="group"
+            [attr.aria-label]="'Quantity for ' + line.productName"
+          >
+            <button
+              mat-icon-button
+              [attr.aria-label]="'Decrease quantity for ' + line.productName"
+              [disabled]="
+                facade.locked() ||
+                line.quantity <= 1 ||
+                line.quantity > 99 ||
+                line.quantity % 1 !== 0
+              "
+              (click)="facade.draft.editQuantity(line.lineId, line.quantity - 1)"
+            >
+              <mat-icon aria-hidden="true">remove</mat-icon>
+            </button>
+            <input
+              class="line-quantity"
               type="number"
+              inputmode="numeric"
               min="1"
               max="99"
               step="1"
+              [attr.aria-label]="'Units for ' + line.productName"
               [value]="line.quantity"
               (input)="quantity($event, line.lineId)"
-              [disabled]="facade.locked()" /></mat-form-field
-          ><button
-            mat-icon-button
-            [attr.aria-label]="'Remove ' + line.productName"
-            (click)="facade.draft.remove(line.lineId)"
-            [disabled]="facade.locked()"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
+              [disabled]="facade.locked()"
+            />
+            <button
+              mat-icon-button
+              [attr.aria-label]="'Increase quantity for ' + line.productName"
+              [disabled]="
+                facade.locked() ||
+                line.quantity >= 99 ||
+                line.quantity < 1 ||
+                line.quantity % 1 !== 0
+              "
+              (click)="facade.draft.editQuantity(line.lineId, line.quantity + 1)"
+            >
+              <mat-icon aria-hidden="true">add</mat-icon>
+            </button>
+          </div>
+          <div class="line-stock" [class.shortage]="line.quantity > line.hqAvailable">
+            HQ <b>{{ line.hqAvailable }}</b
+            ><span class="sr-only"> available</span>
+          </div>
+          <div class="line-stock">
+            Salon
+            <b
+              >{{ line.salonOnHand }} →
+              @if (line.quantity >= 1 && line.quantity <= 99 && line.quantity % 1 === 0) {
+                {{ line.salonOnHand + line.quantity }}
+              } @else {
+                —
+              }
+            </b>
+          </div>
         </div>
-        <p>
-          HQ available: <b>{{ line.hqAvailable }}</b> · Salon: {{ line.salonOnHand }} →
-          {{ line.salonOnHand + line.quantity }} after full receipt
-        </p>
+        <span class="sr-only">Projected salon stock after full receipt.</span>
         @if (line.quantity > line.hqAvailable) {
-          <p class="warning">More than HQ currently has. You can still send this request.</p>
+          <p class="line-warning">
+            <mat-icon aria-hidden="true">warning</mat-icon
+            ><span
+              >HQ has {{ line.hqAvailable }} available. You can still submit — HQ decides. Nothing
+              is swapped automatically.</span
+            >
+          </p>
         }
         @if (line.quantity < 1 || line.quantity > 99 || line.quantity % 1 !== 0) {
           <p class="error" role="alert">Enter a whole number from 1 to 99.</p>
         }
       } @else {
-        <p>{{ line.originalWording }} × {{ line.quantity }} — {{ line.reason }}</p>
-        <button mat-button (click)="facade.draft.remove(line.lineId)" [disabled]="facade.locked()">
-          Remove unresolved item
-        </button>
+        <p class="line-warning">
+          <mat-icon aria-hidden="true">help</mat-icon
+          ><span>{{ line.reason }} · Qty {{ line.quantity }}</span>
+        </p>
+        @if (assistantEnabled && line.origin === 'assistant') {
+          <app-clarification-input
+            [line]="line"
+            [products]="facade.inventory.rows()"
+            [locked]="facade.locked() || assistant.loading()"
+            (resolved)="assistant.clarify(line.lineId, $event.productId, $event.quantity)"
+          />
+        }
       }
     </article>
   } @empty {

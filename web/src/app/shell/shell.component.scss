@@ -1,8 +1,12 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
 }
 .toolbar {
   height: 60px;
+  flex: none;
   background: var(--ink);
   color: var(--surface);
   border-bottom: 2px solid var(--brand);
@@ -36,7 +40,8 @@
   font-size: 14px;
 }
 mat-sidenav-container {
-  min-height: calc(100dvh - 60px);
+  flex: 1;
+  min-height: 0;
   background: var(--background);
 }
 mat-sidenav {
@@ -115,9 +120,6 @@ main {
   }
   main {
     padding: 20px 16px;
-  }
-  mat-sidenav-container {
-    min-height: calc(100dvh - 104px);
   }
 }
 

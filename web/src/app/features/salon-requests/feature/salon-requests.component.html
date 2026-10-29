@@ -16,14 +16,19 @@
   ><mat-button-toggle value="RECEIVED">Received</mat-button-toggle
   ><mat-button-toggle value="REJECTED">Rejected</mat-button-toggle>
 </mat-button-toggle-group>
-@if (facade.loading()) {
-  <mat-progress-bar mode="indeterminate" aria-label="Loading requests" />
-} @else if (facade.error()) {
-  <p role="alert">
-    Requests unavailable. <button mat-button (click)="facade.refresh()">Retry</button>
-  </p>
-} @else {
-  <app-request-list [requests]="facade.items()" [context]="facade.context()" />
+<mat-progress-bar
+  *appDelayedLoading="facade.loading()"
+  mode="indeterminate"
+  aria-label="Loading requests"
+/>
+@if (!facade.loading()) {
+  @if (facade.error()) {
+    <p role="alert">
+      Requests unavailable. <button mat-button (click)="facade.refresh()">Retry</button>
+    </p>
+  } @else {
+    <app-request-list [requests]="facade.items()" [context]="facade.context()" />
+  }
 }
 <nav aria-label="Request pages">
   <button

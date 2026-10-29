@@ -22,6 +22,64 @@ export const routes: Routes = [
     canActivate: [accessGuard],
     children: [
       {
+        path: 'procedures/review/:versionId',
+        title: 'Review document · BarberHQ',
+        data: { kind: 'hq', workspace: 'HQ' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/procedures/document-review.component').then(
+            (m) => m.DocumentReviewComponent,
+          ),
+      },
+      {
+        path: 'procedures',
+        title: 'Procedures · BarberHQ',
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/procedures/procedure-page.component').then(
+            (m) => m.ProcedurePageComponent,
+          ),
+      },
+      {
+        path: 'procedures/sources/:versionId',
+        title: 'Source PDF · BarberHQ',
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/procedures/pdf-viewer/pdf-viewer.component').then(
+            (m) => m.PdfViewerComponent,
+          ),
+      },
+      {
+        path: 'hq/delivery-issues/:issueId',
+        title: 'Delivery issue · BarberHQ',
+        data: { kind: 'hq', workspace: 'HQ' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/delivery/ui/delivery-issue.component').then(
+            (m) => m.DeliveryIssueComponent,
+          ),
+      },
+      {
+        path: 'salons/:salonId/delivery-issues/:issueId',
+        title: 'Delivery issue · BarberHQ',
+        data: { workspace: 'SALON' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/delivery/ui/delivery-issue.component').then(
+            (m) => m.DeliveryIssueComponent,
+          ),
+      },
+      {
+        path: 'salons/:salonId/requests/:requestId/receipt',
+        title: 'Check delivery · BarberHQ',
+        data: { workspace: 'SALON' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/delivery/ui/delivery-receipt.component').then(
+            (m) => m.DeliveryReceiptComponent,
+          ),
+      },
+      {
         path: 'salons/:salonId/requests/:requestId',
         title: 'Salon request · BarberHQ',
         data: { workspace: 'SALON' },
@@ -69,6 +127,26 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'hq/stock/products/new',
+        title: 'Add product · BarberHQ',
+        data: { kind: 'hq' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/hq-products/feature/product-editor.component').then(
+            (m) => m.ProductEditorComponent,
+          ),
+      },
+      {
+        path: 'hq/stock/products/:productId',
+        title: 'Edit product · BarberHQ',
+        data: { kind: 'hq' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/hq-products/feature/product-editor.component').then(
+            (m) => m.ProductEditorComponent,
+          ),
+      },
+      {
         path: 'hq/stock',
         title: 'HQ stock · BarberHQ',
         data: { kind: 'hq' },
@@ -76,6 +154,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/hq-stock/feature/hq-stock/hq-stock.component').then(
             (m) => m.HqStockComponent,
+          ),
+      },
+      {
+        path: 'hq/shorthand',
+        title: 'Salon shorthand · BarberHQ',
+        data: { kind: 'hq' },
+        canActivate: [accessGuard],
+        loadComponent: () =>
+          import('./features/hq-shorthand/hq-shorthand.component').then(
+            (m) => m.HqShorthandComponent,
           ),
       },
       {

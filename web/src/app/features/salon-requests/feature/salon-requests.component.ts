@@ -1,3 +1,4 @@
+import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -8,7 +9,14 @@ import { SalonRequestsFacade } from './salon-requests.facade';
 @Component({
   selector: 'app-salon-requests',
   providers: [SalonRequestsFacade],
-  imports: [MatButtonModule, MatButtonToggleModule, MatProgressBarModule, PageHeader, RequestList],
+  imports: [
+    DelayedLoadingDirective,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatProgressBarModule,
+    PageHeader,
+    RequestList,
+  ],
   templateUrl: './salon-requests.component.html',
   styleUrl: './salon-requests.component.scss',
 })

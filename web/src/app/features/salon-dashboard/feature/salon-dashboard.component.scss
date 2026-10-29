@@ -31,7 +31,23 @@ mat-progress-bar {
 }
 
 .request-sheet-content {
-  padding: 0 8px 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: 90dvh;
+  min-height: 0;
+}
+
+.request-sheet-chrome {
+  flex: none;
+  padding: 12px 24px 0;
+  background: var(--surface);
+}
+
+.request-sheet-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 0 24px calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .request-sheet-header {

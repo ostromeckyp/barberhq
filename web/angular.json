@@ -27,11 +27,14 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/build",
+                "output": "/"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -52,6 +55,10 @@
                 {
                   "replace": "src/app/core/public-config.ts",
                   "with": "src/app/core/public-config.generated.ts"
+                },
+                {
+                  "replace": "src/app/core/generated/esm/index.esm.js",
+                  "with": "src/app/core/generated-cloud/esm/index.esm.js"
                 }
               ]
             },
@@ -89,7 +96,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "isolate": true
+          }
         }
       }
     }

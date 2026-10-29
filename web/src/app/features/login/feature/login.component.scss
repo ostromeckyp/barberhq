@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .login-page {
   min-height: 100dvh;
   display: flex;
@@ -12,7 +14,30 @@
   width: 100%;
   max-width: 400px;
   border-radius: 16px;
-  border-top: 4px solid var(--brand);
+  overflow: hidden;
+}
+.login-progress {
+  height: 4px;
+  flex: 0 0 4px;
+  @include mat.progress-bar-overrides(
+    (
+      active-indicator-color: var(--brand),
+      track-color: transparent,
+    )
+  );
+}
+.login-feedback .error-message {
+  margin: 0;
+  line-height: 18px;
+  padding: 0;
+  background: transparent;
+  font-size: 12px;
+}
+.login-feedback mat-icon {
+  flex-shrink: 0;
+}
+.feedback-placeholder {
+  visibility: hidden;
 }
 mat-card-content {
   padding: 28px !important;
@@ -39,12 +64,18 @@ mat-form-field {
   width: 100%;
 }
 .login-help {
+  display: grid;
+  line-height: 18px;
   font-size: 12px;
   text-align: left;
   color: var(--muted);
   margin: 20px 0 0;
   padding-top: 16px;
   border-top: 1px solid var(--divider);
+}
+.login-help > * {
+  grid-area: 1 / 1;
+  margin: 0;
 }
 @media (max-width: 400px) {
   mat-card-content {

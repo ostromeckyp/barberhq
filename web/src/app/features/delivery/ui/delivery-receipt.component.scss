@@ -1,0 +1,107 @@
+:host {
+  display: block;
+  color: var(--ink);
+}
+h1 {
+  margin: 16px 0 8px;
+  font-size: 28px;
+}
+h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+h3 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+p {
+  line-height: 1.55;
+}
+.intro {
+  margin-bottom: 24px;
+}
+.card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #deded7);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.receipt-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 24px;
+  align-items: start;
+}
+.product {
+  border-top: 1px solid var(--border, #deded7);
+  padding-top: 20px;
+  margin-top: 20px;
+}
+.quantities {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+mat-form-field {
+  width: 100%;
+  min-width: 0;
+}
+input {
+  min-width: 0;
+}
+.preview {
+  position: sticky;
+  top: 24px;
+}
+.good-total {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+.preview button {
+  width: 100%;
+  min-height: 44px;
+  height: auto;
+  padding-block: 12px;
+}
+.source-reference {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 12px;
+  gap: 8px;
+}
+.procedure-question {
+  height: auto;
+  min-height: 44px;
+  padding-block: 10px;
+  margin-bottom: 12px;
+  white-space: normal;
+  text-align: left;
+}
+.validation {
+  color: var(--error, #8c1d18);
+}
+button {
+  max-width: 100%;
+}
+@media (max-width: 800px) {
+  .receipt-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .preview {
+    position: static;
+  }
+  .card {
+    padding: 16px;
+  }
+}
+@media (max-width: 400px) {
+  .quantities {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

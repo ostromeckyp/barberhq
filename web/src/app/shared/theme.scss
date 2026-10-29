@@ -2,6 +2,9 @@
 @use '@angular/material' as mat;
 .request-products-sheet mat-bottom-sheet-container {
   border-radius: 1rem 1rem 0 0;
+  overflow: hidden;
+  padding: 0;
+  max-height: 90dvh;
   @include mat.bottom-sheet-overrides(
     (
       container-background-color: tokens.$surface,
@@ -48,6 +51,9 @@ html {
   @include mat.button-overrides(
     (
       filled-container-height: 40px,
+      // Dark feedback preserves white-label contrast on the brand-red surface.
+      filled-state-layer-color: #000000,
+      filled-ripple-color: rgba(0, 0, 0, 0.12),
       outlined-container-height: 40px,
       text-container-height: 40px,
     )

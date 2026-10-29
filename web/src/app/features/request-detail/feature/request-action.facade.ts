@@ -54,6 +54,11 @@ export class RequestActionFacade {
       if (code === 'UNKNOWN') {
         this.unknown.set(true);
         this.error.set('Outcome unknown. Retry this same action to check whether it was recorded.');
+      } else if (code === 'CLIENT_UPDATE_REQUIRED' && this.data.type === 'RECEIVE') {
+        this.unknown.set(true);
+        this.error.set(
+          'Reload the app to inspect this delivery. Keep this saved action until its result has been reconciled.',
+        );
       } else
         this.dialog.close({
           error:

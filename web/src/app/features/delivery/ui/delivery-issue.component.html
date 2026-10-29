@@ -1,0 +1,241 @@
+<div class="app-back-navigation">
+  <button
+    mat-button
+    type="button"
+    (click)="facade.refresh()"
+    [disabled]="facade.loading() || facade.busy()"
+  >
+    Refresh</button
+  ><button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
+    Back to {{ facade.view === 'HQ' ? 'delivery issues' : 'request' }}
+  </button>
+</div>
+<h1>Delivery issue</h1>
+<mat-progress-bar
+  *appDelayedLoading="facade.loading()"
+  mode="indeterminate"
+  aria-label="Loading delivery issue"
+/>
+@if (facade.message()) {
+  <p role="status">{{ facade.message() }}</p>
+}
+@if (facade.recoveryError()) {
+  <p role="alert">{{ facade.recoveryError() }}</p>
+}
+@if (facade.error()) {
+  <section class="card">
+    <h2>Delivery issue unavailable</h2>
+    <p>It may be outside your access. Your unsent note is retained.</p>
+    <button mat-button type="button" (click)="facade.refresh()">Retry</button>
+  </section>
+}
+@if (facade.issue(); as issue) {
+  <header class="heading">
+    <p>{{ issue.salonName }} · {{ issue.createdAt | date: 'd MMM, HH:mm' }}</p>
+    <span class="issue-status">{{ facade.statusLabel() }}</span>
+  </header>
+  <div class="layout">
+    <div>
+      <section class="card" aria-label="Outstanding units">
+        <h2>Replacement progress</h2>
+        @for (item of issue.items; track item.productId) {
+          <div class="progress-item">
+            <h3>{{ item.productName }}</h3>
+            <p class="remaining">{{ item.outstandingQuantity }} remaining</p>
+            <p>
+              {{ item.replacementAcceptedQuantity }} good replacement units received of
+              {{ item.initialAffectedQuantity }} affected units
+            </p>
+          </div>
+        }
+        @if (issue.status === 'RESOLVED') {
+          <p>The outstanding good replacement units have been received.</p>
+        }
+      </section>
+      <section class="card" aria-label="Original inspection">
+        <h2>Original inspection</h2>
+        <a mat-button [routerLink]="facade.requestLink(issue.rootRequestId)"
+          >Open original request</a
+        >
+        @for (item of issue.rootReceipt.items; track item.productId) {
+          <h3>{{ item.productName }}</h3>
+          <p>
+            {{ item.goodQuantity }} good · {{ item.damagedQuantity }} damaged ·
+            {{ item.missingQuantity }} missing
+          </p>
+        }
+        @if (issue.rootReceipt.report; as report) {
+          <p>{{ report.description }}</p>
+          @if (report.batchIdentifier) {
+            <p>Batch: {{ report.batchIdentifier }}</p>
+          }
+        }
+        <p class="muted">
+          Inspected by {{ issue.rootReceipt.actorLabel }} ·
+          {{ issue.rootReceipt.recordedAt | date: 'd MMM, HH:mm' }}
+        </p>
+        @for (ref of issue.rootReceipt.procedureReferences; track ref.kind) {
+          <button mat-stroked-button type="button" (click)="facade.openProcedure(ref)">
+            Open {{ sourceLabels[ref.kind] }} procedure
+          </button>
+        }
+        @if (!issue.rootReceipt.procedureReferences.length) {
+          <p class="muted">No procedure source was selected for the original inspection.</p>
+        }
+      </section>
+      <section class="card" aria-label="Current delivery procedures">
+        <h2>Current delivery procedures</h2>
+        @if (facade.procedures(); as procedures) {
+          @for (procedure of procedures; track procedure.kind) {
+            @if (procedure.reference; as reference) {
+              <h3>{{ sourceLabels[procedure.kind] }}</h3>
+              <p>{{ procedure.title }}</p>
+              <button mat-stroked-button type="button" (click)="facade.openProcedure(reference)">
+                Open {{ sourceLabels[procedure.kind] }} procedure
+              </button>
+            } @else {
+              <p>
+                The {{ sourceLabels[procedure.kind] }} procedure is
+                {{ procedure.availability === 'MISSING' ? 'not assigned' : 'unavailable' }}. Contact
+                HQ for instructions.
+              </p>
+            }
+          }
+        } @else {
+          <p>
+            Current procedures unavailable. Refresh to check again or contact HQ for instructions.
+          </p>
+        }
+      </section>
+      <section class="card" aria-labelledby="replacements-title">
+        <h2 id="replacements-title">Replacement requests</h2>
+        @if (!issue.replacements.length) {
+          <p>No replacement requests yet.</p>
+        }
+        @for (child of issue.replacements; track child.id) {
+          <article class="replacement">
+            <div>
+              <p class="reference">
+                {{ child.id.slice(0, 8) }} · {{ child.createdAt | date: 'd MMM, HH:mm' }}
+              </p>
+              <app-status-chip [state]="child.state" />
+            </div>
+            <a mat-button [routerLink]="facade.requestLink(child.id)">Open replacement request</a>
+          </article>
+        }
+        <nav aria-label="Replacement pages">
+          <button
+            mat-button
+            type="button"
+            (click)="facade.replacementsBy(-1)"
+            [disabled]="facade.replacementOffset() === 0 || facade.loading()"
+          >
+            Previous replacements</button
+          ><button
+            mat-button
+            type="button"
+            (click)="facade.replacementsBy(1)"
+            [disabled]="!issue.hasMoreReplacements || facade.loading()"
+          >
+            Next replacements
+          </button>
+        </nav>
+      </section>
+      <section class="card" aria-labelledby="history-title">
+        <h2 id="history-title">Issue history</h2>
+        <ol>
+          @for (event of issue.events; track event.id) {
+            <li>
+              <h3>{{ eventLabels[event.type] }}</h3>
+              <p class="muted">
+                {{ event.actorLabel }} · {{ event.recordedAt | date: 'd MMM, HH:mm' }}
+              </p>
+              @if (event.note) {
+                <p class="note-text">{{ event.note }}</p>
+              }
+              @for (row of event.quantities; track row.productId) {
+                <p>
+                  {{ row.goodQuantity }} good · {{ row.damagedQuantity }} damaged ·
+                  {{ row.missingQuantity }} missing
+                </p>
+              }
+            </li>
+          }
+        </ol>
+        <nav aria-label="Issue history pages">
+          <button
+            mat-button
+            type="button"
+            (click)="facade.eventsBy(-1)"
+            [disabled]="facade.eventOffset() === 0 || facade.loading()"
+          >
+            Previous events</button
+          ><button
+            mat-button
+            type="button"
+            (click)="facade.eventsBy(1)"
+            [disabled]="!issue.hasMoreEvents || facade.loading()"
+          >
+            Next events
+          </button>
+        </nav>
+      </section>
+    </div>
+    @if (facade.isHq()) {
+      <section class="card actions" aria-labelledby="hq-actions-title">
+        <h2 id="hq-actions-title">HQ follow-up</h2>
+        @if (facade.unknown()) {
+          <p>The saved action is locked until its result is confirmed.</p>
+          <button
+            mat-flat-button
+            type="button"
+            (click)="facade.retry()"
+            [disabled]="facade.busy() || facade.loading()"
+          >
+            Retry saved action
+          </button>
+        } @else {
+          @if (issue.status === 'OPEN') {
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="facade.act('START_REVIEW')"
+              [disabled]="!facade.canReview()"
+            >
+              Start review
+            </button>
+          }
+          @if (issue.status !== 'RESOLVED') {
+            <button
+              mat-flat-button
+              type="button"
+              (click)="facade.act('CREATE_REPLACEMENT')"
+              [disabled]="!facade.canCreate()"
+            >
+              Create replacement
+            </button>
+            <p>
+              Creates a linked request for the remaining good units. Approval and dispatch follow
+              the usual request flow.
+            </p>
+            <mat-form-field appearance="outline"
+              ><mat-label>HQ note</mat-label
+              ><textarea matInput rows="3" [formField]="note"></textarea></mat-form-field
+            ><button
+              mat-stroked-button
+              type="button"
+              (click)="facade.act('ADD_NOTE')"
+              [disabled]="!facade.canNote()"
+            >
+              Add note
+            </button>
+          } @else {
+            <p>
+              All replacement units were received. The original inspection remains in the history.
+            </p>
+          }
+        }
+      </section>
+    }
+  </div>
+}

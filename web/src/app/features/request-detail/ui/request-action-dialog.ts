@@ -1,3 +1,4 @@
+import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { Component, inject } from '@angular/core';
 import { form, FormField, disabled, maxLength } from '@angular/forms/signals';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -12,6 +13,7 @@ import { RequestActionFacade } from '../feature/request-action.facade';
   providers: [RequestActionFacade],
   imports: [
     FormField,
+    DelayedLoadingDirective,
     MatDialogModule,
     MatInputModule,
     MatFormFieldModule,
@@ -48,6 +50,7 @@ import { RequestActionFacade } from '../feature/request-action.facade';
               <input
                 matInput
                 type="number"
+                inputmode="numeric"
                 step="1"
                 [formField]="fields.items[index].receivedQuantity"
               />
@@ -81,9 +84,10 @@ import { RequestActionFacade } from '../feature/request-action.facade';
       @if (facade.error()) {
         <p role="alert" class="warning">{{ facade.error() }}</p>
       }
-      @if (facade.busy()) {
-        <mat-progress-bar mode="indeterminate" aria-label="Saving action" />
-      }</mat-dialog-content
+      <mat-progress-bar
+        *appDelayedLoading="facade.busy()"
+        mode="indeterminate"
+        aria-label="Saving action" /></mat-dialog-content
     ><mat-dialog-actions align="end"
       ><button mat-button mat-dialog-close [disabled]="facade.busy()">
         {{ facade.unknown() ? 'Close and review' : 'Cancel' }}</button

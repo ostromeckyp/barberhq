@@ -1,10 +1,12 @@
 import { Service, signal, inject, DestroyRef } from '@angular/core';
+import { DELIVERY_JOURNAL } from '../../delivery/feature/delivery-journal';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
 import type { SessionState } from '../../../../../../shared/contracts/business';
 import { SESSION_GATEWAY, type SalonOption } from '../data-access/session.gateway';
 @Service()
 export class SessionFacade {
+  private readonly deliveryJournal = inject(DELIVERY_JOURNAL);
   private readonly gateway = inject(SESSION_GATEWAY);
   private readonly current = signal<SessionState>({ status: 'LOADING' });
   readonly state = this.current.asReadonly();
@@ -48,6 +50,13 @@ export class SessionFacade {
     return this.gateway.signIn(email, password);
   }
   async signOut() {
+    if (this.uid) {
+      try {
+        this.deliveryJournal.clearUser(this.uid);
+      } catch {
+        /* Browser storage may be blocked; access remains scoped to its original user. */
+      }
+    }
     ++this.generation;
     this.uid = null;
     this.availableSalons.set([]);

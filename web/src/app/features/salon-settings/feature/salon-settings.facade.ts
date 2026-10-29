@@ -83,8 +83,7 @@ export class SalonSettingsFacade {
     }),
     computation: (s, previous): number | undefined => {
       if (!s.scope) return undefined;
-      if (!previous || previous.source.scope !== s.scope)
-        return s.snapshot?.settings.version;
+      if (!previous || previous.source.scope !== s.scope) return s.snapshot?.settings.version;
       if (s.snapshot && previous.value === undefined) return s.snapshot.settings.version;
       if (
         s.snapshot?.resetEpoch === s.resetEpoch &&

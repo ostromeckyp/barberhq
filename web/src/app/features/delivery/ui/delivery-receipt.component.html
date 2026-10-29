@@ -1,0 +1,191 @@
+<div class="app-back-navigation">
+  <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
+    Back to request
+  </button>
+</div>
+<h1>
+  {{
+    facade.result() || (facade.context()?.summary.receipt && !facade.unknown())
+      ? 'Inspection recorded'
+      : 'Check delivery'
+  }}
+</h1>
+<mat-progress-bar
+  *appDelayedLoading="facade.loading()"
+  mode="indeterminate"
+  aria-label="Loading delivery"
+/>
+@if (facade.message()) {
+  <p role="status">{{ facade.message() }}</p>
+}
+@if (facade.recoveryError()) {
+  <p role="alert">{{ facade.recoveryError() }}</p>
+}
+@if (facade.error()) {
+  <section class="card">
+    <h2>Delivery unavailable</h2>
+    <p>Your draft is retained. Refresh to check access and delivery information.</p>
+    <button mat-button type="button" (click)="facade.refresh()">Retry</button>
+  </section>
+}
+@if (facade.context(); as context) {
+  <p class="intro">
+    HQ → {{ context.request.salonName }} · Request {{ context.request.id.slice(0, 8) }}
+  </p>
+  @if (context.summary.receipt && !facade.unknown()) {
+    <section class="card" aria-label="Recorded quantities">
+      @for (item of context.summary.receipt.items; track item.productId) {
+        <h2>{{ item.productName }}</h2>
+        <p>
+          {{ item.goodQuantity }} good · {{ item.damagedQuantity }} damaged ·
+          {{ item.missingQuantity }} missing
+        </p>
+      }
+      @if (context.summary.receipt.report; as report) {
+        <p>{{ report.description }}</p>
+      }
+    </section>
+  } @else {
+    <div class="receipt-layout">
+      <div>
+        <section class="card" aria-labelledby="quantities-title">
+          <h2 id="quantities-title">Inspect the products</h2>
+          <p>
+            Count good, damaged and missing units for each product. Only good units enter salon
+            stock.
+          </p>
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="facade.markAllGood()"
+            [disabled]="facade.locked()"
+          >
+            <mat-icon aria-hidden="true">done_all</mat-icon>Mark all as good
+          </button>
+          @for (item of fields.items; track $index) {
+            @if (facade.products().get(item.productId().value()); as product) {
+              <article class="product">
+                <h3>{{ product.productName }}</h3>
+                <p>{{ product.dispatchedQuantity }} units dispatched</p>
+                <div class="quantities">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                    ><mat-label>Good units</mat-label
+                    ><input
+                      matInput
+                      type="number"
+                      inputmode="numeric"
+                      [formField]="item.goodQuantity"
+                      [attr.aria-label]="'Good units · ' + product.productName"
+                  /></mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                    ><mat-label>Damaged units</mat-label
+                    ><input
+                      matInput
+                      type="number"
+                      inputmode="numeric"
+                      [formField]="item.damagedQuantity"
+                      [attr.aria-label]="'Damaged units · ' + product.productName"
+                  /></mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                    ><mat-label>Missing units</mat-label
+                    ><input
+                      matInput
+                      type="number"
+                      inputmode="numeric"
+                      [formField]="item.missingQuantity"
+                      [attr.aria-label]="'Missing units · ' + product.productName"
+                  /></mat-form-field>
+                </div>
+              </article>
+            }
+          }
+        </section>
+        @if (facade.totals().affected > 0) {
+          <section class="card" aria-labelledby="problem-title">
+            <h2 id="problem-title">Report a delivery problem</h2>
+            <mat-form-field appearance="outline"
+              ><mat-label>Describe the problem</mat-label
+              ><textarea matInput rows="3" [formField]="fields.description"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline"
+              ><mat-label>Batch number (if known)</mat-label
+              ><input matInput [formField]="fields.batchIdentifier"
+            /></mat-form-field>
+            <h3>What to do with the products</h3>
+            <p>Check your salon procedure before handling damaged or missing products.</p>
+            @if (facade.procedureQuestion(); as question) {
+              <button
+                mat-stroked-button
+                type="button"
+                class="procedure-question"
+                (click)="facade.openProcedureAssistant()"
+                [disabled]="facade.locked()"
+              >
+                <mat-icon aria-hidden="true">auto_awesome</mat-icon>{{ question }}
+              </button>
+            }
+            @for (procedure of context.procedures; track procedure.kind) {
+              @if (procedure.reference) {
+                <button
+                  mat-stroked-button
+                  type="button"
+                  (click)="facade.openProcedure(procedure)"
+                  [disabled]="facade.locked()"
+                >
+                  Open {{ labels[procedure.kind] }} procedure
+                </button>
+              }
+            }
+          </section>
+        }
+        @if (facade.draft.model().procedureReferences.length) {
+          <section class="card" aria-label="Selected procedure sources">
+            <h2>Selected procedure sources</h2>
+            @for (reference of facade.draft.model().procedureReferences; track reference.kind) {
+              <div class="source-reference">
+                <span>Selected {{ labels[reference.kind] }} source</span
+                ><button
+                  mat-button
+                  type="button"
+                  [disabled]="facade.locked()"
+                  (click)="facade.removeReference(reference.kind)"
+                >
+                  Remove source reference
+                </button>
+              </div>
+            }
+          </section>
+        }
+      </div>
+      <section class="card preview" aria-label="Receipt preview">
+        <h2>Receipt preview</h2>
+        <p class="good-total">{{ facade.totals().good }} good units</p>
+        <p>will be added to salon stock.</p>
+        @if (facade.totals().affected > 0) {
+          <p>{{ facade.totals().affected }} units will be reported to HQ for replacement.</p>
+        }
+        <p>Recording the inspection ends transit for this delivery.</p>
+        @if (facade.validation() && !facade.unknown()) {
+          <p class="validation" role="status">{{ facade.validation() }}</p>
+        }
+        @if (facade.unknown()) {
+          <p>The saved inspection is locked until its result is confirmed.</p>
+        }
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="!facade.canSubmit()"
+          (click)="facade.submit()"
+        >
+          {{
+            facade.busy()
+              ? 'Recording…'
+              : facade.unknown()
+                ? 'Retry saved inspection'
+                : 'Record inspection'
+          }}
+        </button>
+      </section>
+    </div>
+  }
+}

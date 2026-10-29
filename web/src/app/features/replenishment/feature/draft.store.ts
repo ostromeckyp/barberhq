@@ -6,6 +6,32 @@ import type { DraftLine, ReadyDraftLine } from '../../../../../../shared/contrac
 export class DraftStore {
   private readonly value = signal<DraftLine[]>([]);
   readonly lines = this.value.asReadonly();
+  readonly clearEpoch = signal(0);
+  mergeProposal(lines: DraftLine[], replaceIds: string[] = []): boolean {
+    if (replaceIds.some((id) => !this.lines().some((l) => l.lineId === id))) return false;
+    const next = this.lines().filter((l) => !replaceIds.includes(l.lineId));
+    for (const line of lines) {
+      const index =
+        line.status === 'READY'
+          ? next.findIndex((l) => l.status === 'READY' && l.productId === line.productId)
+          : -1;
+      const existing = next[index];
+      if (existing?.status === 'READY' && line.status === 'READY')
+        next[index] = {
+          ...line,
+          ...existing,
+          quantity: existing.quantity + line.quantity,
+          hqAvailable: line.hqAvailable,
+          salonOnHand: line.salonOnHand,
+          hqInventoryVersion: line.hqInventoryVersion,
+          salonInventoryVersion: line.salonInventoryVersion,
+        };
+      else next.push({ ...line });
+    }
+    if (next.length > 6) return false;
+    this.value.set(next);
+    return true;
+  }
   readonly canSubmit = computed(
     () =>
       this.lines().length > 0 &&
@@ -76,5 +102,6 @@ export class DraftStore {
   }
   clear() {
     this.value.set([]);
+    this.clearEpoch.update((v) => v + 1);
   }
 }

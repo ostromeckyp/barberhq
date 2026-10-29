@@ -34,9 +34,11 @@
     </button>
   </app-stale-banner>
 }
-@if (facade.loading()) {
-  <mat-progress-bar mode="indeterminate" aria-label="Loading inventory" />
-}
+<mat-progress-bar
+  *appDelayedLoading="facade.loading()"
+  mode="indeterminate"
+  aria-label="Loading inventory"
+/>
 @if (facade.error() && !facade.rows().length) {
   <app-empty-state
     title="Inventory is unavailable"
@@ -94,17 +96,19 @@
 
 <ng-template #requestSheet>
   <div class="request-sheet-content">
-    <div class="request-sheet-handle" aria-hidden="true"></div>
-    <header class="request-sheet-header">
-      <button
-        mat-icon-button
-        type="button"
-        aria-label="Close request products"
-        (click)="closeRequestSheet()"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-    </header>
-    <app-order-panel [embedded]="true" />
+    <div class="request-sheet-chrome">
+      <div class="request-sheet-handle" aria-hidden="true"></div>
+      <header class="request-sheet-header">
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Close request products"
+          (click)="closeRequestSheet()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+    </div>
+    <div class="request-sheet-body"><app-order-panel [embedded]="true" /></div>
   </div>
 </ng-template>

@@ -1,0 +1,139 @@
+<section class="review" aria-labelledby="review-title">
+  <div class="app-back-navigation">
+    <button mat-stroked-button type="button" class="app-back-button" (click)="facade.back()">
+      Back to documents
+    </button>
+  </div>
+  @if (facade.review(); as data) {
+    <header class="review-header">
+      <div>
+        <p class="eyebrow">
+          DOCUMENT REVIEW · {{ data.version.version }} · {{ data.version.language.toUpperCase() }}
+        </p>
+        <h1 id="review-title">{{ data.version.title }}</h1>
+        <p class="badge">{{ provenanceLabel(data.version) }}</p>
+      </div>
+      @if (!facade.published()) {
+        <div class="coverage" aria-live="polite">
+          {{ facade.checkedPages().size }} of {{ facade.totalPages() }} pages reviewed
+        </div>
+      }
+    </header>
+    @if (facade.published()) {
+      <p class="notice" role="status">
+        Published. This version is read-only; the original PDF and extracted text remain available
+        for reference.
+      </p>
+    } @else {
+      <p class="instruction">
+        Compare the original PDF and extracted text for every physical page. Checks reflect your
+        review of the rendered original; server review history never checks pages for you.
+      </p>
+    }
+    <div class="page-controls" role="group" aria-label="Review page navigation">
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="facade.pageNumber() <= 1"
+        (click)="facade.pageBy(-1)"
+      >
+        Previous page
+      </button>
+      <span aria-live="polite">Page {{ facade.pageNumber() }} of {{ facade.totalPages() }}</span>
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="facade.pageNumber() >= facade.totalPages()"
+        (click)="facade.pageBy(1)"
+      >
+        Next page
+      </button>
+    </div>
+    <div class="review-grid">
+      <section class="original" aria-label="Rendered original PDF page">
+        <h2>Original PDF · page {{ facade.pageNumber() }}</h2>
+        <div class="page-scroll">
+          <div class="page-frame">
+            <canvas #pageCanvas aria-label="Rendered original PDF physical page"></canvas>
+          </div>
+        </div>
+        <p *appDelayedLoading="facade.rendering()" class="state" role="status">
+          Rendering original page…
+        </p>
+        @if (!facade.published()) {
+          <mat-checkbox
+            [checked]="facade.checkedPages().has(facade.pageNumber())"
+            [disabled]="!facade.renderedPages().has(facade.pageNumber()) || facade.busy()"
+            (change)="facade.togglePage($event.checked)"
+            >I checked this original page against its extracted text</mat-checkbox
+          >
+        }
+      </section>
+      <section class="extracted" aria-label="Extracted text for the current physical page">
+        <h2>Extracted text · page {{ facade.pageNumber() }}</h2>
+        @if (facade.currentPage(); as page) {
+          <p class="quality">
+            {{
+              page.quality === 'COMPLETE' ? 'Text extraction complete' : 'This page needs review'
+            }}
+          </p>
+          <pre>{{ page.text }}</pre>
+        }
+      </section>
+    </div>
+    @if (data.version.kind === 'product-card' || data.version.kind === 'product-catalog') {
+      <app-product-knowledge-review
+        [versionId]="data.version.versionId"
+        [disabled]="
+          facade.busy() ||
+          facade.hasFrozen() ||
+          data.version.pendingStage === 'PUBLISH' ||
+          facade.published()
+        "
+      />
+    }
+    @if (facade.published()) {
+      <button mat-stroked-button type="button" (click)="replace()">Replace PDF</button>
+    }
+    @if (!facade.published() && !facade.publicationAllowed()) {
+      <p class="blocked">
+        This version is not eligible for publication. Refresh the document list or resolve its
+        server processing state.
+      </p>
+    }
+    @if (facade.error()) {
+      <p class="error" role="alert">
+        {{ facade.error() }}
+        <button mat-button type="button" (click)="facade.refresh()">Retry loading review</button>
+      </p>
+    }
+    @if (!facade.published() && facade.notice()) {
+      <p class="notice" role="status">{{ facade.notice() }}</p>
+    }
+    @if (!facade.published()) {
+      <footer class="review-footer">
+        <p>
+          Publication requires the complete extracted page set and an explicit check for each page.
+        </p>
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="!facade.canPublish() && !facade.hasFrozen()"
+          (click)="facade.publish()"
+        >
+          {{ facade.publishLabel() }}
+        </button>
+      </footer>
+    }
+  } @else {
+    <p *appDelayedLoading="facade.loading()" class="state" role="status">
+      Loading review and original PDF…
+    </p>
+    @if (facade.error()) {
+      <p class="error" role="alert">
+        {{ facade.error() }}
+        <button mat-button type="button" (click)="facade.refresh()">Retry review</button>
+      </p>
+    }
+  }
+</section>
