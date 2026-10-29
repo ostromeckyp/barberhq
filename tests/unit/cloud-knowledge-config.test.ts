@@ -138,3 +138,21 @@ it('validates connector input before clearing an existing artifact', async () =>
   );
   expect(await readFile(marker, 'utf8')).toBe('keep this');
 });
+
+it('stages gql files from nested domain folders', async () => {
+  const options = await fixture();
+  const dataConnect = path.join(options.root, 'dataconnect');
+  const schema = 'type RequestState @table { id: String! }\n';
+  const lifecycle = 'mutation CloseRequest { requestState_update }\n';
+  await mkdir(path.join(dataConnect, 'schema/stock'), { recursive: true });
+  await mkdir(path.join(dataConnect, 'server/stock'), { recursive: true });
+  await writeFile(path.join(dataConnect, 'schema/stock/RequestState.gql'), schema);
+  await writeFile(path.join(dataConnect, 'server/stock/lifecycle.gql'), lifecycle);
+  await prepareKnowledgeCloud(options);
+  const dc = path.join(options.outputRoot, 'dataconnect');
+  expect(await readFile(path.join(dc, 'schema/stock/RequestState.gql'), 'utf8')).toBe(schema);
+  expect(await readFile(path.join(dc, 'server/stock/lifecycle.gql'), 'utf8')).toBe(lifecycle);
+  expect(await readFile(path.join(dc, 'server/connector.yaml'), 'utf8')).toBe(
+    'connectorId: server-id\n',
+  );
+});

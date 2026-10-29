@@ -35,17 +35,26 @@ function requireMatch(
   }
 }
 
-async function gqlFiles(directory: string): Promise<StagedFile[]> {
-  const names = (await readdir(directory, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.gql'))
-    .map((entry) => entry.name)
-    .sort();
-  return Promise.all(
-    names.map(async (name) => ({
-      name,
-      contents: await readFile(path.join(directory, name), 'utf8'),
-    })),
+async function gqlFiles(directory: string, relative = ''): Promise<StagedFile[]> {
+  const entries = (await readdir(path.join(directory, relative), { withFileTypes: true })).sort(
+    (a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
   );
+  const files: StagedFile[] = [];
+  for (const entry of entries) {
+    const name = relative ? path.join(relative, entry.name) : entry.name;
+    if (entry.isDirectory()) files.push(...(await gqlFiles(directory, name)));
+    else if (entry.isFile() && entry.name.endsWith('.gql'))
+      files.push({ name, contents: await readFile(path.join(directory, name), 'utf8') });
+  }
+  return files;
+}
+
+async function writeStagedFiles(directory: string, files: StagedFile[]): Promise<void> {
+  for (const file of files) {
+    const target = path.join(directory, file.name);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, file.contents);
+  }
 }
 
 export async function prepareKnowledgeCloud({
@@ -149,12 +158,11 @@ export async function prepareKnowledgeCloud({
   const cloudDataConnect = path.join(outputRoot, 'dataconnect');
   const cloudSchema = path.join(cloudDataConnect, 'schema');
   await mkdir(cloudSchema, { recursive: true });
-  for (const file of schemaFiles) await writeFile(path.join(cloudSchema, file.name), file.contents);
+  await writeStagedFiles(cloudSchema, schemaFiles);
   for (const connector of connectors) {
     const outputConnector = path.join(cloudDataConnect, connector.name);
     await mkdir(outputConnector, { recursive: true });
-    for (const file of connector.files)
-      await writeFile(path.join(outputConnector, file.name), file.contents);
+    await writeStagedFiles(outputConnector, connector.files);
     await writeFile(
       path.join(outputConnector, 'connector.yaml'),
       `connectorId: ${connector.connectorId}\n`,
