@@ -13,7 +13,7 @@ import {
   type ProductAliasRow,
 } from '../../../../../../shared/contracts/product-admin/index';
 import { PdfDropzone } from '../../../shared/ui/pdf-dropzone/pdf-dropzone';
-import type { CardSuggestion } from '../data-access/product-admin-api';
+import type { CardSuggestion } from '../models/card-suggestion';
 import { ProductEditorFacade } from './product-editor.facade';
 
 const kinds: { value: ProductAliasKind; label: string }[] = [

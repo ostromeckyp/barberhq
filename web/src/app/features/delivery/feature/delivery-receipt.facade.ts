@@ -12,7 +12,8 @@ import { SalonContext } from '../../../core/salon-context';
 import { DeliveryApi } from '../data-access/delivery-api';
 import { DeliveryDraftStore } from './delivery-draft.store';
 import { deliveryReceiptQuery } from './delivery-return';
-import { DELIVERY_JOURNAL, scopeKey, type DeliveryScope } from './delivery-journal';
+import { DELIVERY_JOURNAL, scopeKey } from './delivery-journal';
+import type { DeliveryScope } from '../models/delivery-scope';
 import { runtimeConfig } from '../../../core/public-config';
 import { deliveryProcedureQuestion } from '../../procedures/procedure-question';
 @Service({ autoProvided: false })

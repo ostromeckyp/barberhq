@@ -2,20 +2,11 @@ import { Service, inject, signal, computed } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
 import { CommandError } from '../../replenishment/data-access/command-error';
-import {
-  ACTION_LABELS,
-  canConfirm,
-  buildAction,
-  type TransitionType,
-  type Confirmation,
-} from './action-input';
-import type {
-  RequestDetail,
-  StockAction,
-  CommandResult,
-} from '../../../../../../shared/contracts/stock/index';
-export type ActionDialogData = { request: RequestDetail; type: TransitionType };
-export type ActionOutcome = { result?: CommandResult; error?: string };
+import { ACTION_LABELS, canConfirm, buildAction } from './action-input';
+import type { StockAction } from '../../../../../../shared/contracts/stock/index';
+import type { ActionDialogData } from '../models/action-dialog-data';
+import type { ActionOutcome } from '../models/action-outcome';
+import type { Confirmation } from '../models/confirmation';
 @Service({ autoProvided: false })
 export class RequestActionFacade {
   readonly data = inject<ActionDialogData>(MAT_DIALOG_DATA);

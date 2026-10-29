@@ -11,18 +11,8 @@ import type {
   SetHqStockInput,
   UpdateProductInput,
 } from '../../../../../../shared/contracts/product-admin/index';
+import type { CardAttachmentState } from '../models/card-attachment-state';
 
-export type CardSuggestion = {
-  phrase: string;
-  kind: 'NAME' | 'PHONETIC' | 'TYPE';
-  collisions: string[];
-};
-export type CardAttachmentState = {
-  documentId: string;
-  versionId: string;
-  status: 'UPLOADING' | 'GENERATING' | 'PUBLISHING' | 'PUBLISHED' | 'NEEDS_REVIEW' | 'FAILED';
-  suggestions: CardSuggestion[];
-};
 export type ProductAdminErrorCode =
   | 'STALE_STATE'
   | 'FORBIDDEN'

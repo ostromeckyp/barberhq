@@ -1,6 +1,6 @@
 import type { PdfRect } from '../../../../../../shared/contracts/knowledge/index';
+import type { ScreenRect } from '../models/screen-rect';
 
-export type ScreenRect = { left: number; top: number; width: number; height: number };
 export type PdfViewport = {
   convertToViewportRectangle(rect: [number, number, number, number]): readonly number[];
 };

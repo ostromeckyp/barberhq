@@ -3,8 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { RequestActionDialog } from '../ui/request-action-dialog';
 import type { RequestDetail } from '../../../../../../shared/contracts/stock/index';
-import type { ActionDialogData, ActionOutcome } from './request-action.facade';
-import type { TransitionType } from './action-input';
+import type { ActionDialogData } from '../models/action-dialog-data';
+import type { ActionOutcome } from '../models/action-outcome';
+import type { TransitionType } from '../models/transition-type';
 @Service()
 export class RequestActions {
   private readonly dialog = inject(MatDialog);

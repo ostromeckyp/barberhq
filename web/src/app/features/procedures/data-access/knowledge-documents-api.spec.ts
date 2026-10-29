@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { KnowledgePageRecord, KnowledgeVersionRecord } from './knowledge.mapper';
+import type { KnowledgePageRecord } from '../models/knowledge-page-record';
+import type { KnowledgeVersionRecord } from '../models/knowledge-version-record';
 import { mapDocumentRow, mapKnowledgeReview } from './knowledge.mapper';
 import { normalizePage, shouldLoadHqDocumentRows } from './knowledge-documents-api';
 import {

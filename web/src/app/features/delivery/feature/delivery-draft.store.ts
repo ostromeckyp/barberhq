@@ -5,7 +5,8 @@ import type {
 } from '../../../../../../shared/contracts/delivery/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
-import { scopeKey, type DeliveryScope } from './delivery-journal';
+import { scopeKey } from './delivery-journal';
+import type { DeliveryScope } from '../models/delivery-scope';
 export type ReceiptDraft = {
   items: DeliveryQuantities[];
   description: string;

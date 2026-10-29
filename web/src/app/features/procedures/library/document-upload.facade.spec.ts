@@ -10,11 +10,9 @@ import type {
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
-import {
-  DocumentUploadFacade,
-  type UploadDialogData,
-  type UploadFormValue,
-} from './document-upload.facade';
+import { DocumentUploadFacade } from './document-upload.facade';
+import type { UploadDialogData } from '../models/upload-dialog-data';
+import type { UploadFormValue } from '../models/upload-form-value';
 
 const sha256 = 'c'.repeat(64);
 const staged: DocumentRow = {

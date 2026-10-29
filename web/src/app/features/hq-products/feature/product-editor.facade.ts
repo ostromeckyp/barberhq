@@ -8,12 +8,9 @@ import type {
   ProductAliasesResult,
   ProductForm,
 } from '../../../../../../shared/contracts/product-admin/index';
-import {
-  ProductAdminApi,
-  ProductAdminError,
-  type CardAttachmentState,
-  type CardSuggestion,
-} from '../data-access/product-admin-api';
+import { ProductAdminApi, ProductAdminError } from '../data-access/product-admin-api';
+import type { CardAttachmentState } from '../models/card-attachment-state';
+import type { CardSuggestion } from '../models/card-suggestion';
 
 /** Optional text fields are edited as strings; empty means none. */
 export type ProductDraft = Omit<ProductForm, 'type' | 'scent' | 'category'> & {

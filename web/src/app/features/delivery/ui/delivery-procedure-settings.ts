@@ -6,8 +6,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { SessionFacade } from '../../auth/feature/session.facade';
-import { DeliveryApi, type DeliveryProcedureOption } from '../data-access/delivery-api';
-import { DELIVERY_JOURNAL, type DeliveryScope } from '../feature/delivery-journal';
+import { DeliveryApi } from '../data-access/delivery-api';
+import { DELIVERY_JOURNAL } from '../feature/delivery-journal';
+import type { DeliveryProcedureOption } from '../models/delivery-procedure-option';
+import type { DeliveryScope } from '../models/delivery-scope';
 import type {
   DeliveryProblemKind,
   SetDeliveryProcedureInput,

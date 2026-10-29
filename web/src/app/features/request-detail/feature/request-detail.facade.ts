@@ -8,7 +8,8 @@ import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { RequestActions } from './request-actions';
-import { availableRequestActions, type TransitionType } from './action-input';
+import { availableRequestActions } from './action-input';
+import type { TransitionType } from '../models/transition-type';
 @Service({ autoProvided: false })
 export class RequestDetailFacade {
   private readonly router = inject(Router);

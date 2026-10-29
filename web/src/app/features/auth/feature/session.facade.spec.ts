@@ -1,10 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { SessionFacade } from './session.facade';
-import {
-  SESSION_GATEWAY,
-  type SessionGateway,
-  type ResolvedMember,
-} from '../data-access/session.gateway';
+import { SESSION_GATEWAY, type SessionGateway } from '../data-access/session.gateway';
+import type { ResolvedMember } from '../models/resolved-member';
 import { describe, it, expect, vi } from 'vitest';
 function setup() {
   let changed: (uid: string | null) => void = () => undefined;

@@ -2,28 +2,14 @@ import { DestroyRef, Service, effect, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import type {
   CreateDocumentRequest,
-  KnowledgeDocumentKind,
-  KnowledgeOrigin,
   DocumentRow,
   VersionStatus,
 } from '../../../../../../shared/contracts/knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
-export type UploadDialogData = {
-  resume?: DocumentRow;
-  replaceTarget?: Pick<DocumentRow, 'documentId' | 'documentRevision' | 'title' | 'version'> &
-    Partial<Pick<DocumentRow, 'language' | 'kind' | 'origin' | 'sourceUrls' | 'observedOn'>>;
-};
-
-export type UploadFormValue = {
-  title: string;
-  language: 'en' | 'pl';
-  kind: KnowledgeDocumentKind;
-  origin: KnowledgeOrigin;
-  sourceUrls: string;
-  observedOn: string;
-};
+import type { UploadDialogData } from '../models/upload-dialog-data';
+import type { UploadFormValue } from '../models/upload-form-value';
 
 @Service({ autoProvided: false })
 export class DocumentUploadFacade {

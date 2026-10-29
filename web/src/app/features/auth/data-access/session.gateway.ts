@@ -1,13 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import type { Membership } from '../../../../../../shared/contracts/business/index';
-export interface SalonOption {
-  id: string;
-  name: string;
-}
-export interface ResolvedMember {
-  membership: Membership;
-  salons: SalonOption[];
-}
+import type { ResolvedMember } from '../models/resolved-member';
 export interface SessionGateway {
   observe(callback: (uid: string | null) => void): () => void;
   signIn(email: string, password: string): Promise<void>;

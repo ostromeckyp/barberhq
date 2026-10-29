@@ -18,6 +18,7 @@ import type {
   SetDeliveryProcedureInput,
 } from '../../../../../../shared/contracts/delivery/index';
 import type { Page, PageInput } from '../../../../../../shared/contracts/business/index';
+import type { DeliveryProcedureOption } from '../models/delivery-procedure-option';
 const names = {
   RECORD_RECEIPT: 'recordDeliveryReceipt',
   START_REVIEW: 'startDeliveryIssueReview',
@@ -26,7 +27,6 @@ const names = {
   SET_PROCEDURE: 'setDeliveryProcedure',
 };
 const policy = { fetchPolicy: QueryFetchPolicy.SERVER_ONLY };
-export type DeliveryProcedureOption = { documentId: string; title: string; documentCode: string };
 @Service()
 export class DeliveryApi {
   private readonly firebase = inject(FIREBASE);

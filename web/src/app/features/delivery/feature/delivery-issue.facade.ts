@@ -12,7 +12,8 @@ import { BrowserActivity } from '../../../core/browser-activity';
 import { pageOffset } from '../../../core/request-navigation';
 import { deliveryIssueQuery } from './delivery-return';
 import { DeliveryApi } from '../data-access/delivery-api';
-import { DELIVERY_JOURNAL, scopeKey, type DeliveryScope } from './delivery-journal';
+import { DELIVERY_JOURNAL, scopeKey } from './delivery-journal';
+import type { DeliveryScope } from '../models/delivery-scope';
 type IssueAction =
   | Extract<DeliveryAction, { type: 'ADD_NOTE' }>
   | {

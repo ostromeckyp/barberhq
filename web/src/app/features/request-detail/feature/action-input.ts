@@ -1,11 +1,7 @@
 import type { RequestDetail, StockAction } from '../../../../../../shared/contracts/stock/index';
 import type { Membership } from '../../../../../../shared/contracts/business/index';
-export type TransitionType = Exclude<StockAction['type'], 'SUBMIT'>;
-export type Confirmation = {
-  reason: string;
-  items: { productId: string; receivedQuantity: number }[];
-  allIntact: boolean;
-};
+import type { Confirmation } from '../models/confirmation';
+import type { TransitionType } from '../models/transition-type';
 export const ACTION_LABELS: Record<TransitionType, string> = {
   APPROVE: 'Approve request',
   REJECT: 'Reject request',

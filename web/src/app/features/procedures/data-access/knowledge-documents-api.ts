@@ -27,12 +27,9 @@ import { FIREBASE } from '../../../core/firebase.providers';
 import { SalonContext } from '../../../core/salon-context';
 import { runtimeConfig } from '../../../core/public-config';
 import type { PublicConfig } from '../../../../../../scripts/config/public-config';
-import {
-  mapDocumentRow,
-  mapKnowledgeReview,
-  type KnowledgePageRecord,
-  type KnowledgeVersionRecord,
-} from './knowledge.mapper';
+import { mapDocumentRow, mapKnowledgeReview } from './knowledge.mapper';
+import type { KnowledgePageRecord } from '../models/knowledge-page-record';
+import type { KnowledgeVersionRecord } from '../models/knowledge-version-record';
 import {
   hashPdf,
   KnowledgeApiError,

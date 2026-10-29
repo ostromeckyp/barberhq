@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { DeliveryJournal, type DeliveryScope, type JournalStorage } from './delivery-journal';
+import { DeliveryJournal, type JournalStorage } from './delivery-journal';
+import type { DeliveryScope } from '../models/delivery-scope';
 const scope: DeliveryScope = {
   userId: 'one',
   businessId: 'business',

@@ -1,11 +1,6 @@
 import { inject, InjectionToken } from '@angular/core';
 import type { DeliveryAction } from '../../../../../../shared/contracts/delivery/index';
-export type DeliveryScope = {
-  userId: string;
-  businessId: string;
-  salonId: string;
-  targetId: string;
-};
+import type { DeliveryScope } from '../models/delivery-scope';
 export type JournalStorage = {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;

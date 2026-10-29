@@ -7,7 +7,7 @@ import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { deliveryReturn } from '../../delivery/feature/delivery-return';
 import { PdfRenderer } from './pdf-renderer';
-import type { ScreenRect } from './pdf-overlay';
+import type { ScreenRect } from '../models/screen-rect';
 
 @Service({ autoProvided: false })
 export class PdfViewerFacade {

@@ -3,7 +3,8 @@ import { DELIVERY_JOURNAL } from '../../delivery/feature/delivery-journal';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
 import type { SessionState } from '../../../../../../shared/contracts/business/index';
-import { SESSION_GATEWAY, type SalonOption } from '../data-access/session.gateway';
+import { SESSION_GATEWAY } from '../data-access/session.gateway';
+import type { SalonOption } from '../models/salon-option';
 @Service()
 export class SessionFacade {
   private readonly deliveryJournal = inject(DELIVERY_JOURNAL);
