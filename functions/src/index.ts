@@ -18,7 +18,7 @@ import {
   acceptKnowledgeProductReviewFunction,
   suggestKnowledgeProductLinkFunction,
   generateKnowledgeProductAliasesFunction,
-} from './knowledge/product-knowledge-callables.js';
+} from './product-knowledge/callables.js';
 import { processKnowledgeTaskFunction } from './knowledge/worker.js';
 import {
   attachProductCardFunction,

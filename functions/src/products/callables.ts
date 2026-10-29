@@ -3,7 +3,7 @@ import { DocumentCommandService } from '../knowledge/document-commands.js';
 import {
   createProductKnowledgeCommands,
   createProductKnowledgeGeneration,
-} from '../knowledge/product-knowledge-callables.js';
+} from '../product-knowledge/callables.js';
 import { createProductCardService } from './card-attachment.js';
 import { KnowledgeError, KnowledgeRepository } from '../knowledge/repository.js';
 import {

@@ -1,5 +1,5 @@
-import { KnowledgeError, type VersionState } from './repository.js';
-import { ProductKnowledgeRepository } from './product-knowledge-repository.js';
+import { KnowledgeError, type VersionState } from '../knowledge/repository.js';
+import { ProductKnowledgeRepository } from './repository.js';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { metadataFromStorage } from '../../../shared/knowledge-metadata.js';
 /** Fresh requests must include the accepted identity. Only durable old receipts can recover PDF-only. */

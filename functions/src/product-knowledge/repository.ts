@@ -6,8 +6,8 @@ import type {
   KnowledgeCatalogProduct,
   KnowledgeProductReview,
 } from '../../../shared/contracts/product-knowledge/index.js';
-import { KnowledgeError } from './repository.js';
-import type { PassageChunk } from './product-knowledge-rules.js';
+import { KnowledgeError } from '../knowledge/repository.js';
+import type { PassageChunk } from './rules.js';
 export type KnowledgeLinkRow = {
   id: string;
   version_id: string;

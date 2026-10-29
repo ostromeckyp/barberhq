@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
-import { parseProductAliasGeneration } from '../../functions/src/knowledge/product-knowledge-schemas.js';
-import { calculateAliasImpact } from '../../functions/src/knowledge/product-knowledge-rules.js';
+import { parseProductAliasGeneration } from '../../functions/src/product-knowledge/schemas.js';
+import { calculateAliasImpact } from '../../functions/src/product-knowledge/rules.js';
 const args = process.argv.slice(2);
 if (args.length !== 2 || args[0] !== '--fixture')
   throw new Error(

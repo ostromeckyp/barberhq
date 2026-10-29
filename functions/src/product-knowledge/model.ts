@@ -3,11 +3,8 @@ import { z } from 'genkit';
 import { createAiRuntime, runBudgetedModelTurn } from '../ai/runtime.js';
 import type { AiBudget } from '../ai/budget.js';
 import { AiError } from '../ai/budget.js';
-import {
-  parseProductAliasGeneration,
-  parseProductLinkSuggestion,
-} from './product-knowledge-schemas.js';
-import { KnowledgeError } from './repository.js';
+import { parseProductAliasGeneration, parseProductLinkSuggestion } from './schemas.js';
+import { KnowledgeError } from '../knowledge/repository.js';
 export type ProductKnowledgeProviderOptions = {
   prompt: string;
   abortSignal: AbortSignal;

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import * as sql from '@barberhq/server';
 import { createKnowledgeHarness } from './knowledge.ts';
-import { ProductKnowledgeCommands } from '../../functions/src/knowledge/product-knowledge-commands.ts';
+import { ProductKnowledgeCommands } from '../../functions/src/product-knowledge/commands.ts';
 export async function createProductKnowledgeHarness() {
   const h = await createKnowledgeHarness();
   const hq = randomUUID();

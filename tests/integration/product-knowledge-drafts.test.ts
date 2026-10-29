@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { beforeEach, afterEach, it, expect } from 'vitest';
 import * as sql from '@barberhq/server';
 import { createKnowledgeHarness } from '../support/knowledge.ts';
-import { ProductKnowledgeCommands } from '../../functions/src/knowledge/product-knowledge-commands.ts';
+import { ProductKnowledgeCommands } from '../../functions/src/product-knowledge/commands.ts';
 import type { SaveKnowledgeProductReviewInput } from '../../shared/contracts/product-knowledge/index.ts';
 let h: Awaited<ReturnType<typeof createKnowledgeHarness>>,
   commands: ProductKnowledgeCommands,

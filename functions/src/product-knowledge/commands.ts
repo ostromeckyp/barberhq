@@ -9,7 +9,7 @@ import type {
   KnowledgePassageRef,
 } from '../../../shared/contracts/product-knowledge/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
-import { KnowledgeError, type KnowledgeRepository } from './repository.js';
+import { KnowledgeError, type KnowledgeRepository } from '../knowledge/repository.js';
 import {
   ProductKnowledgeRepository,
   type ProductKnowledgeState,
@@ -17,18 +17,15 @@ import {
   type KnowledgeLinkRow,
   type KnowledgeProfileRow,
   type ProductOperation,
-} from './product-knowledge-repository.js';
+} from './repository.js';
 import {
   resolveKnowledgePassage,
   validateProductLinks,
   calculateAliasImpact,
   passageKey,
   productKnowledgeHash,
-} from './product-knowledge-rules.js';
-import {
-  parseSaveKnowledgeProductReview,
-  parseAcceptKnowledgeProductReview,
-} from './product-knowledge-schemas.js';
+} from './rules.js';
+import { parseSaveKnowledgeProductReview, parseAcceptKnowledgeProductReview } from './schemas.js';
 export function productOperationHash(action: string, input: unknown): string {
   const canonical = (v: unknown): unknown =>
     Array.isArray(v)

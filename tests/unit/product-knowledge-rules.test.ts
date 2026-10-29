@@ -12,11 +12,11 @@ import {
   calculateAliasImpact,
   productKnowledgeHash,
   validateProductLinks,
-} from '../../functions/src/knowledge/product-knowledge-rules.ts';
+} from '../../functions/src/product-knowledge/rules.ts';
 import {
   parseSaveKnowledgeProductReview,
   parseProductAliasGeneration,
-} from '../../functions/src/knowledge/product-knowledge-schemas.ts';
+} from '../../functions/src/product-knowledge/schemas.ts';
 
 const passage = { chunkId: 'v:1:0', start: 0, end: 5 };
 const chunks = [

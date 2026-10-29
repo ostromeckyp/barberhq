@@ -10,13 +10,9 @@ import {
   assertProductDraft,
   productOperationHash,
   reviewFromState,
-} from './product-knowledge-commands.js';
-import type {
-  KnowledgeAliasRow,
-  ProductKnowledgeState,
-  ProductOperation,
-} from './product-knowledge-repository.js';
-import { KnowledgeError } from './repository.js';
+} from './commands.js';
+import type { KnowledgeAliasRow, ProductKnowledgeState, ProductOperation } from './repository.js';
+import { KnowledgeError } from '../knowledge/repository.js';
 import { createAiBudget, consumeToolCall, runWithinBudget, type AiBudget } from '../ai/budget.js';
 import type { createAiAdmission } from '../ai/admission.js';
 import {
@@ -24,13 +20,9 @@ import {
   parseSuggestKnowledgeProductLink,
   parseProductAliasGeneration,
   parseProductLinkSuggestion,
-} from './product-knowledge-schemas.js';
-import {
-  resolveKnowledgePassage,
-  suggestProductCodeLinks,
-  passageKey,
-} from './product-knowledge-rules.js';
-import { productKnowledgePrompt } from './product-knowledge-model.js';
+} from './schemas.js';
+import { resolveKnowledgePassage, suggestProductCodeLinks, passageKey } from './rules.js';
+import { productKnowledgePrompt } from './model.js';
 export type KnowledgeGenerationProvider = (
   budget: AiBudget,
   prompt: string,

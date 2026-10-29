@@ -6,7 +6,7 @@ import { createSqlAiRepository } from '../../functions/src/ai/repository.ts';
 import {
   ProductKnowledgeGeneration,
   type KnowledgeGenerationProvider,
-} from '../../functions/src/knowledge/product-knowledge-generation.ts';
+} from '../../functions/src/product-knowledge/generation.ts';
 import * as sql from '@barberhq/server';
 let h: Awaited<ReturnType<typeof createProductKnowledgeHarness>>;
 let provider: KnowledgeGenerationProvider;

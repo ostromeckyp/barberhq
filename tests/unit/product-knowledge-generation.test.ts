@@ -3,7 +3,7 @@ import { createAiBudget } from '../../functions/src/ai/budget.ts';
 import {
   createProductKnowledgeGenerator,
   productKnowledgePrompt,
-} from '../../functions/src/knowledge/product-knowledge-model.ts';
+} from '../../functions/src/product-knowledge/model.ts';
 import { createAiAdmission } from '../../functions/src/ai/admission.ts';
 it('uses one structured 2048-token call without provider-controlled product authority', async () => {
   let calls = 0;

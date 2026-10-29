@@ -2,11 +2,11 @@ import { HttpsError } from 'firebase-functions/v2/https';
 import { AiError } from '../ai/budget.js';
 import { createAiAdmission } from '../ai/admission.js';
 import { createSqlAiRepository } from '../ai/repository.js';
-import { createProductKnowledgeGenerator } from './product-knowledge-model.js';
-import { ProductKnowledgeGeneration } from './product-knowledge-generation.js';
-import { callable } from './callables.js';
-import { ProductKnowledgeCommands } from './product-knowledge-commands.js';
-import { knowledgeDataConnectors, knowledgeRuntimeConfig } from './runtime.js';
+import { createProductKnowledgeGenerator } from './model.js';
+import { ProductKnowledgeGeneration } from './generation.js';
+import { callable } from '../knowledge/callables.js';
+import { ProductKnowledgeCommands } from './commands.js';
+import { knowledgeDataConnectors, knowledgeRuntimeConfig } from '../knowledge/runtime.js';
 export function createProductKnowledgeCommands() {
   return new ProductKnowledgeCommands({
     dc: knowledgeDataConnectors(knowledgeRuntimeConfig()).server,

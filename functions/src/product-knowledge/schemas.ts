@@ -7,7 +7,7 @@ import type {
   GenerateKnowledgeProductAliasesInput,
 } from '../../../shared/contracts/product-knowledge/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
-import { KnowledgeError } from './repository.js';
+import { KnowledgeError } from '../knowledge/repository.js';
 const id = z.string().min(1).max(200);
 const revision = z.int().min(0).max(2147483647);
 const sha = z.string().regex(/^[a-f0-9]{64}$/);

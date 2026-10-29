@@ -8,13 +8,16 @@ import {
   storageKind,
   storageOrigin,
 } from '../../../shared/knowledge-metadata.js';
-import type { KnowledgeMetadata, ProcessingResult } from '../../../shared/contracts/knowledge/index.js';
+import type {
+  KnowledgeMetadata,
+  ProcessingResult,
+} from '../../../shared/contracts/knowledge/index.js';
 import { chunkPages } from './chunk.js';
 import { extractPdf, validatePdf } from './extract.js';
 import type { EmbeddingConfig, EmbeddingMode } from './embedding.js';
 import { KnowledgeError, KnowledgeRepository } from './repository.js';
-import { unlinkedPassages } from './product-knowledge-commands.js';
-import { productKnowledgeHash } from './product-knowledge-rules.js';
+import { unlinkedPassages } from '../product-knowledge/commands.js';
+import { productKnowledgeHash } from '../product-knowledge/rules.js';
 import type { KnowledgeProductReview } from '../../../shared/contracts/product-knowledge/index.js';
 
 export type ManifestEntry = {
