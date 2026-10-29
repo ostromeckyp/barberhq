@@ -25,6 +25,8 @@ export const replenishmentModules = Object.freeze([
     'salon-alias-commands',
     'schemas',
   ].map((name) => `functions/src/ai/${name}.js`),
+  'functions/src/cloud-config.js',
+  'functions/config/cloud.json',
   'functions/src/stock/runtime.js',
   'shared/product-normalization.js',
 ]);

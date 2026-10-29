@@ -3,7 +3,6 @@ import { getAuth } from 'firebase-admin/auth';
 import { getAppCheck } from 'firebase-admin/app-check';
 import { getStorage } from 'firebase-admin/storage';
 import * as sql from '@barberhq/server';
-import { defineString } from 'firebase-functions/params';
 import { onRequest } from 'firebase-functions/v2/https';
 import { status } from './document-commands.js';
 import { MAX_PDF_BYTES, PdfValidationError, validatePdf } from './pdf-validation.js';
@@ -11,6 +10,7 @@ import { DispatchService } from './queue.js';
 import { KnowledgeError, KnowledgeRepository, type VersionState } from './repository.js';
 import { sourceStorageBucket } from './source.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from './runtime.js';
+import { CLOUD } from '../cloud-config.js';
 
 type Headers = Record<string, string | string[] | undefined>;
 export type UploadRequest = {
@@ -232,20 +232,13 @@ export function createUploadHandler(deps: UploadDeps) {
   };
 }
 
-const originsParam = defineString('SOURCE_PDF_ALLOWED_ORIGINS', {
-  default: 'https://notbad-6be95.web.app,https://notbad-6be95.firebaseapp.com',
-});
 /** Exported factory only; Task 2C/controller owns callable exports and deployment packaging. */
 export function uploadKnowledgePdfFunction() {
   return onRequest(
     { region: 'europe-west1', maxInstances: 5, memory: '512MiB' },
     async (request, response) => {
       const emulator = process.env.FUNCTIONS_EMULATOR === 'true';
-      const origins = originsParam
-        .value()
-        .split(',')
-        .map((value) => value.trim())
-        .filter(Boolean);
+      const origins = [...CLOUD.allowedOrigins];
       if (emulator) origins.push('http://localhost:4200', 'http://127.0.0.1:4200');
       const config = knowledgeRuntimeConfig();
       const connectors = knowledgeDataConnectors(config);

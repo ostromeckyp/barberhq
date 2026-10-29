@@ -1,26 +1,17 @@
 import { getDataConnect } from 'firebase-admin/data-connect';
 import { getStorage } from 'firebase-admin/storage';
-import { defineString } from 'firebase-functions/params';
+import { CLOUD } from '../cloud-config.js';
 import { KnowledgeError } from './repository.js';
 
-const PROJECT = 'notbad-6be95';
-const CLOUD_SERVICE = 'notbad-6be95-service';
-const CLOUD_LOCATION = 'europe-west3';
-const CLOUD_BUCKET = 'notbad-6be95.firebasestorage.app';
-const VERTEX_MODEL = 'gemini-embedding-001';
-const VERTEX_LOCATION = 'europe-west3';
-const VERTEX_DIMENSION = 768;
+const PROJECT = CLOUD.projectId;
+const CLOUD_SERVICE = CLOUD.sqlService;
+const CLOUD_LOCATION = CLOUD.sqlLocation;
+const CLOUD_BUCKET = CLOUD.bucket;
+const VERTEX_MODEL = CLOUD.vertexAi.model;
+const VERTEX_LOCATION = CLOUD.vertexAi.location;
+const VERTEX_DIMENSION = CLOUD.vertexAi.dimension;
 const DEMO_PROJECT = 'demo-barberhq';
 const DEMO_BUCKET = 'demo-barberhq.appspot.com';
-
-const serviceParam = defineString('SOURCE_PDF_SQL_SERVICE', { default: CLOUD_SERVICE });
-const locationParam = defineString('SOURCE_PDF_SQL_LOCATION', { default: CLOUD_LOCATION });
-const bucketParam = defineString('SOURCE_PDF_BUCKET', { default: CLOUD_BUCKET });
-const vertexModelParam = defineString('KNOWLEDGE_VERTEX_MODEL', { default: VERTEX_MODEL });
-const vertexLocationParam = defineString('KNOWLEDGE_VERTEX_LOCATION', { default: VERTEX_LOCATION });
-const vertexDimensionParam = defineString('KNOWLEDGE_VERTEX_DIMENSION', {
-  default: String(VERTEX_DIMENSION),
-});
 
 export type KnowledgeRuntimeInput = {
   emulator: boolean;
@@ -166,13 +157,13 @@ export function knowledgeRuntimeConfig(): KnowledgeRuntimeConfig {
     sqlHost: process.env.DATA_CONNECT_EMULATOR_HOST,
     firebaseStorageHost: process.env.FIREBASE_STORAGE_EMULATOR_HOST,
     storageHost: process.env.STORAGE_EMULATOR_HOST,
-    serviceId: emulator ? 'barberhq' : serviceParam.value(),
-    sqlLocation: emulator ? 'europe-west1' : locationParam.value(),
-    bucket: emulator ? DEMO_BUCKET : bucketParam.value(),
+    serviceId: emulator ? 'barberhq' : CLOUD_SERVICE,
+    sqlLocation: emulator ? 'europe-west1' : CLOUD_LOCATION,
+    bucket: emulator ? DEMO_BUCKET : CLOUD_BUCKET,
     vertexProject: PROJECT,
-    vertexModel: vertexModelParam.value(),
-    vertexLocation: vertexLocationParam.value(),
-    vertexDimension: vertexDimensionParam.value(),
+    vertexModel: VERTEX_MODEL,
+    vertexLocation: VERTEX_LOCATION,
+    vertexDimension: String(VERTEX_DIMENSION),
   });
 }
 

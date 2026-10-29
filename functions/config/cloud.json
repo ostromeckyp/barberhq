@@ -1,0 +1,16 @@
+{
+  "projectId": "notbad-6be95",
+  "sqlService": "notbad-6be95-service",
+  "sqlLocation": "europe-west3",
+  "bucket": "notbad-6be95.firebasestorage.app",
+  "vertexAi": {
+    "model": "gemini-embedding-001",
+    "location": "europe-west3",
+    "dimension": 768
+  },
+  "allowedOrigins": [
+    "https://notbad-6be95.web.app",
+    "https://notbad-6be95.firebaseapp.com",
+    "https://notbad-6be95--foundation-unesffgt.web.app"
+  ]
+}

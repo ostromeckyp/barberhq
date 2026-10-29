@@ -4,26 +4,16 @@ import { getAppCheck } from 'firebase-admin/app-check';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { getStorage } from 'firebase-admin/storage';
 import { getDataConnect } from 'firebase-admin/data-connect';
-import { defineString } from 'firebase-functions/params';
 import { onRequest } from 'firebase-functions/v2/https';
+import { CLOUD } from '../cloud-config.js';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const DEMO_PROJECT = 'demo-barberhq';
 const DEMO_BUCKET = 'demo-barberhq.appspot.com';
-const originsParam = defineString('SOURCE_PDF_ALLOWED_ORIGINS', {
-  default: 'https://notbad-6be95.web.app,https://notbad-6be95.firebaseapp.com',
-});
-const sourceServiceParam = defineString('SOURCE_PDF_SQL_SERVICE', {
-  default: 'notbad-6be95-service',
-});
-const sourceLocationParam = defineString('SOURCE_PDF_SQL_LOCATION', { default: 'europe-west3' });
-const sourceBucketParam = defineString('SOURCE_PDF_BUCKET', {
-  default: 'notbad-6be95.firebasestorage.app',
-});
-const CLOUD_PROJECT = 'notbad-6be95';
-const CLOUD_SERVICE = 'notbad-6be95-service';
-const CLOUD_LOCATION = 'europe-west3';
-const CLOUD_BUCKET = 'notbad-6be95.firebasestorage.app';
+const CLOUD_PROJECT = CLOUD.projectId;
+const CLOUD_SERVICE = CLOUD.sqlService;
+const CLOUD_LOCATION = CLOUD.sqlLocation;
+const CLOUD_BUCKET = CLOUD.bucket;
 
 export type PdfIdentity = {
   id: string;
@@ -306,16 +296,7 @@ function sourceRuntimeConfig(emulator: boolean) {
       storageHost,
     };
   }
-  if (
-    projectId !== CLOUD_PROJECT ||
-    authHost ||
-    sqlHost ||
-    firebaseStorageHost ||
-    storageHost ||
-    sourceServiceParam.value() !== CLOUD_SERVICE ||
-    sourceLocationParam.value() !== CLOUD_LOCATION ||
-    sourceBucketParam.value() !== CLOUD_BUCKET
-  )
+  if (projectId !== CLOUD_PROJECT || authHost || sqlHost || firebaseStorageHost || storageHost)
     throw Error('invalid production source runtime');
   return {
     serviceId: CLOUD_SERVICE,
@@ -358,11 +339,7 @@ export function sourcePdfFunction() {
     { region: 'europe-west1', maxInstances: 5, memory: '512MiB' },
     async (request, response) => {
       const emulator = process.env.FUNCTIONS_EMULATOR === 'true';
-      const origins = originsParam
-        .value()
-        .split(',')
-        .map((value) => value.trim())
-        .filter(Boolean);
+      const origins = [...CLOUD.allowedOrigins];
       if (emulator) origins.push('http://localhost:4200', 'http://127.0.0.1:4200');
       const config = sourceRuntimeConfig(emulator);
       const connector = getDataConnect({

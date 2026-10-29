@@ -1,14 +1,11 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getDataConnect } from 'firebase-admin/data-connect';
-import { defineString } from 'firebase-functions/params';
 import type { StockAction } from '../../../shared/contracts/stock.js';
 import { StockRepository } from './repository.js';
 import { parseAction } from './schemas.js';
 import { StockError } from './errors.js';
 import { stockConnectorConfig } from './runtime.js';
-
-const stockSqlService = defineString('STOCK_SQL_SERVICE', { default: 'notbad-6be95-service' });
-const stockSqlLocation = defineString('STOCK_SQL_LOCATION', { default: 'europe-west3' });
+import { CLOUD } from '../cloud-config.js';
 
 export function getStockDataConnect() {
   const emulator = process.env.FUNCTIONS_EMULATOR === 'true';
@@ -17,9 +14,7 @@ export function getStockDataConnect() {
       emulator,
       projectId: process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT,
       emulatorHost: process.env.DATA_CONNECT_EMULATOR_HOST,
-      ...(emulator
-        ? {}
-        : { serviceId: stockSqlService.value(), location: stockSqlLocation.value() }),
+      ...(emulator ? {} : { serviceId: CLOUD.sqlService, location: CLOUD.sqlLocation }),
     }),
   );
 }

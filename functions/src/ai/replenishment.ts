@@ -1,7 +1,6 @@
 import { getDataConnect } from 'firebase-admin/data-connect';
 import { getAuth } from 'firebase-admin/auth';
 import { getAppCheck } from 'firebase-admin/app-check';
-import { defineString } from 'firebase-functions/params';
 import { onCall } from 'firebase-functions/v2/https';
 import { z } from 'genkit';
 import type {
@@ -36,6 +35,7 @@ import {
 import { parsePrepareInput } from './schemas.js';
 import { publicAiError } from './errors.js';
 import { stockConnectorConfig } from '../stock/runtime.js';
+import { CLOUD } from '../cloud-config.js';
 
 export type ReplenishmentDependencies = {
   resolveActor(uid: string): Promise<ActorContext>;
@@ -124,8 +124,6 @@ export function createReplenishmentPreparer(dependencies: ReplenishmentDependenc
   };
 }
 
-const service = defineString('STOCK_SQL_SERVICE', { default: 'notbad-6be95-service' });
-const location = defineString('STOCK_SQL_LOCATION', { default: 'europe-west3' });
 export function createReplenishmentService() {
   const emulator = process.env.FUNCTIONS_EMULATOR === 'true';
   const dc = getDataConnect(
@@ -133,7 +131,7 @@ export function createReplenishmentService() {
       emulator,
       projectId: process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT,
       emulatorHost: process.env.DATA_CONNECT_EMULATOR_HOST,
-      ...(emulator ? {} : { serviceId: service.value(), location: location.value() }),
+      ...(emulator ? {} : { serviceId: CLOUD.sqlService, location: CLOUD.sqlLocation }),
     }),
   );
   const admission = createAiAdmission(createSqlAiRepository(dc));

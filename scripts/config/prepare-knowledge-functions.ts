@@ -122,6 +122,8 @@ async function safeOutput(root: string, outputRoot: string): Promise<void> {
         'knowledge',
         'ai',
         'server-sdk',
+        'cloud-config.js',
+        'config',
         'package-lock.json',
         'node_modules',
         '.env.notbad-6be95',
@@ -129,6 +131,7 @@ async function safeOutput(root: string, outputRoot: string): Promise<void> {
     ],
     [path.join(outputRoot, 'functions/knowledge'), generatedModules],
     [path.join(outputRoot, 'functions/ai'), aiModules.map((n) => `${n}.js`)],
+    [path.join(outputRoot, 'functions/config'), ['cloud.json']],
     [path.join(outputRoot, 'functions/server-sdk'), generatedSdk],
     [path.join(outputRoot, 'functions/server-sdk/esm'), ['index.esm.js', 'package.json']],
   ];
@@ -157,6 +160,7 @@ async function safeOutput(root: string, outputRoot: string): Promise<void> {
         'server-sdk',
         'esm',
         'node_modules',
+        'config',
       ].includes(name);
       if (stat.isSymbolicLink() || (shouldBeDirectory ? !stat.isDirectory() : !stat.isFile())) {
         throw new Error(
@@ -312,6 +316,8 @@ export async function prepareKnowledgeFunctions({ root, outputRoot }: Options): 
     'functions/package.json',
     'functions/lib/shared/knowledge-metadata.js',
     'functions/lib/shared/product-normalization.js',
+    'functions/lib/functions/src/cloud-config.js',
+    'functions/lib/functions/config/cloud.json',
   ];
   const bytes = await Promise.all(files.map((name) => input(root, name)));
   if (bytes.some((data) => data.length === 0))
@@ -429,6 +435,7 @@ export async function prepareKnowledgeFunctions({ root, outputRoot }: Options): 
   };
   await mkdir(path.join(functionsDir, 'knowledge'), { recursive: true });
   await mkdir(path.join(functionsDir, 'ai'), { recursive: true });
+  await mkdir(path.join(functionsDir, 'config'), { recursive: true });
   await mkdir(path.join(functionsDir, 'server-sdk/esm'), { recursive: true });
   await Promise.all([
     writeFile(
@@ -458,6 +465,18 @@ export async function prepareKnowledgeFunctions({ root, outputRoot }: Options): 
         path.join(functionsDir, `server-sdk/${name}`),
         byName.get(`functions/src/generated/${name}`)!,
       ),
+    ),
+    // Flattened layout: the public cloud config sits next to the package root.
+    writeFile(
+      path.join(functionsDir, 'cloud-config.js'),
+      byName
+        .get('functions/lib/functions/src/cloud-config.js')!
+        .toString('utf8')
+        .replace("'../config/cloud.json'", "'./config/cloud.json'"),
+    ),
+    writeFile(
+      path.join(functionsDir, 'config/cloud.json'),
+      byName.get('functions/lib/functions/config/cloud.json')!,
     ),
     writeFile(path.join(functionsDir, 'index.js'), entry),
     writeFile(path.join(functionsDir, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`),

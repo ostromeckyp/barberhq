@@ -1,7 +1,6 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getAppCheck } from 'firebase-admin/app-check';
 import { getDataConnect } from 'firebase-admin/data-connect';
-import { defineString } from 'firebase-functions/params';
 import { onCall } from 'firebase-functions/v2/https';
 import { z } from 'genkit';
 import { AiError } from './budget.js';
@@ -13,6 +12,7 @@ import {
 import { publicAiError } from './errors.js';
 import { createSalonAliasCommands, type RemoveShorthandInput } from './salon-alias-commands.js';
 import { stockConnectorConfig } from '../stock/runtime.js';
+import { CLOUD } from '../cloud-config.js';
 
 const identifier = z.string().min(1).max(200);
 const removeInput = z
@@ -29,8 +29,6 @@ export function parseRemoveShorthandInput(input: unknown): RemoveShorthandInput 
   return parsed.data;
 }
 
-const service = defineString('STOCK_SQL_SERVICE', { default: 'notbad-6be95-service' });
-const location = defineString('STOCK_SQL_LOCATION', { default: 'europe-west3' });
 /** Only the salon's own staff remove its shorthand; HQ and forged writes are rejected by SQL scope. */
 export function createRemoveSalonShorthandFunction() {
   return onCall(
@@ -47,7 +45,7 @@ export function createRemoveSalonShorthandFunction() {
             emulator,
             projectId: process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT,
             emulatorHost: process.env.DATA_CONNECT_EMULATOR_HOST,
-            ...(emulator ? {} : { serviceId: service.value(), location: location.value() }),
+            ...(emulator ? {} : { serviceId: CLOUD.sqlService, location: CLOUD.sqlLocation }),
           }),
         );
         const endpoint = createAiUserEndpoint(

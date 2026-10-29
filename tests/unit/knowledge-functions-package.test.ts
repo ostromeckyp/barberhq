@@ -85,6 +85,12 @@ function fixture() {
     join(root, 'functions/lib/shared/knowledge-metadata.js'),
     'export function metadataFromLegacy() {return {kind: "procedure", origin: "synthetic"};}',
   );
+  mkdirSync(join(root, 'functions/lib/functions/config'), { recursive: true });
+  writeFileSync(
+    join(root, 'functions/lib/functions/src/cloud-config.js'),
+    "import cloud from '../config/cloud.json' with { type: 'json' };\nexport const CLOUD = cloud;\n",
+  );
+  writeFileSync(join(root, 'functions/lib/functions/config/cloud.json'), '{"projectId":"p"}');
   mkdirSync(join(root, 'functions/src'), { recursive: true });
   for (const name of modules)
     writeFileSync(
@@ -159,6 +165,8 @@ function packageFiles(outputRoot: string) {
     ...[
       'functions/index.js',
       'functions/package.json',
+      'functions/cloud-config.js',
+      'functions/config/cloud.json',
       'functions/knowledge/knowledge-metadata.js',
       'functions/knowledge/product-normalization.js',
       ...aiModules.map((n) => `functions/ai/${n}.js`),
@@ -180,6 +188,8 @@ it('packages only allowlisted compiled modules, byte-exact SDK files, and ten ca
   expect(readdirSync(outputRoot).sort()).toEqual(['firebase.json', 'functions']);
   expect(readdirSync(functionsDir).sort()).toEqual([
     'ai',
+    'cloud-config.js',
+    'config',
     'index.js',
     'knowledge',
     'package.json',
@@ -424,6 +434,8 @@ it('loads actual compiled product services using only named packaged files and d
     ...aiModules.map((n) => `functions/lib/functions/src/ai/${n}.js`),
     'functions/lib/shared/knowledge-metadata.js',
     'functions/lib/shared/product-normalization.js',
+    'functions/lib/functions/src/cloud-config.js',
+    'functions/lib/functions/config/cloud.json',
     'functions/src/index.ts',
     'functions/package.json',
     ...sdkFiles.map((n) => `functions/src/generated/${n}`),
