@@ -226,4 +226,29 @@ describe('code structure', () => {
     }
     expect(problems).toEqual([]);
   });
+
+  it('functions: models in models/, logic <= 300 lines', () => {
+    const root = 'functions/src';
+    const tsFiles = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) return entry.name === 'generated' ? [] : tsFiles(path);
+        return entry.name.endsWith('.ts') ? [path] : [];
+      });
+    const problems: string[] = [];
+    for (const file of tsFiles(root)) {
+      const rel = relative(root, file);
+      const source = readFileSync(file, 'utf8');
+      const inModels = /^[^/]+\/models\/[^/]+\.ts$/.test(rel);
+      if (!inModels && /^export (?:declare )?(?:interface|type)\b/m.test(source)) {
+        problems.push(`${rel}: exported interface/type must live in <domain>/models/`);
+      }
+      const lines = source.split('\n').length;
+      if (lines > 300) problems.push(`${rel}: ${lines} lines (max 300)`);
+      if (/^knowledge\/product-knowledge-/.test(rel)) {
+        problems.push(`${rel}: product-knowledge files belong in product-knowledge/`);
+      }
+    }
+    expect(problems).toEqual([]);
+  });
 });

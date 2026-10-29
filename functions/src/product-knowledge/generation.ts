@@ -5,12 +5,8 @@ import type {
   SuggestKnowledgeProductLinkInput,
 } from '../../../shared/contracts/product-knowledge/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
-import {
-  ProductKnowledgeCommands,
-  assertProductDraft,
-  productOperationHash,
-  reviewFromState,
-} from './commands.js';
+import { ProductKnowledgeCommands } from './commands.js';
+import { assertProductDraft, productOperationHash, reviewFromState } from './review-state.js';
 import type { ProductKnowledgeState } from './models/product-knowledge-state.js';
 import type { ProductOperation } from './models/product-operation.js';
 import type { KnowledgeAliasRow } from './models/knowledge-alias-row.js';

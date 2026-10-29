@@ -4,7 +4,7 @@ import type {
   DeliveryProcedureDto,
 } from '../../../shared/contracts/delivery/index.js';
 import * as sql from '@barberhq/server';
-import { authorizeDeliveryContext } from './repository.js';
+import { authorizeDeliveryContext } from './access.js';
 import { StockError } from '../stock/errors.js';
 export async function resolveDeliveryProcedures(
   dc: DataConnect,

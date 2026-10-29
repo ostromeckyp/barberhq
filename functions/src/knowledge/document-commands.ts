@@ -10,7 +10,7 @@ import {
   storageOrigin,
   isSyntheticSource,
 } from '../../../shared/knowledge-metadata.js';
-import { knowledgeIds } from './pipeline.js';
+import { knowledgeIds } from './pipeline-scope.js';
 import { KnowledgeError, type KnowledgeRepository } from './repository.js';
 import type { VersionState } from './models/version-state.js';
 import {
