@@ -1,18 +1,10 @@
 import { Service, effect, inject, signal, untracked } from '@angular/core';
-import type {
-  DeliveryQuantities,
-  ProcedureReference,
-} from '../../../../../../shared/contracts/delivery/index';
+import type { DeliveryQuantities } from '../../../../../../shared/contracts/delivery/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { scopeKey } from './delivery-journal';
 import type { DeliveryScope } from '../models/delivery-scope';
-export type ReceiptDraft = {
-  items: DeliveryQuantities[];
-  description: string;
-  batchIdentifier: string;
-  procedureReferences: ProcedureReference[];
-};
+import type { ReceiptDraft } from '../models/receipt-draft';
 const empty = (): ReceiptDraft => ({
   items: [],
   description: '',

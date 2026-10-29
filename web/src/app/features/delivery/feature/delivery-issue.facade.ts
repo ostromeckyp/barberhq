@@ -1,11 +1,7 @@
 import { Service, computed, effect, inject, resource, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import type {
-  DeliveryAction,
-  DeliveryCommandResult,
-  ProcedureReference,
-} from '../../../../../../shared/contracts/delivery/index';
+import type { ProcedureReference } from '../../../../../../shared/contracts/delivery/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { BrowserActivity } from '../../../core/browser-activity';
@@ -14,47 +10,10 @@ import { deliveryIssueQuery } from './delivery-return';
 import { DeliveryApi } from '../data-access/delivery-api';
 import { DELIVERY_JOURNAL, scopeKey } from './delivery-journal';
 import type { DeliveryScope } from '../models/delivery-scope';
-type IssueAction =
-  | Extract<DeliveryAction, { type: 'ADD_NOTE' }>
-  | {
-      type: 'START_REVIEW' | 'CREATE_REPLACEMENT';
-      input: { issueId: string; expectedRevision: number; idempotencyKey: string };
-    };
-@Service()
-export class DeliveryIssueDraft {
-  private readonly session = inject(SessionFacade);
-  private readonly workspace = inject(SalonContext);
-  readonly note = signal('');
-  private owner: { scope: DeliveryScope; view: 'HQ' | 'SALON' } | null = null;
-  constructor() {
-    effect(() => {
-      const s = this.session.state(),
-        w = this.workspace.workspace(),
-        owner = this.owner;
-      if (!owner) return;
-      if (
-        s.status === 'SIGNED_OUT' ||
-        s.status === 'NO_ACCESS' ||
-        (s.status === 'READY' &&
-          (s.membership.userId !== owner.scope.userId ||
-            s.membership.businessId !== owner.scope.businessId ||
-            !s.membership.salonIds.includes(owner.scope.salonId) ||
-            (w &&
-              (w.kind !== owner.view ||
-                (w.kind === 'SALON' && w.salonId !== owner.scope.salonId)))))
-      ) {
-        this.note.set('');
-        this.owner = null;
-      }
-    });
-  }
-  activate(scope: DeliveryScope, view: 'HQ' | 'SALON') {
-    if (!this.owner || scopeKey(this.owner.scope) !== scopeKey(scope) || this.owner.view !== view) {
-      this.note.set('');
-      this.owner = { scope, view };
-    }
-  }
-}
+import { DeliveryIssueDraft } from './delivery-issue-draft';
+import { deliveryIssueIdentity } from './delivery-access';
+import { issueAction, sendIssueAction } from './delivery-issue-command';
+import type { IssueAction } from '../models/issue-action';
 @Service({ autoProvided: false })
 export class DeliveryIssueFacade {
   private readonly api = inject(DeliveryApi);
@@ -68,29 +27,15 @@ export class DeliveryIssueFacade {
   private readonly query = toSignal(this.route.queryParamMap);
   readonly draft = inject(DeliveryIssueDraft);
   readonly view: 'HQ' | 'SALON' = this.route.snapshot.data['workspace'];
-  private readonly identity = computed(() => {
-    const s = this.session.state(),
-      w = this.workspace.workspace(),
-      id = this.params()?.get('issueId'),
-      salonId = this.params()?.get('salonId');
-    if (s.status !== 'READY' || !id) return undefined;
-    if (this.view === 'HQ' && (s.membership.role !== 'HQ' || w?.kind !== 'HQ')) return undefined;
-    if (
-      this.view === 'SALON' &&
-      (!salonId ||
-        !s.membership.salonIds.includes(salonId) ||
-        w?.kind !== 'SALON' ||
-        w.salonId !== salonId)
-    )
-      return undefined;
-    return {
-      id,
-      userId: s.membership.userId,
-      businessId: s.membership.businessId,
-      salonId,
-      key: JSON.stringify([s.membership.userId, s.membership.businessId, this.view, id, salonId]),
-    };
-  });
+  private readonly identity = computed(() =>
+    deliveryIssueIdentity(
+      this.session.state(),
+      this.workspace.workspace(),
+      this.view,
+      this.params()?.get('issueId'),
+      this.params()?.get('salonId'),
+    ),
+  );
   readonly eventOffset = signal(0);
   readonly replacementOffset = signal(0);
   private readonly record = resource({
@@ -279,16 +224,8 @@ export class DeliveryIssueFacade {
     )
       return;
     const issue = this.issue()!,
-      scope = this.scope()!,
-      input = {
-        issueId: issue.id,
-        expectedRevision: issue.revision,
-        idempotencyKey: crypto.randomUUID(),
-      };
-    const action: IssueAction =
-      type === 'ADD_NOTE'
-        ? { type, input: { ...input, text: this.draft.note().trim() } }
-        : { type, input };
+      scope = this.scope()!;
+    const action = issueAction(type, issue, () => this.draft.note());
     try {
       this.journal.save(scope, action);
       const saved = this.journal.load(scope);
@@ -310,12 +247,7 @@ export class DeliveryIssueFacade {
     this.busy.set(true);
     this.message.set('');
     try {
-      const result: DeliveryCommandResult =
-        action.type === 'ADD_NOTE'
-          ? await this.api.addNote(action.input)
-          : action.type === 'START_REVIEW'
-            ? await this.api.startReview(action.input)
-            : await this.api.createReplacement(action.input);
+      const result = await sendIssueAction(this.api, action);
       this.journal.clear(scope);
       if (!this.scope() || scopeKey(this.scope()!) !== scopeKey(scope) || !this.isHq()) return;
       this.pending.set(null);

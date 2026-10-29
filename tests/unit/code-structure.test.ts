@@ -251,4 +251,35 @@ describe('code structure', () => {
     }
     expect(problems).toEqual([]);
   });
+  it('web: models in features/<feature>/models/, no logic file over 300 lines', () => {
+    const root = 'web/src/app';
+    // Ports (behaviour interfaces behind an InjectionToken), not data models.
+    const ports = new Set(['SessionGateway', 'JournalStorage']);
+    const tsFiles = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) return /^generated/.test(entry.name) ? [] : tsFiles(path);
+        return entry.name.endsWith('.ts') ? [path] : [];
+      });
+    const files = tsFiles(root).map((file) => ({
+      rel: relative(root, file),
+      source: readFileSync(file, 'utf8'),
+    }));
+    const problems: string[] = [];
+    for (const { rel, source } of files) {
+      if (rel.endsWith('.spec.ts')) continue;
+      const lines = source.split('\n').length;
+      if (lines > 300) problems.push(`${rel}: ${lines} lines (max 300)`);
+      if (!rel.startsWith('features/') || /^features\/[^/]+\/models\//.test(rel)) continue;
+      for (const [, name] of source.matchAll(/^export (?:declare )?(?:interface|type) (\w+)/gm)) {
+        if (ports.has(name)) continue;
+        const importer = new RegExp(`import[^;]*\\b${name}\\b[^;]*from`);
+        const users = files.filter((f) => f.rel !== rel && importer.test(f.source));
+        if (users.length > 0) {
+          problems.push(`${rel}: ${name} is used outside its file, move it to models/`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
 });

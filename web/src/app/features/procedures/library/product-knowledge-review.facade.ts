@@ -4,7 +4,6 @@ import type {
   KnowledgeProductReview,
   KnowledgePassageRef,
   AliasProposal,
-  ProductProfileProposal,
   SaveKnowledgeProductReviewInput,
   AcceptKnowledgeProductReviewInput,
   GenerateKnowledgeProductAliasesInput,
@@ -13,6 +12,7 @@ import type {
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
+import * as draft from './product-knowledge-review-draft';
 type Pending =
   | { action: 'save'; input: SaveKnowledgeProductReviewInput }
   | { action: 'accept'; input: AcceptKnowledgeProductReviewInput }
@@ -61,7 +61,7 @@ export class ProductKnowledgeReviewFacade {
       r.links.every((l) => l.confirmed) &&
       r.profiles.every((p) => p.aliases.every((a) => a.decision !== 'pending')) &&
       r.unlinkedPassages.every((p) =>
-        r.acknowledgedUnlinkedPassages.some((a) => this.key(a) === this.key(p)),
+        r.acknowledgedUnlinkedPassages.some((a) => draft.passageKey(a) === draft.passageKey(p)),
       ) &&
       (this.workspace()?.kind === 'product-card'
         ? this.confirmedProducts().length === 1
@@ -122,9 +122,6 @@ export class ProductKnowledgeReviewFacade {
     this.versionId = '';
     await this.open(id);
   }
-  private key(p: KnowledgePassageRef) {
-    return JSON.stringify([p.chunkId, p.start, p.end]);
-  }
   private edit(change: (r: KnowledgeProductReview) => void): void {
     if (this.blocked()) return;
     this.workspace.update((w) => {
@@ -137,82 +134,31 @@ export class ProductKnowledgeReviewFacade {
     this.dirty.set(true);
   }
   link(passage: KnowledgePassageRef, productId: string) {
-    this.edit((r) => {
-      r.links.push({
-        id: `draft:${crypto.randomUUID()}`,
-        passage,
-        productId,
-        method: 'hq',
-        confirmed: true,
-      });
-      r.acknowledgedUnlinkedPassages = [];
-    });
+    this.edit((r) => draft.linkPassage(r, passage, productId));
   }
   changeLink(id: string, productId: string, confirmed: boolean) {
-    this.edit((r) => {
-      const l = r.links.find((l) => l.id === id);
-      if (l) {
-        l.productId = productId || null;
-        l.confirmed = confirmed && !!productId;
-      }
-      const supported = new Set(
-        r.links.filter((link) => link.confirmed).map((link) => link.productId),
-      );
-      r.profiles = r.profiles.filter((profile) => supported.has(profile.productId));
-      r.acknowledgedUnlinkedPassages = [];
-    });
+    this.edit((r) => draft.changeLink(r, id, productId, confirmed));
   }
   removeLink(id: string) {
-    this.edit((r) => {
-      r.links = r.links.filter((l) => l.id !== id);
-      const ids = new Set(r.links.filter((l) => l.confirmed).map((l) => l.productId));
-      r.profiles = r.profiles.filter((p) => ids.has(p.productId));
-      r.acknowledgedUnlinkedPassages = [];
-    });
-  }
-  private profile(r: KnowledgeProductReview, id: string): ProductProfileProposal {
-    let p = r.profiles.find((p) => p.productId === id);
-    if (!p) {
-      p = { productId: id, type: null, aliases: [] };
-      r.profiles.push(p);
-    }
-    return p;
+    this.edit((r) => draft.removeLink(r, id));
   }
   setType(id: string, type: string) {
     this.edit((r) => {
-      this.profile(r, id).type = type.trim() || null;
+      draft.profileOf(r, id).type = type.trim() || null;
     });
   }
   addAlias(id: string) {
-    this.edit((r) => {
-      this.profile(r, id).aliases.push({
-        id: `draft:${crypto.randomUUID()}`,
-        productId: id,
-        phrase: '',
-        kind: 'name',
-        lang: 'pl',
-        source: 'hq',
-        decision: 'pending',
-      });
-    });
+    this.edit((r) => draft.addAlias(r, id));
   }
   editAlias(
     id: string,
     aliasId: string,
     patch: Partial<Pick<AliasProposal, 'phrase' | 'kind' | 'lang' | 'decision'>>,
   ) {
-    this.edit((r) => {
-      const a = this.profile(r, id).aliases.find((a) => a.id === aliasId);
-      if (a) Object.assign(a, patch);
-    });
+    this.edit((r) => draft.editAlias(r, id, aliasId, patch));
   }
   acknowledge(ref: KnowledgePassageRef, checked: boolean) {
-    this.edit((r) => {
-      r.acknowledgedUnlinkedPassages = r.acknowledgedUnlinkedPassages.filter(
-        (p) => this.key(p) !== this.key(ref),
-      );
-      if (checked) r.acknowledgedUnlinkedPassages.push(ref);
-    });
+    this.edit((r) => draft.acknowledgePassage(r, ref, checked));
   }
   acknowledgeEmpty(value: boolean) {
     this.edit((r) => (r.emptyKnowledgeAcknowledged = value));
@@ -220,34 +166,7 @@ export class ProductKnowledgeReviewFacade {
   async save() {
     const r = this.review();
     if (!r || this.blocked()) return;
-    await this.execute({
-      action: 'save',
-      input: {
-        versionId: r.versionId,
-        extractionHash: r.extractionHash,
-        expectedReviewRevision: r.revision,
-        idempotencyKey: crypto.randomUUID(),
-        links: r.links.map((l) => ({
-          ...(!l.id.startsWith('draft:') ? { id: l.id } : {}),
-          passage: l.passage,
-          productId: l.productId,
-          confirmed: l.confirmed,
-        })),
-        profiles: r.profiles.map((p) => ({
-          productId: p.productId,
-          type: p.type,
-          aliases: p.aliases.map((a) => ({
-            ...(!a.id.startsWith('draft:') ? { id: a.id } : {}),
-            phrase: a.phrase,
-            kind: a.kind,
-            lang: a.lang,
-            decision: a.decision,
-          })),
-        })),
-        acknowledgedUnlinkedPassages: r.acknowledgedUnlinkedPassages,
-        emptyKnowledgeAcknowledged: r.emptyKnowledgeAcknowledged,
-      },
-    });
+    await this.execute({ action: 'save', input: draft.saveReviewInput(r) });
   }
   async accept() {
     const r = this.review();

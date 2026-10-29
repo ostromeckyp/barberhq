@@ -14,6 +14,8 @@ import { DeliveryDraftStore } from './delivery-draft.store';
 import { deliveryReceiptQuery } from './delivery-return';
 import { DELIVERY_JOURNAL, scopeKey } from './delivery-journal';
 import type { DeliveryScope } from '../models/delivery-scope';
+import { deliveryReceiptScope } from './delivery-access';
+import { receiptInput, receiptProcedureProblem, receiptValidation } from './delivery-receipt-input';
 import { runtimeConfig } from '../../../core/public-config';
 import { deliveryProcedureQuestion } from '../../procedures/procedure-question';
 @Service({ autoProvided: false })
@@ -28,19 +30,13 @@ export class DeliveryReceiptFacade {
   private readonly journal = inject(DELIVERY_JOURNAL);
   readonly draft = inject(DeliveryDraftStore);
   readonly scope = computed<DeliveryScope | undefined>(() => {
-    const s = this.session.state(),
-      workspace = this.workspace.workspace(),
-      p = this.params(),
-      salonId = p?.get('salonId'),
-      targetId = p?.get('requestId');
-    return s.status === 'READY' &&
-      salonId &&
-      targetId &&
-      s.membership.salonIds.includes(salonId) &&
-      workspace?.kind === 'SALON' &&
-      workspace.salonId === salonId
-      ? { userId: s.membership.userId, businessId: s.membership.businessId, salonId, targetId }
-      : undefined;
+    const p = this.params();
+    return deliveryReceiptScope(
+      this.session.state(),
+      this.workspace.workspace(),
+      p?.get('salonId'),
+      p?.get('requestId'),
+    );
   });
   private readonly record = resource({
     params: () => this.scope(),
@@ -88,43 +84,17 @@ export class DeliveryReceiptFacade {
       { good: 0, affected: 0 },
     ),
   );
-  private readonly procedureProblem = computed(() => {
-    const items = this.draft.model().items;
-    const damaged = items.some((item) => item.damagedQuantity > 0);
-    const missing = items.some((item) => item.missingQuantity > 0);
-    return damaged && missing ? 'BOTH' : damaged ? 'DAMAGED' : missing ? 'MISSING' : null;
-  });
+  private readonly procedureProblem = computed(() =>
+    receiptProcedureProblem(this.draft.model().items),
+  );
   readonly procedureQuestion = computed(() =>
     runtimeConfig.publicConfig?.ragEnabled && runtimeConfig.publicConfig.knowledgeEnabled
       ? deliveryProcedureQuestion(this.procedureProblem())
       : null,
   );
-  readonly validation = computed(() => {
-    const ctx = this.context(),
-      draft = this.draft.model();
-    if (!ctx) return 'Delivery information unavailable.';
-    if (draft.items.length !== ctx.request.items.length) return 'Check all products.';
-    for (const item of ctx.request.items) {
-      const row = draft.items.find((r) => r.productId === item.productId);
-      if (
-        !row ||
-        [row.goodQuantity, row.damagedQuantity, row.missingQuantity].some(
-          (q) => !Number.isInteger(q) || q < 0 || q > 99,
-        )
-      )
-        return `${item.productName}: enter whole quantities from 0 to 99.`;
-      if (row.goodQuantity + row.damagedQuantity + row.missingQuantity !== item.dispatchedQuantity)
-        return `${item.productName}: quantities must add up to ${item.dispatchedQuantity}.`;
-    }
-    if (
-      this.totals().affected &&
-      (!draft.description.trim() || draft.description.trim().length > 1000)
-    )
-      return 'Describe the problem in 1–1000 characters.';
-    if (draft.batchIdentifier.trim().length > 120)
-      return 'Batch number must be 120 characters or fewer.';
-    return '';
-  });
+  readonly validation = computed(() =>
+    receiptValidation(this.context(), this.draft.model(), () => this.totals().affected),
+  );
   readonly canSubmit = computed(
     () =>
       !this.busy() &&
@@ -264,21 +234,7 @@ export class DeliveryReceiptFacade {
       draft = this.draft.model();
     let input = this.pending();
     if (!input) {
-      input = {
-        requestId: scope.targetId,
-        expectedRevision: context.request.revision,
-        idempotencyKey: crypto.randomUUID(),
-        items: draft.items.map((row) => ({ ...row })),
-        ...(this.totals().affected
-          ? {
-              report: {
-                description: draft.description.trim(),
-                batchIdentifier: draft.batchIdentifier.trim() || null,
-              },
-            }
-          : {}),
-        procedureReferences: draft.procedureReferences.map((ref) => ({ ...ref })),
-      };
+      input = receiptInput(scope, context, draft, this.totals().affected);
       try {
         this.journal.save(scope, { type: 'RECORD_RECEIPT', input });
         const saved = this.journal.load(scope);

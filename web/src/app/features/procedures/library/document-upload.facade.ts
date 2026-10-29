@@ -10,6 +10,17 @@ import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import type { UploadDialogData } from '../models/upload-dialog-data';
 import type { UploadFormValue } from '../models/upload-form-value';
+import {
+  clearPendingUpload,
+  clearScopeStorage,
+  isRecoverableForTarget,
+  isValidRegistration,
+  matchesUploadTarget,
+  persistPendingRegistration,
+  persistPendingUpload,
+  removePendingRegistration,
+  uploadTargetStorageKey,
+} from './document-upload-storage';
 
 @Service({ autoProvided: false })
 export class DocumentUploadFacade {
@@ -45,14 +56,14 @@ export class DocumentUploadFacade {
         this.activeScope = scope;
         if (state.status === 'READY') {
           this.storagePrefix = `barberhq:document-upload:${state.membership.userId}:${state.membership.businessId}`;
-          this.storageKey = this.targetStorageKey();
+          this.storageKey = uploadTargetStorageKey(this.storagePrefix, this.data);
           if (!this.data.resume) this.restorePendingRegistration();
         }
         return;
       }
       if (scope !== this.activeScope) {
         const oldStoragePrefix = this.storagePrefix;
-        this.clearScopeStorage(oldStoragePrefix);
+        clearScopeStorage(oldStoragePrefix);
         this.activeScope = scope;
         this.cancelled = true;
         this.uploadAbort?.abort();
@@ -62,7 +73,9 @@ export class DocumentUploadFacade {
           state.status === 'READY'
             ? `barberhq:document-upload:${state.membership.userId}:${state.membership.businessId}`
             : '';
-        this.storageKey = this.storagePrefix ? this.targetStorageKey() : '';
+        this.storageKey = this.storagePrefix
+          ? uploadTargetStorageKey(this.storagePrefix, this.data)
+          : '';
         this.ref.close();
       }
     });
@@ -156,13 +169,13 @@ export class DocumentUploadFacade {
         this.registered.set(result);
         this.unknownRegistration.set(false);
         this.clearPendingRegistration();
-        this.persistPendingUpload(result.versionId, sha256);
+        persistPendingUpload(this.storageKey, result.versionId, sha256);
         await this.upload(result.versionId);
       } catch (error) {
         if (this.isUnknown(error)) {
           this.unknownRegistration.set(true);
           this.recoveredRegistration.set(this.frozen ?? null);
-          this.persistPendingRegistration();
+          persistPendingRegistration(this.storageKey, this.frozen);
         }
         throw error;
       }
@@ -182,7 +195,7 @@ export class DocumentUploadFacade {
     this.uploadAbort = new AbortController();
     const status = await this.api.uploadPdf(versionId, this.file, this.uploadAbort.signal);
     if (this.cancelled) return;
-    this.clearPendingUpload();
+    clearPendingUpload(this.storageKey);
     this.clearPendingRegistration();
     this.ref.close(status);
   }
@@ -213,14 +226,14 @@ export class DocumentUploadFacade {
       if (!raw && this.storagePrefix) {
         const legacyKey = this.storagePrefix;
         const legacyRaw = sessionStorage.getItem(legacyKey);
-        if (legacyRaw && this.isRecoverableForCurrentTarget(legacyRaw)) {
+        if (legacyRaw && isRecoverableForTarget(legacyRaw, this.data)) {
           raw = legacyRaw;
           sourceKey = legacyKey;
         }
       }
       if (!raw) return;
       const value = JSON.parse(raw) as CreateDocumentRequest;
-      if (this.isValidRegistration(value) && this.matchesCurrentTarget(value)) {
+      if (isValidRegistration(value) && matchesUploadTarget(value, this.data)) {
         this.frozen = Object.freeze(value);
         this.recoveredRegistration.set(this.frozen);
         this.unknownRegistration.set(true);
@@ -233,74 +246,8 @@ export class DocumentUploadFacade {
       /* Preserve unresolved metadata for a deliberate same-target retry. */
     }
   }
-  private isRecoverableForCurrentTarget(raw: string): boolean {
-    try {
-      const value = JSON.parse(raw) as CreateDocumentRequest;
-      return this.isValidRegistration(value) && this.matchesCurrentTarget(value);
-    } catch {
-      return false;
-    }
-  }
-  private isValidRegistration(value: CreateDocumentRequest): boolean {
-    return (
-      typeof value.idempotencyKey === 'string' &&
-      typeof value.sha256 === 'string' &&
-      Array.isArray(value.sourceUrls)
-    );
-  }
-  private matchesCurrentTarget(value: CreateDocumentRequest): boolean {
-    if (this.data.resume) return false;
-    if (this.data.replaceTarget) return value.documentId === this.data.replaceTarget.documentId;
-    return value.documentId === undefined;
-  }
-  private targetStorageKey(): string {
-    if (this.data.resume)
-      return `${this.storagePrefix}:resume:${encodeURIComponent(this.data.resume.versionId)}`;
-    if (this.data.replaceTarget)
-      return `${this.storagePrefix}:replace:${encodeURIComponent(this.data.replaceTarget.documentId)}`;
-    return `${this.storagePrefix}:new`;
-  }
-  private persistPendingRegistration(): void {
-    try {
-      if (this.frozen && this.storageKey)
-        sessionStorage.setItem(this.storageKey, JSON.stringify(this.frozen));
-    } catch {
-      /* In-memory replay remains available in this dialog. */
-    }
-  }
   private clearPendingRegistration(): void {
     this.recoveredRegistration.set(null);
-    try {
-      if (this.storageKey) sessionStorage.removeItem(this.storageKey);
-    } catch {
-      /* Storage may be disabled by the browser. */
-    }
-  }
-  private persistPendingUpload(versionId: string, sha256: string): void {
-    try {
-      if (this.storageKey)
-        sessionStorage.setItem(`${this.storageKey}:staged`, JSON.stringify({ versionId, sha256 }));
-    } catch {
-      /* The server list remains the durable record. */
-    }
-  }
-  private clearPendingUpload(): void {
-    try {
-      if (this.storageKey) sessionStorage.removeItem(`${this.storageKey}:staged`);
-    } catch {
-      /* Storage may be disabled by the browser. */
-    }
-  }
-  private clearScopeStorage(storageKey: string): void {
-    try {
-      const prefix = storageKey;
-      if (!prefix) return;
-      for (let index = sessionStorage.length - 1; index >= 0; index--) {
-        const key = sessionStorage.key(index);
-        if (key === prefix || key?.startsWith(`${prefix}:`)) sessionStorage.removeItem(key);
-      }
-    } catch {
-      /* Storage may be disabled by the browser. */
-    }
+    removePendingRegistration(this.storageKey);
   }
 }

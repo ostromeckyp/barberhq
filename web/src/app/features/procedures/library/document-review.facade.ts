@@ -10,6 +10,18 @@ import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { PdfRenderer } from '../pdf-viewer/pdf-renderer';
 import { DOCUMENT_PDF_RENDERER } from './document-review-renderer';
+import {
+  frozenMatches,
+  loadErrorMessage,
+  persistFrozen,
+  readFrozen,
+  removeFrozen,
+  removeOwnerStorage,
+  reviewErrorCode,
+  reviewPublishInput,
+  reviewScope,
+  reviewStorageKey,
+} from './document-review-publication';
 
 @Service({ autoProvided: false })
 export class DocumentReviewFacade {
@@ -80,45 +92,26 @@ export class DocumentReviewFacade {
     effect(() => {
       const state = this.session.state();
       const versionId = this.params()?.get('versionId');
-      const currentIdentity =
-        state.status === 'READY' && versionId
-          ? `${state.membership.userId}:${state.membership.businessId}:${versionId}`
-          : state.status;
+      const { identity: currentIdentity, owner: nextOwner } = reviewScope(state, versionId);
       if (currentIdentity === this.identity) return;
-      const nextOwner =
-        state.status === 'READY'
-          ? `${state.membership.userId}:${state.membership.businessId}`
-          : state.status;
       if (this.ownerScope && nextOwner !== this.ownerScope) {
-        this.removeOwnerStorage(this.ownerScope);
+        removeOwnerStorage(this.ownerScope);
         this.frozenStorageKey = '';
       }
       this.ownerScope = nextOwner;
       this.identity = currentIdentity;
       this.clear();
       if (state.status === 'READY' && versionId) {
-        this.frozenStorageKey = this.storageKey(
-          state.membership.userId,
-          state.membership.businessId,
-          versionId,
-        );
-        this.frozenCommand.set(this.readFrozen(this.frozenStorageKey));
+        this.frozenStorageKey = reviewStorageKey(nextOwner, versionId);
+        this.frozenCommand.set(readFrozen(this.frozenStorageKey));
         void this.load(versionId, false);
       } else {
         this.frozenStorageKey = '';
         this.loading.set(false);
       }
     });
-    this.timer = setInterval(() => {
-      const id = this.params()?.get('versionId');
-      if (id && document.visibilityState === 'visible' && this.session.state().status === 'READY')
-        void this.load(id, true);
-    }, 5000);
-    this.visibleHandler = () => {
-      const id = this.params()?.get('versionId');
-      if (id && document.visibilityState === 'visible' && this.session.state().status === 'READY')
-        void this.load(id, true);
-    };
+    this.timer = setInterval(() => this.poll(), 5000);
+    this.visibleHandler = () => this.poll();
     document.addEventListener('visibilitychange', this.visibleHandler);
     this.destroyRef.onDestroy(() => {
       this.generation++;
@@ -174,23 +167,17 @@ export class DocumentReviewFacade {
     this.notice.set('');
     const input =
       this.frozenCommand() ??
-      Object.freeze({
-        versionId: review.version.versionId,
-        extractionHash: review.extractionHash,
-        reviewedPhysicalPages: [...this.checkedPages()].sort((a, b) => a - b),
-        expectedDocumentRevision: review.version.documentRevision,
-        idempotencyKey: crypto.randomUUID(),
-        ...((review.version.kind === 'product-card' || review.version.kind === 'product-catalog') &&
-        this.productKnowledge?.review()?.reviewedHash
-          ? { productKnowledgeReviewedHash: this.productKnowledge.review()!.reviewedHash! }
-          : {}),
-      });
+      reviewPublishInput(
+        review,
+        this.checkedPages(),
+        this.productKnowledge?.review()?.reviewedHash,
+      );
     this.frozenCommand.set(input);
-    this.persistFrozen();
+    persistFrozen(this.frozenStorageKey, () => this.frozenCommand());
     try {
       const result = await this.api.reviewAndPublishDocument(input);
       this.frozenCommand.set(undefined);
-      this.removeFrozen();
+      removeFrozen(this.frozenStorageKey);
       this.notice.set(
         result.status === 'READY'
           ? 'Publication queued. The server will finish this version in the background.'
@@ -199,10 +186,10 @@ export class DocumentReviewFacade {
       const id = this.params()?.get('versionId');
       if (id) await this.load(id, false);
     } catch (error) {
-      const code = this.errorCode(error);
+      const code = reviewErrorCode(error);
       if (code === 'STALE_STATE' || code === 'VERSION_CONFLICT') {
         this.frozenCommand.set(undefined);
-        this.removeFrozen();
+        removeFrozen(this.frozenStorageKey);
         this.checkedPages.set(new Set());
         this.renderedPages.set(new Set());
         const id = this.params()?.get('versionId');
@@ -217,7 +204,7 @@ export class DocumentReviewFacade {
         );
       } else {
         this.frozenCommand.set(undefined);
-        this.removeFrozen();
+        removeFrozen(this.frozenStorageKey);
         this.error.set(
           'The document could not be published. Refresh and review the current version before retrying.',
         );
@@ -230,6 +217,11 @@ export class DocumentReviewFacade {
     void this.router.navigate(['/procedures'], { queryParams: { tab: 'documents' } });
   }
 
+  private poll(): void {
+    const id = this.params()?.get('versionId');
+    if (id && document.visibilityState === 'visible' && this.session.state().status === 'READY')
+      void this.load(id, true);
+  }
   private async load(versionId: string, quiet: boolean): Promise<void> {
     if (quiet && this.fetchingGeneration !== null) return;
     const generation = ++this.generation;
@@ -265,21 +257,17 @@ export class DocumentReviewFacade {
         if (generation !== this.generation) return;
         if (this.renderer.pageCount !== review.version.pageCount)
           throw new Error('PDF page count does not match the extracted page set.');
-        this.frozenCommand.update((frozen) => frozen ?? this.readFrozen(this.frozenStorageKey));
+        this.frozenCommand.update((frozen) => frozen ?? readFrozen(this.frozenStorageKey));
         const frozen = this.frozenCommand();
-        if (
-          frozen &&
-          (frozen.versionId !== review.version.versionId ||
-            frozen.extractionHash !== review.extractionHash)
-        ) {
+        if (frozen && !frozenMatches(frozen, review)) {
           this.frozenCommand.set(undefined);
-          this.removeFrozen();
+          removeFrozen(this.frozenStorageKey);
         }
         this.review.set(review);
       }
       this.error.set('');
     } catch (error) {
-      if (generation === this.generation) this.error.set(this.loadErrorMessage(error));
+      if (generation === this.generation) this.error.set(loadErrorMessage(error));
     } finally {
       if (this.fetchingGeneration === generation) this.fetchingGeneration = null;
       if (generation === this.generation) this.loading.set(false);
@@ -306,54 +294,5 @@ export class DocumentReviewFacade {
     this.renderer.dispose();
     this.bytes?.fill(0);
     this.bytes = undefined;
-  }
-  private errorCode(error: unknown): string {
-    return typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
-  }
-  private loadErrorMessage(error: unknown): string {
-    const code = this.errorCode(error);
-    if (code === 'FORBIDDEN')
-      return 'This document review is unavailable in the selected workspace.';
-    if (code === 'UNAUTHENTICATED') return 'Sign in again to continue this review.';
-    return 'The review and original PDF could not be loaded. Retry to refresh the current version.';
-  }
-  private storageKey(userId: string, businessId: string, versionId: string): string {
-    return `barberhq:document-review:${userId}:${businessId}:${versionId}`;
-  }
-  private readFrozen(key: string): ReviewDocumentInput | undefined {
-    if (!key) return undefined;
-    try {
-      const value = sessionStorage.getItem(key);
-      return value ? (JSON.parse(value) as ReviewDocumentInput) : undefined;
-    } catch {
-      return undefined;
-    }
-  }
-  private persistFrozen(): void {
-    try {
-      const frozen = this.frozenCommand();
-      if (this.frozenStorageKey && frozen)
-        sessionStorage.setItem(this.frozenStorageKey, JSON.stringify(frozen));
-    } catch {
-      /* In-memory replay still preserves this view's command. */
-    }
-  }
-  private removeFrozen(): void {
-    try {
-      if (this.frozenStorageKey) sessionStorage.removeItem(this.frozenStorageKey);
-    } catch {
-      /* Storage may be disabled by the browser. */
-    }
-  }
-  private removeOwnerStorage(owner: string): void {
-    try {
-      const prefix = `barberhq:document-review:${owner}:`;
-      for (let index = sessionStorage.length - 1; index >= 0; index--) {
-        const key = sessionStorage.key(index);
-        if (key?.startsWith(prefix)) sessionStorage.removeItem(key);
-      }
-    } catch {
-      /* Storage may be disabled by the browser. */
-    }
   }
 }
