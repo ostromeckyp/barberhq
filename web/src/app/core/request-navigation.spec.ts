@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { parseListContext, requestReturnContext } from './request-navigation';
-import type { RequestSummary } from '../../../../shared/contracts/stock';
+import type { RequestSummary } from '../../../../shared/contracts/stock/index';
 const request = { salonId: 's' } as RequestSummary;
 const member = { userId: 'u', businessId: 'b', role: 'SALON' as const, salonIds: ['s', 's2'] };
 it('bounds_return_context_and_rejects_external_urls', () => {

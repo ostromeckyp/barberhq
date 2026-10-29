@@ -6,7 +6,7 @@ import type {
   InsertKnowledgePageVariables,
   StageKnowledgeVersionVariables,
 } from '@barberhq/server';
-import type { SourceSection } from '../../shared/contracts/knowledge.ts';
+import type { SourceSection } from '../../shared/contracts/knowledge/index.ts';
 import type { createCloudHarness } from '../support/cloud.ts';
 
 type Harness = Awaited<ReturnType<typeof createCloudHarness>>;

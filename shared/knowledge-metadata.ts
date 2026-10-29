@@ -3,7 +3,7 @@ import type {
   KnowledgeOrigin,
   KnowledgeMetadata,
   LegacyCreateDocumentInput,
-} from './contracts/knowledge.js';
+} from './contracts/knowledge/index.js';
 
 export const knowledgeKinds: readonly KnowledgeDocumentKind[] = [
   'procedure',

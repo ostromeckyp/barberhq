@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import type { DeliveryAction, DeliveryQuantities } from '../../shared/contracts/delivery.ts';
-import type { RequestState } from '../../shared/contracts/stock.ts';
+import type { DeliveryAction, DeliveryQuantities } from '../../shared/contracts/delivery/index.ts';
+import type { RequestState } from '../../shared/contracts/stock/index.ts';
 import { StockRepository } from '../../functions/src/stock/repository.ts';
 import { DeliveryRepository } from '../../functions/src/delivery/repository.ts';
 import { createCloudHarness } from './cloud.ts';

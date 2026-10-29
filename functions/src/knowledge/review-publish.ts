@@ -1,7 +1,7 @@
 import { validateProductPublication } from './product-knowledge-publication.js';
 import { randomUUID } from 'node:crypto';
 import * as sql from '@barberhq/server';
-import type { ReviewDocumentInput, VersionStatus } from '../../../shared/contracts/knowledge.js';
+import type { ReviewDocumentInput, VersionStatus } from '../../../shared/contracts/knowledge/index.js';
 import { KnowledgeError, type KnowledgeRepository, type VersionState } from './repository.js';
 import type { KnowledgePipeline } from './pipeline.js';
 import { knowledgePayloadHash, parseReviewDocument } from './schemas.js';

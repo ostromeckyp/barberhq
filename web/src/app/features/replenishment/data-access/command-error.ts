@@ -1,4 +1,4 @@
-import type { ActiveConflict } from '../../../../../../shared/contracts/stock';
+import type { ActiveConflict } from '../../../../../../shared/contracts/stock/index';
 export class CommandError extends Error {
   constructor(
     readonly code: string,

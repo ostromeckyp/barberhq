@@ -1,4 +1,4 @@
-import type { DeliveryQuantities } from './contracts/delivery.js';
+import type { DeliveryQuantities } from './contracts/delivery/index.js';
 export function deliveryQuantities(input: {
   dispatchedQuantity: number;
   receivedQuantity: number;

@@ -1,10 +1,10 @@
-import type { StockContext, PrepareInput, ProposalResult } from '../../../shared/contracts/ai.js';
+import type { StockContext, PrepareInput, ProposalResult } from '../../../shared/contracts/ai/index.js';
 import type {
   LookupAlias,
   LookupProduct,
   ProductMatch,
-} from '../../../shared/contracts/product-lookup.js';
-import type { ClarificationLine } from '../../../shared/contracts/draft.js';
+} from '../../../shared/contracts/product-lookup/index.js';
+import type { ClarificationLine } from '../../../shared/contracts/draft/index.js';
 import type { ActorContext } from './context.js';
 import { AiError, consumeToolCall, runWithinBudget, type AiBudget } from './budget.js';
 import { bindSourceLines, type RequestedLine } from './proposal.js';

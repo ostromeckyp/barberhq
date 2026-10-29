@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { lookupProducts } from '../../../functions/src/ai/product-lookup.ts';
 import { normalizeProduct } from '../../../shared/product-normalization.ts';
-import type { LookupAlias, LookupProduct } from '../../../shared/contracts/product-lookup.ts';
+import type { LookupAlias, LookupProduct } from '../../../shared/contracts/product-lookup/index.ts';
 
 /** Fixture-only lookup evaluation: no SQL, no provider, no stock or alias writes. */
 type Fixture = {

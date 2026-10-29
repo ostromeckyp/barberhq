@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
-import type { DocumentRow } from '../../../../../shared/contracts/knowledge';
+import type { DocumentRow } from '../../../../../shared/contracts/knowledge/index';
 import { DocumentLibraryComponent } from './document-library.component';
 import { DocumentLibraryFacade } from './library/document-library.facade';
 

@@ -9,7 +9,7 @@ import { DocumentLibraryFacade } from './library/document-library.facade';
 import { DocumentRowComponent } from './document-row.component';
 import { DocumentDeleteDialogComponent } from './document-delete-dialog.component';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
-import type { DocumentRow } from '../../../../../shared/contracts/knowledge';
+import type { DocumentRow } from '../../../../../shared/contracts/knowledge/index';
 
 @Component({
   selector: 'app-document-library',

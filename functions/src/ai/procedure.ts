@@ -5,7 +5,7 @@ import type { DataConnect } from 'firebase-admin/data-connect';
 import { HttpsError, onCall, type CallableRequest } from 'firebase-functions/v2/https';
 import { info } from 'firebase-functions/logger';
 import { z } from 'genkit';
-import type { ProcedureInput, ProcedureResult } from '../../../shared/contracts/ai.js';
+import type { ProcedureInput, ProcedureResult } from '../../../shared/contracts/ai/index.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from '../knowledge/runtime.js';
 import { createAiAdmission } from './admission.js';
 import { AiError, consumeToolCall, runWithinBudget, type AiBudget } from './budget.js';

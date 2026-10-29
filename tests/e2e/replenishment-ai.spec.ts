@@ -1,7 +1,7 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
 import { createCloudHarness } from '../support/cloud.ts';
-import type { ProposalResult } from '../../shared/contracts/ai.ts';
+import type { ProposalResult } from '../../shared/contracts/ai/index.ts';
 
 let h: Awaited<ReturnType<typeof createCloudHarness>>;
 let extra: BrowserContext | undefined;

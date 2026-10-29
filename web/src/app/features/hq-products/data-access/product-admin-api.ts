@@ -10,7 +10,7 @@ import type {
   SaveProductAliasesInput,
   SetHqStockInput,
   UpdateProductInput,
-} from '../../../../../../shared/contracts/product-admin';
+} from '../../../../../../shared/contracts/product-admin/index';
 
 export type CardSuggestion = {
   phrase: string;

@@ -1,8 +1,8 @@
 import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import type { CitedStep, ProcedureResult } from '../../../../../shared/contracts/ai';
-import type { SourceSection } from '../../../../../shared/contracts/knowledge';
+import type { CitedStep, ProcedureResult } from '../../../../../shared/contracts/ai/index';
+import type { SourceSection } from '../../../../../shared/contracts/knowledge/index';
 import { SourceExcerptComponent } from './source-excerpt.component';
 
 @Component({

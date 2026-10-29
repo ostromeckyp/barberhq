@@ -1,7 +1,7 @@
 import { RequestState, DeliveryIssueStatus } from '../../../core/generated';
 import { expect, it } from 'vitest';
 import { toRequestSummary, toRequestDetail } from './request.mapper';
-import type { InventoryRow } from '../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
 const record: Parameters<typeof toRequestDetail>[0] = {
   id: 'r',
   salonId: 's',

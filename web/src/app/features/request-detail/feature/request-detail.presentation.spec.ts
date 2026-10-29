@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import type { RequestDetail } from '../../../../../../shared/contracts/stock';
+import type { RequestDetail } from '../../../../../../shared/contracts/stock/index';
 import { buildRequestHistory } from './request-detail.presentation';
 
 const submitted = {

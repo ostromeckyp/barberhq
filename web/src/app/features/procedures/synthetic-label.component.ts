@@ -1,6 +1,6 @@
 import { knowledgeProvenanceLabel } from '../../../../../shared/knowledge-metadata';
 import { Component, input } from '@angular/core';
-import type { DocumentSource } from '../../../../../shared/contracts/knowledge';
+import type { DocumentSource } from '../../../../../shared/contracts/knowledge/index';
 
 @Component({
   selector: 'app-synthetic-label',

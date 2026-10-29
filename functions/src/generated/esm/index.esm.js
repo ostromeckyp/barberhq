@@ -148,6 +148,42 @@ export function readAiCurrentWindow(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeQuery('ReadAiCurrentWindow', inputVars, inputOpts);
 }
 
+export function changeDeliveryIssue(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('ChangeDeliveryIssue', inputVars, inputOpts);
+}
+
+export function createDeliveryReplacement(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('CreateDeliveryReplacement', inputVars, inputOpts);
+}
+
+export function insertLegacyDeliveryReceipt(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('InsertLegacyDeliveryReceipt', inputVars, inputOpts);
+}
+
+export function readDeliveryBindings(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ReadDeliveryBindings', inputVars, inputOpts);
+}
+
+export function readDeliveryProcedureDocument(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ReadDeliveryProcedureDocument', inputVars, inputOpts);
+}
+
+export function setDeliveryProcedure(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('SetDeliveryProcedure', inputVars, inputOpts);
+}
+
 export function readDeliveryContext(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
@@ -172,70 +208,10 @@ export function readIssueContext(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeQuery('ReadIssueContext', inputVars, inputOpts);
 }
 
-export function insertLegacyDeliveryReceipt(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('InsertLegacyDeliveryReceipt', inputVars, inputOpts);
-}
-
-export function readDeliveryBindings(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ReadDeliveryBindings', inputVars, inputOpts);
-}
-
-export function readDeliveryProcedureDocument(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ReadDeliveryProcedureDocument', inputVars, inputOpts);
-}
-
 export function recordDeliveryTransaction(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeMutation('RecordDeliveryTransaction', inputVars, inputOpts);
-}
-
-export function changeDeliveryIssue(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('ChangeDeliveryIssue', inputVars, inputOpts);
-}
-
-export function createDeliveryReplacement(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('CreateDeliveryReplacement', inputVars, inputOpts);
-}
-
-export function setDeliveryProcedure(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('SetDeliveryProcedure', inputVars, inputOpts);
-}
-
-export function searchEligibleProcedureChunks(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('SearchEligibleProcedureChunks', inputVars, inputOpts);
-}
-
-export function recheckProcedureSources(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('RecheckProcedureSources', inputVars, inputOpts);
-}
-
-export function knowledgeVersionState(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('KnowledgeVersionState', inputVars, inputOpts);
-}
-
-export function knowledgeDocumentState(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('KnowledgeDocumentState', inputVars, inputOpts);
 }
 
 export function knowledgeCursorDocuments(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -262,24 +238,6 @@ export function backfillKnowledgeCursor(dcOrVarsOrOptions, varsOrOptions, option
   return dcInstance.executeMutation('BackfillKnowledgeCursor', inputVars, inputOpts);
 }
 
-export function knowledgeCommandContext(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('KnowledgeCommandContext', inputVars, inputOpts);
-}
-
-export function registerKnowledgeVersion(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('RegisterKnowledgeVersion', inputVars, inputOpts);
-}
-
-export function bindKnowledgeOriginal(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('BindKnowledgeOriginal', inputVars, inputOpts);
-}
-
 export function setKnowledgeDispatchFailure(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
@@ -304,16 +262,28 @@ export function completeKnowledgeRetry(dcOrVarsOrOptions, varsOrOptions, options
   return dcInstance.executeMutation('CompleteKnowledgeRetry', inputVars, inputOpts);
 }
 
-export function startKnowledgeReview(dcOrVarsOrOptions, varsOrOptions, options) {
+export function saveKnowledgeExtraction(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('StartKnowledgeReview', inputVars, inputOpts);
+  return dcInstance.executeMutation('SaveKnowledgeExtraction', inputVars, inputOpts);
 }
 
-export function completeKnowledgeReview(dcOrVarsOrOptions, varsOrOptions, options) {
+export function insertKnowledgePage(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('CompleteKnowledgeReview', inputVars, inputOpts);
+  return dcInstance.executeMutation('InsertKnowledgePage', inputVars, inputOpts);
+}
+
+export function knowledgeMetadataPage(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('KnowledgeMetadataPage', inputVars, inputOpts);
+}
+
+export function backfillKnowledgeMetadata(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('BackfillKnowledgeMetadata', inputVars, inputOpts);
 }
 
 export function setKnowledgePublishIntent(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -332,6 +302,66 @@ export function markKnowledgePublishStale(dcOrVarsOrOptions, varsOrOptions, opti
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeMutation('MarkKnowledgePublishStale', inputVars, inputOpts);
+}
+
+export function publishKnowledgeVersion(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('PublishKnowledgeVersion', inputVars, inputOpts);
+}
+
+export function registerKnowledgeVersion(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('RegisterKnowledgeVersion', inputVars, inputOpts);
+}
+
+export function bindKnowledgeOriginal(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('BindKnowledgeOriginal', inputVars, inputOpts);
+}
+
+export function searchEligibleProcedureChunks(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('SearchEligibleProcedureChunks', inputVars, inputOpts);
+}
+
+export function recheckProcedureSources(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('RecheckProcedureSources', inputVars, inputOpts);
+}
+
+export function startKnowledgeReview(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('StartKnowledgeReview', inputVars, inputOpts);
+}
+
+export function completeKnowledgeReview(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('CompleteKnowledgeReview', inputVars, inputOpts);
+}
+
+export function recordKnowledgeReview(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('RecordKnowledgeReview', inputVars, inputOpts);
+}
+
+export function markKnowledgePageReviewed(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('MarkKnowledgePageReviewed', inputVars, inputOpts);
+}
+
+export function markKnowledgeReady(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('MarkKnowledgeReady', inputVars, inputOpts);
 }
 
 export function revokeKnowledgeVersion(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -364,70 +394,28 @@ export function failKnowledgeExtraction(dcOrVarsOrOptions, varsOrOptions, option
   return dcInstance.executeMutation('FailKnowledgeExtraction', inputVars, inputOpts);
 }
 
-export function saveKnowledgeExtraction(dcOrVarsOrOptions, varsOrOptions, options) {
+export function knowledgeVersionState(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('SaveKnowledgeExtraction', inputVars, inputOpts);
+  return dcInstance.executeQuery('KnowledgeVersionState', inputVars, inputOpts);
 }
 
-export function insertKnowledgePage(dcOrVarsOrOptions, varsOrOptions, options) {
+export function knowledgeDocumentState(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('InsertKnowledgePage', inputVars, inputOpts);
+  return dcInstance.executeQuery('KnowledgeDocumentState', inputVars, inputOpts);
 }
 
-export function recordKnowledgeReview(dcOrVarsOrOptions, varsOrOptions, options) {
+export function knowledgeCommandContext(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('RecordKnowledgeReview', inputVars, inputOpts);
+  return dcInstance.executeQuery('KnowledgeCommandContext', inputVars, inputOpts);
 }
 
-export function markKnowledgePageReviewed(dcOrVarsOrOptions, varsOrOptions, options) {
+export function recordOperatorProductReview(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('MarkKnowledgePageReviewed', inputVars, inputOpts);
-}
-
-export function markKnowledgeReady(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('MarkKnowledgeReady', inputVars, inputOpts);
-}
-
-export function publishKnowledgeVersion(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('PublishKnowledgeVersion', inputVars, inputOpts);
-}
-
-export function knowledgeMetadataPage(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('KnowledgeMetadataPage', inputVars, inputOpts);
-}
-
-export function backfillKnowledgeMetadata(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('BackfillKnowledgeMetadata', inputVars, inputOpts);
-}
-
-export function productKnowledgeState(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ProductKnowledgeState', inputVars, inputOpts);
-}
-
-export function productKnowledgeCatalogPage(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ProductKnowledgeCatalogPage', inputVars, inputOpts);
-}
-
-export function productKnowledgeActiveAliasPage(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ProductKnowledgeActiveAliasPage', inputVars, inputOpts);
+  return dcInstance.executeMutation('RecordOperatorProductReview', inputVars, inputOpts);
 }
 
 export function saveProductKnowledgeSnapshot(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -454,10 +442,22 @@ export function acceptProductKnowledgeSnapshot(dcOrVarsOrOptions, varsOrOptions,
   return dcInstance.executeMutation('AcceptProductKnowledgeSnapshot', inputVars, inputOpts);
 }
 
-export function recordOperatorProductReview(dcOrVarsOrOptions, varsOrOptions, options) {
+export function productKnowledgeState(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('RecordOperatorProductReview', inputVars, inputOpts);
+  return dcInstance.executeQuery('ProductKnowledgeState', inputVars, inputOpts);
+}
+
+export function productKnowledgeCatalogPage(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ProductKnowledgeCatalogPage', inputVars, inputOpts);
+}
+
+export function productKnowledgeActiveAliasPage(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ProductKnowledgeActiveAliasPage', inputVars, inputOpts);
 }
 
 export function readProductAdmin(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -604,6 +604,24 @@ export function removeSalonShorthand(dcOrVarsOrOptions, varsOrOptions, options) 
   return dcInstance.executeMutation('RemoveSalonShorthand', inputVars, inputOpts);
 }
 
+export function readProductAliasSeedState(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('ReadProductAliasSeedState', inputVars, inputOpts);
+}
+
+export function applyProductAliasSeed(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('ApplyProductAliasSeed', inputVars, inputOpts);
+}
+
+export function resetProductAdmin(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('ResetProductAdmin', inputVars, inputOpts);
+}
+
 export function readSeedState(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
@@ -652,40 +670,10 @@ export function upsertSalonAccess(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeMutation('UpsertSalonAccess', inputVars, inputOpts);
 }
 
-export function readResetCounts(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ReadResetCounts', inputVars, inputOpts);
-}
-
-export function resetDemoStock(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('ResetDemoStock', inputVars, inputOpts);
-}
-
 export function insertSalonSettings(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeMutation('InsertSalonSettings', inputVars, inputOpts);
-}
-
-export function readProductAliasSeedState(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeQuery('ReadProductAliasSeedState', inputVars, inputOpts);
-}
-
-export function applyProductAliasSeed(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('ApplyProductAliasSeed', inputVars, inputOpts);
-}
-
-export function resetProductAdmin(dcOrVarsOrOptions, varsOrOptions, options) {
-  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
-  dcInstance.useGen(true);
-  return dcInstance.executeMutation('ResetProductAdmin', inputVars, inputOpts);
 }
 
 export function readKnowledgeWipeCounts(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -712,16 +700,16 @@ export function seedDeliveryProcedureBindings(dcOrVarsOrOptions, varsOrOptions, 
   return dcInstance.executeMutation('SeedDeliveryProcedureBindings', inputVars, inputOpts);
 }
 
-export function stockContext(dcOrVarsOrOptions, varsOrOptions, options) {
+export function readResetCounts(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeQuery('StockContext', inputVars, inputOpts);
+  return dcInstance.executeQuery('ReadResetCounts', inputVars, inputOpts);
 }
 
-export function submitStock(dcOrVarsOrOptions, varsOrOptions, options) {
+export function resetDemoStock(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('SubmitStock', inputVars, inputOpts);
+  return dcInstance.executeMutation('ResetDemoStock', inputVars, inputOpts);
 }
 
 export function approveStock(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -730,10 +718,10 @@ export function approveStock(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeMutation('ApproveStock', inputVars, inputOpts);
 }
 
-export function rejectStock(dcOrVarsOrOptions, varsOrOptions, options) {
+export function stockContext(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
-  return dcInstance.executeMutation('RejectStock', inputVars, inputOpts);
+  return dcInstance.executeQuery('StockContext', inputVars, inputOpts);
 }
 
 export function dispatchStock(dcOrVarsOrOptions, varsOrOptions, options) {
@@ -742,9 +730,21 @@ export function dispatchStock(dcOrVarsOrOptions, varsOrOptions, options) {
   return dcInstance.executeMutation('DispatchStock', inputVars, inputOpts);
 }
 
+export function rejectStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('RejectStock', inputVars, inputOpts);
+}
+
 export function bindReplayKey(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
   return dcInstance.executeMutation('BindReplayKey', inputVars, inputOpts);
+}
+
+export function submitStock(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('SubmitStock', inputVars, inputOpts);
 }
 

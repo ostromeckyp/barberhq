@@ -1,5 +1,5 @@
 import { z } from 'genkit';
-import type { PrepareInput, ProcedureInput } from '../../../shared/contracts/ai.js';
+import type { PrepareInput, ProcedureInput } from '../../../shared/contracts/ai/index.js';
 import { AiError } from './budget.js';
 
 const boundedText = z

@@ -6,7 +6,7 @@ import { BrowserActivity } from '../../../core/browser-activity';
 import { SalonSettingsApi } from '../../salon-settings/data-access/salon-settings-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { InventoryApi } from '../data-access/inventory-api';
-import type { InventoryRow } from '../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
 
 interface InventoryScope {
   salonId: string;

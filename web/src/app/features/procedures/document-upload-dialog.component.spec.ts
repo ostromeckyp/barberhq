@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { expect, it, vi } from 'vitest';
-import type { LegacyCreateDocumentInput } from '../../../../../shared/contracts/knowledge';
+import type { LegacyCreateDocumentInput } from '../../../../../shared/contracts/knowledge/index';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
 import { DocumentUploadFacade } from './library/document-upload.facade';
 

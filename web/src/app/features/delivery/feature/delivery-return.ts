@@ -1,4 +1,4 @@
-import type { Membership } from '../../../../../../shared/contracts/business';
+import type { Membership } from '../../../../../../shared/contracts/business/index';
 import type { Workspace } from '../../../core/salon-context';
 import { pageOffset, requestFilter } from '../../../core/request-navigation';
 type Query = { get(name: string): string | null };

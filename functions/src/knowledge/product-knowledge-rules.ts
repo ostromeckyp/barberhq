@@ -10,7 +10,7 @@ import type {
   ActiveProductAlias,
   AliasImpact,
   KnowledgeProductReview,
-} from '../../../shared/contracts/product-knowledge.js';
+} from '../../../shared/contracts/product-knowledge/index.js';
 import { KnowledgeError } from './repository.js';
 export type PassageChunk = { id: string; text: string; physicalPage: number };
 const invalid = (message: string): never => {

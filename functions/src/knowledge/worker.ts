@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { ProcessingResult } from '../../../shared/contracts/knowledge.js';
+import type { ProcessingResult } from '../../../shared/contracts/knowledge/index.js';
 import { z } from 'zod';
 import { KnowledgeError, type KnowledgeRepository } from './repository.js';
 import type { KnowledgePipeline } from './pipeline.js';

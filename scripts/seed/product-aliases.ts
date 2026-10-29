@@ -7,7 +7,7 @@ import { initializeApp, deleteApp, applicationDefault } from 'firebase-admin/app
 import { getDataConnect, type DataConnect } from 'firebase-admin/data-connect';
 import { z } from 'zod';
 import { normalizeProduct } from '../../shared/product-normalization.ts';
-import type { BusinessSeed } from '../../shared/contracts/business.ts';
+import type { BusinessSeed } from '../../shared/contracts/business/index.ts';
 import { parsePublicConfig } from '../config/public-config.ts';
 import { validateSeed } from '../prepare-data/catalog.ts';
 

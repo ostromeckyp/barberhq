@@ -7,7 +7,7 @@ import type {
   KnowledgeProductLink,
   ProductProfileProposal,
   KnowledgePassageRef,
-} from '../../../shared/contracts/product-knowledge.js';
+} from '../../../shared/contracts/product-knowledge/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 import { KnowledgeError, type KnowledgeRepository } from './repository.js';
 import {

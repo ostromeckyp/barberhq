@@ -7,7 +7,7 @@ import type {
   AiOperationalCode,
   PrepareInput,
   ProposalResult,
-} from '../../../../shared/contracts/ai';
+} from '../../../../shared/contracts/ai/index';
 import { FIREBASE } from './firebase.providers';
 import { isReplenishmentProposal } from './replenishment-proposal';
 

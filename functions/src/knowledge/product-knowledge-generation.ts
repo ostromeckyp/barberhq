@@ -3,7 +3,7 @@ import type {
   KnowledgeProductReview,
   GenerateKnowledgeProductAliasesInput,
   SuggestKnowledgeProductLinkInput,
-} from '../../../shared/contracts/product-knowledge.js';
+} from '../../../shared/contracts/product-knowledge/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 import {
   ProductKnowledgeCommands,

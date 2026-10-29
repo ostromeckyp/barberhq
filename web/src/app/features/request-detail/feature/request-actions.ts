@@ -2,7 +2,7 @@ import { Service, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { RequestActionDialog } from '../ui/request-action-dialog';
-import type { RequestDetail } from '../../../../../../shared/contracts/stock';
+import type { RequestDetail } from '../../../../../../shared/contracts/stock/index';
 import type { ActionDialogData, ActionOutcome } from './request-action.facade';
 import type { TransitionType } from './action-input';
 @Service()

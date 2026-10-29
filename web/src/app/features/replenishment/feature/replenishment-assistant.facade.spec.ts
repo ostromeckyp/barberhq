@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { expect, it } from 'vitest';
-import type { ProposalResult } from '../../../../../../shared/contracts/ai';
+import type { ProposalResult } from '../../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { DraftStore } from './draft.store';

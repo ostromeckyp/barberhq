@@ -1,5 +1,5 @@
 import type { GetSalonInventoryData } from '../../../core/generated';
-import type { InventoryRow } from '../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
 
 type InventoryBusiness = NonNullable<GetSalonInventoryData['membership']>['business'];
 

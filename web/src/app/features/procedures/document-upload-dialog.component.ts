@@ -1,7 +1,7 @@
 import type {
   KnowledgeDocumentKind,
   KnowledgeOrigin,
-} from '../../../../../shared/contracts/knowledge';
+} from '../../../../../shared/contracts/knowledge/index';
 import { metadataFromLegacy } from '../../../../../shared/knowledge-metadata';
 import { Component, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';

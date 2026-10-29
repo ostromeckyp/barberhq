@@ -5,7 +5,7 @@ import { form, validate, disabled } from '@angular/forms/signals';
 import { SalonSettingsApi, SettingsSaveError } from '../data-access/salon-settings-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
-import type { SalonSettings } from '../../../../../../shared/contracts/settings';
+import type { SalonSettings } from '../../../../../../shared/contracts/settings/index';
 interface SettingsScope {
   salonId: string;
   userId: string;

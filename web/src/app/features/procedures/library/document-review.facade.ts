@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import type {
   KnowledgeReview,
   ReviewDocumentInput,
-} from '../../../../../../shared/contracts/knowledge';
+} from '../../../../../../shared/contracts/knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { PdfRenderer } from '../pdf-viewer/pdf-renderer';

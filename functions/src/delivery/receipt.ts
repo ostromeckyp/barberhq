@@ -1,4 +1,4 @@
-import type { DeliveryQuantities } from '../../../shared/contracts/delivery.js';
+import type { DeliveryQuantities } from '../../../shared/contracts/delivery/index.js';
 import { StockError } from '../stock/errors.js';
 export function classifyReceipt(
   items: DeliveryQuantities[],

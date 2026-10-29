@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import type { RequestState } from '../../../../../../shared/contracts/stock';
+import type { RequestState } from '../../../../../../shared/contracts/stock/index';
 export const STATUSES: Record<RequestState, { label: string; icon: string }> = {
   PENDING_APPROVAL: { label: 'Pending approval', icon: 'hourglass_top' },
   RESERVED: { label: 'Approved · reserved', icon: 'lock' },

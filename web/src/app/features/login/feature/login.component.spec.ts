@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { expect, it, vi } from 'vitest';
-import type { SessionState } from '../../../../../../shared/contracts/business';
+import type { SessionState } from '../../../../../../shared/contracts/business/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { LoginComponent } from './login.component';
 

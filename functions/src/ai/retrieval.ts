@@ -5,7 +5,7 @@ import type {
   SourceSection,
   PdfRect,
   KnowledgeDocumentKind,
-} from '../../../shared/contracts/knowledge.js';
+} from '../../../shared/contracts/knowledge/index.js';
 import {
   createEmbeddingConfig,
   createVertexEmbeddingAdapter,

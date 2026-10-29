@@ -9,7 +9,7 @@ import type {
   AcceptKnowledgeProductReviewInput,
   GenerateKnowledgeProductAliasesInput,
   SuggestKnowledgeProductLinkInput,
-} from '../../../../../../shared/contracts/product-knowledge';
+} from '../../../../../../shared/contracts/product-knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';

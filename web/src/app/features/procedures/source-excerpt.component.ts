@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
-import type { SourceSection } from '../../../../../shared/contracts/knowledge';
+import type { SourceSection } from '../../../../../shared/contracts/knowledge/index';
 import { SyntheticLabelComponent } from './synthetic-label.component';
 
 @Component({

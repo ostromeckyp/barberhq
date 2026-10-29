@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { StockRepository } from '../../functions/src/stock/repository.ts';
-import type { DeliveryAction } from '../../shared/contracts/delivery.ts';
+import type { DeliveryAction } from '../../shared/contracts/delivery/index.ts';
 import {
   createDeliveryHarness,
   executeDelivery,

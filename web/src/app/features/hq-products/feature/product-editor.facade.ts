@@ -7,7 +7,7 @@ import type {
   ProductAliasRow,
   ProductAliasesResult,
   ProductForm,
-} from '../../../../../../shared/contracts/product-admin';
+} from '../../../../../../shared/contracts/product-admin/index';
 import {
   ProductAdminApi,
   ProductAdminError,

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { BusinessSeed, Location } from '../../shared/contracts/business.ts';
+import type { BusinessSeed, Location } from '../../shared/contracts/business/index.ts';
 const ids = [
   'NBS-MATOWA-100',
   'NBS-DRYMATT-100',

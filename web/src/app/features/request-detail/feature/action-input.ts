@@ -1,5 +1,5 @@
-import type { RequestDetail, StockAction } from '../../../../../../shared/contracts/stock';
-import type { Membership } from '../../../../../../shared/contracts/business';
+import type { RequestDetail, StockAction } from '../../../../../../shared/contracts/stock/index';
+import type { Membership } from '../../../../../../shared/contracts/business/index';
 export type TransitionType = Exclude<StockAction['type'], 'SUBMIT'>;
 export type Confirmation = {
   reason: string;

@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import type { InventoryRow } from '../../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../../shared/contracts/business/index';
 @Component({
   selector: 'app-hq-availability',
   imports: [MatIconModule, MatTableModule],

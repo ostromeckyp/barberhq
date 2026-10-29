@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { DraftStore } from './draft.store';
-import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft';
+import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
 const line = (quantity: number, origin: 'manual' | 'assistant' = 'manual'): ReadyDraftLine => ({
   status: 'READY',
   lineId: '1',

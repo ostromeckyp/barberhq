@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createProductAdminCommands } from '../../functions/src/products/commands.ts';
-import type { ProductForm } from '../../shared/contracts/product-admin.ts';
+import type { ProductForm } from '../../shared/contracts/product-admin/index.ts';
 import { createLookupHarness, type LookupHarness } from '../support/replenishment.ts';
 
 const form = (patch: Partial<ProductForm> = {}): ProductForm => ({

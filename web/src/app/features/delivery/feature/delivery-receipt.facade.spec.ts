@@ -3,11 +3,11 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { it, expect, vi } from 'vitest';
-import type { SessionState } from '../../../../../../shared/contracts/business';
+import type { SessionState } from '../../../../../../shared/contracts/business/index';
 import type {
   DeliveryReceiptContextDto,
   RecordDeliveryInput,
-} from '../../../../../../shared/contracts/delivery';
+} from '../../../../../../shared/contracts/delivery/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { DeliveryApi } from '../data-access/delivery-api';

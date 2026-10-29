@@ -1,4 +1,4 @@
-import type { PdfRect } from '../../../../../../shared/contracts/knowledge';
+import type { PdfRect } from '../../../../../../shared/contracts/knowledge/index';
 
 export type ScreenRect = { left: number; top: number; width: number; height: number };
 export type PdfViewport = {

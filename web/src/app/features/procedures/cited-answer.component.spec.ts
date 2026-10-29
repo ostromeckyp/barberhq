@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { expect, it } from 'vitest';
-import type { ProcedureResult } from '../../../../../shared/contracts/ai';
+import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
 import { CitedAnswerComponent } from './cited-answer.component';
 
 const answer: Extract<ProcedureResult, { status: 'ANSWER' }> = {

@@ -3,7 +3,7 @@ import { httpsCallable } from 'firebase/functions';
 import { QueryFetchPolicy } from 'firebase/data-connect';
 import { FIREBASE } from '../../../core/firebase.providers';
 import { listHqShorthand, listSalonShorthand } from '../../../core/generated';
-import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup';
+import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup/index';
 export type ShorthandPage = { rows: SalonShorthand[]; nextCursor: string | null };
 export type RemoveShorthandInput = {
   salonId: string;

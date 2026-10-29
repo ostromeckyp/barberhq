@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeProduct } from '../../shared/product-normalization.ts';
 import { lookupProducts, normalizeProductForMatch } from '../../functions/src/ai/product-lookup.ts';
-import type { LookupAlias, LookupProduct } from '../../shared/contracts/product-lookup.ts';
+import type { LookupAlias, LookupProduct } from '../../shared/contracts/product-lookup/index.ts';
 
 function product(productId: string, productName: string, extra: Partial<LookupProduct> = {}) {
   return {

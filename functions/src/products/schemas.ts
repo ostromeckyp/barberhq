@@ -5,7 +5,7 @@ import {
   type SaveProductAliasesInput,
   type SetHqStockInput,
   type UpdateProductInput,
-} from '../../../shared/contracts/product-admin.js';
+} from '../../../shared/contracts/product-admin/index.js';
 import { KnowledgeError } from '../knowledge/repository.js';
 
 const text = (max: number) =>

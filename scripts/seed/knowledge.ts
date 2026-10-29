@@ -1,5 +1,5 @@
 import type { DataConnect } from 'firebase-admin/data-connect';
-import type { BusinessSeed } from '../../shared/contracts/business.ts';
+import type { BusinessSeed } from '../../shared/contracts/business/index.ts';
 import {
   KnowledgePipeline,
   knowledgeIds,

@@ -1,5 +1,5 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
-import type { ProcedureResult } from '../../../../../shared/contracts/ai';
+import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../core/assistant-api';
 import { SalonContext } from '../../core/salon-context';
 import { SessionFacade } from '../auth/feature/session.facade';

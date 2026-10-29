@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { DeliveryAction } from '../../../shared/contracts/delivery.js';
+import type { DeliveryAction } from '../../../shared/contracts/delivery/index.js';
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
 export const deliveryReceiptId = (requestId: string) => `delivery-receipt-${hash(requestId)}`;
 export const deliveryIssueId = (receiptId: string) => `delivery-issue-${hash(receiptId)}`;

@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import type { DocumentRow } from '../../../../../shared/contracts/knowledge';
+import type { DocumentRow } from '../../../../../shared/contracts/knowledge/index';
 
 @Component({
   selector: 'app-document-row',

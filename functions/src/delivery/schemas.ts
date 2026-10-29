@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { DeliveryAction } from '../../../shared/contracts/delivery.js';
+import type { DeliveryAction } from '../../../shared/contracts/delivery/index.js';
 import { StockError } from '../stock/errors.js';
 
 const id = z.string().min(1).max(300);

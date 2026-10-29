@@ -10,8 +10,8 @@ import type {
   RequestSummary,
   RequestDetail,
   RequestFilter,
-} from '../../../../../../shared/contracts/stock';
-import type { Page, PageInput } from '../../../../../../shared/contracts/business';
+} from '../../../../../../shared/contracts/stock/index';
+import type { Page, PageInput } from '../../../../../../shared/contracts/business/index';
 import { commandError } from './command-error';
 import { toRequestSummary, toRequestDetail } from './request.mapper';
 const names = {

@@ -1,4 +1,4 @@
-import type { ProposalResult } from '../../../../shared/contracts/ai';
+import type { ProposalResult } from '../../../../shared/contracts/ai/index';
 type RecordValue = Record<string, unknown>;
 const record = (x: unknown): x is RecordValue =>
   typeof x === 'object' && x !== null && !Array.isArray(x);

@@ -6,9 +6,9 @@ import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../data-access/replenishment-api';
 import { PENDING_STORAGE, PendingSubmissionStore } from '../data-access/pending-submission.store';
 import { CommandError } from '../data-access/command-error';
-import type { SessionState } from '../../../../../../shared/contracts/business';
-import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft';
-import type { StockAction, CommandResult } from '../../../../../../shared/contracts/stock';
+import type { SessionState } from '../../../../../../shared/contracts/business/index';
+import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
+import type { StockAction, CommandResult } from '../../../../../../shared/contracts/stock/index';
 const line = (id: string): ReadyDraftLine => ({
   status: 'READY',
   lineId: id,

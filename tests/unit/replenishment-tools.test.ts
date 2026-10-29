@@ -4,7 +4,7 @@ import {
   createReplenishmentTools,
   type ReplenishmentContext,
 } from '../../functions/src/ai/replenishment-tools.ts';
-import type { LookupAlias } from '../../shared/contracts/product-lookup.ts';
+import type { LookupAlias } from '../../shared/contracts/product-lookup/index.ts';
 
 const actor = { uid: 'staff', businessId: 'business', role: 'SALON' as const, salonIds: ['salon'] };
 const message = '2 Matowa, 3 Sól Morska, 1 Savage';

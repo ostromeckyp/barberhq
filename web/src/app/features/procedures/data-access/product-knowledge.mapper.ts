@@ -6,7 +6,7 @@ import type {
   KnowledgePassageRef,
   ActiveProductAlias,
   ProductAliasKind,
-} from '../../../../../../shared/contracts/product-knowledge';
+} from '../../../../../../shared/contracts/product-knowledge/index';
 import { normalizeProduct } from '../../../../../../shared/product-normalization';
 export function mapProductKnowledgeWorkspace(
   data: GetKnowledgeProductReviewData,

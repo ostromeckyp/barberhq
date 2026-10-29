@@ -1,11 +1,11 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
-import type { Page } from '../../../../../../shared/contracts/business';
+import type { Page } from '../../../../../../shared/contracts/business/index';
 import type {
   DeleteVersionInput,
   DocumentRow,
   RetryDocumentInput,
   VersionStatus,
-} from '../../../../../../shared/contracts/knowledge';
+} from '../../../../../../shared/contracts/knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';

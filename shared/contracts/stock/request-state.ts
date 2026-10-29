@@ -1,0 +1,2 @@
+export type RequestState =
+  'PENDING_APPROVAL' | 'RESERVED' | 'DISPATCHED' | 'RECEIVED' | 'REJECTED' | 'RECEIVED_WITH_ISSUE';

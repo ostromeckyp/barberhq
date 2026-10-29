@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { expect, it, vi } from 'vitest';
-import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup';
+import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonShorthandApi, ShorthandRemoveError } from '../data-access/salon-shorthand-api';
 import { SalonShorthandFacade } from './salon-shorthand.facade';

@@ -3,7 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { createCloudHarness } from '../support/cloud.ts';
 import { StockRepository } from '../../functions/src/stock/repository.ts';
-import type { RequestState } from '../../shared/contracts/stock.ts';
+import type { RequestState } from '../../shared/contracts/stock/index.ts';
 
 let h: Awaited<ReturnType<typeof createCloudHarness>>;
 const evidence = '.superpowers/sdd/2026-09-29-barberhq-05-demo-release/request-design';

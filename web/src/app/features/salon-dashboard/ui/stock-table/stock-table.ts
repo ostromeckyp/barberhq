@@ -3,7 +3,7 @@ import { Component, inject, input, output } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { ResponsiveLayout } from '../../../../core/responsive-layout';
 import { LowStockChip } from '../../../../shared/ui/low-stock-chip/low-stock-chip';
-import type { InventoryRow } from '../../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../../shared/contracts/business/index';
 @Component({
   selector: 'app-stock-table',
   imports: [MatTableModule, LowStockChip, MatButtonModule],

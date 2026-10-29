@@ -2,7 +2,7 @@ import { Service, signal, inject, DestroyRef } from '@angular/core';
 import { DELIVERY_JOURNAL } from '../../delivery/feature/delivery-journal';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
-import type { SessionState } from '../../../../../../shared/contracts/business';
+import type { SessionState } from '../../../../../../shared/contracts/business/index';
 import { SESSION_GATEWAY, type SalonOption } from '../data-access/session.gateway';
 @Service()
 export class SessionFacade {

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it, vi } from 'vitest';
-import type { ProductDetail, ProductForm } from '../../../../../../shared/contracts/product-admin';
+import type { ProductDetail, ProductForm } from '../../../../../../shared/contracts/product-admin/index';
 import { ProductAdminApi, ProductAdminError } from '../data-access/product-admin-api';
 import { ProductEditorFacade } from './product-editor.facade';
 

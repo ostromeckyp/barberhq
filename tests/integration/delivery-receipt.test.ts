@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import type { DeliveryAction, RecordDeliveryInput } from '../../shared/contracts/delivery.ts';
+import type { DeliveryAction, RecordDeliveryInput } from '../../shared/contracts/delivery/index.ts';
 import { StockRepository } from '../../functions/src/stock/repository.ts';
 import { DeliveryRepository } from '../../functions/src/delivery/repository.ts';
 import { payloadHash, semanticHash } from '../../functions/src/stock/intent.ts';
-import type { StockAction } from '../../shared/contracts/stock.ts';
+import type { StockAction } from '../../shared/contracts/stock/index.ts';
 import {
   createDeliveryHarness,
   executeDelivery,

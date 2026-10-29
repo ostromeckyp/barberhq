@@ -1,6 +1,6 @@
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
-import type { PdfRect } from '../../../../../../shared/contracts/knowledge';
+import type { PdfRect } from '../../../../../../shared/contracts/knowledge/index';
 import { projectRect, type ScreenRect } from './pdf-overlay';
 
 GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';

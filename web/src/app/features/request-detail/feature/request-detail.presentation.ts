@@ -1,4 +1,4 @@
-import type { RequestDetail, RequestState } from '../../../../../../shared/contracts/stock';
+import type { RequestDetail, RequestState } from '../../../../../../shared/contracts/stock/index';
 
 export type HistoryStep = {
   state: RequestState;

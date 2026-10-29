@@ -3,8 +3,8 @@ import type {
   ReadyDraftLine,
   SubmissionOutcome,
   PendingSubmission,
-} from '../../../../../../shared/contracts/draft';
-import type { RequestItemInput } from '../../../../../../shared/contracts/stock';
+} from '../../../../../../shared/contracts/draft/index';
+import type { RequestItemInput } from '../../../../../../shared/contracts/stock/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../data-access/replenishment-api';
 import { PendingSubmissionStore } from '../data-access/pending-submission.store';

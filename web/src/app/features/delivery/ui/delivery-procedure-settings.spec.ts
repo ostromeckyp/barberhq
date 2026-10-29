@@ -9,7 +9,7 @@ import { DeliveryProcedureSettings } from './delivery-procedure-settings';
 import type {
   DeliveryProcedureDto,
   SetDeliveryProcedureInput,
-} from '../../../../../../shared/contracts/delivery';
+} from '../../../../../../shared/contracts/delivery/index';
 const member = { userId: 'one', businessId: 'business', role: 'HQ' as const, salonIds: ['salon'] };
 const scope = { userId: 'one', businessId: 'business', salonId: '', targetId: 'DAMAGED' };
 async function settle() {

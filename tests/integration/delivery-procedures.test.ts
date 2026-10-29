@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { executeQuery, queryRef } from 'firebase/data-connect';
-import type { DeliveryProblemKind } from '../../shared/contracts/delivery.ts';
+import type { DeliveryProblemKind } from '../../shared/contracts/delivery/index.ts';
 import { resolveDeliveryProcedures } from '../../functions/src/delivery/procedures.ts';
 import {
   createDeliveryHarness,

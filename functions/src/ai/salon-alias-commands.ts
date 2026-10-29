@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { z } from 'genkit';
-import type { PrepareInput, ShorthandLearning } from '../../../shared/contracts/ai.js';
-import type { SalonShorthand } from '../../../shared/contracts/product-lookup.js';
+import type { PrepareInput, ShorthandLearning } from '../../../shared/contracts/ai/index.js';
+import type { SalonShorthand } from '../../../shared/contracts/product-lookup/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 import { normalizeProductForMatch } from './product-lookup.js';
 import type { ActorContext } from './context.js';

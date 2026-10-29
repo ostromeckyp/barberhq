@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import * as sql from '@barberhq/server';
-import type { DeleteVersionInput, VersionStatus } from '../../../shared/contracts/knowledge.js';
+import type { DeleteVersionInput, VersionStatus } from '../../../shared/contracts/knowledge/index.js';
 import {
   legacySourceType,
   storageKind,

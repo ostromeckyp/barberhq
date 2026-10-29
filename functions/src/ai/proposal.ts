@@ -1,4 +1,4 @@
-import type { PrepareInput } from '../../../shared/contracts/ai.js';
+import type { PrepareInput } from '../../../shared/contracts/ai/index.js';
 import { AiError } from './budget.js';
 
 export type RequestedLine = {

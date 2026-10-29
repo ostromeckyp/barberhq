@@ -5,7 +5,7 @@ import type {
   DeliveryAction,
   DeliveryCommandResult,
   ProcedureReference,
-} from '../../../../../../shared/contracts/delivery';
+} from '../../../../../../shared/contracts/delivery/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { BrowserActivity } from '../../../core/browser-activity';

@@ -5,7 +5,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import type { KnowledgePassageRef } from '../../../../../shared/contracts/product-knowledge';
+import type { KnowledgePassageRef } from '../../../../../shared/contracts/product-knowledge/index';
 import { ProductKnowledgeReviewFacade } from './library/product-knowledge-review.facade';
 @Component({
   selector: 'app-product-knowledge-review',

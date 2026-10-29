@@ -4,7 +4,7 @@ import { provideRouter, Router } from '@angular/router';
 import { expect, it } from 'vitest';
 import { SalonContext } from './salon-context';
 import { SessionFacade } from '../features/auth/feature/session.facade';
-import type { SessionState } from '../../../../shared/contracts/business';
+import type { SessionState } from '../../../../shared/contracts/business/index';
 @Component({ template: '' })
 class Empty {}
 it('derives_workspace_from_url_and_always_switches_to_inventory', async () => {

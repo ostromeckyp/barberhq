@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DataConnect } from 'firebase-admin/data-connect';
-import type { PrepareInput, ProposalResult } from '../../shared/contracts/ai.ts';
-import type { ClarificationLine } from '../../shared/contracts/draft.ts';
+import type { PrepareInput, ProposalResult } from '../../shared/contracts/ai/index.ts';
+import type { ClarificationLine } from '../../shared/contracts/draft/index.ts';
 import { createAiBudget } from '../../functions/src/ai/budget.ts';
 import { createReplenishmentRepository } from '../../functions/src/ai/replenishment-repository.ts';
 import { createReplenishmentPreparer } from '../../functions/src/ai/replenishment.ts';

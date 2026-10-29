@@ -1,5 +1,5 @@
 import type { DataConnect } from 'firebase-admin/data-connect';
-import type { DeliveryAction, DeliveryCommandResult } from '../../../shared/contracts/delivery.js';
+import type { DeliveryAction, DeliveryCommandResult } from '../../../shared/contracts/delivery/index.js';
 import { StockError } from '../stock/errors.js';
 import { randomUUID, createHash } from 'node:crypto';
 import * as sql from '@barberhq/server';

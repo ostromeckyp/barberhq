@@ -5,7 +5,7 @@ import type {
   ActiveProductAlias,
   KnowledgeCatalogProduct,
   KnowledgeProductReview,
-} from '../../../shared/contracts/product-knowledge.js';
+} from '../../../shared/contracts/product-knowledge/index.js';
 import { KnowledgeError } from './repository.js';
 import type { PassageChunk } from './product-knowledge-rules.js';
 export type KnowledgeLinkRow = {

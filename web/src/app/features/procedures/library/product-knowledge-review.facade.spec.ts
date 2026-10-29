@@ -5,7 +5,7 @@ import { ProductKnowledgeReviewFacade } from './product-knowledge-review.facade'
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
-import type { KnowledgeProductWorkspace } from '../../../../../../shared/contracts/product-knowledge';
+import type { KnowledgeProductWorkspace } from '../../../../../../shared/contracts/product-knowledge/index';
 const workspace = (): KnowledgeProductWorkspace => ({
   catalog: [],
   passages: [],

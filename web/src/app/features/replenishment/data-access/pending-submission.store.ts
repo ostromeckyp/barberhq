@@ -1,5 +1,5 @@
 import { Service, InjectionToken, inject } from '@angular/core';
-import type { PendingSubmission } from '../../../../../../shared/contracts/draft';
+import type { PendingSubmission } from '../../../../../../shared/contracts/draft/index';
 export const PENDING_STORAGE = new InjectionToken<Storage>('Pending submission storage', {
   providedIn: 'root',
   factory: () => sessionStorage,

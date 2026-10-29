@@ -2,7 +2,7 @@ import type { DataConnect } from 'firebase-admin/data-connect';
 import type {
   DeliveryProblemKind,
   DeliveryProcedureDto,
-} from '../../../shared/contracts/delivery.js';
+} from '../../../shared/contracts/delivery/index.js';
 import * as sql from '@barberhq/server';
 import { authorizeDeliveryContext } from './repository.js';
 import { StockError } from '../stock/errors.js';

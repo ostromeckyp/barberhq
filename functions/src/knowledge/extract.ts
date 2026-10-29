@@ -4,7 +4,7 @@ import type {
   ExtractedDocument,
   ExtractedPage,
   PdfRect,
-} from '../../../shared/contracts/knowledge.js';
+} from '../../../shared/contracts/knowledge/index.js';
 import { openPdf, validatePdf } from './pdf-validation.js';
 
 export { validatePdf };

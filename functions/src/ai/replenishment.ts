@@ -7,7 +7,7 @@ import type {
   PrepareInput,
   ProposalResult,
   ShorthandLearning,
-} from '../../../shared/contracts/ai.js';
+} from '../../../shared/contracts/ai/index.js';
 import { createAiAdmission } from './admission.js';
 import { createAiBudget, AiError, runWithinBudget, type AiBudget } from './budget.js';
 import {

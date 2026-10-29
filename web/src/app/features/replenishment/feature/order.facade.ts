@@ -8,7 +8,7 @@ import { BrowserActivity } from '../../../core/browser-activity';
 import { ReplenishmentApi } from '../data-access/replenishment-api';
 import { DraftStore } from './draft.store';
 import { SubmissionService } from './submission.service';
-import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft';
+import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
 @Service({ autoProvided: false })
 export class OrderFacade {
   readonly inventory = inject(SalonInventoryFacade);

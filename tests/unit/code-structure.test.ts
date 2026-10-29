@@ -186,4 +186,44 @@ describe('code structure', () => {
     }
     expect(problems).toEqual([]);
   });
+
+  it('contracts: one exported model per file', () => {
+    const root = 'shared/contracts';
+    const kebabToName = (file: string, upper: boolean) => {
+      const parts = file.replace(/\.ts$/, '').split('-');
+      return parts
+        .map((p, i) => (i === 0 && !upper ? p : p.charAt(0).toUpperCase() + p.slice(1)))
+        .join('');
+    };
+    const problems: string[] = [];
+    for (const entry of readdirSync(root, { withFileTypes: true })) {
+      if (!entry.isDirectory()) {
+        problems.push(`${entry.name}: must live in a domain folder`);
+        continue;
+      }
+      const dir = join(root, entry.name);
+      const files = readdirSync(dir).filter((f) => f.endsWith('.ts'));
+      if (!files.includes('index.ts')) problems.push(`${entry.name}: missing index.ts`);
+      for (const file of files.filter((f) => f !== 'index.ts')) {
+        const source = readFileSync(join(dir, file), 'utf8');
+        const exported = [
+          ...source.matchAll(/^export (?:declare )?(interface|type|const|function) (\w+)/gm),
+        ];
+        if (exported.length !== 1) {
+          problems.push(
+            `${entry.name}/${file}: expected exactly one export, found ${exported.length}`,
+          );
+          continue;
+        }
+        const [, kind, name] = exported[0];
+        const isModel = kind === 'interface' || kind === 'type';
+        if (name !== kebabToName(file, isModel)) {
+          problems.push(
+            `${entry.name}/${file}: export must be named ${kebabToName(file, isModel)}`,
+          );
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
 });

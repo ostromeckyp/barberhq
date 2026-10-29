@@ -16,8 +16,8 @@ import type {
   IssueTransitionInput,
   RecordDeliveryInput,
   SetDeliveryProcedureInput,
-} from '../../../../../../shared/contracts/delivery';
-import type { Page, PageInput } from '../../../../../../shared/contracts/business';
+} from '../../../../../../shared/contracts/delivery/index';
+import type { Page, PageInput } from '../../../../../../shared/contracts/business/index';
 const names = {
   RECORD_RECEIPT: 'recordDeliveryReceipt',
   START_REVIEW: 'startDeliveryIssueReview',

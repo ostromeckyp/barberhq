@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { ExtractedDocument, ExtractedPage } from '../../shared/contracts/knowledge.js';
+import type { ExtractedDocument, ExtractedPage } from '../../shared/contracts/knowledge/index.js';
 import { chunkPages } from '../../functions/src/knowledge/chunk.js';
 import { extractPdf } from '../../functions/src/knowledge/extract.js';
 import { readFile } from 'node:fs/promises';

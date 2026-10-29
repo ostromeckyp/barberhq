@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { getFunctions } from 'firebase-admin/functions';
 import * as sql from '@barberhq/server';
 import { z } from 'zod';
-import type { RetryDocumentInput, VersionStatus } from '../../../shared/contracts/knowledge.js';
+import type { RetryDocumentInput, VersionStatus } from '../../../shared/contracts/knowledge/index.js';
 import { status } from './document-commands.js';
 import { KnowledgeError, type KnowledgeRepository, type VersionState } from './repository.js';
 import { knowledgePayloadHash, parseRetryDocument } from './schemas.js';

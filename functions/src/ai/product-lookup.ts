@@ -4,7 +4,7 @@ import type {
   LookupMatchTier,
   LookupProduct,
   ProductMatch,
-} from '../../../shared/contracts/product-lookup.js';
+} from '../../../shared/contracts/product-lookup/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 
 /** Light Polish inflection, base-normalized; longest suffix first. Lookup-only, never persisted. */

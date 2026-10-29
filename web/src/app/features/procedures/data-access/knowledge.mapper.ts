@@ -7,7 +7,7 @@ import type {
   ExtractedPage,
   KnowledgeReview,
   ProcessingStatus,
-} from '../../../../../../shared/contracts/knowledge';
+} from '../../../../../../shared/contracts/knowledge/index';
 
 export interface KnowledgeVersionRecord {
   id: string;

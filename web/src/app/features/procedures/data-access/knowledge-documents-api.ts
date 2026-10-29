@@ -5,14 +5,14 @@ import type {
   AcceptKnowledgeProductReviewInput,
   GenerateKnowledgeProductAliasesInput,
   SuggestKnowledgeProductLinkInput,
-} from '../../../../../../shared/contracts/product-knowledge';
+} from '../../../../../../shared/contracts/product-knowledge/index';
 import { mapProductKnowledgeWorkspace } from './product-knowledge.mapper';
 import { Service, inject } from '@angular/core';
 import { httpsCallable } from 'firebase/functions';
 import { QueryFetchPolicy } from 'firebase/data-connect';
 import { getIdToken } from 'firebase/auth';
 import { getToken as getAppCheckToken } from 'firebase/app-check';
-import type { Page, PageInput } from '../../../../../../shared/contracts/business';
+import type { Page, PageInput } from '../../../../../../shared/contracts/business/index';
 import type {
   CreateDocumentRequest,
   DeleteVersionInput,
@@ -21,7 +21,7 @@ import type {
   RetryDocumentInput,
   ReviewDocumentInput,
   VersionStatus,
-} from '../../../../../../shared/contracts/knowledge';
+} from '../../../../../../shared/contracts/knowledge/index';
 import * as sdk from '../../../core/generated';
 import { FIREBASE } from '../../../core/firebase.providers';
 import { SalonContext } from '../../../core/salon-context';

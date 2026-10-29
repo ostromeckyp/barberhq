@@ -8,7 +8,7 @@ import type {
   ProductDetail,
   SetHqStockInput,
   UpdateProductInput,
-} from '../../../shared/contracts/product-admin.js';
+} from '../../../shared/contracts/product-admin/index.js';
 import { KnowledgeError } from '../knowledge/repository.js';
 import { parseCreateProduct, parseSetHqStock, parseUpdateProduct } from './schemas.js';
 

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { it, expect } from 'vitest';
 import { planSeed } from '../../scripts/seed/business.ts';
-import type { BusinessSeed } from '../../shared/contracts/business.ts';
+import type { BusinessSeed } from '../../shared/contracts/business/index.ts';
 const seed: BusinessSeed = JSON.parse(readFileSync('data/seed/business.json', 'utf8'));
 it('plans only missing stock rows and preserves changed quantities', () => {
   const plan = planSeed(seed, [

@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { expect, it, vi } from 'vitest';
-import type { ProcedureResult } from '../../../../../shared/contracts/ai';
+import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
 import { AssistantFacade } from './assistant.facade';
 import { ProcedureAssistantComponent } from './procedure-assistant.component';
 

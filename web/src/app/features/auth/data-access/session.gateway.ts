@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import type { Membership } from '../../../../../../shared/contracts/business';
+import type { Membership } from '../../../../../../shared/contracts/business/index';
 export interface SalonOption {
   id: string;
   name: string;

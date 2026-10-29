@@ -5,7 +5,7 @@ import { ProductKnowledgeReviewComponent } from './product-knowledge-review.comp
 import { ProductKnowledgeReviewFacade } from './library/product-knowledge-review.facade';
 import { KnowledgeApi } from '../../core/knowledge-api';
 import { SessionFacade } from '../auth/feature/session.facade';
-import type { KnowledgeProductWorkspace } from '../../../../../shared/contracts/product-knowledge';
+import type { KnowledgeProductWorkspace } from '../../../../../shared/contracts/product-knowledge/index';
 const workspace = (): KnowledgeProductWorkspace => ({
   review: {
     versionId: 'v',

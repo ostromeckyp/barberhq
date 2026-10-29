@@ -1,7 +1,7 @@
 import { Service, signal, computed } from '@angular/core';
-import type { InventoryRow } from '../../../../../../shared/contracts/business';
-import type { RequestItemInput } from '../../../../../../shared/contracts/stock';
-import type { DraftLine, ReadyDraftLine } from '../../../../../../shared/contracts/draft';
+import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
+import type { RequestItemInput } from '../../../../../../shared/contracts/stock/index';
+import type { DraftLine, ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
 @Service({ autoProvided: false })
 export class DraftStore {
   private readonly value = signal<DraftLine[]>([]);

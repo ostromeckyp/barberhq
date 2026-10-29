@@ -3,7 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
-import type { RequestSummary } from '../../../../../../shared/contracts/stock';
+import type { RequestSummary } from '../../../../../../shared/contracts/stock/index';
 import { ResponsiveLayout } from '../../../core/responsive-layout';
 import type { RequestListContext } from '../../../core/request-navigation';
 import { StatusChip } from './status-chip';

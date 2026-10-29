@@ -2,7 +2,7 @@ import { Service, effect, inject, signal, untracked } from '@angular/core';
 import type {
   DeliveryQuantities,
   ProcedureReference,
-} from '../../../../../../shared/contracts/delivery';
+} from '../../../../../../shared/contracts/delivery/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { scopeKey, type DeliveryScope } from './delivery-journal';

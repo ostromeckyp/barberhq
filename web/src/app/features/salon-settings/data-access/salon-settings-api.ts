@@ -5,7 +5,7 @@ import { getSalonSettings, saveSalonSettings } from '../../../core/generated';
 import type {
   SalonSettings,
   SaveSalonSettingsInput,
-} from '../../../../../../shared/contracts/settings';
+} from '../../../../../../shared/contracts/settings/index';
 export class SettingsSaveError extends Error {
   constructor(readonly code: 'STALE_STATE' | 'FORBIDDEN' | 'VALIDATION_ERROR' | 'UNKNOWN') {
     super(code);

@@ -1,5 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import type { DeliveryAction } from '../../../shared/contracts/delivery.js';
+import type { DeliveryAction } from '../../../shared/contracts/delivery/index.js';
 import { getStockDataConnect } from '../stock/commands.js';
 import { StockError } from '../stock/errors.js';
 import { DeliveryRepository } from './repository.js';

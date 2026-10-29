@@ -5,7 +5,7 @@ import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { pageOffset, requestFilter } from '../../../core/request-navigation';
-import type { RequestFilter } from '../../../../../../shared/contracts/stock';
+import type { RequestFilter } from '../../../../../../shared/contracts/stock/index';
 @Service({ autoProvided: false })
 export class SalonRequestsFacade {
   private readonly route = inject(ActivatedRoute);

@@ -3,7 +3,7 @@ import { Service, inject } from '@angular/core';
 import { QueryFetchPolicy } from 'firebase/data-connect';
 import { FIREBASE } from '../../../core/firebase.providers';
 import { getSalonInventory } from '../../../core/generated';
-import type { InventoryRow } from '../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
 @Service()
 export class InventoryApi {
   private readonly firebase = inject(FIREBASE);

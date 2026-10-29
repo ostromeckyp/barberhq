@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { z } from 'zod';
-import type { ProductAliasKind } from '../../../shared/contracts/product-admin.js';
+import type { ProductAliasKind } from '../../../shared/contracts/product-admin/index.js';
 import type { DocumentCommandService } from '../knowledge/document-commands.js';
 import type { ProductKnowledgeCommands } from '../knowledge/product-knowledge-commands.js';
 import type { ProductKnowledgeGeneration } from '../knowledge/product-knowledge-generation.js';

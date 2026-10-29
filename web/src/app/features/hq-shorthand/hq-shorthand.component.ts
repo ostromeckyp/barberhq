@@ -1,7 +1,7 @@
 import { Component, PendingTasks, computed, effect, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import type { SalonShorthand } from '../../../../../shared/contracts/product-lookup';
+import type { SalonShorthand } from '../../../../../shared/contracts/product-lookup/index';
 import { DelayedLoadingDirective } from '../../shared/ui/delayed-loading/delayed-loading';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
 import { SessionFacade } from '../auth/feature/session.facade';

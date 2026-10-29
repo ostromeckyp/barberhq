@@ -1,4 +1,4 @@
-import type { VersionStatus } from '../../../../../../shared/contracts/knowledge';
+import type { VersionStatus } from '../../../../../../shared/contracts/knowledge/index';
 
 export const MAX_KNOWLEDGE_PDF_BYTES = 10 * 1024 * 1024;
 const MAX_RESPONSE_BYTES = 64 * 1024;

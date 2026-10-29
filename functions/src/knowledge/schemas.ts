@@ -7,7 +7,7 @@ import type {
   DeleteVersionInput,
   ReviewDocumentInput,
   RetryDocumentInput,
-} from '../../../shared/contracts/knowledge.js';
+} from '../../../shared/contracts/knowledge/index.js';
 import { metadataFromLegacy } from '../../../shared/knowledge-metadata.js';
 import { KnowledgeError } from './repository.js';
 

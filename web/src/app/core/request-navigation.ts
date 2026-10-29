@@ -1,5 +1,5 @@
-import type { Membership } from '../../../../shared/contracts/business';
-import type { RequestFilter, RequestSummary } from '../../../../shared/contracts/stock';
+import type { Membership } from '../../../../shared/contracts/business/index';
+import type { RequestFilter, RequestSummary } from '../../../../shared/contracts/stock/index';
 export type RequestListContext =
   | { kind: 'SALON'; salonId: string; filter: RequestFilter; offset: number }
   | { kind: 'HQ'; offset: number };

@@ -8,7 +8,7 @@ import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonSettingsApi } from '../../salon-settings/data-access/salon-settings-api';
 import { InventoryApi } from '../data-access/inventory-api';
 import { SalonInventoryFacade } from './salon-inventory.facade';
-import type { InventoryRow, SessionState } from '../../../../../../shared/contracts/business';
+import type { InventoryRow, SessionState } from '../../../../../../shared/contracts/business/index';
 
 function deferred<T>() {
   let resolve!: (value: T) => void;

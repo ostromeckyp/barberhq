@@ -1,5 +1,5 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
-import type { PrepareInput, ProposalResult } from '../../../../../../shared/contracts/ai';
+import type { PrepareInput, ProposalResult } from '../../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { DraftStore } from './draft.store';

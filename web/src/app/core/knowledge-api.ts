@@ -5,7 +5,7 @@ import type {
   AcceptKnowledgeProductReviewInput,
   GenerateKnowledgeProductAliasesInput,
   SuggestKnowledgeProductLinkInput,
-} from '../../../../shared/contracts/product-knowledge';
+} from '../../../../shared/contracts/product-knowledge/index';
 import { metadataFromStorage, isSyntheticSource } from '../../../../shared/knowledge-metadata';
 import { Service, inject } from '@angular/core';
 import { getIdToken } from 'firebase/auth';
@@ -23,8 +23,8 @@ import type {
   RetryDocumentInput,
   ReviewDocumentInput,
   VersionStatus,
-} from '../../../../shared/contracts/knowledge';
-import type { Page, PageInput } from '../../../../shared/contracts/business';
+} from '../../../../shared/contracts/knowledge/index';
+import type { Page, PageInput } from '../../../../shared/contracts/business/index';
 import { FIREBASE } from './firebase.providers';
 import { getSourceSection } from './generated';
 import { runtimeConfig } from './public-config';

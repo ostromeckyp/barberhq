@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { StockAction } from '../../../shared/contracts/stock.js';
+import type { StockAction } from '../../../shared/contracts/stock/index.js';
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 export const requestItemId = (requestId: string, productId: string) =>
   `item:${hash([requestId, productId])}`;

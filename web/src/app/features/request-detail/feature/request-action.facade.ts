@@ -13,7 +13,7 @@ import type {
   RequestDetail,
   StockAction,
   CommandResult,
-} from '../../../../../../shared/contracts/stock';
+} from '../../../../../../shared/contracts/stock/index';
 export type ActionDialogData = { request: RequestDetail; type: TransitionType };
 export type ActionOutcome = { result?: CommandResult; error?: string };
 @Service({ autoProvided: false })

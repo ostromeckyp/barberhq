@@ -6,7 +6,7 @@ import type {
   CreateDocumentInput,
   DocumentRow,
   VersionStatus,
-} from '../../../../../../shared/contracts/knowledge';
+} from '../../../../../../shared/contracts/knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';

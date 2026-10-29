@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getDataConnect } from 'firebase-admin/data-connect';
-import type { StockAction } from '../../../shared/contracts/stock.js';
+import type { StockAction } from '../../../shared/contracts/stock/index.js';
 import { StockRepository } from './repository.js';
 import { parseAction } from './schemas.js';
 import { StockError } from './errors.js';

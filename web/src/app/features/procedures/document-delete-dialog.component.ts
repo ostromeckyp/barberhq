@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import type { DocumentRow } from '../../../../../shared/contracts/knowledge';
+import type { DocumentRow } from '../../../../../shared/contracts/knowledge/index';
 
 @Component({
   selector: 'app-document-delete-dialog',

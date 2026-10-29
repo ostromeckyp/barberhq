@@ -11,7 +11,7 @@ import { DELIVERY_JOURNAL, type DeliveryScope } from '../feature/delivery-journa
 import type {
   DeliveryProblemKind,
   SetDeliveryProcedureInput,
-} from '../../../../../../shared/contracts/delivery';
+} from '../../../../../../shared/contracts/delivery/index';
 
 @Component({
   imports: [

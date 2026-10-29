@@ -1,5 +1,5 @@
 import { inject, InjectionToken } from '@angular/core';
-import type { DeliveryAction } from '../../../../../../shared/contracts/delivery';
+import type { DeliveryAction } from '../../../../../../shared/contracts/delivery/index';
 export type DeliveryScope = {
   userId: string;
   businessId: string;

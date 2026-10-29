@@ -1,10 +1,10 @@
 import type * as sdk from '../../../core/generated';
-import type { InventoryRow } from '../../../../../../shared/contracts/business';
+import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
 import type {
   RequestSummary,
   RequestDetail,
   RequestState,
-} from '../../../../../../shared/contracts/stock';
+} from '../../../../../../shared/contracts/stock/index';
 import { toDeliverySummary } from '../../delivery/data-access/delivery.mapper';
 type SummaryRecord = NonNullable<sdk.ListHqQueueData['membership']>['business']['requests'][number];
 type DetailRecord = NonNullable<

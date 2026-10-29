@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { initializeApp, applicationDefault, deleteApp } from 'firebase-admin/app';
 import { getDataConnect, type DataConnect } from 'firebase-admin/data-connect';
 import * as sdk from '@barberhq/server';
-import type { BusinessSeed } from '../../shared/contracts/business.ts';
+import type { BusinessSeed } from '../../shared/contracts/business/index.ts';
 import { validateSeed } from '../prepare-data/catalog.ts';
 export type MembershipSeed = {
   uid: string;

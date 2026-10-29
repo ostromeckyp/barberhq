@@ -3,7 +3,7 @@ import type {
   ExtractedPage,
   KnowledgeChunkDraft,
   PdfRect,
-} from '../../../shared/contracts/knowledge.js';
+} from '../../../shared/contracts/knowledge/index.js';
 
 const TARGET_TOKENS = 320;
 

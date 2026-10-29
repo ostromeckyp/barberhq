@@ -3,7 +3,7 @@ import { beforeEach, afterEach, it, expect } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { createCloudHarness } from '../support/cloud.ts';
 import { StockRepository } from '../../functions/src/stock/repository.ts';
-import type { StockAction, SubmitInput } from '../../shared/contracts/stock.ts';
+import type { StockAction, SubmitInput } from '../../shared/contracts/stock/index.ts';
 let h: Awaited<ReturnType<typeof createCloudHarness>>;
 let repo: StockRepository;
 beforeEach(async () => {

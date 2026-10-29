@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { it, expect } from 'vitest';
-import type { SessionState } from '../../../../../../shared/contracts/business';
+import type { SessionState } from '../../../../../../shared/contracts/business/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext, type Workspace } from '../../../core/salon-context';
 import { DeliveryDraftStore } from './delivery-draft.store';

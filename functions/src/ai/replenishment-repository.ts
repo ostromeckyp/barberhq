@@ -1,6 +1,6 @@
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { z } from 'genkit';
-import type { LookupAlias } from '../../../shared/contracts/product-lookup.js';
+import type { LookupAlias } from '../../../shared/contracts/product-lookup/index.js';
 import type { ActorContext } from './context.js';
 import { AiError, runWithinBudget, type AiBudget } from './budget.js';
 import type { ReplenishmentProduct, ReplenishmentRepository } from './replenishment-tools.js';

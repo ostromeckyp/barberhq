@@ -11,7 +11,7 @@ import {
   productCategories,
   type ProductAliasKind,
   type ProductAliasRow,
-} from '../../../../../../shared/contracts/product-admin';
+} from '../../../../../../shared/contracts/product-admin/index';
 import { PdfDropzone } from '../../../shared/ui/pdf-dropzone/pdf-dropzone';
 import type { CardSuggestion } from '../data-access/product-admin-api';
 import { ProductEditorFacade } from './product-editor.facade';

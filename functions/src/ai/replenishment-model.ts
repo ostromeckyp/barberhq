@@ -1,6 +1,6 @@
 import { z, type ModelArgument } from 'genkit';
 import { vertexAI } from '@genkit-ai/google-genai';
-import type { PrepareInput, ProductMatch } from '../../../shared/contracts/ai.js';
+import type { PrepareInput, ProductMatch } from '../../../shared/contracts/ai/index.js';
 import { AiError, type AiBudget } from './budget.js';
 import { createAiRuntime, runBudgetedModelTurn, type ReasoningConfig } from './runtime.js';
 import type { ReplenishmentTools } from './replenishment-tools.js';

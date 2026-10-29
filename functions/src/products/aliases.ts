@@ -5,8 +5,8 @@ import type {
   ProductAliasKind,
   ProductAliasRow,
   ProductAliasesResult,
-} from '../../../shared/contracts/product-admin.js';
-import type { LookupAlias, LookupProduct } from '../../../shared/contracts/product-lookup.js';
+} from '../../../shared/contracts/product-admin/index.js';
+import type { LookupAlias, LookupProduct } from '../../../shared/contracts/product-lookup/index.js';
 import { normalizeProduct } from '../../../shared/product-normalization.js';
 import { lookupProducts, normalizeProductForMatch } from '../ai/product-lookup.js';
 import { KnowledgeError } from '../knowledge/repository.js';

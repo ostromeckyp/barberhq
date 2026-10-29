@@ -5,7 +5,7 @@ import type {
   KnowledgeCatalogProduct,
   AliasProposal,
   ActiveProductAlias,
-} from '../../shared/contracts/product-knowledge.ts';
+} from '../../shared/contracts/product-knowledge/index.ts';
 import {
   resolveKnowledgePassage,
   suggestProductCodeLinks,

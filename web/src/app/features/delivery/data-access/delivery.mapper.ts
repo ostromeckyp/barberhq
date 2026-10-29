@@ -6,7 +6,7 @@ import type {
   DeliverySummaryDto,
   DeliveryQuantities,
   DeliveryProcedureDto,
-} from '../../../../../../shared/contracts/delivery';
+} from '../../../../../../shared/contracts/delivery/index';
 import { deliveryQuantities } from '../../../../../../shared/delivery-quantities';
 type ReceiptRecord = NonNullable<
   NonNullable<sdk.GetDeliveryReceiptData['membership']>['business']['requests'][number]['receipt']

@@ -4,7 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import type { ClarificationLine } from '../../../../../../shared/contracts/draft';
+import type { ClarificationLine } from '../../../../../../shared/contracts/draft/index';
 
 @Component({
   imports: [FormField, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule],

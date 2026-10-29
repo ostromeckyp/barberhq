@@ -1,7 +1,7 @@
 import { ApplicationRef, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { DocumentRow } from '../../../../../../shared/contracts/knowledge';
+import type { DocumentRow } from '../../../../../../shared/contracts/knowledge/index';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';

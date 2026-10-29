@@ -5,7 +5,7 @@ import {
   buildAction,
   type Confirmation,
 } from './action-input';
-import type { RequestDetail, RequestDetailItem } from '../../../../../../shared/contracts/stock';
+import type { RequestDetail, RequestDetailItem } from '../../../../../../shared/contracts/stock/index';
 const item = (id: string, quantity: number): RequestDetailItem => ({
   productId: id,
   productName: id,

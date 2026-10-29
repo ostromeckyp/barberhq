@@ -7,7 +7,7 @@ import { SalonSettingsFacade } from './salon-settings.facade';
 import { SalonSettingsApi, SettingsSaveError } from '../data-access/salon-settings-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
-import type { SalonSettings } from '../../../../../../shared/contracts/settings';
+import type { SalonSettings } from '../../../../../../shared/contracts/settings/index';
 const setting = (salonId = 'a', lowStockThreshold = 2, version = 1): SalonSettings => ({
   salonId,
   lowStockThreshold,

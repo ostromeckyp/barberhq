@@ -1,7 +1,7 @@
 import { PendingTasks, Service, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup';
+import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonShorthandApi, ShorthandRemoveError } from '../data-access/salon-shorthand-api';
 

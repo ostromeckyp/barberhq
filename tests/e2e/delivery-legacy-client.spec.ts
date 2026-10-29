@@ -14,7 +14,7 @@ import {
   planDeliveryBackfill,
   applyDeliveryBackfill,
 } from '../../scripts/migrations/delivery-receipts.ts';
-import type { ReceiveInput } from '../../shared/contracts/stock.ts';
+import type { ReceiveInput } from '../../shared/contracts/stock/index.ts';
 let h: DeliveryHarness,
   input: ReceiveInput,
   token: string,
