@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/*.local.json)",
+      "Edit(**/*.local.json)",
+      "Write(**/*.local.json)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Read|Edit|Write|Grep|Glob|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.agents/hooks/block-local-json.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

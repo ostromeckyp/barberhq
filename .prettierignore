@@ -1,0 +1,42 @@
+# Dependencies, builds and tool output
+node_modules/
+dist/
+coverage/
+functions/lib/
+.angular/
+.firebase/
+.genkit/
+.dataconnect/
+.emulator-data/
+.code-review-graph/
+.superpowers/
+artifacts/
+test-results/
+playwright-report/
+package-lock.json
+
+# Generated code
+**/generated/
+**/generated-cloud/
+web/src/app/core/public-config*.generated.ts
+dataconnect/*_read.gql
+dataconnect/webstorm/
+
+# Hashed or fixture data (content hashes must stay stable)
+data/
+tests/fixtures/
+
+# Agent/editor config and docs (not application code)
+.agents/
+.claude/
+.codex/
+.idea/
+design_handoff_barberhq/
+*.md
+
+# Local config with secrets
+*.local.*
+.env*
+
+# Research snapshots (hashed into the PDF corpus)
+docs/

@@ -1,0 +1,33 @@
+# Private configuration: exclude before any file contents are read.
+*.local.*
+.env*
+**/.env*
+*service-account*.json
+*credentials*.json
+
+# Dependencies, tooling, generated clients and build output.
+.agents/
+.claude/
+.codex/
+.idea/
+.superpowers/
+.code-review-graph/
+.dataconnect/
+.firebase/
+.genkit/
+.emulator-data/
+artifacts/
+node_modules/
+**/node_modules/**
+**/.angular/**
+**/dist/**
+**/coverage/**
+functions/lib/
+functions/src/generated/
+scripts/generated/
+web/src/app/core/generated/
+web/src/app/core/generated-cloud/
+*.generated.ts
+playwright-report/
+test-results/
+*.log
