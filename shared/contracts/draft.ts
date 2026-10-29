@@ -1,7 +1,7 @@
-import type { SubmitInput, ActiveConflict } from "./stock.js";
-export type LineOrigin = "manual" | "assistant";
+import type { SubmitInput, ActiveConflict } from './stock.js';
+export type LineOrigin = 'manual' | 'assistant';
 export type ReadyDraftLine = {
-  status: "READY";
+  status: 'READY';
   lineId: string;
   productId: string;
   productName: string;
@@ -13,19 +13,21 @@ export type ReadyDraftLine = {
   salonInventoryVersion: number;
 };
 export type ClarificationLine = {
-  status: "NEEDS_CLARIFICATION";
+  status: 'NEEDS_CLARIFICATION';
   lineId: string;
   originalWording: string;
   reason: string;
   origin: LineOrigin;
   candidates: { productId: string; productName: string }[];
   quantity?: number;
+  /** Server receipt that lets an explicit choice teach salon shorthand. */
+  choiceReceiptId?: string;
 };
 export type DraftLine = ReadyDraftLine | ClarificationLine;
 export type SubmissionOutcome =
-  | { status: "CREATED"; requestId: string }
-  | { status: "FAILED"; code: string; conflicts?: ActiveConflict[] }
-  | { status: "UNKNOWN" };
+  | { status: 'CREATED'; requestId: string }
+  | { status: 'FAILED'; code: string; conflicts?: ActiveConflict[] }
+  | { status: 'UNKNOWN' };
 export type PendingSubmission = {
   version: 2;
   userId: string;

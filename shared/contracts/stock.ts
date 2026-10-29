@@ -1,6 +1,7 @@
-import type { InventoryRow } from "./business.js";
+import type { InventoryRow } from './business.js';
+import type { DeliverySummaryDto } from './delivery.js';
 export type RequestState =
-  "PENDING_APPROVAL" | "RESERVED" | "DISPATCHED" | "RECEIVED" | "REJECTED";
+  'PENDING_APPROVAL' | 'RESERVED' | 'DISPATCHED' | 'RECEIVED' | 'REJECTED' | 'RECEIVED_WITH_ISSUE';
 export type RequestItemInput = { productId: string; quantity: number };
 export type SubmitInput = {
   salonId: string;
@@ -24,11 +25,11 @@ export type ReceiveInput = TransitionInput & {
   allIntact: true;
 };
 export type StockAction =
-  | { type: "SUBMIT"; input: SubmitInput }
-  | { type: "APPROVE"; input: ApproveInput }
-  | { type: "REJECT"; input: RejectInput }
-  | { type: "DISPATCH"; input: TransitionInput }
-  | { type: "RECEIVE"; input: ReceiveInput };
+  | { type: 'SUBMIT'; input: SubmitInput }
+  | { type: 'APPROVE'; input: ApproveInput }
+  | { type: 'REJECT'; input: RejectInput }
+  | { type: 'DISPATCH'; input: TransitionInput }
+  | { type: 'RECEIVE'; input: ReceiveInput };
 export type CommandResult = {
   actionReceiptId: string;
   requestId: string;
@@ -53,9 +54,16 @@ export type RequestDetailItem = RequestItemSummary & {
   dispatchedQuantity: number;
   receivedQuantity: number;
   stock: InventoryRow;
+  delivery?: {
+    inTransit: number;
+    goodQuantity: number;
+    damagedQuantity: number;
+    missingQuantity: number;
+  };
 };
-export type RequestDetail = Omit<RequestSummary, "items"> & {
+export type RequestDetail = Omit<RequestSummary, 'items'> & {
   items: RequestDetailItem[];
+  delivery?: DeliverySummaryDto;
   timeline: {
     state: RequestState;
     at: string;
@@ -63,14 +71,16 @@ export type RequestDetail = Omit<RequestSummary, "items"> & {
     reason?: string;
   }[];
 };
-export type RequestFilter = "ALL" | "ACTIVE" | "RECEIVED" | "REJECTED";
+export type RequestFilter = 'ALL' | 'ACTIVE' | 'RECEIVED' | 'REJECTED';
 export type StockErrorCode =
-  | "UNAUTHENTICATED"
-  | "FORBIDDEN"
-  | "VALIDATION_ERROR"
-  | "STALE_STATE"
-  | "INSUFFICIENT_STOCK"
-  | "INVALID_TRANSITION"
-  | "IDEMPOTENCY_CONFLICT"
-  | "ALREADY_ACTIVE"
-  | "NOT_FOUND";
+  | 'UNAUTHENTICATED'
+  | 'FORBIDDEN'
+  | 'VALIDATION_ERROR'
+  | 'STALE_STATE'
+  | 'INSUFFICIENT_STOCK'
+  | 'INVALID_TRANSITION'
+  | 'IDEMPOTENCY_CONFLICT'
+  | 'ALREADY_ACTIVE'
+  | 'NOT_FOUND'
+  | 'CLIENT_UPDATE_REQUIRED'
+  | 'SOURCE_CHANGED';

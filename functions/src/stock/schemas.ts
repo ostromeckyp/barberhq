@@ -1,6 +1,6 @@
-import { z } from "zod";
-import type { StockAction } from "../../../shared/contracts/stock.js";
-import { StockError } from "./errors.js";
+import { z } from 'zod';
+import type { StockAction } from '../../../shared/contracts/stock.js';
+import { StockError } from './errors.js';
 const id = z.string().min(1).max(300);
 const quantity = z.number().int().min(1).max(99);
 const items = <T extends z.ZodType<{ productId: string }>>(item: T) =>
@@ -10,7 +10,7 @@ const items = <T extends z.ZodType<{ productId: string }>>(item: T) =>
     .max(6)
     .refine(
       (rows) => new Set(rows.map((r) => r.productId)).size === rows.length,
-      "Distinct products required",
+      'Distinct products required',
     );
 const transition = {
   requestId: id,
@@ -43,15 +43,9 @@ const schemas = {
     allIntact: z.literal(true),
   }),
 };
-export function parseAction(
-  type: StockAction["type"],
-  input: unknown,
-): StockAction {
+export function parseAction(type: StockAction['type'], input: unknown): StockAction {
   const result = schemas[type].safeParse(input);
   if (!result.success)
-    throw new StockError(
-      "VALIDATION_ERROR",
-      "Check quantities and required fields.",
-    );
+    throw new StockError('VALIDATION_ERROR', 'Check quantities and required fields.');
   return { type, input: result.data } as StockAction;
 }
