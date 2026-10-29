@@ -1,0 +1,51 @@
+type ProbeInventory @table(key: "id") {
+  id: String!
+  onHand: Int!
+  version: Int!
+}
+type ProbeRequest @table(key: "id") {
+  id: String!
+  businessId: String!
+  state: String!
+  revision: Int!
+  itemCount: Int!
+}
+type ProbeDispatchItem @table(key: ["request", "product"]) {
+  request: ProbeRequest!
+  product: ProbeInventory!
+  quantity: Int!
+}
+type ProbeReceipt @table(key: "request") {
+  request: ProbeRequest!
+}
+type ProbeReceiptItem @table(key: ["receipt", "product"]) {
+  receipt: ProbeReceipt!
+  product: ProbeInventory!
+  goodQuantity: Int!
+  damagedQuantity: Int!
+  missingQuantity: Int!
+}
+type ProbeMovement @table(key: ["receipt", "product"]) {
+  receipt: ProbeReceipt!
+  product: ProbeInventory!
+  quantity: Int!
+}
+type ProbeIssue @table(key: "id") {
+  id: String!
+  rootRequest: ProbeRequest!
+  businessId: String!
+  revision: Int!
+}
+type ProbeIssueItem @table(key: ["issue", "product"]) {
+  issue: ProbeIssue!
+  product: ProbeInventory!
+  initialAffectedQuantity: Int!
+}
+type ProbeReplacement @table(key: "issue") {
+  issue: ProbeIssue!
+  request: ProbeRequest!
+}
+type ProbeAudit @table(key: "id") {
+  id: String!
+  request: ProbeRequest!
+}

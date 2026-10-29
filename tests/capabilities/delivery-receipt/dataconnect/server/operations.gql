@@ -1,0 +1,163 @@
+# Capability-only operations: never deployed with the application connector.
+mutation RecordProbe(
+  $requestId: String!
+  $businessId: String!
+  $expectedRevision: Int!
+  $issueId: String!
+  $hasIssue: Boolean!
+  $itemCount: Int!
+  $p0: String!
+  $g0: Int!
+  $d0: Int!
+  $m0: Int!
+  $a0: Int!
+  $v0: Int!
+  $use0: Boolean!
+  $move0: Boolean!
+  $issue0: Boolean!
+  $p1: String!
+  $g1: Int!
+  $d1: Int!
+  $m1: Int!
+  $a1: Int!
+  $v1: Int!
+  $use1: Boolean!
+  $move1: Boolean!
+  $issue1: Boolean!
+  $p2: String!
+  $g2: Int!
+  $d2: Int!
+  $m2: Int!
+  $a2: Int!
+  $v2: Int!
+  $use2: Boolean!
+  $move2: Boolean!
+  $issue2: Boolean!
+  $p3: String!
+  $g3: Int!
+  $d3: Int!
+  $m3: Int!
+  $a3: Int!
+  $v3: Int!
+  $use3: Boolean!
+  $move3: Boolean!
+  $issue3: Boolean!
+  $p4: String!
+  $g4: Int!
+  $d4: Int!
+  $m4: Int!
+  $a4: Int!
+  $v4: Int!
+  $use4: Boolean!
+  $move4: Boolean!
+  $issue4: Boolean!
+  $p5: String!
+  $g5: Int!
+  $d5: Int!
+  $m5: Int!
+  $a5: Int!
+  $v5: Int!
+  $use5: Boolean!
+  $move5: Boolean!
+  $issue5: Boolean!
+) @auth(level: NO_ACCESS) @transaction {
+  scope: query @redact {
+    probeRequest(id:$requestId) @check(expr:"this != null && this.businessId == vars.businessId",message:"FORBIDDEN") {
+      id businessId
+      itemCount @check(expr:"this == vars.itemCount && this >= 1 && this <= 6",message:"INVALID_ITEMS")
+    }
+  }
+  claim: probeRequest_updateMany(
+    where:{id:{eq:$requestId},businessId:{eq:$businessId},state:{eq:"DISPATCHED"},revision:{eq:$expectedRevision}}
+    data:{revision_update:{inc:1},state_expr:"vars.hasIssue ? 'RECEIVED_WITH_ISSUE' : 'RECEIVED'"}
+  ) @check(expr:"this == 1",message:"STALE_STATE")
+  probeReceipt_insert(data:{requestId:$requestId})
+  probeIssue_insert(data:{id:$issueId,rootRequestId:$requestId,businessId:$businessId,revision:1}) @include(if:$hasIssue)
+  valid0: query @redact @include(if:$use0) {
+    probeDispatchItem(key:{requestId:$requestId,productId:$p0})
+      @check(expr:"this != null && vars.g0 >= 0 && vars.d0 >= 0 && vars.m0 >= 0 && vars.g0 + vars.d0 + vars.m0 == this.quantity && vars.a0 == vars.d0 + vars.m0 && vars.move0 == (vars.g0 > 0) && vars.issue0 == (vars.a0 > 0)",message:"INVALID_ITEMS") { quantity }
+    probeInventory(id:$p0) @check(expr:"this != null && this.version == vars.v0",message:"STALE_STATE") {id version}
+  }
+  stock0: probeInventory_updateMany(
+    where:{id:{eq:$p0},version:{eq:$v0}}
+    data:{onHand_update:{inc:$g0},version_update:{inc:1}}
+  ) @include(if:$move0) @check(expr:"this == 1",message:"STALE_STATE")
+  receipt0: probeReceiptItem_insert(data:{receiptRequestId:$requestId,productId:$p0,goodQuantity:$g0,damagedQuantity:$d0,missingQuantity:$m0}) @include(if:$use0)
+  movement0: probeMovement_insert(data:{receiptRequestId:$requestId,productId:$p0,quantity:$g0}) @include(if:$move0)
+  affected0: probeIssueItem_insert(data:{issueId:$issueId,productId:$p0,initialAffectedQuantity:$a0}) @include(if:$issue0)
+  valid1: query @redact @include(if:$use1) {
+    probeDispatchItem(key:{requestId:$requestId,productId:$p1})
+      @check(expr:"this != null && vars.g1 >= 0 && vars.d1 >= 0 && vars.m1 >= 0 && vars.g1 + vars.d1 + vars.m1 == this.quantity && vars.a1 == vars.d1 + vars.m1 && vars.move1 == (vars.g1 > 0) && vars.issue1 == (vars.a1 > 0)",message:"INVALID_ITEMS") { quantity }
+    probeInventory(id:$p1) @check(expr:"this != null && this.version == vars.v1",message:"STALE_STATE") {id version}
+  }
+  stock1: probeInventory_updateMany(
+    where:{id:{eq:$p1},version:{eq:$v1}}
+    data:{onHand_update:{inc:$g1},version_update:{inc:1}}
+  ) @include(if:$move1) @check(expr:"this == 1",message:"STALE_STATE")
+  receipt1: probeReceiptItem_insert(data:{receiptRequestId:$requestId,productId:$p1,goodQuantity:$g1,damagedQuantity:$d1,missingQuantity:$m1}) @include(if:$use1)
+  movement1: probeMovement_insert(data:{receiptRequestId:$requestId,productId:$p1,quantity:$g1}) @include(if:$move1)
+  affected1: probeIssueItem_insert(data:{issueId:$issueId,productId:$p1,initialAffectedQuantity:$a1}) @include(if:$issue1)
+  valid2: query @redact @include(if:$use2) {
+    probeDispatchItem(key:{requestId:$requestId,productId:$p2})
+      @check(expr:"this != null && vars.g2 >= 0 && vars.d2 >= 0 && vars.m2 >= 0 && vars.g2 + vars.d2 + vars.m2 == this.quantity && vars.a2 == vars.d2 + vars.m2 && vars.move2 == (vars.g2 > 0) && vars.issue2 == (vars.a2 > 0)",message:"INVALID_ITEMS") { quantity }
+    probeInventory(id:$p2) @check(expr:"this != null && this.version == vars.v2",message:"STALE_STATE") {id version}
+  }
+  stock2: probeInventory_updateMany(
+    where:{id:{eq:$p2},version:{eq:$v2}}
+    data:{onHand_update:{inc:$g2},version_update:{inc:1}}
+  ) @include(if:$move2) @check(expr:"this == 1",message:"STALE_STATE")
+  receipt2: probeReceiptItem_insert(data:{receiptRequestId:$requestId,productId:$p2,goodQuantity:$g2,damagedQuantity:$d2,missingQuantity:$m2}) @include(if:$use2)
+  movement2: probeMovement_insert(data:{receiptRequestId:$requestId,productId:$p2,quantity:$g2}) @include(if:$move2)
+  affected2: probeIssueItem_insert(data:{issueId:$issueId,productId:$p2,initialAffectedQuantity:$a2}) @include(if:$issue2)
+  valid3: query @redact @include(if:$use3) {
+    probeDispatchItem(key:{requestId:$requestId,productId:$p3})
+      @check(expr:"this != null && vars.g3 >= 0 && vars.d3 >= 0 && vars.m3 >= 0 && vars.g3 + vars.d3 + vars.m3 == this.quantity && vars.a3 == vars.d3 + vars.m3 && vars.move3 == (vars.g3 > 0) && vars.issue3 == (vars.a3 > 0)",message:"INVALID_ITEMS") { quantity }
+    probeInventory(id:$p3) @check(expr:"this != null && this.version == vars.v3",message:"STALE_STATE") {id version}
+  }
+  stock3: probeInventory_updateMany(
+    where:{id:{eq:$p3},version:{eq:$v3}}
+    data:{onHand_update:{inc:$g3},version_update:{inc:1}}
+  ) @include(if:$move3) @check(expr:"this == 1",message:"STALE_STATE")
+  receipt3: probeReceiptItem_insert(data:{receiptRequestId:$requestId,productId:$p3,goodQuantity:$g3,damagedQuantity:$d3,missingQuantity:$m3}) @include(if:$use3)
+  movement3: probeMovement_insert(data:{receiptRequestId:$requestId,productId:$p3,quantity:$g3}) @include(if:$move3)
+  affected3: probeIssueItem_insert(data:{issueId:$issueId,productId:$p3,initialAffectedQuantity:$a3}) @include(if:$issue3)
+  valid4: query @redact @include(if:$use4) {
+    probeDispatchItem(key:{requestId:$requestId,productId:$p4})
+      @check(expr:"this != null && vars.g4 >= 0 && vars.d4 >= 0 && vars.m4 >= 0 && vars.g4 + vars.d4 + vars.m4 == this.quantity && vars.a4 == vars.d4 + vars.m4 && vars.move4 == (vars.g4 > 0) && vars.issue4 == (vars.a4 > 0)",message:"INVALID_ITEMS") { quantity }
+    probeInventory(id:$p4) @check(expr:"this != null && this.version == vars.v4",message:"STALE_STATE") {id version}
+  }
+  stock4: probeInventory_updateMany(
+    where:{id:{eq:$p4},version:{eq:$v4}}
+    data:{onHand_update:{inc:$g4},version_update:{inc:1}}
+  ) @include(if:$move4) @check(expr:"this == 1",message:"STALE_STATE")
+  receipt4: probeReceiptItem_insert(data:{receiptRequestId:$requestId,productId:$p4,goodQuantity:$g4,damagedQuantity:$d4,missingQuantity:$m4}) @include(if:$use4)
+  movement4: probeMovement_insert(data:{receiptRequestId:$requestId,productId:$p4,quantity:$g4}) @include(if:$move4)
+  affected4: probeIssueItem_insert(data:{issueId:$issueId,productId:$p4,initialAffectedQuantity:$a4}) @include(if:$issue4)
+  valid5: query @redact @include(if:$use5) {
+    probeDispatchItem(key:{requestId:$requestId,productId:$p5})
+      @check(expr:"this != null && vars.g5 >= 0 && vars.d5 >= 0 && vars.m5 >= 0 && vars.g5 + vars.d5 + vars.m5 == this.quantity && vars.a5 == vars.d5 + vars.m5 && vars.move5 == (vars.g5 > 0) && vars.issue5 == (vars.a5 > 0)",message:"INVALID_ITEMS") { quantity }
+    probeInventory(id:$p5) @check(expr:"this != null && this.version == vars.v5",message:"STALE_STATE") {id version}
+  }
+  stock5: probeInventory_updateMany(
+    where:{id:{eq:$p5},version:{eq:$v5}}
+    data:{onHand_update:{inc:$g5},version_update:{inc:1}}
+  ) @include(if:$move5) @check(expr:"this == 1",message:"STALE_STATE")
+  receipt5: probeReceiptItem_insert(data:{receiptRequestId:$requestId,productId:$p5,goodQuantity:$g5,damagedQuantity:$d5,missingQuantity:$m5}) @include(if:$use5)
+  movement5: probeMovement_insert(data:{receiptRequestId:$requestId,productId:$p5,quantity:$g5}) @include(if:$move5)
+  affected5: probeIssueItem_insert(data:{issueId:$issueId,productId:$p5,initialAffectedQuantity:$a5}) @include(if:$issue5)
+  probeAudit_insert(data:{id:$requestId,requestId:$requestId})
+}
+
+mutation CreateReplacementProbe($issueId:String!,$expectedRevision:Int!,$businessId:String!,$requestId:String!) @auth(level:NO_ACCESS) @transaction {
+  scope: query @redact {
+    probeIssue(id:$issueId) @check(expr:"this != null && this.businessId == vars.businessId",message:"FORBIDDEN") {
+      id businessId
+      items:probeIssueItems_on_issue {productId initialAffectedQuantity}
+    }
+  }
+  claim: probeIssue_updateMany(where:{id:{eq:$issueId},businessId:{eq:$businessId},revision:{eq:$expectedRevision}},data:{revision_update:{inc:1}})
+    @check(expr:"this == 1",message:"STALE_STATE")
+  probeRequest_insert(data:{id:$requestId,businessId:$businessId,state:"PENDING_APPROVAL",revision:1,itemCount_expr:"response.scope.probeIssue.items.size()"})
+  probeReplacement_insert(data:{issueId:$issueId,requestId:$requestId})
+  probeAudit_insert(data:{id:$requestId,requestId:$requestId})
+}

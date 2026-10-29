@@ -1,0 +1,12 @@
+specVersion: v1
+serviceId: delivery-receipt-proof
+location: europe-west1
+schemaValidation: COMPATIBLE
+schema:
+  source: ./schema
+  datasource:
+    postgresql:
+      database: delivery_proof
+      cloudSql:
+        instanceId: proof
+connectorDirs: [./server]

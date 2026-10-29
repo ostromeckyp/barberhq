@@ -1,0 +1,98 @@
+{
+  "label": "Deterministic validation fixture, not model-quality evidence",
+  "cases": [
+    {
+      "productId": "NBS-MATOWA-100",
+      "output": {
+        "type": "pomada do włosów",
+        "aliases": [
+          {
+            "phrase": "Pomada Matowa",
+            "kind": "name",
+            "lang": "pl"
+          }
+        ]
+      }
+    },
+    {
+      "productId": "NBS-SOL-200",
+      "output": {
+        "type": "sól morska do włosów",
+        "aliases": [
+          {
+            "phrase": "Sól Morska",
+            "kind": "name",
+            "lang": "pl"
+          }
+        ]
+      }
+    },
+    {
+      "productId": "NBS-SAVAGE-50",
+      "output": {
+        "type": "olejek do brody",
+        "aliases": [
+          {
+            "phrase": "Savage",
+            "kind": "name",
+            "lang": "en"
+          },
+          {
+            "phrase": "sawedż",
+            "kind": "phonetic",
+            "lang": "pl"
+          }
+        ]
+      }
+    },
+    {
+      "productId": "NBS-DRYMATT-100",
+      "output": {
+        "type": "pomada do włosów",
+        "aliases": [
+          {
+            "phrase": "Dry Matt",
+            "kind": "name",
+            "lang": "en"
+          },
+          {
+            "phrase": "draj mat",
+            "kind": "phonetic",
+            "lang": "pl"
+          }
+        ]
+      }
+    },
+    {
+      "productId": "NBS-MATTIFIER-100",
+      "output": {
+        "type": "puder do włosów",
+        "aliases": [
+          {
+            "phrase": "Mattifier",
+            "kind": "name",
+            "lang": "en"
+          },
+          {
+            "phrase": "matifajer",
+            "kind": "phonetic",
+            "lang": "pl"
+          }
+        ]
+      }
+    },
+    {
+      "productId": "NBS-CEMENT-100",
+      "output": {
+        "type": "pomada do włosów",
+        "aliases": [
+          {
+            "phrase": "Pomada Cement",
+            "kind": "name",
+            "lang": "pl"
+          }
+        ]
+      }
+    }
+  ]
+}

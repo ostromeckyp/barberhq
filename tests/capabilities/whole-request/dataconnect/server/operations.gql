@@ -1,23 +1,144 @@
-mutation ApproveProbe($requestId:String!,$allowed:Boolean!,$p0:String!,$q0:Int!,$v0:Int!,$use0:Boolean!,$p1:String!,$q1:Int!,$v1:Int!,$use1:Boolean!,$p2:String!,$q2:Int!,$v2:Int!,$use2:Boolean!,$p3:String!,$q3:Int!,$v3:Int!,$use3:Boolean!,$p4:String!,$q4:Int!,$v4:Int!,$use4:Boolean!,$p5:String!,$q5:Int!,$v5:Int!,$use5:Boolean!) @auth(level:NO_ACCESS) @transaction {
-  guard: query @redact { probeInventories(limit:1) @check(expr:"vars.allowed",message:"FORBIDDEN") {id} }
-  probeRequest_insert(data:{id:$requestId,state:"RESERVED",revision:2})
-  available0: query @redact @include(if:$use0) { probeInventory(id:$p0) @check(expr:"this != null && this.version == vars.v0 && vars.q0 >= 1 && vars.q0 <= 99 && this.onHand - this.reserved >= vars.q0",message:"STALE_STATE") {id onHand reserved version} }
-  stock0: probeInventory_updateMany(where:{id:{eq:$p0},version:{eq:$v0},onHand:{ge:$q0}},data:{reserved_update:{inc:$q0},version_update:{inc:1}}) @include(if:$use0) @check(expr:"this == 1",message:"STALE_STATE")
-  item0: probeItem_insert(data:{requestId:$requestId,productId:$p0,quantity:$q0}) @include(if:$use0)
-  available1: query @redact @include(if:$use1) { probeInventory(id:$p1) @check(expr:"this != null && this.version == vars.v1 && vars.q1 >= 1 && vars.q1 <= 99 && this.onHand - this.reserved >= vars.q1",message:"STALE_STATE") {id onHand reserved version} }
-  stock1: probeInventory_updateMany(where:{id:{eq:$p1},version:{eq:$v1},onHand:{ge:$q1}},data:{reserved_update:{inc:$q1},version_update:{inc:1}}) @include(if:$use1) @check(expr:"this == 1",message:"STALE_STATE")
-  item1: probeItem_insert(data:{requestId:$requestId,productId:$p1,quantity:$q1}) @include(if:$use1)
-  available2: query @redact @include(if:$use2) { probeInventory(id:$p2) @check(expr:"this != null && this.version == vars.v2 && vars.q2 >= 1 && vars.q2 <= 99 && this.onHand - this.reserved >= vars.q2",message:"STALE_STATE") {id onHand reserved version} }
-  stock2: probeInventory_updateMany(where:{id:{eq:$p2},version:{eq:$v2},onHand:{ge:$q2}},data:{reserved_update:{inc:$q2},version_update:{inc:1}}) @include(if:$use2) @check(expr:"this == 1",message:"STALE_STATE")
-  item2: probeItem_insert(data:{requestId:$requestId,productId:$p2,quantity:$q2}) @include(if:$use2)
-  available3: query @redact @include(if:$use3) { probeInventory(id:$p3) @check(expr:"this != null && this.version == vars.v3 && vars.q3 >= 1 && vars.q3 <= 99 && this.onHand - this.reserved >= vars.q3",message:"STALE_STATE") {id onHand reserved version} }
-  stock3: probeInventory_updateMany(where:{id:{eq:$p3},version:{eq:$v3},onHand:{ge:$q3}},data:{reserved_update:{inc:$q3},version_update:{inc:1}}) @include(if:$use3) @check(expr:"this == 1",message:"STALE_STATE")
-  item3: probeItem_insert(data:{requestId:$requestId,productId:$p3,quantity:$q3}) @include(if:$use3)
-  available4: query @redact @include(if:$use4) { probeInventory(id:$p4) @check(expr:"this != null && this.version == vars.v4 && vars.q4 >= 1 && vars.q4 <= 99 && this.onHand - this.reserved >= vars.q4",message:"STALE_STATE") {id onHand reserved version} }
-  stock4: probeInventory_updateMany(where:{id:{eq:$p4},version:{eq:$v4},onHand:{ge:$q4}},data:{reserved_update:{inc:$q4},version_update:{inc:1}}) @include(if:$use4) @check(expr:"this == 1",message:"STALE_STATE")
-  item4: probeItem_insert(data:{requestId:$requestId,productId:$p4,quantity:$q4}) @include(if:$use4)
-  available5: query @redact @include(if:$use5) { probeInventory(id:$p5) @check(expr:"this != null && this.version == vars.v5 && vars.q5 >= 1 && vars.q5 <= 99 && this.onHand - this.reserved >= vars.q5",message:"STALE_STATE") {id onHand reserved version} }
-  stock5: probeInventory_updateMany(where:{id:{eq:$p5},version:{eq:$v5},onHand:{ge:$q5}},data:{reserved_update:{inc:$q5},version_update:{inc:1}}) @include(if:$use5) @check(expr:"this == 1",message:"STALE_STATE")
-  item5: probeItem_insert(data:{requestId:$requestId,productId:$p5,quantity:$q5}) @include(if:$use5)
-  probeAudit_insert(data:{id:$requestId,requestId:$requestId})
+mutation ApproveProbe(
+  $requestId: String!
+  $allowed: Boolean!
+  $p0: String!
+  $q0: Int!
+  $v0: Int!
+  $use0: Boolean!
+  $p1: String!
+  $q1: Int!
+  $v1: Int!
+  $use1: Boolean!
+  $p2: String!
+  $q2: Int!
+  $v2: Int!
+  $use2: Boolean!
+  $p3: String!
+  $q3: Int!
+  $v3: Int!
+  $use3: Boolean!
+  $p4: String!
+  $q4: Int!
+  $v4: Int!
+  $use4: Boolean!
+  $p5: String!
+  $q5: Int!
+  $v5: Int!
+  $use5: Boolean!
+) @auth(level: NO_ACCESS) @transaction {
+  guard: query @redact {
+    probeInventories(limit: 1) @check(expr: "vars.allowed", message: "FORBIDDEN") {
+      id
+    }
+  }
+  probeRequest_insert(data: { id: $requestId, state: "RESERVED", revision: 2 })
+  available0: query @redact @include(if: $use0) {
+    probeInventory(id: $p0)
+      @check(
+        expr: "this != null && this.version == vars.v0 && vars.q0 >= 1 && vars.q0 <= 99 && this.onHand - this.reserved >= vars.q0"
+        message: "STALE_STATE"
+      ) {
+      id
+      onHand
+      reserved
+      version
+    }
+  }
+  stock0: probeInventory_updateMany(
+    where: { id: { eq: $p0 }, version: { eq: $v0 }, onHand: { ge: $q0 } }
+    data: { reserved_update: { inc: $q0 }, version_update: { inc: 1 } }
+  ) @include(if: $use0) @check(expr: "this == 1", message: "STALE_STATE")
+  item0: probeItem_insert(data: { requestId: $requestId, productId: $p0, quantity: $q0 })
+    @include(if: $use0)
+  available1: query @redact @include(if: $use1) {
+    probeInventory(id: $p1)
+      @check(
+        expr: "this != null && this.version == vars.v1 && vars.q1 >= 1 && vars.q1 <= 99 && this.onHand - this.reserved >= vars.q1"
+        message: "STALE_STATE"
+      ) {
+      id
+      onHand
+      reserved
+      version
+    }
+  }
+  stock1: probeInventory_updateMany(
+    where: { id: { eq: $p1 }, version: { eq: $v1 }, onHand: { ge: $q1 } }
+    data: { reserved_update: { inc: $q1 }, version_update: { inc: 1 } }
+  ) @include(if: $use1) @check(expr: "this == 1", message: "STALE_STATE")
+  item1: probeItem_insert(data: { requestId: $requestId, productId: $p1, quantity: $q1 })
+    @include(if: $use1)
+  available2: query @redact @include(if: $use2) {
+    probeInventory(id: $p2)
+      @check(
+        expr: "this != null && this.version == vars.v2 && vars.q2 >= 1 && vars.q2 <= 99 && this.onHand - this.reserved >= vars.q2"
+        message: "STALE_STATE"
+      ) {
+      id
+      onHand
+      reserved
+      version
+    }
+  }
+  stock2: probeInventory_updateMany(
+    where: { id: { eq: $p2 }, version: { eq: $v2 }, onHand: { ge: $q2 } }
+    data: { reserved_update: { inc: $q2 }, version_update: { inc: 1 } }
+  ) @include(if: $use2) @check(expr: "this == 1", message: "STALE_STATE")
+  item2: probeItem_insert(data: { requestId: $requestId, productId: $p2, quantity: $q2 })
+    @include(if: $use2)
+  available3: query @redact @include(if: $use3) {
+    probeInventory(id: $p3)
+      @check(
+        expr: "this != null && this.version == vars.v3 && vars.q3 >= 1 && vars.q3 <= 99 && this.onHand - this.reserved >= vars.q3"
+        message: "STALE_STATE"
+      ) {
+      id
+      onHand
+      reserved
+      version
+    }
+  }
+  stock3: probeInventory_updateMany(
+    where: { id: { eq: $p3 }, version: { eq: $v3 }, onHand: { ge: $q3 } }
+    data: { reserved_update: { inc: $q3 }, version_update: { inc: 1 } }
+  ) @include(if: $use3) @check(expr: "this == 1", message: "STALE_STATE")
+  item3: probeItem_insert(data: { requestId: $requestId, productId: $p3, quantity: $q3 })
+    @include(if: $use3)
+  available4: query @redact @include(if: $use4) {
+    probeInventory(id: $p4)
+      @check(
+        expr: "this != null && this.version == vars.v4 && vars.q4 >= 1 && vars.q4 <= 99 && this.onHand - this.reserved >= vars.q4"
+        message: "STALE_STATE"
+      ) {
+      id
+      onHand
+      reserved
+      version
+    }
+  }
+  stock4: probeInventory_updateMany(
+    where: { id: { eq: $p4 }, version: { eq: $v4 }, onHand: { ge: $q4 } }
+    data: { reserved_update: { inc: $q4 }, version_update: { inc: 1 } }
+  ) @include(if: $use4) @check(expr: "this == 1", message: "STALE_STATE")
+  item4: probeItem_insert(data: { requestId: $requestId, productId: $p4, quantity: $q4 })
+    @include(if: $use4)
+  available5: query @redact @include(if: $use5) {
+    probeInventory(id: $p5)
+      @check(
+        expr: "this != null && this.version == vars.v5 && vars.q5 >= 1 && vars.q5 <= 99 && this.onHand - this.reserved >= vars.q5"
+        message: "STALE_STATE"
+      ) {
+      id
+      onHand
+      reserved
+      version
+    }
+  }
+  stock5: probeInventory_updateMany(
+    where: { id: { eq: $p5 }, version: { eq: $v5 }, onHand: { ge: $q5 } }
+    data: { reserved_update: { inc: $q5 }, version_update: { inc: 1 } }
+  ) @include(if: $use5) @check(expr: "this == 1", message: "STALE_STATE")
+  item5: probeItem_insert(data: { requestId: $requestId, productId: $p5, quantity: $q5 })
+    @include(if: $use5)
+  probeAudit_insert(data: { id: $requestId, requestId: $requestId })
 }

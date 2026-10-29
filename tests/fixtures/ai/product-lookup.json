@@ -1,0 +1,309 @@
+{
+  "note": "Deterministic lookup fixtures. Product words live here, never in application logic.",
+  "catalogs": {
+    "demo": [
+      {
+        "productId": "matowa",
+        "productName": "Pomada Matowa",
+        "sourceCode": "5905191055165",
+        "type": "pomada",
+        "keywords": [
+          "matowe wykończenie"
+        ]
+      },
+      {
+        "productId": "dry",
+        "productName": "Pomada Dry Matt",
+        "sourceCode": "5905191055172",
+        "type": "pomada",
+        "keywords": [
+          "mocny chwyt"
+        ]
+      },
+      {
+        "productId": "cement",
+        "productName": "Pomada Cement",
+        "sourceCode": "5905191055189",
+        "type": "pomada",
+        "keywords": [
+          "objętość"
+        ]
+      },
+      {
+        "productId": "sol",
+        "productName": "Sól Morska",
+        "sourceCode": "5905191055080",
+        "type": "spray teksturyzujący",
+        "keywords": [
+          "spray"
+        ]
+      },
+      {
+        "productId": "savage",
+        "productName": "Olejek do brody | Savage",
+        "sourceCode": "5905191055974",
+        "type": "olejek do brody",
+        "keywords": [
+          "broda"
+        ]
+      },
+      {
+        "productId": "mattifier",
+        "productName": "Mattifier",
+        "sourceCode": "5905191055479",
+        "type": "prestyler",
+        "keywords": [
+          "krem"
+        ]
+      },
+      {
+        "productId": "extra-1",
+        "productName": "Szampon Codzienny",
+        "sourceCode": "x1",
+        "type": "szampon",
+        "keywords": []
+      },
+      {
+        "productId": "extra-2",
+        "productName": "Odżywka Lekka",
+        "sourceCode": "x2",
+        "type": "odżywka",
+        "keywords": []
+      }
+    ],
+    "empty": []
+  },
+  "aliases": [
+    {
+      "productId": "matowa",
+      "phrase": "matte",
+      "kind": "TYPE",
+      "source": "SEED"
+    },
+    {
+      "productId": "dry",
+      "phrase": "matte",
+      "kind": "TYPE",
+      "source": "SEED"
+    },
+    {
+      "productId": "mattifier",
+      "phrase": "matte",
+      "kind": "TYPE",
+      "source": "SEED"
+    },
+    {
+      "productId": "dry",
+      "phrase": "dry matt",
+      "kind": "NAME",
+      "source": "SEED"
+    },
+    {
+      "productId": "dry",
+      "phrase": "drymatt",
+      "kind": "PHONETIC",
+      "source": "SEED"
+    },
+    {
+      "productId": "sol",
+      "phrase": "sea salt",
+      "kind": "NAME",
+      "source": "SEED"
+    },
+    {
+      "productId": "savage",
+      "phrase": "savage",
+      "kind": "NAME",
+      "source": "SEED"
+    },
+    {
+      "productId": "savage",
+      "phrase": "savage",
+      "kind": "NAME",
+      "source": "GENERATED",
+      "sourceVersionId": "v1"
+    },
+    {
+      "productId": "cement",
+      "phrase": "pasta",
+      "kind": "NAME",
+      "source": "SALON_CONFIRMED",
+      "salonId": "salon-a"
+    },
+    {
+      "productId": "matowa",
+      "phrase": "pasta",
+      "kind": "NAME",
+      "source": "SALON_CONFIRMED",
+      "salonId": "salon-b"
+    },
+    {
+      "productId": "sol",
+      "phrase": "beton",
+      "kind": "NAME",
+      "source": "HQ",
+      "sourceVersionId": "v2",
+      "withdrawn": true
+    },
+    {
+      "productId": "cement",
+      "phrase": "betonik",
+      "kind": "PHONETIC",
+      "source": "HQ"
+    }
+  ],
+  "cases": [
+    {
+      "id": "inflection-plural",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "olejki do brody",
+      "match": "TYPE",
+      "ambiguous": false,
+      "expect": [
+        "savage"
+      ]
+    },
+    {
+      "id": "inflection-genitive",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "soli morskiej",
+      "match": "NAME",
+      "ambiguous": false,
+      "expect": [
+        "sol"
+      ]
+    },
+    {
+      "id": "inflection-adjective",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "matowej",
+      "match": "CONTAINS",
+      "ambiguous": false,
+      "expect": [
+        "matowa"
+      ]
+    },
+    {
+      "id": "phonetic",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "drymatt",
+      "match": "PHONETIC",
+      "ambiguous": false,
+      "expect": [
+        "dry"
+      ]
+    },
+    {
+      "id": "code",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "5905191055974",
+      "match": "NAME",
+      "ambiguous": false,
+      "expect": [
+        "savage"
+      ]
+    },
+    {
+      "id": "generic-type-ambiguous",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "matte",
+      "match": "TYPE",
+      "ambiguous": true,
+      "expect": [
+        "matowa",
+        "dry",
+        "mattifier"
+      ]
+    },
+    {
+      "id": "duplicate-provenance",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "savage",
+      "match": "NAME",
+      "ambiguous": false,
+      "expect": [
+        "savage"
+      ]
+    },
+    {
+      "id": "salon-a-meaning",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "pasty",
+      "match": "SALON",
+      "ambiguous": false,
+      "expect": [
+        "cement"
+      ]
+    },
+    {
+      "id": "salon-b-meaning",
+      "catalog": "demo",
+      "salonId": "salon-b",
+      "query": "pasty",
+      "match": "SALON",
+      "ambiguous": false,
+      "expect": [
+        "matowa"
+      ]
+    },
+    {
+      "id": "learning-isolation",
+      "catalog": "demo",
+      "salonId": "salon-c",
+      "query": "pasta",
+      "match": "NONE",
+      "ambiguous": true,
+      "expect": [],
+      "fallback": 8
+    },
+    {
+      "id": "withdrawn-source",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "beton",
+      "match": "NONE",
+      "ambiguous": true,
+      "expect": [],
+      "fallback": 8
+    },
+    {
+      "id": "unknown-large-catalog",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "lakier",
+      "match": "NONE",
+      "ambiguous": true,
+      "expect": [],
+      "fallback": 8
+    },
+    {
+      "id": "unknown-empty-catalog",
+      "catalog": "empty",
+      "salonId": "salon-a",
+      "query": "lakier",
+      "match": "NONE",
+      "ambiguous": false,
+      "expect": [],
+      "fallback": 0
+    },
+    {
+      "id": "hq-product-alias",
+      "catalog": "demo",
+      "salonId": "salon-a",
+      "query": "betoniki",
+      "match": "PHONETIC",
+      "ambiguous": false,
+      "expect": [
+        "cement"
+      ]
+    }
+  ]
+}
