@@ -4,7 +4,7 @@ import { AiError } from './budget.js';
 import type { ActorContext } from './models/actor-context.js';
 import type { AiAdmissionRepository } from './models/ai-admission-repository.js';
 
-/** Server connector only; named operations are generated from dataconnect/server/ai.gql. */
+/** Server connector only; named operations are generated from dataconnect/server/ai/admission.gql. */
 type SqlOperations = Pick<typeof sql, 'readAiActor' | 'admitAiWindow'>;
 export function createSqlAiRepository(
   dc: DataConnect,

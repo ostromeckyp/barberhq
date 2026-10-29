@@ -430,7 +430,7 @@ it.skipIf(!process.env.BARBERHQ_ISOLATED_POSTGRES_URL)(
     // SQL Connect's local transport serializes operations; use independent native
     // sessions to execute the exact production statement under READ COMMITTED.
     const { readFile } = await import('node:fs/promises');
-    const gql = await readFile('dataconnect/server/knowledge.gql', 'utf8');
+    const gql = await readFile('dataconnect/server/knowledge/revocation.gql', 'utf8');
     const statement = gql
       .slice(gql.indexOf('mutation RevokeKnowledgeVersion'))
       .match(/sql: """([\s\S]*?)"""/)![1];

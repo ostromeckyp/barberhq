@@ -74,10 +74,6 @@ export async function recordReview(
   );
 }
 
-/**
- * Product review from an operator receipt (demo reset): a card links its whole first passage
- * to its product, a catalog acknowledges empty knowledge. Every other passage is acknowledged.
- */
 export async function recordOperatorProductReview(
   p: KnowledgePipeline,
   input: {

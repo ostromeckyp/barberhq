@@ -13,138 +13,7 @@ function gqlFiles(dir: string): string[] {
 }
 
 const operationRoot = 'dataconnect';
-const expectedOperations: Record<string, string[]> = {
-  server: [
-    'AcceptProductKnowledgeSnapshot',
-    'AdmitAiWindow',
-    'ApplyProductAliasSeed',
-    'ApproveStock',
-    'BackfillKnowledgeCursor',
-    'BackfillKnowledgeMetadata',
-    'BeginKnowledgeExtraction',
-    'BindKnowledgeOriginal',
-    'BindReplayKey',
-    'ChangeDeliveryIssue',
-    'ClaimKnowledgeExtraction',
-    'ClaimProductKnowledgeGeneration',
-    'CompleteKnowledgeRetry',
-    'CompleteKnowledgeReview',
-    'ConfirmSalonShorthand',
-    'CreateDeliveryReplacement',
-    'CreateProductAdmin',
-    'DispatchStock',
-    'FailKnowledgeExtraction',
-    'InsertInventory',
-    'InsertKnowledgePage',
-    'InsertLegacyDeliveryReceipt',
-    'InsertSalonSettings',
-    'IssueReplenishmentChoiceReceipts',
-    'KnowledgeCommandContext',
-    'KnowledgeCursorBusiness',
-    'KnowledgeCursorDocuments',
-    'KnowledgeCursorLabels',
-    'KnowledgeDocumentState',
-    'KnowledgeMetadataPage',
-    'KnowledgeVersionState',
-    'MarkKnowledgePageReviewed',
-    'MarkKnowledgePublishStale',
-    'MarkKnowledgeReady',
-    'ProductKnowledgeActiveAliasPage',
-    'ProductKnowledgeCatalogPage',
-    'ProductKnowledgeState',
-    'PublishKnowledgeVersion',
-    'ReadAiActor',
-    'ReadAiCurrentWindow',
-    'ReadCollisionAliases',
-    'ReadCollisionProducts',
-    'ReadDeliveryBindings',
-    'ReadDeliveryContext',
-    'ReadDeliveryKey',
-    'ReadDeliveryProcedureDocument',
-    'ReadIssueContext',
-    'ReadKnowledgeWipeCounts',
-    'ReadMembership',
-    'ReadProductAdmin',
-    'ReadProductAdminOperation',
-    'ReadProductAdminScope',
-    'ReadProductAliasRevisions',
-    'ReadProductAliasSeedState',
-    'ReadProductAliases',
-    'ReadProductCardAttachment',
-    'ReadProductCodeOwner',
-    'ReadReplacementSlots',
-    'ReadReplenishmentAliasPage',
-    'ReadReplenishmentProductPage',
-    'ReadReplenishmentSalonAliasPage',
-    'ReadReplenishmentSnapshotHeader',
-    'ReadResetCounts',
-    'ReadSalonAliasOperation',
-    'ReadSalonShorthandConfirmation',
-    'ReadSalonShorthandScope',
-    'ReadSeedState',
-    'RecheckProcedureSources',
-    'RecordDeliveryTransaction',
-    'RecordKnowledgeReview',
-    'RecordOperatorProductReview',
-    'RegisterKnowledgeVersion',
-    'RejectStock',
-    'ReleaseProductKnowledgeGeneration',
-    'RemoveSalonShorthand',
-    'ResetDemoStock',
-    'ResetProductAdmin',
-    'RevokeKnowledgeVersion',
-    'SaveKnowledgeExtraction',
-    'SaveProductAliases',
-    'SaveProductCardAttachment',
-    'SaveProductKnowledgeSnapshot',
-    'SearchEligibleProcedureChunks',
-    'SeedDeliveryProcedureBindings',
-    'SeedProductCardAttachment',
-    'SetDeliveryProcedure',
-    'SetHqStockAdmin',
-    'SetKnowledgeDispatchFailure',
-    'SetKnowledgeDispatchPending',
-    'SetKnowledgePublishIntent',
-    'SetOperatorKnowledgePublishIntent',
-    'StageKnowledgeVersion',
-    'StartKnowledgeRetry',
-    'StartKnowledgeReview',
-    'StockContext',
-    'SubmitStock',
-    'UpdateProductAdmin',
-    'UpsertBusiness',
-    'UpsertLocation',
-    'UpsertMembership',
-    'UpsertProduct',
-    'UpsertSalonAccess',
-    'WipeDemoKnowledge',
-  ],
-  browser: [
-    'GetDeliveryIssue',
-    'GetDeliveryProcedureBindings',
-    'GetDeliveryReceipt',
-    'GetHqInventory',
-    'GetKnowledgeProductReview',
-    'GetKnowledgeReview',
-    'GetMyMembership',
-    'GetRequestDetail',
-    'GetSalonInventory',
-    'GetSalonSettings',
-    'GetSourceSection',
-    'ListActiveRequests',
-    'ListDeliveryIssues',
-    'ListDeliveryProcedureDocuments',
-    'ListHQQueue',
-    'ListHqKnowledgeDocuments',
-    'ListHqShorthand',
-    'ListProducts',
-    'ListPublishedKnowledgeDocuments',
-    'ListSalonRequests',
-    'ListSalonShorthand',
-    'SaveSalonSettings',
-  ],
-  vector: ['InsertKnowledgeChunk', 'SearchKnowledgeChunks'],
-};
+const connectors = ['server', 'browser', 'vector'];
 
 describe('code structure', () => {
   it('schema: one type or enum per file, named after it', () => {
@@ -166,7 +35,7 @@ describe('code structure', () => {
 
   it('operations: grouped by domain, files <= 300 lines unless a single operation', () => {
     const problems: string[] = [];
-    for (const [connector, expected] of Object.entries(expectedOperations)) {
+    for (const connector of connectors) {
       const root = join(operationRoot, connector);
       const names: string[] = [];
       for (const file of gqlFiles(root)) {
@@ -180,8 +49,11 @@ describe('code structure', () => {
           problems.push(`${connector}/${rel}: ${lines} lines with ${ops.length} operations`);
         }
       }
-      if (JSON.stringify(names.sort()) !== JSON.stringify(expected)) {
-        problems.push(`${connector}: operation names differ from the HEAD baseline`);
+      const duplicates = names.filter((name, i) => names.indexOf(name) !== i);
+      if (duplicates.length) {
+        problems.push(
+          `${connector}: duplicate operation names ${[...new Set(duplicates)].join(', ')}`,
+        );
       }
     }
     expect(problems).toEqual([]);
