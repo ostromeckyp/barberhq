@@ -16,6 +16,7 @@ artifacts/
 playwright-report/
 test-results/
 web/src/app/core/public-config.generated.ts
+web/src/app/core/generated-cloud/
 .dataconnect/
 
 pglite-debug.log*
@@ -24,3 +25,11 @@ web/src/app/core/public-config.*.generated.ts
 .firebase/
 functions/lib/
 functions-debug.log*
+
+.emulator-data/
+.genkit/
+.code-review-graph/
+
+.idea/
+__pycache__/
+firepit-log.txt
