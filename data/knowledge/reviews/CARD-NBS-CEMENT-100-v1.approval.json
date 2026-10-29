@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:CARD-NBS-CEMENT-100:v1",
+    "pdfSha256": "b111ae5ed2263d26ed52de30945bb68c560235e7e69fc13a9dc862be6f787c43",
+    "extractionHash": "167d998053f328d4ff6b985c397ce7792530fa169c92281eb0f9224e27acfc73",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "sprawdzilem karty tylko nie pasowala mi karta zbiorcza - akzde indywidualne jest ok",
+    "approvedAt": "2026-10-29"
+  },
+  "approvalTimeNote": "Owner reviewed the six individual product card PDFs in the conversation and approved each one (one page each); the combined catalog CAT-001 was rejected and removed from the demo baseline."
+}

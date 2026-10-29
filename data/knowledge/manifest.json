@@ -1,0 +1,162 @@
+[
+  {
+    "documentId": "DAM-001",
+    "version": "v1",
+    "title": "Damaged products in a salon delivery",
+    "language": "en",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/DAM-001-v1.pdf",
+    "sha256": "b6f877bd6ed8842e9b5e9fd1c679bf1d05322fae8dcad86a7deb7836b52f1edd",
+    "sourceUrls": [],
+    "observedOn": null,
+    "kind": "procedure",
+    "origin": "synthetic",
+    "deliveryProblemKind": "DAMAGED"
+  },
+  {
+    "documentId": "DIS-001",
+    "version": "v1",
+    "title": "Missing or incorrect products in a delivery",
+    "language": "en",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/DIS-001-v1.pdf",
+    "sha256": "f4151a551d563b38f9c5a091e12351ae12a89ad5372ac606cb58ca2aa6b2cbe1",
+    "sourceUrls": [],
+    "observedOn": null,
+    "kind": "procedure",
+    "origin": "synthetic",
+    "deliveryProblemKind": "MISSING"
+  },
+  {
+    "documentId": "REP-001",
+    "version": "v1",
+    "title": "Requesting and confirming routine replenishment",
+    "language": "en",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/REP-001-v1.pdf",
+    "sha256": "6e77d188584821a51b33d9f3a7e619b98d854e0e56b681f56f0580be516c302b",
+    "sourceUrls": [],
+    "observedOn": null,
+    "kind": "procedure",
+    "origin": "synthetic"
+  },
+  {
+    "documentId": "DAM-001",
+    "version": "v0",
+    "title": "Damaged products in a salon delivery — retired example",
+    "language": "en",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "retired",
+    "inputPdf": "data/knowledge/pdfs/DAM-001-v0.pdf",
+    "sha256": "3223bd53e7468e446b7133c940749022bd3b1c5dd0b47a7342c4fccdc6346deb",
+    "sourceUrls": [],
+    "observedOn": null,
+    "kind": "procedure",
+    "origin": "synthetic"
+  },
+  {
+    "documentId": "CARD-NBS-MATOWA-100",
+    "version": "v1",
+    "title": "Pomada Matowa — karta produktu",
+    "language": "pl",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/product-cards/CARD-NBS-MATOWA-100-v1.pdf",
+    "sha256": "d57adfeea33bc41b3eeb9b9115c95a0ed4b488653bd73df44d54cccbf68b5253",
+    "sourceUrls": [
+      "https://notbadstuff.pl/produkt/pomada-matowa-do-wlosow-100ml"
+    ],
+    "observedOn": "2026-09-22",
+    "kind": "product-card",
+    "origin": "public-compilation",
+    "productDemoId": "NBS-MATOWA-100"
+  },
+  {
+    "documentId": "CARD-NBS-DRYMATT-100",
+    "version": "v1",
+    "title": "Pomada Dry Matt — karta produktu",
+    "language": "pl",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/product-cards/CARD-NBS-DRYMATT-100-v1.pdf",
+    "sha256": "a3d95e596257387d7c54ddd9e3ac60416382b8aa5415a0b2cdd91f80fe79c158",
+    "sourceUrls": [
+      "https://notbadstuff.pl/produkt/pomada-dry-matt-do-wlosow-100ml"
+    ],
+    "observedOn": "2026-09-22",
+    "kind": "product-card",
+    "origin": "public-compilation",
+    "productDemoId": "NBS-DRYMATT-100"
+  },
+  {
+    "documentId": "CARD-NBS-CEMENT-100",
+    "version": "v1",
+    "title": "Pomada Cement — karta produktu",
+    "language": "pl",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/product-cards/CARD-NBS-CEMENT-100-v1.pdf",
+    "sha256": "b111ae5ed2263d26ed52de30945bb68c560235e7e69fc13a9dc862be6f787c43",
+    "sourceUrls": [
+      "https://notbadstuff.pl/produkt/pomada-cement-do-wlosow-100ml"
+    ],
+    "observedOn": "2026-09-22",
+    "kind": "product-card",
+    "origin": "public-compilation",
+    "productDemoId": "NBS-CEMENT-100"
+  },
+  {
+    "documentId": "CARD-NBS-SOL-200",
+    "version": "v1",
+    "title": "Sól Morska — karta produktu",
+    "language": "pl",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/product-cards/CARD-NBS-SOL-200-v1.pdf",
+    "sha256": "8182e5900e982aa946df62ce0a1f0469f597071eff50b57bf170a74c852bd37f",
+    "sourceUrls": [
+      "https://notbadstuff.pl/produkt/sol-morska-do-wlosow-200ml"
+    ],
+    "observedOn": "2026-09-22",
+    "kind": "product-card",
+    "origin": "public-compilation",
+    "productDemoId": "NBS-SOL-200"
+  },
+  {
+    "documentId": "CARD-NBS-SAVAGE-50",
+    "version": "v1",
+    "title": "Olejek do brody | Savage — karta produktu",
+    "language": "pl",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/product-cards/CARD-NBS-SAVAGE-50-v1.pdf",
+    "sha256": "ede04820a80d7c8745601ee76c4c2bc8c4a449662257bc764b839f8ebd405834",
+    "sourceUrls": [
+      "https://notbadstuff.pl/produkt/olejek-do-brody-savage-50ml"
+    ],
+    "observedOn": "2026-09-22",
+    "kind": "product-card",
+    "origin": "public-compilation",
+    "productDemoId": "NBS-SAVAGE-50"
+  },
+  {
+    "documentId": "CARD-NBS-MATTIFIER-100",
+    "version": "v1",
+    "title": "Mattifier — karta produktu",
+    "language": "pl",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/pdfs/product-cards/CARD-NBS-MATTIFIER-100-v1.pdf",
+    "sha256": "04af3b3273723be98a0facb7e3d1992d3c97e977c3c10fa8320b1094554d1a6b",
+    "sourceUrls": [
+      "https://notbadstuff.pl/produkt/notbad-mattifier-100ml"
+    ],
+    "observedOn": "2026-09-22",
+    "kind": "product-card",
+    "origin": "public-compilation",
+    "productDemoId": "NBS-MATTIFIER-100"
+  }
+]

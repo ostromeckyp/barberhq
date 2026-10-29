@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:DAM-001:v0",
+    "pdfSha256": "3223bd53e7468e446b7133c940749022bd3b1c5dd0b47a7342c4fccdc6346deb",
+    "extractionHash": "4ae1356ef79ca93ae40502809214ba37d6c9b31e657572a2be21c4ab2cdf60eb",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "Zatwierdzam wszystkie 6 stron do demo",
+    "approvedAt": "2026-10-15"
+  },
+  "approvalTimeNote": "Owner explicitly approved all six new physical pages in the conversation. Recorded on 2026-10-15; exact original approval time was not captured. Approval of v0/v2 is for retired/replacement test use and does not authorize activation."
+}

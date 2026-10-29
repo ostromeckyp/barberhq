@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:CARD-NBS-DRYMATT-100:v1",
+    "pdfSha256": "a3d95e596257387d7c54ddd9e3ac60416382b8aa5415a0b2cdd91f80fe79c158",
+    "extractionHash": "1fc1daf17a3fd2e093f859cee1646856e17cfd10399d7e15829b40acc5d58866",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "sprawdzilem karty tylko nie pasowala mi karta zbiorcza - akzde indywidualne jest ok",
+    "approvedAt": "2026-10-29"
+  },
+  "approvalTimeNote": "Owner reviewed the six individual product card PDFs in the conversation and approved each one (one page each); the combined catalog CAT-001 was rejected and removed from the demo baseline."
+}

@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:DAM-001:v1",
+    "pdfSha256": "b6f877bd6ed8842e9b5e9fd1c679bf1d05322fae8dcad86a7deb7836b52f1edd",
+    "extractionHash": "5162f3631d6e7a49b64a857fe2a9bc0689484fb5710174638db2d3c3ddf2c9ca",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "Zatwierdzam treść i czytelność strony 1 do demo",
+    "approvedAt": "2026-10-12"
+  },
+  "approvalTimeNote": "The user approved on 2026-10-12; the exact time was not captured."
+}

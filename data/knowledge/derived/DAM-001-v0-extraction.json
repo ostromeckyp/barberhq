@@ -1,0 +1,33 @@
+{
+  "versionId": "not-bad-stuff-demo:DAM-001:v0",
+  "pdfSha256": "3223bd53e7468e446b7133c940749022bd3b1c5dd0b47a7342c4fccdc6346deb",
+  "extractionHash": "4ae1356ef79ca93ae40502809214ba37d6c9b31e657572a2be21c4ab2cdf60eb",
+  "status": "EXTRACTED",
+  "pages": [
+    {
+      "physicalPage": 1,
+      "quality": "COMPLETE",
+      "markdown": "SYNTHETIC RETIRED TEST FIXTURE\n\nDamaged products in a salon delivery — retired example\n\nDAM-001 · Version v0 · SYNTHETIC RETIRED TEST FIXTURE\n\nSYNTHETIC, RETIRED TEST FIXTURE — never return this document as current guidance. Not an actual Not Bad Stuff policy.\n\nreport — Superseded reporting route\n\nThe obsolete fictional workflow asked salon staff to mention the delivery problem verbally at the next weekly stock meeting, without a structured report. Version 1 replaces that reporting route with a documented report to the HQ delivery coordinator. This text exists only to test that document status and version filters exclude retired guidance before retrieval. It must not appear in a normal answer or be indexed as a current policy.\n\nDAM-001 v0 · SYNTHETIC RETIRED TEST FIXTURE Physical page 1",
+      "viewBox": [
+        0,
+        0,
+        595.2756,
+        841.8898
+      ]
+    }
+  ],
+  "chunks": [
+    {
+      "id": "not-bad-stuff-demo:DAM-001:v0:1:1",
+      "physicalPage": 1,
+      "sectionId": "synthetic-retired-test-fixture",
+      "text": "SYNTHETIC RETIRED TEST FIXTURE\n\nDamaged products in a salon delivery — retired example\n\nDAM-001 · Version v0 · SYNTHETIC RETIRED TEST FIXTURE\n\nSYNTHETIC, RETIRED TEST FIXTURE — never return this document as current guidance. Not an actual Not Bad Stuff policy."
+    },
+    {
+      "id": "not-bad-stuff-demo:DAM-001:v0:1:2",
+      "physicalPage": 1,
+      "sectionId": "report-superseded-reporting-route",
+      "text": "report — Superseded reporting route\n\nThe obsolete fictional workflow asked salon staff to mention the delivery problem verbally at the next weekly stock meeting, without a structured report. Version 1 replaces that reporting route with a documented report to the HQ delivery coordinator. This text exists only to test that document status and version filters exclude retired guidance before retrieval. It must not appear in a normal answer or be indexed as a current policy.\n\nDAM-001 v0 · SYNTHETIC RETIRED TEST FIXTURE Physical page 1"
+    }
+  ]
+}

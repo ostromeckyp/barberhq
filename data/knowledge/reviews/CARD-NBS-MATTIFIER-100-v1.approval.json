@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:CARD-NBS-MATTIFIER-100:v1",
+    "pdfSha256": "04af3b3273723be98a0facb7e3d1992d3c97e977c3c10fa8320b1094554d1a6b",
+    "extractionHash": "9d0fdac60ba97c62510f8f66fb693592d0e2db16cc4cd59e3614a23e5f319528",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "sprawdzilem karty tylko nie pasowala mi karta zbiorcza - akzde indywidualne jest ok",
+    "approvedAt": "2026-10-29"
+  },
+  "approvalTimeNote": "Owner reviewed the six individual product card PDFs in the conversation and approved each one (one page each); the combined catalog CAT-001 was rejected and removed from the demo baseline."
+}

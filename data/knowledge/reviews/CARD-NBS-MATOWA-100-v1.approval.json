@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:CARD-NBS-MATOWA-100:v1",
+    "pdfSha256": "d57adfeea33bc41b3eeb9b9115c95a0ed4b488653bd73df44d54cccbf68b5253",
+    "extractionHash": "7e5662d631b9bcae65320315b9be6193fcf9c3e246de661887bb85747c59804b",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "sprawdzilem karty tylko nie pasowala mi karta zbiorcza - akzde indywidualne jest ok",
+    "approvedAt": "2026-10-29"
+  },
+  "approvalTimeNote": "Owner reviewed the six individual product card PDFs in the conversation and approved each one (one page each); the combined catalog CAT-001 was rejected and removed from the demo baseline."
+}

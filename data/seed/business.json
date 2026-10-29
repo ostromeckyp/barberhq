@@ -18,6 +18,38 @@
       "transferPackSize": null,
       "packageDimensionsMm": null,
       "shippingWeightGrams": null,
+      "type": "pomada",
+      "keywords": [
+        "matowe wykończenie",
+        "klasyczna fryzura"
+      ],
+      "aliases": [
+        {
+          "phrase": "matowa",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matowej",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "pomada matowa",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matte",
+          "kind": "TYPE",
+          "lang": "en"
+        },
+        {
+          "phrase": "matte pomade",
+          "kind": "TYPE",
+          "lang": "en"
+        }
+      ],
       "id": "not-bad-stuff-demo:NBS-MATOWA-100",
       "retailPriceGrosz": 6900
     },
@@ -38,6 +70,58 @@
       "transferPackSize": null,
       "packageDimensionsMm": null,
       "shippingWeightGrams": null,
+      "type": "pomada",
+      "keywords": [
+        "mocny chwyt",
+        "tekstura"
+      ],
+      "aliases": [
+        {
+          "phrase": "dry matt",
+          "kind": "NAME",
+          "lang": "en"
+        },
+        {
+          "phrase": "dry matte",
+          "kind": "PHONETIC",
+          "lang": "en"
+        },
+        {
+          "phrase": "drymatt",
+          "kind": "PHONETIC",
+          "lang": "en"
+        },
+        {
+          "phrase": "matte",
+          "kind": "TYPE",
+          "lang": "en"
+        },
+        {
+          "phrase": "matte pomade",
+          "kind": "TYPE",
+          "lang": "en"
+        },
+        {
+          "phrase": "drajmat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "draj mat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "dry mat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "dramat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        }
+      ],
       "id": "not-bad-stuff-demo:NBS-DRYMATT-100",
       "retailPriceGrosz": 6900
     },
@@ -58,6 +142,22 @@
       "transferPackSize": null,
       "packageDimensionsMm": null,
       "shippingWeightGrams": null,
+      "type": "pomada",
+      "keywords": [
+        "objętość"
+      ],
+      "aliases": [
+        {
+          "phrase": "cement",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "cement pomade",
+          "kind": "NAME",
+          "lang": "en"
+        }
+      ],
       "id": "not-bad-stuff-demo:NBS-CEMENT-100",
       "retailPriceGrosz": 6900
     },
@@ -78,6 +178,33 @@
       "transferPackSize": null,
       "packageDimensionsMm": null,
       "shippingWeightGrams": null,
+      "type": "spray teksturyzujący",
+      "keywords": [
+        "spray",
+        "lekki chwyt"
+      ],
+      "aliases": [
+        {
+          "phrase": "sol morska",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "soli morskiej",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sea salt",
+          "kind": "NAME",
+          "lang": "en"
+        },
+        {
+          "phrase": "sea salt spray",
+          "kind": "NAME",
+          "lang": "en"
+        }
+      ],
       "id": "not-bad-stuff-demo:NBS-SOL-200",
       "retailPriceGrosz": 4900
     },
@@ -98,6 +225,43 @@
       "transferPackSize": null,
       "packageDimensionsMm": null,
       "shippingWeightGrams": null,
+      "type": "olejek do brody",
+      "keywords": [
+        "broda",
+        "zarost"
+      ],
+      "aliases": [
+        {
+          "phrase": "savage",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "savage beard oil",
+          "kind": "NAME",
+          "lang": "en"
+        },
+        {
+          "phrase": "olejek savage",
+          "kind": "NAME",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sawedż",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sewidż",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sawidż",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        }
+      ],
       "id": "not-bad-stuff-demo:NBS-SAVAGE-50",
       "retailPriceGrosz": 7800
     },
@@ -118,6 +282,43 @@
       "transferPackSize": null,
       "packageDimensionsMm": null,
       "shippingWeightGrams": null,
+      "type": "prestyler",
+      "keywords": [
+        "krem",
+        "suszenie"
+      ],
+      "aliases": [
+        {
+          "phrase": "mattifier",
+          "kind": "NAME",
+          "lang": "en"
+        },
+        {
+          "phrase": "matte",
+          "kind": "TYPE",
+          "lang": "en"
+        },
+        {
+          "phrase": "matte pomade",
+          "kind": "TYPE",
+          "lang": "en"
+        },
+        {
+          "phrase": "matifajer",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "mattifajer",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matyfajer",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        }
+      ],
       "id": "not-bad-stuff-demo:NBS-MATTIFIER-100",
       "retailPriceGrosz": 7900
     }

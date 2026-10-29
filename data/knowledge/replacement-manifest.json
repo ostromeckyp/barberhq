@@ -1,0 +1,16 @@
+[
+  {
+    "documentId": "DAM-001",
+    "version": "v2",
+    "title": "Damaged products in a salon delivery — replacement test fixture",
+    "language": "en",
+    "businessKey": "not-bad-stuff-demo",
+    "publicationStatus": "demo-current",
+    "inputPdf": "data/knowledge/replacements/DAM-001-v2.pdf",
+    "sha256": "25f6ce1feeb3b43626b1ffe32f067823bb91c7b3bab959d218b6cc9d75289d99",
+    "sourceUrls": [],
+    "observedOn": null,
+    "kind": "procedure",
+    "origin": "synthetic"
+  }
+]

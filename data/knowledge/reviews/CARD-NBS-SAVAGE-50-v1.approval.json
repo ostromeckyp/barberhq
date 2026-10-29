@@ -1,0 +1,18 @@
+{
+  "actor": {
+    "kind": "operator",
+    "id": "owner",
+    "businessId": "not-bad-stuff-demo"
+  },
+  "review": {
+    "versionId": "not-bad-stuff-demo:CARD-NBS-SAVAGE-50:v1",
+    "pdfSha256": "ede04820a80d7c8745601ee76c4c2bc8c4a449662257bc764b839f8ebd405834",
+    "extractionHash": "60b49fe52dd051ef379bbe07ba1149ce16ba60e6a0bee0ed84add37a310d74e7",
+    "reviewedPhysicalPages": [
+      1
+    ],
+    "approvalText": "sprawdzilem karty tylko nie pasowala mi karta zbiorcza - akzde indywidualne jest ok",
+    "approvedAt": "2026-10-29"
+  },
+  "approvalTimeNote": "Owner reviewed the six individual product card PDFs in the conversation and approved each one (one page each); the combined catalog CAT-001 was rejected and removed from the demo baseline."
+}

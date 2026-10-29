@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "damage-cracked",
+      "split": "calibration",
+      "question": "We received a cracked Pomada Matowa jar. What now?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "intake-identify-the-affected-items"
+        },
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "damage-leak",
+      "split": "calibration",
+      "question": "The product leaked inside the delivery box. What should we do?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "intake-identify-the-affected-items"
+        },
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "damage-report-checklist",
+      "split": "calibration",
+      "question": "What should I include when reporting delivery damage?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "replacement-decision",
+      "split": "calibration",
+      "question": "Do I automatically get a replacement for a damaged delivery?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "decision-await-the-hq-disposition"
+        }
+      ]
+    },
+    {
+      "id": "damage-report-route",
+      "split": "calibration",
+      "question": "Where do I report a broken item?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "missing-unit",
+      "split": "calibration",
+      "question": "We ordered two but only one arrived. What do I report?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DIS-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DIS-001",
+          "sectionId": "missing-fewer-items-than-expected"
+        }
+      ]
+    },
+    {
+      "id": "wrong-product",
+      "split": "calibration",
+      "question": "We received Dry Matt instead of Matowa. What do we do?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DIS-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DIS-001",
+          "sectionId": "wrong-product-a-different-product-arrived"
+        }
+      ]
+    },
+    {
+      "id": "replenishment-how",
+      "split": "calibration",
+      "question": "Legnicka needs two more Pomada Matowa. How does routine replenishment work?",
+      "support": "supported",
+      "expectedDocumentCodes": ["REP-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "REP-001",
+          "sectionId": "request-specify-the-product-and-unit-quantity"
+        },
+        {
+          "documentCode": "REP-001",
+          "sectionId": "movement-approval-dispatch-and-receipt"
+        }
+      ]
+    },
+    {
+      "id": "product-fact",
+      "split": "calibration",
+      "question": "What is the net content of Pomada Matowa?",
+      "support": "supported",
+      "expectedDocumentCodes": ["CARD-NBS-MATOWA-100"],
+      "expectedEvidence": [
+        {
+          "documentCode": "CARD-NBS-MATOWA-100",
+          "sectionId": "unofficial-public-product-card",
+          "chunkId": "not-bad-stuff-demo:CARD-NBS-MATOWA-100:v1:1:1"
+        }
+      ]
+    },
+    {
+      "id": "disinfection",
+      "split": "calibration",
+      "question": "What chemical concentration should we use to disinfect equipment?",
+      "support": "unsupported",
+      "expectedDocumentCodes": [],
+      "expectedEvidence": []
+    },
+    {
+      "id": "carrier-deadline",
+      "split": "calibration",
+      "question": "What is the carrier's legal claim deadline?",
+      "support": "unsupported",
+      "expectedDocumentCodes": [],
+      "expectedEvidence": []
+    },
+    {
+      "id": "clean-leak",
+      "split": "calibration",
+      "question": "Which cleaning chemical should I apply to the leaked product?",
+      "support": "unsupported",
+      "expectedDocumentCodes": [],
+      "expectedEvidence": []
+    },
+    {
+      "id": "mixed-damage-disinfection",
+      "split": "calibration",
+      "question": "How do I report a cracked jar and what concentration should I use to disinfect the room?",
+      "support": "mixed",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "mixed-missing-deadline",
+      "split": "calibration",
+      "question": "One item is missing; what is the legal filing deadline?",
+      "support": "mixed",
+      "expectedDocumentCodes": ["DIS-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DIS-001",
+          "sectionId": "missing-fewer-items-than-expected"
+        }
+      ]
+    },
+    {
+      "id": "damage-photo-paraphrase",
+      "split": "heldout",
+      "question": "A container arrived shattered. What evidence do I send to HQ?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "shortage-paraphrase",
+      "split": "heldout",
+      "question": "The parcel has fewer units than our order. Which process applies?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DIS-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DIS-001",
+          "sectionId": "missing-fewer-items-than-expected"
+        }
+      ]
+    },
+    {
+      "id": "product-fact-paraphrase",
+      "split": "heldout",
+      "question": "How many millilitres are in the Dry Matt product?",
+      "support": "supported",
+      "expectedDocumentCodes": ["CARD-NBS-DRYMATT-100"],
+      "expectedEvidence": [
+        {
+          "documentCode": "CARD-NBS-DRYMATT-100",
+          "sectionId": "unofficial-public-product-card",
+          "chunkId": "not-bad-stuff-demo:CARD-NBS-DRYMATT-100:v1:1:1"
+        }
+      ]
+    },
+    {
+      "id": "unsupported-safety-paraphrase",
+      "split": "heldout",
+      "question": "What temperature sterilizes our barber scissors?",
+      "support": "unsupported",
+      "expectedDocumentCodes": [],
+      "expectedEvidence": []
+    },
+    {
+      "id": "pl-damage",
+      "split": "polish-probe",
+      "question": "Dotarła do nas pęknięta Pomada Matowa. Co mamy zrobić?",
+      "support": "supported",
+      "expectedDocumentCodes": ["DAM-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "intake-identify-the-affected-items"
+        },
+        {
+          "documentCode": "DAM-001",
+          "sectionId": "report-prepare-a-damage-report-for-hq"
+        }
+      ]
+    },
+    {
+      "id": "pl-shortage",
+      "split": "polish-probe",
+      "question": "Zamówiliśmy dwie sztuki, ale przyszła jedna.",
+      "support": "supported",
+      "expectedDocumentCodes": ["DIS-001"],
+      "expectedEvidence": [
+        {
+          "documentCode": "DIS-001",
+          "sectionId": "missing-fewer-items-than-expected"
+        }
+      ]
+    }
+  ]
+}

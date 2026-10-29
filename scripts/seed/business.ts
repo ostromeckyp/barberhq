@@ -1,16 +1,12 @@
-import { z } from "zod";
-import {
-  initializeApp,
-  applicationDefault,
-  deleteApp,
-} from "firebase-admin/app";
-import { getDataConnect, type DataConnect } from "firebase-admin/data-connect";
-import * as sdk from "@barberhq/server";
-import type { BusinessSeed } from "../../shared/contracts/business.ts";
-import { validateSeed } from "../prepare-data/catalog.ts";
+import { z } from 'zod';
+import { initializeApp, applicationDefault, deleteApp } from 'firebase-admin/app';
+import { getDataConnect, type DataConnect } from 'firebase-admin/data-connect';
+import * as sdk from '@barberhq/server';
+import type { BusinessSeed } from '../../shared/contracts/business.ts';
+import { validateSeed } from '../prepare-data/catalog.ts';
 export type MembershipSeed = {
   uid: string;
-  role: "HQ" | "SALON";
+  role: 'HQ' | 'SALON';
   salonKeys: string[];
 };
 export type SeedInput = {
@@ -28,9 +24,7 @@ export type SeedReport = {
 type Stock = { locationId: string; productId: string; onHand: number };
 export function planSeed(seed: BusinessSeed, existing: Stock[]) {
   validateSeed(seed);
-  const existingKeys = new Set(
-    existing.map((r) => `${r.locationId}/${r.productId}`),
-  );
+  const existingKeys = new Set(existing.map((r) => `${r.locationId}/${r.productId}`));
   const inventory = seed.inventory.map((r) => ({
     locationId: `${seed.businessKey}:${r.locationKey}`,
     productId: `${seed.businessKey}:${r.productDemoId}`,
@@ -47,14 +41,32 @@ export function planSeed(seed: BusinessSeed, existing: Stock[]) {
 const membershipSchema = z
   .array(
     z.strictObject({
-      uid: z.string().min(1).max(128),
-      role: z.enum(["HQ", "SALON"]),
+      uid: z
+        .string()
+        .min(1)
+        .max(128)
+        .regex(/^[^\s]+$/),
+      role: z.enum(['HQ', 'SALON']),
       salonKeys: z
-        .array(z.enum(["legnicka", "lodzka", "zakladowa"]))
+        .array(z.enum(['legnicka', 'lodzka', 'zakladowa']))
         .refine((a) => new Set(a).size === a.length),
     }),
   )
+  .min(1)
   .refine((a) => new Set(a.map((m) => m.uid)).size === a.length);
+export function validateMemberships(raw: unknown): MembershipSeed[] {
+  const parsed = membershipSchema.safeParse(raw);
+  if (
+    !parsed.success ||
+    parsed.data.some(
+      (m) =>
+        /^(?:replace|your|todo|change|placeholder|example|sample|<)/i.test(m.uid) ||
+        (m.role === 'SALON' ? m.salonKeys.length === 0 : m.salonKeys.length !== 0),
+    )
+  )
+    throw new Error('SEED_MEMBERSHIPS_INVALID');
+  return parsed.data;
+}
 /** Also used by the isolated integration harness with a fresh business key. */
 export async function seedRecords(
   dc: DataConnect,
@@ -64,28 +76,19 @@ export async function seedRecords(
   dryRun: boolean,
 ): Promise<SeedReport> {
   validateSeed(seed);
-  membershipSchema.parse(members);
-  if (members.some((m) => m.role === "SALON" && m.salonKeys.length === 0))
-    throw new Error("Salon membership requires at least one salon");
+  validateMemberships(members);
   for (const m of members) {
-    const existing = (await sdk.readMembership(dc, { uid: m.uid })).data
-      .membership;
+    const existing = (await sdk.readMembership(dc, { uid: m.uid })).data.membership;
     if (existing && existing.businessId !== businessId)
-      throw new Error(
-        "Refusing to move an existing member to another business",
-      );
+      throw new Error('Refusing to move an existing member to another business');
   }
   const current = (await sdk.readSeedState(dc, { businessId })).data;
-  const remap = (id: string) =>
-    id.replace(`${seed.businessKey}:`, `${businessId}:`);
+  const remap = (id: string) => id.replace(`${seed.businessKey}:`, `${businessId}:`);
   const planned = planSeed(
     seed,
     current.inventories.map((r) => ({
       ...r,
-      locationId: r.locationId.replace(
-        `${businessId}:`,
-        `${seed.businessKey}:`,
-      ),
+      locationId: r.locationId.replace(`${businessId}:`, `${seed.businessKey}:`),
       productId: r.productId.replace(`${businessId}:`, `${seed.businessKey}:`),
     })),
   );
@@ -97,43 +100,43 @@ export async function seedRecords(
   const report = {
     created:
       (current.business ? 0 : 1) +
-      seed.locations.filter(
-        (l) => !current.locations.some((x) => x.id === remap(l.id)),
-      ).length +
-      seed.products.filter(
-        (p) => !current.products.some((x) => x.id === remap(p.id)),
-      ).length +
+      seed.locations.filter((l) => !current.locations.some((x) => x.id === remap(l.id))).length +
+      seed.products.filter((p) => !current.products.some((x) => x.id === remap(p.id))).length +
       missing.length,
     updatedMetadata:
-      (current.business ? 1 : 0) +
-      current.locations.length +
-      current.products.length,
+      (current.business ? 1 : 0) + current.locations.length + current.products.length,
     preservedInventory: 24 - missing.length,
   };
   if (dryRun) return report;
   await sdk.upsertBusiness(dc, {
     id: businessId,
-    name: "Not Bad Stuff — demo",
+    name: 'Not Bad Stuff — demo',
   });
   for (const l of seed.locations)
     await sdk.upsertLocation(dc, {
       ...l,
       id: remap(l.id),
       businessId,
-      kind: l.kind === "HQ" ? sdk.LocationKind.HQ : sdk.LocationKind.SALON,
+      kind: l.kind === 'HQ' ? sdk.LocationKind.HQ : sdk.LocationKind.SALON,
     });
   // Insert defaults only. A racing seed may conflict but never overwrites an edit.
-  for (const l of seed.locations.filter((l) => l.kind === "SALON")) {
+  for (const l of seed.locations.filter((l) => l.kind === 'SALON')) {
     const salonId = remap(l.id);
     if (!current.salonSettings.some((s) => s.salonId === salonId))
       await sdk.insertSalonSettings(dc, { salonId });
   }
   for (const p of seed.products) {
+    // HQ edits made in the app win over the seed; only a demo reset restores seed fields.
+    if (current.products.some((x) => x.id === remap(p.id) && x.hqUpdatedAt)) continue;
+    // type/keywords/aliases are applied by the alias seed, not the product upsert.
     const {
       netContent,
       transferPackSize,
       packageDimensionsMm,
       shippingWeightGrams,
+      type,
+      keywords,
+      aliases,
       ...metadata
     } = p;
     await sdk.upsertProduct(dc, {
@@ -149,7 +152,7 @@ export async function seedRecords(
     await sdk.upsertMembership(dc, {
       uid: m.uid,
       businessId,
-      role: m.role === "HQ" ? sdk.MemberRole.HQ : sdk.MemberRole.SALON,
+      role: m.role === 'HQ' ? sdk.MemberRole.HQ : sdk.MemberRole.SALON,
     });
     for (const key of m.salonKeys)
       await sdk.upsertSalonAccess(dc, {
@@ -160,13 +163,8 @@ export async function seedRecords(
   return report;
 }
 export async function seedBusiness(input: SeedInput): Promise<SeedReport> {
-  if (
-    input.projectId !== "notbad-6be95" ||
-    input.businessKey !== input.seed.businessKey
-  )
-    throw new Error(
-      "Seed target does not match the approved demo project/business",
-    );
+  if (input.projectId !== 'notbad-6be95' || input.businessKey !== input.seed.businessKey)
+    throw new Error('Seed target does not match the approved demo project/business');
   const app = initializeApp(
     { projectId: input.projectId, credential: applicationDefault() },
     `seed-${Date.now()}`,
