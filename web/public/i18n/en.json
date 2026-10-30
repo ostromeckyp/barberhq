@@ -892,9 +892,9 @@
       "submit": "Submit request",
       "submitting": "Submitting…",
       "outcome": {
-        "CREATED": "CREATED",
-        "FAILED": "FAILED",
-        "UNKNOWN": "UNKNOWN"
+        "created": "Request submitted.",
+        "unknown": "We could not confirm the request. Check your request list.",
+        "openList": "Open request list"
       },
       "failed": "Request was not submitted ({{ code }}). Review the complete list before retrying.",
       "openExisting": "Open existing request for {{ product }}",

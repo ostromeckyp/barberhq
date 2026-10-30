@@ -106,7 +106,9 @@ test.describe('Feature: editable ordering assistant', () => {
             .violations,
         ).toEqual([]);
         await page.getByRole('button', { name: 'Submit request', exact: true }).click();
-        await expect(page.getByText('CREATED', { exact: true })).toBeVisible({ timeout: 20000 });
+        await expect(page.getByText('Request submitted.', { exact: true })).toBeVisible({
+          timeout: 20000,
+        });
         await page.getByRole('link', { name: 'Open request', exact: true }).click();
         await expect(page).toHaveURL(/\/requests\/[^/]+$/);
         const id = page.url().split('/').at(-1)!;

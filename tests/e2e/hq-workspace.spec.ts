@@ -53,7 +53,7 @@ test('workspace_switch_drives_menu_request_actions_and_hq_receipt_without_impers
   await page.getByRole('button', { name: 'Request Pomada Matowa', exact: true }).click();
   await page.getByRole('button', { name: 'Add to list', exact: true }).click();
   await page.getByRole('button', { name: 'Submit request', exact: true }).click();
-  await expect(page.getByText('CREATED', { exact: true })).toBeVisible({
+  await expect(page.getByText('Request submitted.', { exact: true })).toBeVisible({
     timeout: 20000,
   });
   await page.getByRole('link', { name: 'Open request', exact: true }).click();

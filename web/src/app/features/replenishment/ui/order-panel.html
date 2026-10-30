@@ -243,23 +243,11 @@
     <p class="error" role="alert">{{ error.key | transloco: error.params }}</p>
   }
   <div aria-live="polite">
-    @if (facade.outcome(); as outcome) {
-      <p>{{ outcomeKeys[outcome.status] | transloco }}</p>
-      @if (outcome.status === 'CREATED') {
-        <a [routerLink]="['/salons', facade.salonId(), 'requests', outcome.requestId]">{{
-          'requests.list.open' | transloco
-        }}</a>
-      } @else if (outcome.status === 'FAILED') {
-        <p role="alert">
-          {{ 'replenishment.order.failed' | transloco: { code: outcome.code } }}
-        </p>
-        @for (conflict of outcome.conflicts; track conflict.productId) {
-          <a [routerLink]="['/salons', facade.salonId(), 'requests', conflict.requestId]">{{
-            'replenishment.order.openExisting' | transloco: { product: conflict.productId }
-          }}</a>
-        }
-      }
-    }
+    <app-order-outcome
+      [outcome]="facade.outcome()"
+      [salonId]="facade.salonId()"
+      [products]="facade.inventory.rows()"
+    />
   </div>
   <footer>{{ 'replenishment.order.footer' | transloco }}</footer>
 </section>

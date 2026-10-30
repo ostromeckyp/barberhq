@@ -9,10 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { NgTemplateOutlet } from '@angular/common';
 import { TranslocoPipe } from '@jsverse/transloco';
-import type { DraftLine, SubmissionOutcome } from '../../../../../../shared/contracts/draft/index';
+import type { DraftLine } from '../../../../../../shared/contracts/draft/index';
 import { OrderFacade } from '../feature/order.facade';
 import { ReplenishmentAssistantFacade } from '../feature/replenishment-assistant.facade';
 import { AssistantInput } from './assistant-input';
+import { OrderOutcome } from './order-outcome';
 import { ClarificationInput } from './clarification-input';
 import { clarificationReasonKey } from '../feature/clarification-reason';
 import { runtimeConfig } from '../../../core/public-config';
@@ -31,6 +32,7 @@ import { runtimeConfig } from '../../../core/public-config';
     TranslocoPipe,
     AssistantInput,
     ClarificationInput,
+    OrderOutcome,
   ],
   templateUrl: './order-panel.html',
   styleUrl: './order-panel.scss',
@@ -38,11 +40,6 @@ import { runtimeConfig } from '../../../core/public-config';
 export class OrderPanel {
   readonly facade = inject(OrderFacade);
   readonly assistant = inject(ReplenishmentAssistantFacade);
-  readonly outcomeKeys: Record<SubmissionOutcome['status'], string> = {
-    CREATED: 'replenishment.order.outcome.CREATED',
-    FAILED: 'replenishment.order.outcome.FAILED',
-    UNKNOWN: 'replenishment.order.outcome.UNKNOWN',
-  };
   readonly assistantEnabled = runtimeConfig.publicConfig?.replenishmentAiEnabled ?? false;
   readonly embedded = input(false);
   readonly fields = form(this.facade.manual, (p) => {

@@ -892,9 +892,9 @@
       "submit": "Złóż zamówienie",
       "submitting": "Trwa składanie zamówienia…",
       "outcome": {
-        "CREATED": "UTWORZONO",
-        "FAILED": "NIEPOWODZENIE",
-        "UNKNOWN": "NIEZNANY"
+        "created": "Zamówienie złożone.",
+        "unknown": "Nie wiemy, czy zamówienie zostało złożone. Sprawdź listę zamówień.",
+        "openList": "Otwórz listę zamówień"
       },
       "failed": "Zamówienie nie zostało złożone ({{ code }}). Przejrzyj całą listę przed ponowną próbą.",
       "openExisting": "Otwórz istniejące zamówienie: {{ product }}",

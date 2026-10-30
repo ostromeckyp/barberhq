@@ -109,7 +109,7 @@ test('mobile sheet preserves the draft through dismissal and desktop resize', as
       fullPage: true,
     });
     await sheet.getByRole('button', { name: 'Submit request', exact: true }).click();
-    await expect(sheet.getByText('CREATED', { exact: true })).toBeVisible({
+    await expect(sheet.getByText('Request submitted.', { exact: true })).toBeVisible({
       timeout: 20000,
     });
     await sheet.getByRole('link', { name: 'Open request', exact: true }).click();

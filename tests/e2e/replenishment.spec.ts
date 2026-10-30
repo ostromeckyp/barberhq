@@ -30,7 +30,7 @@ async function add(page: Page, name: string, quantity = 2) {
 }
 async function submit(page: Page) {
   await page.getByRole('button', { name: 'Submit request', exact: true }).click();
-  await expect(page.getByText('CREATED', { exact: true })).toBeVisible({
+  await expect(page.getByText('Request submitted.', { exact: true })).toBeVisible({
     timeout: 20000,
   });
   await page.getByRole('link', { name: 'Open request', exact: true }).click();
@@ -161,12 +161,14 @@ test('one_three_item_request_survives_committed_lost_response', async ({ page })
     } else await route.continue();
   });
   await page.getByRole('button', { name: 'Submit request', exact: true }).click();
-  await expect(page.getByText('UNKNOWN', { exact: true })).toBeVisible({
+  await expect(
+    page.getByText('We could not confirm the request. Check your request list.', { exact: true }),
+  ).toBeVisible({
     timeout: 20000,
   });
   await page.reload();
   await page.getByRole('button', { name: 'Reconcile saved request', exact: true }).click();
-  await expect(page.getByText('CREATED', { exact: true })).toBeVisible({
+  await expect(page.getByText('Request submitted.', { exact: true })).toBeVisible({
     timeout: 20000,
   });
   expect(keys).toHaveLength(2);
