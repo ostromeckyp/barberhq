@@ -1,0 +1,105 @@
+{
+  "common": {
+    "brand": {
+      "name": "BarberHQ",
+      "demo": "DEMO",
+      "company": "NOT BAD STUFF"
+    },
+    "language": {
+      "label": "Language"
+    },
+    "actions": {
+      "signOut": "Sign out"
+    },
+    "lowStock": "Low stock",
+    "pdfDropzone": {
+      "prompt": "Drag a PDF here or browse",
+      "browse": "Browse",
+      "label": "Browse for a PDF",
+      "selected": "Selected: {{ name }}"
+    }
+  },
+  "shell": {
+    "skipToContent": "Skip to content",
+    "openNavigation": "Open navigation",
+    "accountMenu": "Account menu",
+    "workspace": {
+      "label": "Workspace",
+      "hq": "HQ",
+      "salon": "Salon — {{ name }}",
+      "select": "Select workspace"
+    },
+    "nav": {
+      "label": "Workspace navigation",
+      "heading": "WORKSPACE",
+      "main": "Main navigation",
+      "salonRequests": "Salon requests",
+      "hqStock": "HQ stock",
+      "salonShorthand": "Salon shorthand",
+      "inventory": "Inventory",
+      "requests": "Requests",
+      "settings": "Settings",
+      "procedures": "Procedures",
+      "procedureDocs": "Procedure docs",
+      "documents": "Documents"
+    },
+    "footer": {
+      "demo": "Demo workspace"
+    },
+    "actingFor": "Acting on behalf of salon {{ name }}",
+    "actingForUnnamed": "Acting on behalf of a salon",
+    "errors": {
+      "signOut": "Could not sign out. Please retry."
+    }
+  },
+  "auth": {
+    "errors": {
+      "signOut": "Could not finish signing out. Please retry."
+    }
+  },
+  "login": {
+    "signingIn": "Signing in",
+    "eyebrow": "[ NOT BAD STUFF · INTERNAL ]",
+    "title": "Sign in with your work account.",
+    "email": {
+      "label": "Email address",
+      "invalid": "Enter a valid email address."
+    },
+    "password": {
+      "label": "Password",
+      "required": "Password is required.",
+      "show": "Show password",
+      "hide": "Hide password"
+    },
+    "submit": {
+      "idle": "Sign in",
+      "signingIn": "Signing in…",
+      "checkingAccess": "Checking access…"
+    },
+    "help": {
+      "demo": "Demo environment · synthetic inventory.",
+      "access": "Access is managed by your HQ team."
+    },
+    "errors": {
+      "signIn": "Could not sign in. Check your email and password, then try again."
+    }
+  },
+  "access": {
+    "title": {
+      "hq": "HQ workspace",
+      "notFound": "Page not found",
+      "error": "Could not verify access",
+      "noAccess": "No workspace access"
+    },
+    "message": {
+      "hq": "Salon inventory is ready. The replenishment queue will become available in the next increment.",
+      "notFound": "This address does not point to a page in your workspace.",
+      "noAccess": "Your HQ team manages salon permissions. If you were just assigned access, try again."
+    },
+    "actions": {
+      "retry": "Retry access",
+      "viewSalonStock": "View salon stock",
+      "goToWorkspace": "Go to workspace"
+    }
+  }
+}

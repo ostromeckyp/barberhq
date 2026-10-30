@@ -1,10 +1,11 @@
 import { Component, input, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Drag-and-drop or browse picker for one PDF; the owner validates and uploads the file. */
 @Component({
   selector: 'app-pdf-dropzone',
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, TranslocoPipe],
   template: `
     <div
       class="pdf-dropzone"
@@ -15,22 +16,24 @@ import { MatButtonModule } from '@angular/material/button';
       (dragleave)="onDragLeave($event)"
       (drop)="onDrop($event)"
     >
-      <p>{{ prompt() }}</p>
+      <p>{{ prompt() || ('common.pdfDropzone.prompt' | transloco) }}</p>
       <button mat-stroked-button type="button" [disabled]="disabled()" (click)="fileInput.click()">
-        Browse
+        {{ 'common.pdfDropzone.browse' | transloco }}
       </button>
       <input
         #fileInput
         class="visually-hidden"
         type="file"
         accept="application/pdf,.pdf"
-        [attr.aria-label]="label()"
+        [attr.aria-label]="label() || ('common.pdfDropzone.label' | transloco)"
         tabindex="-1"
         [disabled]="disabled()"
         (change)="onFileInputChange($event)"
       />
       @if (fileName()) {
-        <p class="selected-file" aria-live="polite">Selected: {{ fileName() }}</p>
+        <p class="selected-file" aria-live="polite">
+          {{ 'common.pdfDropzone.selected' | transloco: { name: fileName() } }}
+        </p>
       }
     </div>
   `,
@@ -67,8 +70,9 @@ import { MatButtonModule } from '@angular/material/button';
   `,
 })
 export class PdfDropzone {
-  readonly prompt = input('Drag a PDF here or browse');
-  readonly label = input('Browse for a PDF');
+  /** Already translated text; empty shows the default prompt and label. */
+  readonly prompt = input('');
+  readonly label = input('');
   readonly fileName = input('');
   readonly disabled = input(false);
   readonly filesSelected = output<FileList>();

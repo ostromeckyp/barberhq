@@ -1,8 +1,11 @@
 import { Component, input } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-brand',
+  imports: [TranslocoPipe],
   host: { '[class.large]': 'large()', '[class.inverse]': 'inverse()' },
-  template: `<strong>BarberHQ</strong><span>DEMO</span>`,
+  template: `<strong>{{ 'common.brand.name' | transloco }}</strong
+    ><span>{{ 'common.brand.demo' | transloco }}</span>`,
   styles: `
     :host {
       display: inline-flex;

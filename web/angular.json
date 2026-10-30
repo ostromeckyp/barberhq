@@ -98,7 +98,8 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "isolate": true
+            "isolate": true,
+            "providersFile": "src/testing/i18n.providers.ts"
           }
         }
       }

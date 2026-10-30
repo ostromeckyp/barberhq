@@ -82,3 +82,9 @@ mat-form-field {
     padding: 24px 20px !important;
   }
 }
+.login-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}

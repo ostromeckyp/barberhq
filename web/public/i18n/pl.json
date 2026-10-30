@@ -1,0 +1,105 @@
+{
+  "common": {
+    "brand": {
+      "name": "BarberHQ",
+      "demo": "DEMO",
+      "company": "NOT BAD STUFF"
+    },
+    "language": {
+      "label": "Język"
+    },
+    "actions": {
+      "signOut": "Wyloguj się"
+    },
+    "lowStock": "Niski stan",
+    "pdfDropzone": {
+      "prompt": "Przeciągnij tutaj plik PDF lub wybierz go z dysku",
+      "browse": "Wybierz plik",
+      "label": "Wybierz plik PDF",
+      "selected": "Wybrano: {{ name }}"
+    }
+  },
+  "shell": {
+    "skipToContent": "Przejdź do treści",
+    "openNavigation": "Otwórz nawigację",
+    "accountMenu": "Menu konta",
+    "workspace": {
+      "label": "Obszar roboczy",
+      "hq": "Centrala",
+      "salon": "Salon — {{ name }}",
+      "select": "Wybierz obszar roboczy"
+    },
+    "nav": {
+      "label": "Nawigacja obszaru roboczego",
+      "heading": "OBSZAR ROBOCZY",
+      "main": "Nawigacja główna",
+      "salonRequests": "Zamówienia salonów",
+      "hqStock": "Stan magazynowy centrali",
+      "salonShorthand": "Skróty salonów",
+      "inventory": "Stan magazynowy",
+      "requests": "Zamówienia",
+      "settings": "Ustawienia",
+      "procedures": "Procedury",
+      "procedureDocs": "Dokumenty procedur",
+      "documents": "Dokumenty"
+    },
+    "footer": {
+      "demo": "Obszar demonstracyjny"
+    },
+    "actingFor": "Działasz w imieniu salonu {{ name }}",
+    "actingForUnnamed": "Działasz w imieniu salonu",
+    "errors": {
+      "signOut": "Nie udało się wylogować. Spróbuj ponownie."
+    }
+  },
+  "auth": {
+    "errors": {
+      "signOut": "Nie udało się dokończyć wylogowania. Spróbuj ponownie."
+    }
+  },
+  "login": {
+    "signingIn": "Logowanie",
+    "eyebrow": "[ NOT BAD STUFF · WEWNĘTRZNE ]",
+    "title": "Zaloguj się kontem służbowym.",
+    "email": {
+      "label": "Adres e-mail",
+      "invalid": "Wpisz poprawny adres e-mail."
+    },
+    "password": {
+      "label": "Hasło",
+      "required": "Hasło jest wymagane.",
+      "show": "Pokaż hasło",
+      "hide": "Ukryj hasło"
+    },
+    "submit": {
+      "idle": "Zaloguj się",
+      "signingIn": "Logowanie…",
+      "checkingAccess": "Sprawdzanie dostępu…"
+    },
+    "help": {
+      "demo": "Środowisko demonstracyjne · przykładowe dane magazynowe.",
+      "access": "Dostępem zarządza zespół centrali."
+    },
+    "errors": {
+      "signIn": "Nie udało się zalogować. Sprawdź e-mail i hasło, a potem spróbuj ponownie."
+    }
+  },
+  "access": {
+    "title": {
+      "hq": "Obszar roboczy centrali",
+      "notFound": "Nie znaleziono strony",
+      "error": "Nie udało się sprawdzić dostępu",
+      "noAccess": "Brak dostępu do obszaru roboczego"
+    },
+    "message": {
+      "hq": "Stan magazynowy salonów jest gotowy. Kolejka uzupełnień będzie dostępna w kolejnej wersji.",
+      "notFound": "Ten adres nie prowadzi do żadnej strony w Twoim obszarze roboczym.",
+      "noAccess": "Uprawnieniami salonów zarządza zespół centrali. Jeśli dostęp został właśnie przyznany, spróbuj ponownie."
+    },
+    "actions": {
+      "retry": "Sprawdź dostęp ponownie",
+      "viewSalonStock": "Zobacz stan magazynowy salonu",
+      "goToWorkspace": "Przejdź do obszaru roboczego"
+    }
+  }
+}

@@ -10,19 +10,19 @@ export class AccessFacade {
   readonly kind = this.route.snapshot.data['kind'] as string;
   title() {
     return this.kind === 'hq'
-      ? 'HQ workspace'
+      ? 'access.title.hq'
       : this.kind === 'not-found'
-        ? 'Page not found'
+        ? 'access.title.notFound'
         : this.session.state().status === 'ERROR'
-          ? 'Could not verify access'
-          : 'No workspace access';
+          ? 'access.title.error'
+          : 'access.title.noAccess';
   }
   message() {
     return this.kind === 'hq'
-      ? 'Salon inventory is ready. The replenishment queue will become available in the next increment.'
+      ? 'access.message.hq'
       : this.kind === 'not-found'
-        ? 'This address does not point to a page in your workspace.'
-        : 'Your HQ team manages salon permissions. If you were just assigned access, try again.';
+        ? 'access.message.notFound'
+        : 'access.message.noAccess';
   }
   async retry() {
     await this.session.retry();

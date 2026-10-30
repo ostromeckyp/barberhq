@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-low-stock-chip',
-  imports: [MatChipsModule, MatIconModule],
-  template: `<mat-chip><mat-icon matChipAvatar>warning</mat-icon>Low stock</mat-chip>`,
+  imports: [MatChipsModule, MatIconModule, TranslocoPipe],
+  template: `<mat-chip
+    ><mat-icon matChipAvatar>warning</mat-icon>{{ 'common.lowStock' | transloco }}</mat-chip
+  >`,
   styles: `
     @use '@angular/material' as mat;
     :host {

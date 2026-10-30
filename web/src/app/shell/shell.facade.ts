@@ -2,6 +2,7 @@ import { Service, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SalonContext } from '../core/salon-context';
 import { SessionFacade } from '../features/auth/feature/session.facade';
+import type { TranslatedText } from '../core/models/translated-text';
 
 @Service({ autoProvided: false })
 export class ShellFacade {
@@ -23,14 +24,16 @@ export class ShellFacade {
   readonly selectedSalonId = this.salonContext.salonId;
   readonly navSalonId = this.selectedSalonId;
   readonly selectedWorkspace = this.salonContext.selectedWorkspace;
-  readonly workspaceLabel = computed(() => {
-    if (this.isHqWorkspace()) return 'HQ';
+  readonly workspaceLabel = computed<TranslatedText>(() => {
+    if (this.isHqWorkspace()) return { key: 'shell.workspace.hq' };
     const salonId = this.selectedSalonId();
     const name = this.salons().find((salon) => salon.id === salonId)?.name;
-    return name ? `Salon — ${name}` : 'Select workspace';
+    return name
+      ? { key: 'shell.workspace.salon', params: { name } }
+      : { key: 'shell.workspace.select' };
   });
   readonly actingSalonName = computed(
-    () => this.salons().find((salon) => salon.id === this.selectedSalonId())?.name ?? 'salon',
+    () => this.salons().find((salon) => salon.id === this.selectedSalonId())?.name ?? '',
   );
   readonly signOutError = this.failure.asReadonly();
   constructor() {
@@ -46,7 +49,7 @@ export class ShellFacade {
     try {
       await this.session.signOut();
     } catch {
-      this.failure.set('Could not sign out. Please retry.');
+      this.failure.set('shell.errors.signOut');
     }
   }
 

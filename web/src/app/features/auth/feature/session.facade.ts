@@ -67,7 +67,7 @@ export class SessionFacade {
       await this.gateway.signOut();
     } catch {
       this.current.set({ status: 'ERROR' });
-      throw new Error('Could not finish signing out. Please retry.');
+      throw new Error('auth.errors.signOut');
     }
   }
   retry() {

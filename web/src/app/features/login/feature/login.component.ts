@@ -8,12 +8,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoginFacade } from './login.facade';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Brand } from '../../../shared/ui/brand/brand';
+import { LanguageSelect } from '../../../shared/ui/language-select/language-select';
 @Component({
   selector: 'app-login',
   providers: [LoginFacade],
   imports: [
     Brand,
+    LanguageSelect,
+    TranslocoPipe,
     DelayedLoadingDirective,
     FormField,
     MatCardModule,

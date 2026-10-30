@@ -4,23 +4,23 @@
       <mat-progress-bar
         *appDelayedLoading="facade.busy()"
         mode="indeterminate"
-        aria-label="Signing in"
+        [attr.aria-label]="'login.signingIn' | transloco"
       />
     </div>
     <mat-card-content
-      ><app-brand [large]="true" />
-      <p class="eyebrow">[ NOT BAD STUFF · INTERNAL ]</p>
-      <h1>Sign in with your work account.</h1>
+      ><div class="login-heading"><app-brand [large]="true" /><app-language-select /></div>
+      <p class="eyebrow">{{ 'login.eyebrow' | transloco }}</p>
+      <h1>{{ 'login.title' | transloco }}</h1>
       <form (submit)="signIn($event)">
         <mat-form-field
           appearance="outline"
           floatLabel="always"
           hideRequiredMarker
           subscriptSizing="fixed"
-          ><mat-label>Email address</mat-label
+          ><mat-label>{{ 'login.email.label' | transloco }}</mat-label
           ><input matInput type="email" autocomplete="username" [formField]="fields.email" />
           @if (fields.email().invalid() && fields.email().touched()) {
-            <mat-error>Enter a valid email address.</mat-error>
+            <mat-error>{{ 'login.email.invalid' | transloco }}</mat-error>
           }
         </mat-form-field>
         <mat-form-field
@@ -28,7 +28,7 @@
           floatLabel="always"
           hideRequiredMarker
           subscriptSizing="fixed"
-          ><mat-label>Password</mat-label
+          ><mat-label>{{ 'login.password.label' | transloco }}</mat-label
           ><input
             matInput
             [type]="showPassword() ? 'text' : 'password'"
@@ -39,17 +39,24 @@
             matSuffix
             type="button"
             (click)="showPassword.set(!showPassword())"
-            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            [attr.aria-label]="
+              (showPassword() ? 'login.password.hide' : 'login.password.show') | transloco
+            "
           >
             <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if (fields.password().invalid() && fields.password().touched()) {
-            <mat-error>Password is required.</mat-error>
+            <mat-error>{{ 'login.password.required' | transloco }}</mat-error>
           }
         </mat-form-field>
         <button mat-flat-button type="submit" [disabled]="facade.busy()">
           {{
-            facade.checkingAccess() ? 'Checking access…' : facade.busy() ? 'Signing in…' : 'Sign in'
+            (facade.checkingAccess()
+              ? 'login.submit.checkingAccess'
+              : facade.busy()
+                ? 'login.submit.signingIn'
+                : 'login.submit.idle'
+            ) | transloco
           }}
         </button>
       </form>
@@ -59,7 +66,7 @@
           [class.feedback-placeholder]="!!facade.error()"
           [attr.aria-hidden]="facade.error() ? 'true' : null"
         >
-          Demo environment · synthetic inventory.<br />Access is managed by your HQ team.
+          {{ 'login.help.demo' | transloco }}<br />{{ 'login.help.access' | transloco }}
         </p>
         <div class="login-feedback">
           <p
@@ -69,7 +76,7 @@
             [attr.aria-hidden]="facade.error() ? null : 'true'"
           >
             <mat-icon aria-hidden="true">error</mat-icon
-            >{{ facade.error() || facade.signInErrorMessage }}
+            >{{ facade.error() || facade.signInErrorMessage | transloco }}
           </p>
         </div>
       </footer></mat-card-content
