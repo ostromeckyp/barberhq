@@ -215,12 +215,16 @@ test.describe('Feature: honest failure and recovery states', () => {
         );
         await page.goto(`/procedures/sources/${encodeURIComponent(source.versionId)}`);
         await expect(page.getByRole('alert')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Back to Procedures', exact: true })).toBeEnabled();
+        await expect(
+          page.getByRole('button', { name: 'Back to Procedures', exact: true }),
+        ).toBeEnabled();
         await expect(page.getByTestId('pdf-page-canvas')).toHaveCount(0);
         await capture(page, 'pdf-fetch-error-320');
         mode = 'corrupt';
+        const corruptRead = page.waitForResponse('**/getSourcePdf?*');
         await page.getByRole('button', { name: 'Retry', exact: true }).click();
-        await expect(page.getByRole('alert')).toContainText('Invalid PDF');
+        await corruptRead;
+        await expect(page.getByRole('alert')).toContainText('Source could not be opened');
         await capture(page, 'pdf-corrupt-error-320');
         mode = 'valid';
         await page.getByRole('button', { name: 'Retry', exact: true }).click();
