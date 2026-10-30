@@ -1,34 +1,31 @@
 <app-page-header
-  eyebrow="SALON WORKSPACE"
-  title="Settings"
-  description="Configure how this salon tracks its inventory."
+  [eyebrow]="'salon.settings.eyebrow' | transloco"
+  [title]="'salon.settings.title' | transloco"
+  [description]="'salon.settings.description' | transloco"
 />
 <section aria-labelledby="inventory-settings">
-  <h2 id="inventory-settings">Inventory</h2>
-  <p>
-    Show a low-stock warning when the quantity is at or below this threshold. This is a warning
-    threshold, not an order quantity. Zero warns only when stock is empty.
-  </p>
+  <h2 id="inventory-settings">{{ 'salon.settings.inventory' | transloco }}</h2>
+  <p>{{ 'salon.settings.intro' | transloco }}</p>
   <mat-progress-bar
     *appDelayedLoading="facade.loading() || facade.saving()"
     mode="indeterminate"
-    aria-label="Loading or saving settings"
+    [attr.aria-label]="'salon.settings.busy' | transloco"
   />
-  @if (facade.error()) {
+  @if (facade.error(); as error) {
     <p role="alert">
-      {{ facade.error() }}
+      {{ error.key | transloco: error.params }}
       <button mat-button (click)="facade.reload()" [disabled]="facade.saving()">
-        Reload settings
+        {{ 'salon.settings.reload' | transloco }}
       </button>
     </p>
   }
   @if (facade.saved()) {
-    <p role="status">Settings saved.</p>
+    <p role="status">{{ 'salon.settings.saved' | transloco }}</p>
   }
   @if (facade.version() !== undefined) {
     <form (submit)="$event.preventDefault(); facade.save()">
       <mat-form-field appearance="outline"
-        ><mat-label>Low-stock threshold</mat-label
+        ><mat-label>{{ 'salon.settings.threshold' | transloco }}</mat-label
         ><input
           matInput
           type="number"
@@ -37,20 +34,17 @@
           [formField]="facade.fields.lowStockThreshold"
         />
         @for (error of facade.fields.lowStockThreshold().errors(); track error.kind) {
-          <mat-error>{{ error.message }}</mat-error>
+          <mat-error>{{ error.message! | transloco }}</mat-error>
         }
       </mat-form-field>
       <button mat-flat-button type="submit" [disabled]="!facade.canSave()">
-        {{ facade.saving() ? 'Saving…' : 'Save' }}
+        {{ (facade.saving() ? 'salon.settings.saving' : 'common.actions.save') | transloco }}
       </button>
     </form>
   }
 </section>
 <section aria-labelledby="salon-shorthand">
-  <h2 id="salon-shorthand">Salon shorthand</h2>
-  <p>
-    Phrases your team taught the ordering assistant by choosing a product. They apply only to this
-    salon. Remove one to make the assistant ask again.
-  </p>
+  <h2 id="salon-shorthand">{{ 'salon.shorthand.title' | transloco }}</h2>
+  <p>{{ 'salon.shorthand.description' | transloco }}</p>
   <app-salon-shorthand />
 </section>

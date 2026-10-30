@@ -1,46 +1,49 @@
 <app-page-header
-  eyebrow="HQ WORKSPACE"
-  title="HQ stock"
-  description="Available quantities exclude stock reserved for salon deliveries."
+  [eyebrow]="'hq.eyebrow' | transloco"
+  [title]="'hq.stock.title' | transloco"
+  [description]="'hq.stock.description' | transloco"
 >
-  <a mat-flat-button routerLink="/hq/stock/products/new">Add product</a>
+  <a mat-flat-button routerLink="/hq/stock/products/new">{{ 'hq.products.add' | transloco }}</a>
   <button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-    Refresh
+    {{ 'common.actions.refresh' | transloco }}
   </button>
 </app-page-header>
 <mat-progress-bar
   *appDelayedLoading="facade.loading()"
   mode="indeterminate"
-  aria-label="Loading HQ stock"
+  [attr.aria-label]="'hq.stock.loading' | transloco"
 />
 @if (facade.error()) {
   <p role="alert">
-    HQ stock unavailable. <button mat-button (click)="facade.refresh()">Retry</button>
+    {{ 'hq.stock.unavailable' | transloco }}
+    <button mat-button (click)="facade.refresh()">{{ 'common.actions.retry' | transloco }}</button>
   </p>
 } @else if (!facade.loading() && !facade.rows().length) {
-  <p>No HQ stock records yet. Missing stock is not zero stock.</p>
+  <p>{{ 'hq.stock.empty' | transloco }}</p>
 }
 @if (facade.rows().length) {
   <section class="card">
     @if (responsiveLayout.compact()) {
-      <ul class="compact-list" aria-label="HQ stock">
+      <ul class="compact-list" [attr.aria-label]="'hq.stock.list' | transloco">
         @for (row of facade.rows(); track row.productId) {
           <li class="compact-record" [attr.data-testid]="'hq-stock-' + row.demoId">
             <h2 class="compact-title">
               <a [routerLink]="['/hq/stock/products', row.productId]">{{ row.name }}</a>
             </h2>
-            <div class="compact-meta">{{ row.netContentMl }} ml</div>
+            <div class="compact-meta">
+              {{ 'hq.stock.netContent' | transloco: { ml: row.netContentMl } }}
+            </div>
             <dl class="compact-metrics">
               <div>
-                <dt>On hand</dt>
+                <dt>{{ 'hq.stock.columns.onHand' | transloco }}</dt>
                 <dd>{{ row.onHand }}</dd>
               </div>
               <div>
-                <dt>Reserved</dt>
+                <dt>{{ 'hq.stock.columns.reserved' | transloco }}</dt>
                 <dd>{{ row.reserved }}</dd>
               </div>
               <div>
-                <dt>Available</dt>
+                <dt>{{ 'hq.stock.columns.available' | transloco }}</dt>
                 <dd>{{ row.available }}</dd>
               </div>
             </dl>
@@ -48,26 +51,37 @@
         }
       </ul>
     } @else {
-      <div class="table-scroll" role="region" aria-label="HQ stock table" tabindex="0">
-        <table mat-table [dataSource]="facade.rows()" aria-label="HQ stock">
+      <div
+        class="table-scroll"
+        role="region"
+        [attr.aria-label]="'hq.stock.table' | transloco"
+        tabindex="0"
+      >
+        <table
+          mat-table
+          [dataSource]="facade.rows()"
+          [attr.aria-label]="'hq.stock.list' | transloco"
+        >
           <ng-container matColumnDef="product">
-            <th mat-header-cell *matHeaderCellDef>Product</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'hq.stock.columns.product' | transloco }}</th>
             <td mat-cell *matCellDef="let row">
               <a [routerLink]="['/hq/stock/products', row.productId]"
                 ><strong>{{ row.name }}</strong></a
-              ><small>{{ row.netContentMl }} ml</small>
+              ><small>{{ 'hq.stock.netContent' | transloco: { ml: row.netContentMl } }}</small>
             </td>
           </ng-container>
           <ng-container matColumnDef="onHand">
-            <th mat-header-cell *matHeaderCellDef>On hand</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'hq.stock.columns.onHand' | transloco }}</th>
             <td mat-cell *matCellDef="let row" class="quantity">{{ row.onHand }}</td>
           </ng-container>
           <ng-container matColumnDef="reserved">
-            <th mat-header-cell *matHeaderCellDef>Reserved</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'hq.stock.columns.reserved' | transloco }}</th>
             <td mat-cell *matCellDef="let row" class="quantity">{{ row.reserved }}</td>
           </ng-container>
           <ng-container matColumnDef="available">
-            <th mat-header-cell *matHeaderCellDef>Available</th>
+            <th mat-header-cell *matHeaderCellDef>
+              {{ 'hq.stock.columns.available' | transloco }}
+            </th>
             <td mat-cell *matCellDef="let row" class="quantity">{{ row.available }}</td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="columns"></tr>
@@ -79,6 +93,6 @@
         </table>
       </div>
     }
-    <p>Synthetic demo quantities · Units in pieces</p>
+    <p>{{ 'hq.stock.footer' | transloco }}</p>
   </section>
 }

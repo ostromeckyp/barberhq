@@ -5,6 +5,7 @@ import { form, validate, disabled } from '@angular/forms/signals';
 import { SalonSettingsApi, SettingsSaveError } from '../data-access/salon-settings-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import type { SalonSettings } from '../../../../../../shared/contracts/settings/index';
 interface SettingsScope {
   salonId: string;
@@ -19,10 +20,18 @@ interface SettingsSnapshot {
 }
 interface SaveState {
   phase: 'IDLE' | 'SAVING' | 'SAVED' | 'STALE' | 'UNKNOWN' | 'ERROR';
-  message: string;
+  message: TranslatedText | null;
   readEpoch: number;
   value?: number;
 }
+const saveErrorKey = (code: SettingsSaveError['code']): string =>
+  code === 'STALE_STATE'
+    ? 'salon.settings.errors.stale'
+    : code === 'UNKNOWN'
+      ? 'salon.settings.errors.unknown'
+      : code === 'FORBIDDEN'
+        ? 'salon.settings.errors.forbidden'
+        : 'salon.settings.errors.rejected';
 @Service({ autoProvided: false })
 export class SalonSettingsFacade {
   private readonly api = inject(SalonSettingsApi);
@@ -72,7 +81,7 @@ export class SalonSettingsFacade {
   });
   private readonly status = linkedSignal({
     source: this.scope,
-    computation: (): SaveState => ({ phase: 'IDLE', message: '', readEpoch: 0 }),
+    computation: (): SaveState => ({ phase: 'IDLE', message: null, readEpoch: 0 }),
   });
   private readonly draftVersion = linkedSignal({
     source: () => ({
@@ -134,16 +143,19 @@ export class SalonSettingsFacade {
   readonly saving = computed(() => this.status().phase === 'SAVING');
   readonly saved = computed(() => this.status().phase === 'SAVED');
   readonly stale = computed(() => this.status().phase === 'STALE' || this.draftNeedsReview());
-  readonly error = computed(() => {
+  readonly error = computed((): TranslatedText | null => {
     if (this.draftNeedsReview())
-      return `Settings changed elsewhere. Current server threshold: ${this.snapshot()?.settings.lowStockThreshold}. Reload and review before saving.`;
+      return {
+        key: 'salon.settings.errors.changed',
+        params: { value: this.snapshot()?.settings.lowStockThreshold },
+      };
     return (
-      this.status().message ||
+      this.status().message ??
       (this.record.error()
-        ? 'Settings unavailable. Retry or contact HQ.'
+        ? { key: 'salon.settings.errors.unavailable' }
         : !this.scope()
-          ? 'Access denied.'
-          : '')
+          ? { key: 'salon.settings.errors.forbidden' }
+          : null)
     );
   });
   readonly canSave = computed(
@@ -167,7 +179,7 @@ export class SalonSettingsFacade {
     validate(p.lowStockThreshold, ({ value }) =>
       Number.isInteger(value()) && value() >= 0 && value() <= 2147483647
         ? undefined
-        : { kind: 'range', message: 'Enter a whole number from 0 to 2147483647.' },
+        : { kind: 'range', message: 'salon.settings.errors.range' },
     );
     disabled(p, () => this.loading() || this.saving() || this.version() === undefined);
   });
@@ -178,7 +190,7 @@ export class SalonSettingsFacade {
     const value = this.model().lowStockThreshold;
     this.status.set({
       phase: 'SAVING',
-      message: '',
+      message: null,
       readEpoch,
       value,
     });
@@ -189,21 +201,14 @@ export class SalonSettingsFacade {
         expectedVersion: this.draftVersion()!,
       });
       if (this.scope() !== scope) return;
-      this.status.set({ phase: 'SAVED', message: '', readEpoch, value });
+      this.status.set({ phase: 'SAVED', message: null, readEpoch, value });
       this.readEpoch.update((v) => v + 1);
     } catch (error) {
       if (this.scope() !== scope) return;
       const code = error instanceof SettingsSaveError ? error.code : 'UNKNOWN';
       this.status.set({
         phase: code === 'STALE_STATE' ? 'STALE' : code === 'UNKNOWN' ? 'UNKNOWN' : 'ERROR',
-        message:
-          code === 'STALE_STATE'
-            ? 'Settings changed elsewhere. Reload and review before saving.'
-            : code === 'UNKNOWN'
-              ? 'Save not confirmed. Reloading current settings; review before saving again.'
-              : code === 'FORBIDDEN'
-                ? 'Access denied.'
-                : 'Setting was rejected. Review the value.',
+        message: { key: saveErrorKey(code) },
         readEpoch,
         value,
       });
@@ -212,7 +217,7 @@ export class SalonSettingsFacade {
   }
   reload() {
     if (this.saving()) return;
-    this.status.set({ phase: 'IDLE', message: '', readEpoch: this.readEpoch() });
+    this.status.set({ phase: 'IDLE', message: null, readEpoch: this.readEpoch() });
     this.resetEpoch.update((v) => v + 1);
     this.readEpoch.update((v) => v + 1);
   }

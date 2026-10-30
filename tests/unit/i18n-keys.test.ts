@@ -4,20 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 const appRoot = 'web/src/app';
 const i18nRoot = 'web/public/i18n';
-// Areas whose templates must not contain hard-coded text. Each translation task extends it.
-const migratedAreas = [
-  'shell',
-  'features/login',
-  'features/auth',
-  'features/access',
-  'shared',
-  'features/procedures',
-  'features/replenishment',
-  'features/request-detail',
-  'features/salon-requests',
-  'features/hq-queue',
-  'features/delivery',
-];
+// The whole app (generated code and specs are skipped) must not contain hard-coded text.
+const migratedAreas = ['.'];
 const namespaces =
   'common|shell|auth|login|access|procedures|replenishment|requests|delivery|salon|hq';
 const keyLiteralPattern = new RegExp(

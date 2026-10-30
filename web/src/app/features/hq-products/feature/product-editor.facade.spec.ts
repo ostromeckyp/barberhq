@@ -76,9 +76,7 @@ describe('ProductEditorFacade', () => {
     api.update.mockRejectedValueOnce(new ProductAdminError('STALE_STATE'));
     api.read.mockResolvedValueOnce(detail({ revision: 9 }));
     await facade.save();
-    expect(facade.message()).toBe(
-      'Someone else changed this product. Your edits are kept; save again.',
-    );
+    expect(facade.message()).toEqual({ key: 'hq.products.messages.stale' });
     expect(facade.model().name).toBe('Nowa nazwa');
     await facade.save();
     expect(api.update).toHaveBeenLastCalledWith(
@@ -104,9 +102,10 @@ describe('ProductEditorFacade', () => {
     facade.stockDraft.set(30);
     await facade.saveStock();
     expect(facade.stock()?.version).toBe(6);
-    expect(facade.stockMessage()).toBe(
-      'Stock changed meanwhile (on hand 20, reserved 5). Enter the quantity again.',
-    );
+    expect(facade.stockMessage()).toEqual({
+      key: 'hq.products.stock.stale',
+      params: { onHand: 20, reserved: 5 },
+    });
   });
   it('adds aliases with a default Name kind, shows collisions and retries an unknown outcome with the same key', async () => {
     const { api, facade } = setup();
@@ -117,7 +116,7 @@ describe('ProductEditorFacade', () => {
       collisions: [{ phrase: 'matte', productNames: ['Mattifier'] }],
     });
     await facade.addAlias('matte', 'TYPE');
-    expect(facade.aliasMessage()).toBe('The outcome is unknown. Retry to confirm.');
+    expect(facade.aliasMessage()).toEqual({ key: 'hq.products.aliases.unknown' });
     await facade.retryAliases();
     expect(api.saveAliases.mock.calls[1][0].idempotencyKey).toBe(
       api.saveAliases.mock.calls[0][0].idempotencyKey,

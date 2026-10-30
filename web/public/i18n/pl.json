@@ -14,7 +14,10 @@
       "refresh": "Odśwież",
       "retry": "Spróbuj ponownie",
       "previous": "Poprzednie",
-      "next": "Następne"
+      "next": "Następne",
+      "save": "Zapisz",
+      "showMore": "Pokaż więcej",
+      "reload": "Wczytaj ponownie"
     },
     "lowStock": "Niski stan",
     "pdfDropzone": {
@@ -22,6 +25,10 @@
       "browse": "Wybierz plik",
       "label": "Wybierz plik PDF",
       "selected": "Wybrano: {{ name }}"
+    },
+    "shorthand": {
+      "loading": "Wczytuję skróty salonu",
+      "loadFailed": "Nie udało się wczytać skrótów salonu."
     }
   },
   "shell": {
@@ -55,6 +62,12 @@
     "actingForUnnamed": "Działasz w imieniu salonu",
     "errors": {
       "signOut": "Nie udało się wylogować. Spróbuj ponownie."
+    },
+    "setup": {
+      "eyebrow": "BARBERHQ",
+      "title": "Wymagana konfiguracja obszaru roboczego",
+      "notConfigured": "Połączenie z Firebase nie zostało skonfigurowane dla tej wersji.",
+      "followGuide": "Postępuj zgodnie z instrukcją konfiguracji Firebase w projekcie, a następnie zbuduj aplikację ponownie."
     }
   },
   "auth": {
@@ -686,6 +699,128 @@
       "ready": "Gotowe do wysyłki",
       "other": "Wysłane i zakończone",
       "pages": "Strony kolejki"
+    },
+    "eyebrow": "OBSZAR CENTRALI",
+    "stock": {
+      "title": "Stan magazynowy centrali",
+      "description": "Dostępne ilości nie obejmują stanu zarezerwowanego na dostawy do salonów.",
+      "loading": "Wczytuję stan magazynowy centrali",
+      "unavailable": "Stan magazynowy centrali jest niedostępny.",
+      "empty": "Brak zapisów stanu magazynowego centrali. Brak danych nie oznacza zerowego stanu.",
+      "list": "Stan magazynowy centrali",
+      "table": "Tabela stanu magazynowego centrali",
+      "netContent": "{{ ml }} ml",
+      "columns": {
+        "product": "Produkt",
+        "onHand": "Na stanie",
+        "reserved": "Zarezerwowane",
+        "available": "Dostępne"
+      },
+      "footer": "Syntetyczne ilości demonstracyjne · Jednostki w sztukach"
+    },
+    "shorthand": {
+      "title": "Skróty salonów",
+      "description": "Frazy, których poszczególne salony nauczyły asystenta zamówień. Tylko do odczytu; pracownicy salonów usuwają je w swoich ustawieniach.",
+      "empty": "Żaden salon nie nauczył jeszcze asystenta skrótów."
+    },
+    "products": {
+      "add": "Dodaj produkt",
+      "edit": "Edytuj produkt",
+      "description": "Dane katalogowe, ilość w centrali i frazy, które rozumie asystent zamówień.",
+      "back": "Wróć do stanu magazynowego centrali",
+      "save": "Zapisz produkt",
+      "details": "Dane produktu",
+      "fields": {
+        "name": "Nazwa",
+        "brand": "Marka",
+        "category": "Kategoria",
+        "type": "Typ (opcjonalnie)",
+        "sourceCode": "Kod produktu",
+        "netContent": "Zawartość netto (ml)",
+        "price": "Cena detaliczna (grosze)",
+        "scent": "Zapach (opcjonalnie)",
+        "sourceUrl": "Adres URL źródła",
+        "observedOn": "Data obserwacji",
+        "summary": "Opis",
+        "hqQuantity": "Ilość w centrali"
+      },
+      "pendingCard": {
+        "title": "Karta produktu (opcjonalnie)",
+        "hint": "Plik PDF zostanie dołączony po dodaniu produktu; AI zaproponuje z niego aliasy."
+      },
+      "messages": {
+        "saved": "Produkt zapisany.",
+        "stale": "Ktoś inny zmienił ten produkt. Twoje zmiany zostały zachowane; zapisz ponownie.",
+        "invalid": "Sprawdź pola. Kod produktu musi być unikalny.",
+        "unknown": "Wynik jest nieznany. Zapisz ponownie, aby go potwierdzić."
+      },
+      "stock": {
+        "title": "Ilość w centrali",
+        "reserved": "Zarezerwowane na dostawy do salonów: {{ reserved }} · Dostępne: {{ available }}",
+        "onHand": "Na stanie w centrali",
+        "save": "Zapisz ilość",
+        "saved": "Ilość w centrali zapisana.",
+        "stale": "Stan zmienił się w międzyczasie (na stanie {{ onHand }}, zarezerwowane {{ reserved }}). Wpisz ilość ponownie.",
+        "tooLow": "Ilość nie może być niższa niż zarezerwowana ({{ reserved }}).",
+        "failed": "Nie udało się zapisać ilości. Spróbuj ponownie."
+      },
+      "aliases": {
+        "title": "Aliasy",
+        "intro": "Jak ludzie nazywają ten produkt przy zamawianiu. Wymowa obejmuje to, jak obca nazwa brzmi po polsku.",
+        "kind": {
+          "NAME": "Nazwa",
+          "PHONETIC": "Wymowa",
+          "TYPE": "Typ"
+        },
+        "source": {
+          "HQ": "Ręcznie",
+          "SEED": "Dane startowe",
+          "DOCUMENT": "Z dokumentu"
+        },
+        "phrase": "Fraza",
+        "kindLabel": "Rodzaj",
+        "editPhrase": "Edytuj frazę: {{ phrase }}",
+        "editKind": "Edytuj rodzaj: {{ phrase }}",
+        "saveAlias": "Zapisz alias: {{ phrase }}",
+        "edit": "Edytuj alias: {{ phrase }}",
+        "remove": "Usuń alias: {{ phrase }}",
+        "empty": "Brak aliasów.",
+        "new": "Nowy alias",
+        "add": "Dodaj alias",
+        "collision": "„{{ phrase }}” pasuje też do: {{ products }}",
+        "unknown": "Wynik jest nieznany. Spróbuj ponownie, aby go potwierdzić.",
+        "stale": "Aliasy zmieniły się w międzyczasie. Lista została wczytana ponownie.",
+        "invalid": "Sprawdź frazę. Produkt może mieć najwyżej 32 własne aliasy."
+      },
+      "card": {
+        "title": "Karta produktu",
+        "intro": "Dołącz plik PDF karty produktu. AI proponuje z niego aliasy; karta jest publikowana w bibliotece dokumentów.",
+        "pdfLabel": "Karta produktu (PDF)",
+        "status": "Status karty: {{ status }}",
+        "statusLabel": {
+          "UPLOADING": "Przetwarzam plik PDF…",
+          "GENERATING": "Proponuję aliasy…",
+          "PUBLISHING": "Publikuję w tle",
+          "PUBLISHED": "Opublikowana",
+          "NEEDS_REVIEW": "Wymaga przeglądu dokumentu (aliasy nadal można stosować)",
+          "FAILED": "Niepowodzenie — dołącz ponownie"
+        },
+        "suggestions": "Zaproponowane z karty ({{ count }})",
+        "acceptAll": "Zaakceptuj wszystkie",
+        "acceptAllLabel": "Zaakceptuj wszystkie propozycje",
+        "suggestionsHint": "Przed zaakceptowaniem możesz zmienić frazę lub jej rodzaj. Odrzucone propozycje nie są zapisywane.",
+        "suggestedPhrase": "Proponowana fraza: {{ phrase }}",
+        "suggestedKind": "Proponowany rodzaj: {{ phrase }}",
+        "accept": "Zaakceptuj",
+        "acceptPhrase": "Zaakceptuj: {{ phrase }}",
+        "reject": "Odrzuć: {{ phrase }}",
+        "alsoMatches": "Pasuje też do: {{ products }}",
+        "retry": "Ponów przetwarzanie",
+        "failed": "Nie udało się przetworzyć karty.",
+        "processFailed": "Nie udało się przetworzyć karty. Spróbuj ponownie.",
+        "rateLimited": "Wspólny limit AI został osiągnięty. Spróbuj ponownie później.",
+        "stillProcessing": "Karta jest nadal przetwarzana. Otwórz ten produkt ponownie później."
+      }
     }
   },
   "replenishment": {
@@ -1017,6 +1152,90 @@
         "accessChanged": "Dostęp się zmienił. Zapisana akcja została zachowana. Otwórz ponownie po przywróceniu dostępu, aby uzgodnić jej wynik.",
         "unknown": "Wynik zapisu nieznany. Ponów zapis z tym samym wyborem.",
         "keepSaved": "Zachowaj zapisaną akcję i otwórz ponownie, aby ją uzgodnić."
+      }
+    }
+  },
+  "salon": {
+    "dashboard": {
+      "eyebrow": "STAN MAGAZYNOWY SALONU",
+      "fallbackName": "Salon",
+      "description": {
+        "hq": "Stan magazynowy salonu. Zamawiaj produkty w imieniu tego salonu.",
+        "own": "Co masz na półce. Co jest dostępne w centrali."
+      },
+      "settingsUnavailable": "Ostrzeżenia o niskim stanie są niedostępne. Nie udało się wczytać ustawień.",
+      "stale": "To ostatnio wczytane ilości. Odśwież je przed podjęciem decyzji.",
+      "loading": "Wczytuję stan magazynowy",
+      "unavailable": {
+        "title": "Stan magazynowy jest niedostępny",
+        "message": "Nie udało się wczytać ilości. Spróbuj ponownie, gdy będziesz online."
+      },
+      "empty": {
+        "title": "Brak zapisów stanu magazynowego",
+        "message": "Poproś centralę o skonfigurowanie stanu magazynowego tego salonu. Brak danych nie oznacza zerowego stanu."
+      },
+      "requestProducts": "Zamów produkty",
+      "draftProducts": "produkty na liście zamówienia",
+      "closeRequest": "Zamknij zamawianie produktów",
+      "viewRequests": "Zobacz zamówienia"
+    },
+    "stock": {
+      "title": "Stan magazynowy salonu",
+      "table": "Tabela stanu magazynowego salonu",
+      "list": "Stan magazynowy salonu",
+      "columns": {
+        "product": "Produkt",
+        "inSalon": "W salonie",
+        "hqAvailable": "Dostępne w centrali",
+        "status": "Status",
+        "action": "Akcja"
+      },
+      "inStock": "Na stanie",
+      "request": "Zamów",
+      "requestProduct": "Zamów: {{ name }}",
+      "footer": "Ilości w sztukach. Dostępne w centrali nie obejmuje zarezerwowanych sztuk. Ilości syntetyczne · Odświeżono {{ time }}"
+    },
+    "hqAvailability": {
+      "title": "Dostępność w centrali",
+      "table": "Tabela dostępności w centrali",
+      "list": "Dostępność w centrali",
+      "product": "Produkt",
+      "available": "Dostępne w centrali",
+      "unit": "dostępne",
+      "footer": "Dostępne ilości nie obejmują zarezerwowanych sztuk."
+    },
+    "settings": {
+      "eyebrow": "OBSZAR SALONU",
+      "title": "Ustawienia",
+      "description": "Skonfiguruj, jak ten salon śledzi swój stan magazynowy.",
+      "inventory": "Stan magazynowy",
+      "intro": "Pokaż ostrzeżenie o niskim stanie, gdy ilość jest równa progowi lub niższa. To próg ostrzegawczy, a nie ilość zamówienia. Zero ostrzega tylko wtedy, gdy stan jest pusty.",
+      "busy": "Wczytuję lub zapisuję ustawienia",
+      "reload": "Wczytaj ustawienia ponownie",
+      "saved": "Ustawienia zapisane.",
+      "threshold": "Próg niskiego stanu",
+      "saving": "Zapisuję…",
+      "errors": {
+        "changed": "Ustawienia zmieniono w innym miejscu. Aktualny próg na serwerze: {{ value }}. Wczytaj je ponownie i przejrzyj przed zapisaniem.",
+        "stale": "Ustawienia zmieniono w innym miejscu. Wczytaj je ponownie i przejrzyj przed zapisaniem.",
+        "unknown": "Nie potwierdzono zapisu. Wczytuję bieżące ustawienia; przejrzyj je przed ponownym zapisem.",
+        "forbidden": "Brak dostępu.",
+        "rejected": "Ustawienie zostało odrzucone. Sprawdź wartość.",
+        "unavailable": "Ustawienia są niedostępne. Spróbuj ponownie lub skontaktuj się z centralą.",
+        "range": "Wpisz liczbę całkowitą od 0 do 2147483647."
+      }
+    },
+    "shorthand": {
+      "title": "Skróty salonu",
+      "description": "Frazy, których Twój zespół nauczył asystenta zamówień, wybierając produkt. Dotyczą tylko tego salonu. Usuń frazę, aby asystent zapytał ponownie.",
+      "reload": "Wczytaj skróty ponownie",
+      "empty": "Brak skrótów salonu. Pojawią się, gdy pracownicy wybiorą produkt dla nieznanego sformułowania.",
+      "remove": "Usuń skrót: {{ phrase }}",
+      "errors": {
+        "unknown": "Wynik usunięcia jest nieznany. Spróbuj ponownie, aby go potwierdzić.",
+        "changed": "Ten skrót uległ zmianie. Lista została wczytana ponownie.",
+        "forbidden": "Nie możesz usunąć tego skrótu.",
+        "failed": "Nie udało się usunąć tego skrótu."
       }
     }
   }

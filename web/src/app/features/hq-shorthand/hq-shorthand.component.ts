@@ -1,6 +1,8 @@
 import { Component, PendingTasks, computed, effect, inject, signal } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import type { TranslatedText } from '../../core/models/translated-text';
 import type { SalonShorthand } from '../../../../../shared/contracts/product-lookup/index';
 import { DelayedLoadingDirective } from '../../shared/ui/delayed-loading/delayed-loading';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
@@ -10,7 +12,13 @@ import { SalonShorthandApi } from '../salon-settings/data-access/salon-shorthand
 /** HQ sees every salon's learned shorthand read-only; only salon staff remove it. */
 @Component({
   selector: 'app-hq-shorthand',
-  imports: [MatButtonModule, MatProgressBarModule, DelayedLoadingDirective, PageHeader],
+  imports: [
+    MatButtonModule,
+    MatProgressBarModule,
+    DelayedLoadingDirective,
+    PageHeader,
+    TranslocoPipe,
+  ],
   styles: `
     :host {
       display: block;
@@ -38,20 +46,23 @@ import { SalonShorthandApi } from '../salon-settings/data-access/salon-shorthand
   `,
   template: `
     <app-page-header
-      eyebrow="HQ WORKSPACE"
-      title="Salon shorthand"
-      description="Phrases each salon taught the ordering assistant. Read-only; salon staff remove them in their Settings."
+      [eyebrow]="'hq.eyebrow' | transloco"
+      [title]="'hq.shorthand.title' | transloco"
+      [description]="'hq.shorthand.description' | transloco"
     />
     <mat-progress-bar
       *appDelayedLoading="loading()"
       mode="indeterminate"
-      aria-label="Loading salon shorthand"
+      [attr.aria-label]="'common.shorthand.loading' | transloco"
     />
-    @if (error()) {
-      <p role="alert">{{ error() }} <button mat-button (click)="load()">Reload</button></p>
+    @if (error(); as error) {
+      <p role="alert">
+        {{ error.key | transloco: error.params }}
+        <button mat-button (click)="load()">{{ 'common.actions.reload' | transloco }}</button>
+      </p>
     }
     @if (loaded() && !error() && !rows().length) {
-      <p>No salon has learned shorthand yet.</p>
+      <p>{{ 'hq.shorthand.empty' | transloco }}</p>
     }
     <ul>
       @for (row of rows(); track row.id) {
@@ -65,7 +76,7 @@ import { SalonShorthandApi } from '../salon-settings/data-access/salon-shorthand
     </ul>
     @if (next() !== null) {
       <button mat-button class="load-more" (click)="load(next()!)" [disabled]="loading()">
-        Show more
+        {{ 'common.actions.showMore' | transloco }}
       </button>
     }
   `,
@@ -83,7 +94,7 @@ export class HqShorthandComponent {
   readonly next = signal<string | null>(null);
   readonly loading = signal(false);
   readonly loaded = signal(false);
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   constructor() {
     effect(() => {
       this.businessId();
@@ -99,7 +110,7 @@ export class HqShorthandComponent {
     if (!businessId) return;
     const task = this.tasks.add();
     this.loading.set(true);
-    this.error.set('');
+    this.error.set(null);
     try {
       const page = await this.api.listHq(businessId, after);
       if (generation !== this.generation) return;
@@ -107,7 +118,7 @@ export class HqShorthandComponent {
       this.next.set(page.nextCursor);
       this.loaded.set(true);
     } catch {
-      if (generation === this.generation) this.error.set('Salon shorthand could not be loaded.');
+      if (generation === this.generation) this.error.set({ key: 'common.shorthand.loadFailed' });
     } finally {
       if (generation === this.generation) this.loading.set(false);
       task();

@@ -1,17 +1,18 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { runtimeConfig } from './core/public-config';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, TranslocoPipe],
   template: `@if (configured) {
       <router-outlet />
     } @else {
       <main class="setup">
-        <p class="eyebrow">BARBERHQ</p>
-        <h1>Workspace setup required</h1>
-        <p>The Firebase connection has not been configured for this build.</p>
-        <p>Follow the project’s Firebase setup guide, then rebuild the application.</p>
+        <p class="eyebrow">{{ 'shell.setup.eyebrow' | transloco }}</p>
+        <h1>{{ 'shell.setup.title' | transloco }}</h1>
+        <p>{{ 'shell.setup.notConfigured' | transloco }}</p>
+        <p>{{ 'shell.setup.followGuide' | transloco }}</p>
       </main>
     }`,
   styles: `

@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { BrowserActivity } from '../../../core/browser-activity';
+import { Language } from '../../../core/language';
 import { SalonSettingsApi } from '../../salon-settings/data-access/salon-settings-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { InventoryApi } from '../data-access/inventory-api';
@@ -26,6 +27,7 @@ export class SalonInventoryFacade {
   private readonly api = inject(InventoryApi);
   private readonly session = inject(SessionFacade);
   private readonly browser = inject(BrowserActivity);
+  private readonly language = inject(Language);
   private readonly salonId = toSignal(
     inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('salonId'))),
   );
@@ -59,9 +61,8 @@ export class SalonInventoryFacade {
       return previous?.value?.scope === source.scope ? previous.value : undefined;
     },
   });
-  readonly name = computed(
-    () => this.session.salons().find((s) => s.id === this.salonId())?.name ?? 'Salon',
-  );
+  /** The salon's own name; undefined until the session lists it. */
+  readonly name = computed(() => this.session.salons().find((s) => s.id === this.salonId())?.name);
   private readonly settings = resource({
     params: () => {
       const scope = this.scope();
@@ -88,7 +89,7 @@ export class SalonInventoryFacade {
   readonly stale = computed(() => !!this.snapshot() && (!this.browser.online() || this.error()));
   readonly updated = computed(
     () =>
-      this.snapshot()?.updatedAt.toLocaleTimeString('en-GB', {
+      this.snapshot()?.updatedAt.toLocaleTimeString(this.language.locale(), {
         hour: '2-digit',
         minute: '2-digit',
       }) ?? '',

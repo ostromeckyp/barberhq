@@ -1,10 +1,9 @@
 <app-page-header
-  eyebrow="SALON INVENTORY"
-  [title]="facade.name()"
+  [eyebrow]="'salon.dashboard.eyebrow' | transloco"
+  [title]="facade.name() ?? ('salon.dashboard.fallbackName' | transloco)"
   [description]="
-    order?.isHq()
-      ? 'Salon stock. Request products on behalf of this salon.'
-      : 'What’s on your shelf. What’s available at HQ.'
+    (order?.isHq() ? 'salon.dashboard.description.hq' : 'salon.dashboard.description.own')
+      | transloco
   "
 >
   <button
@@ -12,45 +11,45 @@
     (click)="order ? order.refresh() : facade.refresh()"
     [disabled]="facade.loading()"
   >
-    <mat-icon>refresh</mat-icon>Refresh
+    <mat-icon>refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button>
 </app-page-header>
 @if (facade.settingsUnavailable()) {
   <p role="status">
-    Low-stock warnings unavailable. Settings could not be loaded.
-    <button mat-button (click)="facade.refresh()">Retry</button>
+    {{ 'salon.dashboard.settingsUnavailable' | transloco }}
+    <button mat-button (click)="facade.refresh()">{{ 'common.actions.retry' | transloco }}</button>
   </p>
 }
 @if (facade.stale()) {
-  <app-stale-banner
-    message="These are the last loaded quantities. Refresh before making a decision."
-  >
+  <app-stale-banner [message]="'salon.dashboard.stale' | transloco">
     <button
       mat-button
       (click)="order ? order.refresh() : facade.refresh()"
       [disabled]="facade.loading()"
     >
-      Retry
+      {{ 'common.actions.retry' | transloco }}
     </button>
   </app-stale-banner>
 }
 <mat-progress-bar
   *appDelayedLoading="facade.loading()"
   mode="indeterminate"
-  aria-label="Loading inventory"
+  [attr.aria-label]="'salon.dashboard.loading' | transloco"
 />
 @if (facade.error() && !facade.rows().length) {
   <app-empty-state
-    title="Inventory is unavailable"
-    message="We couldn’t load your quantities. Try again when you’re connected."
+    [title]="'salon.dashboard.unavailable.title' | transloco"
+    [message]="'salon.dashboard.unavailable.message' | transloco"
     icon="error"
   >
-    <button mat-flat-button (click)="order ? order.refresh() : facade.refresh()">Retry</button>
+    <button mat-flat-button (click)="order ? order.refresh() : facade.refresh()">
+      {{ 'common.actions.retry' | transloco }}
+    </button>
   </app-empty-state>
 } @else if (!facade.loading() && !facade.rows().length) {
   <app-empty-state
-    title="No stock records yet"
-    message="Ask HQ to set up inventory for this salon. Missing stock is not zero stock."
+    [title]="'salon.dashboard.empty.title' | transloco"
+    [message]="'salon.dashboard.empty.message' | transloco"
   />
 } @else if (facade.rows().length) {
   <div
@@ -80,9 +79,11 @@
     (click)="openRequestSheet()"
   >
     <mat-icon>add_shopping_cart</mat-icon>
-    Request products
+    {{ 'salon.dashboard.requestProducts' | transloco }}
     @if (order!.draft.lines().length) {
-      <span class="draft-count" aria-label="draft products">{{ order!.draft.lines().length }}</span>
+      <span class="draft-count" [attr.aria-label]="'salon.dashboard.draftProducts' | transloco">{{
+        order!.draft.lines().length
+      }}</span>
     }
   </button>
 }
@@ -91,7 +92,7 @@
   class="requests-link"
   mat-stroked-button
   [routerLink]="['/salons', context.salonId(), 'requests']"
-  >View requests</a
+  >{{ 'salon.dashboard.viewRequests' | transloco }}</a
 >
 
 <ng-template #requestSheet>
@@ -102,7 +103,7 @@
         <button
           mat-icon-button
           type="button"
-          aria-label="Close request products"
+          [attr.aria-label]="'salon.dashboard.closeRequest' | transloco"
           (click)="closeRequestSheet()"
         >
           <mat-icon>close</mat-icon>

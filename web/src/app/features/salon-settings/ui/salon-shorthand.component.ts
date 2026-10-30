@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -8,7 +9,13 @@ import { SalonShorthandFacade } from '../feature/salon-shorthand.facade';
 /** Learned phrase → product list; removal is offered only to this salon's staff. */
 @Component({
   selector: 'app-salon-shorthand',
-  imports: [MatButtonModule, MatIconModule, MatProgressBarModule, DelayedLoadingDirective],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    DelayedLoadingDirective,
+    TranslocoPipe,
+  ],
   styles: `
     :host {
       display: block;
@@ -39,18 +46,18 @@ import { SalonShorthandFacade } from '../feature/salon-shorthand.facade';
     <mat-progress-bar
       *appDelayedLoading="facade.loading()"
       mode="indeterminate"
-      aria-label="Loading salon shorthand"
+      [attr.aria-label]="'common.shorthand.loading' | transloco"
     />
-    @if (facade.error()) {
+    @if (facade.error(); as error) {
       <p role="alert">
-        {{ facade.error() }}
+        {{ error.key | transloco: error.params }}
         <button mat-button (click)="facade.reload()" [disabled]="facade.loading()">
-          Reload shorthand
+          {{ 'salon.shorthand.reload' | transloco }}
         </button>
       </p>
     }
     @if (facade.empty()) {
-      <p>No salon shorthand yet. It appears after staff choose a product for unfamiliar wording.</p>
+      <p>{{ 'salon.shorthand.empty' | transloco }}</p>
     }
     <ul>
       @for (row of facade.rows(); track row.id) {
@@ -61,7 +68,7 @@ import { SalonShorthandFacade } from '../feature/salon-shorthand.facade';
           @if (facade.canRemove()) {
             <button
               mat-icon-button
-              [attr.aria-label]="'Remove shorthand ' + row.phrase"
+              [attr.aria-label]="'salon.shorthand.remove' | transloco: { phrase: row.phrase }"
               [disabled]="facade.removing() !== null"
               (click)="facade.remove(row)"
             >
@@ -73,7 +80,7 @@ import { SalonShorthandFacade } from '../feature/salon-shorthand.facade';
     </ul>
     @if (facade.hasMore()) {
       <button mat-button (click)="facade.loadMore()" [disabled]="facade.loading()">
-        Show more
+        {{ 'common.actions.showMore' | transloco }}
       </button>
     }
   `,

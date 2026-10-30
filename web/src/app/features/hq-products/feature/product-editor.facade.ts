@@ -8,6 +8,7 @@ import type {
   ProductAliasesResult,
   ProductForm,
 } from '../../../../../../shared/contracts/product-admin/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { ProductAdminApi, ProductAdminError } from '../data-access/product-admin-api';
 import type { CardAttachmentState } from '../models/card-attachment-state';
 import type { CardSuggestion } from '../models/card-suggestion';
@@ -35,6 +36,12 @@ const emptyDraft = (): ProductDraft => ({
   hqOnHand: 0,
 });
 const code = (error: unknown) => (error instanceof ProductAdminError ? error.code : 'UNKNOWN');
+const cardFailure = (error: unknown): TranslatedText => ({
+  key:
+    code(error) === 'RATE_LIMITED'
+      ? 'hq.products.card.rateLimited'
+      : 'hq.products.card.processFailed',
+});
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
@@ -47,23 +54,23 @@ export class ProductEditorFacade {
   readonly productId = signal<string | null>(null);
   readonly model = signal<ProductDraft>(emptyDraft());
   readonly saving = signal(false);
-  readonly message = signal('');
+  readonly message = signal<TranslatedText | null>(null);
   private revision = 0;
   private formKey: string | null = null;
 
   readonly stock = signal<HqStock | null>(null);
   readonly stockDraft = signal(0);
-  readonly stockMessage = signal('');
+  readonly stockMessage = signal<TranslatedText | null>(null);
 
   readonly aliases = signal<ProductAliasRow[]>([]);
   readonly collisions = signal<ProductAliasesResult['collisions']>([]);
   readonly newAliasKind = signal<ProductAliasKind>('NAME');
-  readonly aliasMessage = signal('');
+  readonly aliasMessage = signal<TranslatedText | null>(null);
   private pendingAliases: { changes: ProductAliasChange[]; key: string } | null = null;
 
   readonly card = signal<CardAttachmentState | null>(null);
   readonly suggestions = signal<CardSuggestion[]>([]);
-  readonly cardMessage = signal('');
+  readonly cardMessage = signal<TranslatedText | null>(null);
 
   startNew(): void {
     this.productId.set(null);
@@ -106,7 +113,7 @@ export class ProductEditorFacade {
       scent: draft.scent.trim() || null,
     };
     this.saving.set(true);
-    this.message.set('');
+    this.message.set(null);
     this.formKey ??= crypto.randomUUID();
     try {
       const id = this.productId();
@@ -122,7 +129,7 @@ export class ProductEditorFacade {
       this.productId.set(detail.id);
       this.revision = detail.revision;
       this.stock.set(detail.hq);
-      this.message.set('Product saved.');
+      this.message.set({ key: 'hq.products.messages.saved' });
       return detail.id;
     } catch (error) {
       const c = code(error);
@@ -130,11 +137,11 @@ export class ProductEditorFacade {
         this.formKey = null;
         // Refresh only the revision; the user's draft stays on screen.
         this.revision = (await this.api.read(this.productId()!)).revision;
-        this.message.set('Someone else changed this product. Your edits are kept; save again.');
+        this.message.set({ key: 'hq.products.messages.stale' });
       } else if (c === 'VALIDATION_ERROR') {
         this.formKey = null;
-        this.message.set('Check the fields. The product code must be unique.');
-      } else this.message.set('The outcome is unknown. Save again to confirm.');
+        this.message.set({ key: 'hq.products.messages.invalid' });
+      } else this.message.set({ key: 'hq.products.messages.unknown' });
       return null;
     } finally {
       this.saving.set(false);
@@ -144,7 +151,7 @@ export class ProductEditorFacade {
     const id = this.productId();
     const current = this.stock();
     if (!id || !current) return;
-    this.stockMessage.set('');
+    this.stockMessage.set(null);
     try {
       const next = await this.api.setHqStock({
         productId: id,
@@ -153,20 +160,21 @@ export class ProductEditorFacade {
         idempotencyKey: crypto.randomUUID(),
       });
       this.stock.set(next);
-      this.stockMessage.set('HQ quantity saved.');
+      this.stockMessage.set({ key: 'hq.products.stock.saved' });
     } catch (error) {
       const c = code(error);
       if (c === 'STALE_STATE') {
         const fresh = (await this.api.read(id)).hq;
         this.stock.set(fresh);
-        this.stockMessage.set(
-          `Stock changed meanwhile (on hand ${fresh.onHand}, reserved ${fresh.reserved}). Enter the quantity again.`,
-        );
+        this.stockMessage.set({
+          key: 'hq.products.stock.stale',
+          params: { onHand: fresh.onHand, reserved: fresh.reserved },
+        });
       } else
         this.stockMessage.set(
           c === 'VALIDATION_ERROR'
-            ? `The quantity cannot be lower than reserved (${current.reserved}).`
-            : 'The quantity could not be saved. Try again.',
+            ? { key: 'hq.products.stock.tooLow', params: { reserved: current.reserved } }
+            : { key: 'hq.products.stock.failed' },
         );
     }
   }
@@ -191,7 +199,7 @@ export class ProductEditorFacade {
   private async sendAliases(pending: { changes: ProductAliasChange[]; key: string }) {
     const id = this.productId();
     if (!id) return;
-    this.aliasMessage.set('');
+    this.aliasMessage.set(null);
     try {
       const result = await this.api.saveAliases({
         productId: id,
@@ -204,16 +212,14 @@ export class ProductEditorFacade {
     } catch (error) {
       const c = code(error);
       if (c === 'UNKNOWN') {
-        this.aliasMessage.set('The outcome is unknown. Retry to confirm.');
+        this.aliasMessage.set({ key: 'hq.products.aliases.unknown' });
         return;
       }
       this.pendingAliases = null;
       if (c === 'STALE_STATE') this.aliases.set((await this.api.listAliases(id)).aliases);
-      this.aliasMessage.set(
-        c === 'STALE_STATE'
-          ? 'Aliases changed meanwhile. The list was reloaded.'
-          : 'Check the phrase. A product can have at most 32 own aliases.',
-      );
+      this.aliasMessage.set({
+        key: c === 'STALE_STATE' ? 'hq.products.aliases.stale' : 'hq.products.aliases.invalid',
+      });
     }
   }
   /**
@@ -223,17 +229,13 @@ export class ProductEditorFacade {
   async attachCard(file: File, process = true): Promise<void> {
     const id = this.productId();
     if (!id) return;
-    this.cardMessage.set('');
+    this.cardMessage.set(null);
     try {
       const attached = await this.api.attachCard(id, file, crypto.randomUUID());
       this.applyCard(attached);
       if (process) await this.processUntilDone(id, attached.versionId);
     } catch (error) {
-      this.cardMessage.set(
-        code(error) === 'RATE_LIMITED'
-          ? 'The shared AI limit has been reached. Try again later.'
-          : 'The card could not be processed. Try again.',
-      );
+      this.cardMessage.set(cardFailure(error));
     }
   }
   /** Retries a failed or interrupted card; the server replays each completed step. */
@@ -243,7 +245,7 @@ export class ProductEditorFacade {
     return id && card ? this.processUntilDone(id, card.versionId) : Promise.resolve();
   }
   private async processUntilDone(productId: string, versionId: string): Promise<void> {
-    this.cardMessage.set('');
+    this.cardMessage.set(null);
     try {
       const key = crypto.randomUUID();
       for (let attempt = 0; attempt < 60; attempt++) {
@@ -255,13 +257,9 @@ export class ProductEditorFacade {
           await sleep(3000);
         }
       }
-      this.cardMessage.set('The card is still processing. Reopen this product later.');
+      this.cardMessage.set({ key: 'hq.products.card.stillProcessing' });
     } catch (error) {
-      this.cardMessage.set(
-        code(error) === 'RATE_LIMITED'
-          ? 'The shared AI limit has been reached. Try again later.'
-          : 'The card could not be processed. Try again.',
-      );
+      this.cardMessage.set(cardFailure(error));
     }
   }
   /** Saves a suggestion, optionally with HQ's edited phrase or kind, then drops it from the list. */

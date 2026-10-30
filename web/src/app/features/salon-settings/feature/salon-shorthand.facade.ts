@@ -1,6 +1,7 @@
 import { PendingTasks, Service, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup/index';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonShorthandApi, ShorthandRemoveError } from '../data-access/salon-shorthand-api';
@@ -34,7 +35,7 @@ export class SalonShorthandFacade {
   readonly rows = signal<SalonShorthand[]>([]);
   readonly loading = signal(false);
   readonly loaded = signal(false);
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   readonly removing = signal<string | null>(null);
   private readonly next = signal<string | null>(null);
   readonly canRemove = computed(() => !!this.scope()?.canRemove);
@@ -51,7 +52,7 @@ export class SalonShorthandFacade {
       this.rows.set([]);
       this.next.set(null);
       this.loaded.set(false);
-      this.error.set('');
+      this.error.set(null);
       this.removing.set(null);
       if (scope) void this.load();
     });
@@ -69,7 +70,7 @@ export class SalonShorthandFacade {
     const generation = ++this.generation;
     const task = this.tasks.add();
     this.loading.set(true);
-    this.error.set('');
+    this.error.set(null);
     try {
       const page = await this.api.list(scope.salonId, after);
       if (generation !== this.generation) return;
@@ -77,7 +78,7 @@ export class SalonShorthandFacade {
       this.next.set(page.nextCursor);
       this.loaded.set(true);
     } catch {
-      if (generation === this.generation) this.error.set('Salon shorthand could not be loaded.');
+      if (generation === this.generation) this.error.set({ key: 'common.shorthand.loadFailed' });
     } finally {
       if (generation === this.generation) this.loading.set(false);
       task();
@@ -90,7 +91,7 @@ export class SalonShorthandFacade {
     this.keys.set(row.id, idempotencyKey);
     const generation = this.generation;
     this.removing.set(row.id);
-    this.error.set('');
+    this.error.set(null);
     try {
       const done = await this.api.remove({
         salonId: scope.salonId,
@@ -105,19 +106,20 @@ export class SalonShorthandFacade {
       if (generation !== this.generation) return;
       const code = error instanceof ShorthandRemoveError ? error.code : 'UNKNOWN';
       if (code === 'UNKNOWN') {
-        this.error.set('The removal outcome is unknown. Retry to confirm it.');
+        this.error.set({ key: 'salon.shorthand.errors.unknown' });
         return;
       }
       this.keys.delete(row.id);
       if (code === 'STALE_STATE') {
         await this.load();
-        this.error.set('This shorthand changed. The list was reloaded.');
+        this.error.set({ key: 'salon.shorthand.errors.changed' });
       } else
-        this.error.set(
-          code === 'FORBIDDEN'
-            ? 'You cannot remove this shorthand.'
-            : 'This shorthand could not be removed.',
-        );
+        this.error.set({
+          key:
+            code === 'FORBIDDEN'
+              ? 'salon.shorthand.errors.forbidden'
+              : 'salon.shorthand.errors.failed',
+        });
     } finally {
       if (this.removing() === row.id) this.removing.set(null);
     }

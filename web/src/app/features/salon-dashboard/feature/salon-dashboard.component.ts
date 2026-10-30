@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ResponsiveLayout } from '../../../core/responsive-layout';
 import { SalonContext } from '../../../core/salon-context';
 import { runtimeConfig } from '../../../core/public-config';
@@ -45,6 +46,7 @@ import { SalonInventoryFacade } from './salon-inventory.facade';
     StockTable,
     OrderPanel,
     RouterLink,
+    TranslocoPipe,
   ],
   templateUrl: './salon-dashboard.component.html',
   styleUrl: './salon-dashboard.component.scss',
@@ -56,6 +58,7 @@ export class SalonDashboardComponent {
   readonly order = this.enabled ? inject(OrderFacade) : undefined;
   private readonly session = inject(SessionFacade);
   private readonly bottomSheet = inject(MatBottomSheet);
+  private readonly transloco = inject(TranslocoService);
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly requestSheet = viewChild<TemplateRef<unknown>>('requestSheet');
@@ -89,7 +92,7 @@ export class SalonDashboardComponent {
     if (!template || !this.mobile() || !this.order?.canOrder() || this.sheetRef) return;
     this.sheetRef = this.bottomSheet.open(template, {
       viewContainerRef: this.viewContainerRef,
-      ariaLabel: 'Request products',
+      ariaLabel: this.transloco.translate('salon.dashboard.requestProducts'),
       panelClass: 'request-products-sheet',
       autoFocus: 'dialog',
       closeOnNavigation: true,

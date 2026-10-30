@@ -70,7 +70,7 @@ it('reconciles_unknown_save_without_claiming_confirmation_from_matching_values',
   expect(h.save).toHaveBeenCalledTimes(1);
   expect(h.facade.saved()).toBe(false);
   expect(h.facade.version()).toBe(2);
-  expect(h.facade.error()).toContain('not confirmed');
+  expect(h.facade.error()).toEqual({ key: 'salon.settings.errors.unknown' });
   expect(h.facade.canSave()).toBe(true);
   h.save.mockResolvedValue(undefined);
   await h.facade.save();
@@ -92,7 +92,7 @@ it('blocks_a_dirty_draft_when_a_background_refresh_finds_a_newer_version', async
   expect(h.facade.model().lowStockThreshold).toBe(4);
   expect(h.facade.version()).toBe(2);
   expect(h.facade.stale()).toBe(true);
-  expect(h.facade.error()).toContain('changed elsewhere');
+  expect(h.facade.error()?.key).toBe('salon.settings.errors.changed');
   expect(h.facade.canSave()).toBe(false);
   await h.facade.save();
   expect(h.save).not.toHaveBeenCalled();
@@ -126,7 +126,10 @@ it('requires_explicit_reload_after_an_unknown_save_reads_a_different_value', asy
   expect(h.facade.model().lowStockThreshold).toBe(4);
   expect(h.facade.version()).toBe(2);
   expect(h.facade.stale()).toBe(true);
-  expect(h.facade.error()).toContain('Current server threshold: 8');
+  expect(h.facade.error()).toEqual({
+    key: 'salon.settings.errors.changed',
+    params: { value: 8 },
+  });
   expect(h.facade.canSave()).toBe(false);
   await h.facade.save();
   expect(h.save).toHaveBeenCalledTimes(1);

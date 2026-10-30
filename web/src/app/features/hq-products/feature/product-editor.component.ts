@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { form, required, min, max, pattern, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,11 +18,15 @@ import type { CardSuggestion } from '../models/card-suggestion';
 import { ProductEditorFacade } from './product-editor.facade';
 
 const kinds: { value: ProductAliasKind; label: string }[] = [
-  { value: 'NAME', label: 'Name' },
-  { value: 'PHONETIC', label: 'Pronunciation' },
-  { value: 'TYPE', label: 'Type' },
+  { value: 'NAME', label: 'hq.products.aliases.kind.NAME' },
+  { value: 'PHONETIC', label: 'hq.products.aliases.kind.PHONETIC' },
+  { value: 'TYPE', label: 'hq.products.aliases.kind.TYPE' },
 ];
-const sourceLabel = { HQ: 'Manual', SEED: 'Seed', DOCUMENT: 'From document' } as const;
+const sourceLabel = {
+  HQ: 'hq.products.aliases.source.HQ',
+  SEED: 'hq.products.aliases.source.SEED',
+  DOCUMENT: 'hq.products.aliases.source.DOCUMENT',
+} as const;
 
 /** HQ add/edit product: fields, HQ quantity, product-owned aliases and the product card. */
 @Component({
@@ -29,6 +34,7 @@ const sourceLabel = { HQ: 'Manual', SEED: 'Seed', DOCUMENT: 'From document' } as
   providers: [ProductEditorFacade],
   imports: [
     FormField,
+    TranslocoPipe,
     RouterLink,
     MatButtonModule,
     MatFormFieldModule,
@@ -57,12 +63,12 @@ export class ProductEditorComponent implements OnInit {
   });
   readonly sourceLabel = sourceLabel;
   readonly cardStatus = {
-    UPLOADING: 'Processing the PDF…',
-    GENERATING: 'Suggesting aliases…',
-    PUBLISHING: 'Publishing in the background',
-    PUBLISHED: 'Published',
-    NEEDS_REVIEW: 'Needs document review (aliases are still usable)',
-    FAILED: 'Failed — attach again',
+    UPLOADING: 'hq.products.card.statusLabel.UPLOADING',
+    GENERATING: 'hq.products.card.statusLabel.GENERATING',
+    PUBLISHING: 'hq.products.card.statusLabel.PUBLISHING',
+    PUBLISHED: 'hq.products.card.statusLabel.PUBLISHED',
+    NEEDS_REVIEW: 'hq.products.card.statusLabel.NEEDS_REVIEW',
+    FAILED: 'hq.products.card.statusLabel.FAILED',
   } as const;
   readonly newAlias = signal('');
   readonly editingId = signal<string | null>(null);

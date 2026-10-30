@@ -67,7 +67,7 @@ it('loads_pages_and_reports_empty_and_error_states', async () => {
   h.list.mockRejectedValueOnce(new Error('down'));
   h.facade.reload();
   await h.settle();
-  expect(h.facade.error()).toBe('Salon shorthand could not be loaded.');
+  expect(h.facade.error()).toEqual({ key: 'common.shorthand.loadFailed' });
 });
 
 it('removes_only_after_the_authoritative_response', async () => {
@@ -94,7 +94,7 @@ it('retries_an_unknown_outcome_with_the_same_key_and_reloads_when_stale', async 
   await h.settle();
   h.remove.mockRejectedValueOnce(new ShorthandRemoveError('UNKNOWN'));
   await h.facade.remove(h.facade.rows()[0]);
-  expect(h.facade.error()).toBe('The removal outcome is unknown. Retry to confirm it.');
+  expect(h.facade.error()).toEqual({ key: 'salon.shorthand.errors.unknown' });
   expect(h.facade.rows().map((r) => r.id)).toEqual(['1', '2']);
   h.remove.mockResolvedValueOnce(row('1', 2, 'retired'));
   await h.facade.remove(h.facade.rows()[0]);
@@ -104,7 +104,7 @@ it('retries_an_unknown_outcome_with_the_same_key_and_reloads_when_stale', async 
   h.list.mockResolvedValueOnce({ rows: [row('2', 3)], nextCursor: null });
   await h.facade.remove(h.facade.rows()[0]);
   await h.settle();
-  expect(h.facade.error()).toBe('This shorthand changed. The list was reloaded.');
+  expect(h.facade.error()).toEqual({ key: 'salon.shorthand.errors.changed' });
   expect(h.facade.rows()).toEqual([row('2', 3)]);
 });
 

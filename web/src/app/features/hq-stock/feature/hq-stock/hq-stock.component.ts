@@ -2,6 +2,7 @@ import { DelayedLoadingDirective } from '../../../../shared/ui/delayed-loading/d
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ResponsiveLayout } from '../../../../core/responsive-layout';
@@ -16,6 +17,7 @@ import { HqStockFacade } from '../hq-stock.facade';
     MatProgressBarModule,
     PageHeader,
     RouterLink,
+    TranslocoPipe,
   ],
   providers: [HqStockFacade],
   selector: 'app-hq-stock',

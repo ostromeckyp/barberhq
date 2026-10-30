@@ -14,7 +14,10 @@
       "refresh": "Refresh",
       "retry": "Retry",
       "previous": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "save": "Save",
+      "showMore": "Show more",
+      "reload": "Reload"
     },
     "lowStock": "Low stock",
     "pdfDropzone": {
@@ -22,6 +25,10 @@
       "browse": "Browse",
       "label": "Browse for a PDF",
       "selected": "Selected: {{ name }}"
+    },
+    "shorthand": {
+      "loading": "Loading salon shorthand",
+      "loadFailed": "Salon shorthand could not be loaded."
     }
   },
   "shell": {
@@ -55,6 +62,12 @@
     "actingForUnnamed": "Acting on behalf of a salon",
     "errors": {
       "signOut": "Could not sign out. Please retry."
+    },
+    "setup": {
+      "eyebrow": "BARBERHQ",
+      "title": "Workspace setup required",
+      "notConfigured": "The Firebase connection has not been configured for this build.",
+      "followGuide": "Follow the project’s Firebase setup guide, then rebuild the application."
     }
   },
   "auth": {
@@ -686,6 +699,128 @@
       "ready": "Ready to dispatch",
       "other": "Dispatched and completed",
       "pages": "Queue pages"
+    },
+    "eyebrow": "HQ WORKSPACE",
+    "stock": {
+      "title": "HQ stock",
+      "description": "Available quantities exclude stock reserved for salon deliveries.",
+      "loading": "Loading HQ stock",
+      "unavailable": "HQ stock unavailable.",
+      "empty": "No HQ stock records yet. Missing stock is not zero stock.",
+      "list": "HQ stock",
+      "table": "HQ stock table",
+      "netContent": "{{ ml }} ml",
+      "columns": {
+        "product": "Product",
+        "onHand": "On hand",
+        "reserved": "Reserved",
+        "available": "Available"
+      },
+      "footer": "Synthetic demo quantities · Units in pieces"
+    },
+    "shorthand": {
+      "title": "Salon shorthand",
+      "description": "Phrases each salon taught the ordering assistant. Read-only; salon staff remove them in their Settings.",
+      "empty": "No salon has learned shorthand yet."
+    },
+    "products": {
+      "add": "Add product",
+      "edit": "Edit product",
+      "description": "Catalog details, HQ quantity and the phrases the ordering assistant understands.",
+      "back": "Back to HQ stock",
+      "save": "Save product",
+      "details": "Product details",
+      "fields": {
+        "name": "Name",
+        "brand": "Brand",
+        "category": "Category",
+        "type": "Type (optional)",
+        "sourceCode": "Product code",
+        "netContent": "Net content (ml)",
+        "price": "Retail price (grosz)",
+        "scent": "Scent (optional)",
+        "sourceUrl": "Source URL",
+        "observedOn": "Observed on",
+        "summary": "Description",
+        "hqQuantity": "HQ quantity"
+      },
+      "pendingCard": {
+        "title": "Product card (optional)",
+        "hint": "The PDF is attached after the product is added; AI then suggests aliases from it."
+      },
+      "messages": {
+        "saved": "Product saved.",
+        "stale": "Someone else changed this product. Your edits are kept; save again.",
+        "invalid": "Check the fields. The product code must be unique.",
+        "unknown": "The outcome is unknown. Save again to confirm."
+      },
+      "stock": {
+        "title": "HQ quantity",
+        "reserved": "Reserved for salon deliveries: {{ reserved }} · Available: {{ available }}",
+        "onHand": "On hand at HQ",
+        "save": "Save quantity",
+        "saved": "HQ quantity saved.",
+        "stale": "Stock changed meanwhile (on hand {{ onHand }}, reserved {{ reserved }}). Enter the quantity again.",
+        "tooLow": "The quantity cannot be lower than reserved ({{ reserved }}).",
+        "failed": "The quantity could not be saved. Try again."
+      },
+      "aliases": {
+        "title": "Aliases",
+        "intro": "How people name this product when ordering. Pronunciation covers how a foreign name sounds in Polish.",
+        "kind": {
+          "NAME": "Name",
+          "PHONETIC": "Pronunciation",
+          "TYPE": "Type"
+        },
+        "source": {
+          "HQ": "Manual",
+          "SEED": "Seed",
+          "DOCUMENT": "From document"
+        },
+        "phrase": "Phrase",
+        "kindLabel": "Kind",
+        "editPhrase": "Edit phrase {{ phrase }}",
+        "editKind": "Edit kind {{ phrase }}",
+        "saveAlias": "Save alias {{ phrase }}",
+        "edit": "Edit alias {{ phrase }}",
+        "remove": "Remove alias {{ phrase }}",
+        "empty": "No aliases yet.",
+        "new": "New alias",
+        "add": "Add alias",
+        "collision": "“{{ phrase }}” also matches: {{ products }}",
+        "unknown": "The outcome is unknown. Retry to confirm.",
+        "stale": "Aliases changed meanwhile. The list was reloaded.",
+        "invalid": "Check the phrase. A product can have at most 32 own aliases."
+      },
+      "card": {
+        "title": "Product card",
+        "intro": "Attach the product card PDF. AI suggests aliases from it; the card is published to the document library.",
+        "pdfLabel": "Product card PDF",
+        "status": "Card status: {{ status }}",
+        "statusLabel": {
+          "UPLOADING": "Processing the PDF…",
+          "GENERATING": "Suggesting aliases…",
+          "PUBLISHING": "Publishing in the background",
+          "PUBLISHED": "Published",
+          "NEEDS_REVIEW": "Needs document review (aliases are still usable)",
+          "FAILED": "Failed — attach again"
+        },
+        "suggestions": "Suggested from the card ({{ count }})",
+        "acceptAll": "Accept all",
+        "acceptAllLabel": "Accept all suggestions",
+        "suggestionsHint": "Edit a phrase or its kind before accepting. Rejected ones are not saved.",
+        "suggestedPhrase": "Suggested phrase {{ phrase }}",
+        "suggestedKind": "Suggested kind {{ phrase }}",
+        "accept": "Accept",
+        "acceptPhrase": "Accept {{ phrase }}",
+        "reject": "Reject {{ phrase }}",
+        "alsoMatches": "Also matches {{ products }}",
+        "retry": "Retry processing",
+        "failed": "The card could not be processed.",
+        "processFailed": "The card could not be processed. Try again.",
+        "rateLimited": "The shared AI limit has been reached. Try again later.",
+        "stillProcessing": "The card is still processing. Reopen this product later."
+      }
     }
   },
   "replenishment": {
@@ -1017,6 +1152,90 @@
         "accessChanged": "Access changed. The saved command is retained. Reopen after access is restored to reconcile it.",
         "unknown": "Save outcome unknown. Retry with the same selection.",
         "keepSaved": "Keep the saved command and reopen to reconcile it."
+      }
+    }
+  },
+  "salon": {
+    "dashboard": {
+      "eyebrow": "SALON INVENTORY",
+      "fallbackName": "Salon",
+      "description": {
+        "hq": "Salon stock. Request products on behalf of this salon.",
+        "own": "What’s on your shelf. What’s available at HQ."
+      },
+      "settingsUnavailable": "Low-stock warnings unavailable. Settings could not be loaded.",
+      "stale": "These are the last loaded quantities. Refresh before making a decision.",
+      "loading": "Loading inventory",
+      "unavailable": {
+        "title": "Inventory is unavailable",
+        "message": "We couldn’t load your quantities. Try again when you’re connected."
+      },
+      "empty": {
+        "title": "No stock records yet",
+        "message": "Ask HQ to set up inventory for this salon. Missing stock is not zero stock."
+      },
+      "requestProducts": "Request products",
+      "draftProducts": "draft products",
+      "closeRequest": "Close request products",
+      "viewRequests": "View requests"
+    },
+    "stock": {
+      "title": "Salon stock",
+      "table": "Salon stock table",
+      "list": "Salon stock",
+      "columns": {
+        "product": "Product",
+        "inSalon": "In salon",
+        "hqAvailable": "HQ available",
+        "status": "Status",
+        "action": "Action"
+      },
+      "inStock": "In stock",
+      "request": "Request",
+      "requestProduct": "Request {{ name }}",
+      "footer": "Quantities in pieces. HQ available excludes reserved units. Synthetic quantities · Refreshed {{ time }}"
+    },
+    "hqAvailability": {
+      "title": "HQ availability",
+      "table": "HQ availability table",
+      "list": "HQ availability",
+      "product": "Product",
+      "available": "Available at HQ",
+      "unit": "available",
+      "footer": "Available quantities exclude reserved units."
+    },
+    "settings": {
+      "eyebrow": "SALON WORKSPACE",
+      "title": "Settings",
+      "description": "Configure how this salon tracks its inventory.",
+      "inventory": "Inventory",
+      "intro": "Show a low-stock warning when the quantity is at or below this threshold. This is a warning threshold, not an order quantity. Zero warns only when stock is empty.",
+      "busy": "Loading or saving settings",
+      "reload": "Reload settings",
+      "saved": "Settings saved.",
+      "threshold": "Low-stock threshold",
+      "saving": "Saving…",
+      "errors": {
+        "changed": "Settings changed elsewhere. Current server threshold: {{ value }}. Reload and review before saving.",
+        "stale": "Settings changed elsewhere. Reload and review before saving.",
+        "unknown": "Save not confirmed. Reloading current settings; review before saving again.",
+        "forbidden": "Access denied.",
+        "rejected": "Setting was rejected. Review the value.",
+        "unavailable": "Settings unavailable. Retry or contact HQ.",
+        "range": "Enter a whole number from 0 to 2147483647."
+      }
+    },
+    "shorthand": {
+      "title": "Salon shorthand",
+      "description": "Phrases your team taught the ordering assistant by choosing a product. They apply only to this salon. Remove one to make the assistant ask again.",
+      "reload": "Reload shorthand",
+      "empty": "No salon shorthand yet. It appears after staff choose a product for unfamiliar wording.",
+      "remove": "Remove shorthand {{ phrase }}",
+      "errors": {
+        "unknown": "The removal outcome is unknown. Retry to confirm it.",
+        "changed": "This shorthand changed. The list was reloaded.",
+        "forbidden": "You cannot remove this shorthand.",
+        "failed": "This shorthand could not be removed."
       }
     }
   }

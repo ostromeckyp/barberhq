@@ -1,10 +1,12 @@
 <section class="inventory-card" aria-labelledby="stock-heading">
   <header class="card-heading">
-    <h2 id="stock-heading">Salon stock</h2>
-    <span class="muted">{{ rows().length }} products</span>
+    <h2 id="stock-heading">{{ 'salon.stock.title' | transloco }}</h2>
+    <span class="muted">{{
+      productsKey(rows().length) | transloco: { count: rows().length }
+    }}</span>
   </header>
   @if (responsiveLayout.compact()) {
-    <ul class="compact-list" aria-label="Salon stock">
+    <ul class="compact-list" [attr.aria-label]="'salon.stock.list' | transloco">
       @for (row of rows(); track row.productId) {
         <li
           class="compact-record"
@@ -14,11 +16,11 @@
           <div class="compact-meta">{{ row.netContent.value }} {{ row.netContent.unit }}</div>
           <dl class="compact-metrics">
             <div>
-              <dt>In salon</dt>
+              <dt>{{ 'salon.stock.columns.inSalon' | transloco }}</dt>
               <dd [attr.data-testid]="'stock-' + row.demoId">{{ row.salonOnHand }}</dd>
             </div>
             <div>
-              <dt>HQ available</dt>
+              <dt>{{ 'salon.stock.columns.hqAvailable' | transloco }}</dt>
               <dd>{{ row.hqAvailable }}</dd>
             </div>
           </dl>
@@ -26,15 +28,17 @@
             @if (threshold() !== undefined && row.salonOnHand <= threshold()!) {
               <app-low-stock-chip [attr.data-testid]="'low-stock-' + row.demoId" />
             } @else {
-              <span class="normal-status">In stock</span>
+              <span class="normal-status">{{ 'salon.stock.inStock' | transloco }}</span>
             }
             @if (requestEnabled()) {
               <button
                 mat-button
                 (click)="requestProduct.emit(row.productId)"
-                [attr.aria-label]="'Request ' + row.productName"
+                [attr.aria-label]="
+                  'salon.stock.requestProduct' | transloco: { name: row.productName }
+                "
               >
-                Request
+                {{ 'salon.stock.request' | transloco }}
               </button>
             }
           </div>
@@ -42,55 +46,66 @@
       }
     </ul>
   } @else {
-    <div class="table-scroll" role="region" aria-label="Salon stock table" tabindex="0">
-      <table mat-table [dataSource]="rows()" aria-label="Salon stock">
+    <div
+      class="table-scroll"
+      role="region"
+      [attr.aria-label]="'salon.stock.table' | transloco"
+      tabindex="0"
+    >
+      <table mat-table [dataSource]="rows()" [attr.aria-label]="'salon.stock.list' | transloco">
         <ng-container matColumnDef="product">
-          <th mat-header-cell *matHeaderCellDef>Product</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'salon.stock.columns.product' | transloco }}</th>
           <td mat-cell *matCellDef="let row">
             <strong>{{ row.productName }}</strong>
             <small>{{ row.netContent.value }} {{ row.netContent.unit }}</small>
           </td>
         </ng-container>
         <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef class="quantity-cell">In salon</th>
+          <th mat-header-cell *matHeaderCellDef class="quantity-cell">
+            {{ 'salon.stock.columns.inSalon' | transloco }}
+          </th>
           <td mat-cell *matCellDef="let row" class="quantity-cell">
             <div class="stock-value">
               <span class="quantity" [attr.data-testid]="'stock-' + row.demoId">{{
                 row.salonOnHand
               }}</span>
-              <small>pcs</small>
+              <small>{{ 'requests.unit.pcs' | transloco }}</small>
             </div>
           </td>
         </ng-container>
         <ng-container matColumnDef="hqAvailable">
-          <th mat-header-cell *matHeaderCellDef class="quantity-cell">HQ available</th>
+          <th mat-header-cell *matHeaderCellDef class="quantity-cell">
+            {{ 'salon.stock.columns.hqAvailable' | transloco }}
+          </th>
           <td mat-cell *matCellDef="let row" class="quantity-cell">
             <div class="stock-value">
               <span class="quantity">{{ row.hqAvailable }}</span>
-              <small>pcs</small>
+              <small>{{ 'requests.unit.pcs' | transloco }}</small>
             </div>
           </td>
         </ng-container>
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'salon.stock.columns.status' | transloco }}</th>
           <td mat-cell *matCellDef="let row">
             @if (threshold() !== undefined && row.salonOnHand <= threshold()!) {
               <app-low-stock-chip [attr.data-testid]="'low-stock-' + row.demoId" />
             } @else {
-              <span class="normal-status">In stock</span>
+              <span class="normal-status">{{ 'salon.stock.inStock' | transloco }}</span>
             }
           </td>
         </ng-container>
         <ng-container matColumnDef="action">
-          <th mat-header-cell *matHeaderCellDef>Action</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'salon.stock.columns.action' | transloco }}</th>
           <td mat-cell *matCellDef="let row">
             @if (requestEnabled()) {
               <button
                 mat-button
                 (click)="requestProduct.emit(row.productId)"
-                [attr.aria-label]="'Request ' + row.productName"
+                [attr.aria-label]="
+                  'salon.stock.requestProduct' | transloco: { name: row.productName }
+                "
               >
-                Request
+                {{ 'salon.stock.request' | transloco }}
               </button>
             } @else {
               <span class="no-action" aria-hidden="true">—</span>
@@ -107,7 +122,6 @@
     </div>
   }
   <footer class="card-footer">
-    Quantities in pieces. HQ available excludes reserved units. Synthetic quantities · Refreshed
-    {{ updated() }}
+    {{ 'salon.stock.footer' | transloco: { time: updated() } }}
   </footer>
 </section>
