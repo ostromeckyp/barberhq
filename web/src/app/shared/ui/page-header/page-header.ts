@@ -22,6 +22,9 @@ import { Component, input } from '@angular/core';
       color: var(--muted);
     }
     .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
       flex-shrink: 0;
     }
     @media (max-width: 500px) {

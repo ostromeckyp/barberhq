@@ -1,0 +1,5 @@
+// Quantities use the body font with aligned digits; never monospace.
+.qty {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}

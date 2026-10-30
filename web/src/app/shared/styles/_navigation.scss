@@ -20,3 +20,16 @@ button.app-back-button[mat-stroked-button] {
     margin: 0 0 12px;
   }
 }
+
+// Side nav labels wrap to two lines instead of truncating.
+.mat-mdc-nav-list .mat-mdc-list-item {
+  height: auto;
+  min-height: 48px;
+  padding-block: 6px;
+}
+.mat-mdc-nav-list .mdc-list-item__content,
+.mat-mdc-nav-list .mdc-list-item__primary-text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
