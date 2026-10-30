@@ -9,6 +9,9 @@ import { pageOffset } from '../../../core/request-navigation';
 import { deliveryIssueQuery } from './delivery-return';
 import { DeliveryApi } from '../data-access/delivery-api';
 import { DELIVERY_JOURNAL, scopeKey } from './delivery-journal';
+import type { TranslatedText } from '../../../core/models/translated-text';
+import { ISSUE_STATUS_KEYS } from './issue-status-keys';
+import { deliveryCommandError } from './delivery-command-error';
 import type { DeliveryScope } from '../models/delivery-scope';
 import { DeliveryIssueDraft } from './delivery-issue-draft';
 import { deliveryIssueIdentity } from './delivery-access';
@@ -102,8 +105,8 @@ export class DeliveryIssueFacade {
   readonly busy = signal(false);
   readonly pending = signal<IssueAction | null>(null);
   readonly unknown = computed(() => !!this.pending());
-  readonly message = signal('');
-  readonly recoveryError = signal('');
+  readonly message = signal<TranslatedText | null>(null);
+  readonly recoveryError = signal<TranslatedText | null>(null);
   readonly isHq = computed(() => !!this.scope() && this.view === 'HQ');
   readonly locked = computed(
     () => !this.isHq() || this.loading() || this.busy() || this.unknown() || !!this.recoveryError(),
@@ -126,16 +129,9 @@ export class DeliveryIssueFacade {
       this.draft.note().trim().length > 0 &&
       this.draft.note().trim().length <= 1000,
   );
-  readonly statusLabel = computed(() => {
+  readonly statusKey = computed(() => {
     const status = this.issue()?.status;
-    return status
-      ? {
-          OPEN: 'Open',
-          IN_REVIEW: 'Under review',
-          REPLACEMENT_IN_PROGRESS: 'Replacement in progress',
-          RESOLVED: 'Resolved',
-        }[status]
-      : '';
+    return status ? ISSUE_STATUS_KEYS[status] : '';
   });
   private owner: string | undefined;
   constructor() {
@@ -147,21 +143,21 @@ export class DeliveryIssueFacade {
       this.owner = key;
       untracked(() => this.draft.activate(scope, this.view));
       this.pending.set(null);
-      this.message.set('');
-      this.recoveryError.set('');
+      this.message.set(null);
+      this.recoveryError.set(null);
       if (this.view === 'HQ')
         try {
           const saved = this.journal.load(scope);
           if (saved) {
             if (!['START_REVIEW', 'CREATE_REPLACEMENT', 'ADD_NOTE'].includes(saved.type))
-              throw new Error('A different saved command needs review.');
-            this.pending.set(saved as IssueAction);
-            if (saved.type === 'ADD_NOTE') this.draft.note.set(saved.input.text);
+              this.recoveryError.set({ key: 'delivery.errors.differentCommand' });
+            else {
+              this.pending.set(saved as IssueAction);
+              if (saved.type === 'ADD_NOTE') this.draft.note.set(saved.input.text);
+            }
           }
-        } catch (error) {
-          this.recoveryError.set(
-            error instanceof Error ? error.message : 'Saved action unavailable.',
-          );
+        } catch {
+          this.recoveryError.set({ key: 'delivery.errors.savedUnreadable' });
         }
     });
   }
@@ -232,9 +228,7 @@ export class DeliveryIssueFacade {
       if (!saved) throw new Error();
       this.pending.set(saved as IssueAction);
     } catch {
-      this.recoveryError.set(
-        'Could not save recovery data in this browser. Enable browser storage before continuing.',
-      );
+      this.recoveryError.set({ key: 'delivery.errors.recoveryStorage' });
       return;
     }
     await this.retry();
@@ -245,39 +239,35 @@ export class DeliveryIssueFacade {
     if (!scope || !action || !this.isHq() || this.busy() || this.loading() || this.recoveryError())
       return;
     this.busy.set(true);
-    this.message.set('');
+    this.message.set(null);
     try {
       const result = await sendIssueAction(this.api, action);
       this.journal.clear(scope);
       if (!this.scope() || scopeKey(this.scope()!) !== scopeKey(scope) || !this.isHq()) return;
       this.pending.set(null);
       if (action.type === 'ADD_NOTE') this.draft.note.set('');
-      this.message.set(result.replayed ? 'The earlier action was recorded.' : 'Action recorded.');
+      this.message.set({
+        key: result.replayed ? 'delivery.issue.replayed' : 'delivery.issue.recorded',
+      });
       this.record.reload();
     } catch (error) {
       if (!this.scope() || scopeKey(this.scope()!) !== scopeKey(scope) || !this.isHq()) return;
-      const e = error as { code?: string; message?: string };
+      const e = error as { code?: string };
       if (e.code === 'FORBIDDEN' || e.code === 'UNAUTHENTICATED') {
-        this.recoveryError.set(
-          'Access changed. The saved command is retained. Reload after access is restored to reconcile it.',
-        );
+        this.recoveryError.set({ key: 'delivery.errors.accessChanged' });
         return;
       }
       if (!e.code || e.code === 'UNKNOWN')
-        this.message.set('Outcome unknown. Retry the saved action before making changes.');
+        this.message.set({ key: 'delivery.issue.errors.unknown' });
       else {
         try {
           this.journal.clear(scope);
           this.pending.set(null);
         } catch {
-          this.message.set('Keep the saved action and retry reconciliation.');
+          this.message.set({ key: 'delivery.issue.errors.keepSaved' });
           return;
         }
-        this.message.set(
-          e.code === 'ALREADY_ACTIVE'
-            ? 'An active request already covers this product. Finish it before creating a replacement.'
-            : (e.message ?? 'Action was not recorded. Refresh and try again.'),
-        );
+        this.message.set(deliveryCommandError(e.code));
         this.record.reload();
       }
     } finally {

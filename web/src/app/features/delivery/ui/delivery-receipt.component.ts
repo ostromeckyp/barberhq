@@ -6,6 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { pluralKey } from '../../../core/i18n/plural';
+import { Language } from '../../../core/language';
+import { OPEN_PROCEDURE_KEYS } from '../feature/procedure-kind-keys';
 import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { DeliveryReceiptFacade } from '../feature/delivery-receipt.facade';
 @Component({
@@ -37,5 +40,14 @@ export class DeliveryReceiptComponent {
       }
     });
   });
-  readonly labels = { DAMAGED: 'damaged product', MISSING: 'missing product' };
+  private readonly language = inject(Language);
+  readonly openProcedureLabels = OPEN_PROCEDURE_KEYS;
+  readonly selectedSourceLabels = {
+    DAMAGED: 'delivery.receipt.sources.selected.DAMAGED',
+    MISSING: 'delivery.receipt.sources.selected.MISSING',
+  };
+  /** Plural form key for a unit count under the given base key. */
+  countKey(base: string, count: number): string {
+    return pluralKey(base, count, this.language.current());
+  }
 }

@@ -788,5 +788,236 @@
       "quantity": "Ilość dla: {{ wording }}",
       "use": "Zastosuj wybór"
     }
+  },
+  "delivery": {
+    "quantities": "W dobrym stanie: {{ good }} · Uszkodzone: {{ damaged }} · Brakujące: {{ missing }}",
+    "status": {
+      "OPEN": "Otwarty",
+      "IN_REVIEW": "W przeglądzie",
+      "REPLACEMENT_IN_PROGRESS": "Zamówienie zastępcze w toku",
+      "RESOLVED": "Rozwiązany"
+    },
+    "count": {
+      "dispatched": {
+        "one": "Wysłano {{ count }} sztukę",
+        "few": "Wysłano {{ count }} sztuki",
+        "many": "Wysłano {{ count }} sztuk",
+        "other": "Wysłano {{ count }} sztuk"
+      },
+      "goodUnits": {
+        "one": "{{ count }} sztuka w dobrym stanie",
+        "few": "{{ count }} sztuki w dobrym stanie",
+        "many": "{{ count }} sztuk w dobrym stanie",
+        "other": "{{ count }} sztuk w dobrym stanie"
+      },
+      "reported": {
+        "one": "{{ count }} sztuka zostanie zgłoszona do centrali w celu wymiany.",
+        "few": "{{ count }} sztuki zostaną zgłoszone do centrali w celu wymiany.",
+        "many": "{{ count }} sztuk zostanie zgłoszonych do centrali w celu wymiany.",
+        "other": "{{ count }} sztuk zostanie zgłoszonych do centrali w celu wymiany."
+      },
+      "remaining": {
+        "one": "Pozostała {{ count }} sztuka",
+        "few": "Pozostały {{ count }} sztuki",
+        "many": "Pozostało {{ count }} sztuk",
+        "other": "Pozostało {{ count }} sztuk"
+      }
+    },
+    "errors": {
+      "differentCommand": "Inna zapisana akcja wymaga przeglądu.",
+      "savedUnreadable": "Nie można odczytać zapisanej akcji. Zachowaj dane tej przeglądarki i skontaktuj się z centralą.",
+      "recoveryStorage": "Nie udało się zapisać danych odzyskiwania w tej przeglądarce. Włącz pamięć przeglądarki, zanim przejdziesz dalej.",
+      "accessChanged": "Dostęp się zmienił. Zapisana akcja została zachowana. Przeładuj aplikację po przywróceniu dostępu, aby uzgodnić jej wynik.",
+      "ALREADY_ACTIVE": "Aktywne zamówienie obejmuje już ten produkt. Zakończ je, zanim utworzysz zamówienie zastępcze.",
+      "STALE_STATE": "Dane uległy zmianie. Przejrzyj odświeżone informacje przed ponowną próbą.",
+      "default": "Nie ukończono akcji ({{ code }}). Odśwież i sprawdź dane."
+    },
+    "validation": {
+      "unavailable": "Dane dostawy są niedostępne.",
+      "checkAll": "Sprawdź wszystkie produkty.",
+      "wholeQuantities": "{{ product }}: wpisz liczby całkowite od 0 do 99.",
+      "mustAddUp": "{{ product }}: ilości muszą w sumie dawać {{ total }}.",
+      "describe": "Opisz problem w 1–1000 znakach.",
+      "batchLength": "Numer partii może mieć maksymalnie 120 znaków."
+    },
+    "procedure": {
+      "kind": {
+        "DAMAGED": "Uszkodzony produkt",
+        "MISSING": "Brakujący produkt"
+      },
+      "open": {
+        "DAMAGED": "Otwórz procedurę dla uszkodzonego produktu",
+        "MISSING": "Otwórz procedurę dla brakującego produktu"
+      },
+      "notAssigned": {
+        "DAMAGED": "Procedura dla uszkodzonego produktu nie jest przypisana. Skontaktuj się z centralą po wskazówki.",
+        "MISSING": "Procedura dla brakującego produktu nie jest przypisana. Skontaktuj się z centralą po wskazówki."
+      },
+      "unavailable": {
+        "DAMAGED": "Procedura dla uszkodzonego produktu jest niedostępna. Skontaktuj się z centralą po wskazówki.",
+        "MISSING": "Procedura dla brakującego produktu jest niedostępna. Skontaktuj się z centralą po wskazówki."
+      }
+    },
+    "receipt": {
+      "back": "Wróć do zamówienia",
+      "title": {
+        "check": "Sprawdź dostawę",
+        "recorded": "Dostawa sprawdzona"
+      },
+      "loading": "Wczytuję dostawę",
+      "unavailable": {
+        "title": "Dostawa niedostępna",
+        "body": "Twój szkic został zachowany. Odśwież, aby sprawdzić dostęp i dane dostawy."
+      },
+      "route": "Centrala → {{ salon }} · Zamówienie {{ id }}",
+      "recordedLabel": "Zapisane ilości",
+      "inspect": {
+        "title": "Sprawdź produkty",
+        "body": "Policz sztuki w dobrym stanie, uszkodzone i brakujące dla każdego produktu. Tylko sztuki w dobrym stanie trafiają do stanu magazynowego salonu."
+      },
+      "markAllGood": "Oznacz wszystko jako dobre",
+      "field": {
+        "good": "Sztuki w dobrym stanie",
+        "goodAria": "Sztuki w dobrym stanie · {{ product }}",
+        "damaged": "Sztuki uszkodzone",
+        "damagedAria": "Sztuki uszkodzone · {{ product }}",
+        "missing": "Sztuki brakujące",
+        "missingAria": "Sztuki brakujące · {{ product }}"
+      },
+      "problem": {
+        "title": "Zgłoś problem z dostawą",
+        "description": "Opisz problem",
+        "batch": "Numer partii (jeśli znany)",
+        "handleTitle": "Co zrobić z produktami",
+        "handleBody": "Zanim zajmiesz się uszkodzonymi lub brakującymi produktami, sprawdź procedurę salonu."
+      },
+      "sources": {
+        "title": "Wybrane źródła procedur",
+        "remove": "Usuń odwołanie do źródła",
+        "selected": {
+          "DAMAGED": "Wybrane źródło dla uszkodzonego produktu",
+          "MISSING": "Wybrane źródło dla brakującego produktu"
+        }
+      },
+      "preview": {
+        "title": "Podgląd odbioru",
+        "addedToStock": "Sztuki w dobrym stanie zostaną dodane do stanu magazynowego salonu.",
+        "endsTransit": "Zapisanie wyniku kończy etap „w drodze” tej dostawy.",
+        "locked": "Zapisany wynik sprawdzenia jest zablokowany do czasu potwierdzenia rezultatu."
+      },
+      "submit": {
+        "busy": "Zapisuję…",
+        "retry": "Ponów zapisane sprawdzenie dostawy",
+        "record": "Zapisz wynik sprawdzenia"
+      },
+      "replayed": "Wcześniejsze sprawdzenie dostawy zostało już zapisane.",
+      "recorded": "Sprawdzenie dostawy zostało zapisane.",
+      "errors": {
+        "recoveryStorage": "Nie udało się zapisać danych odzyskiwania w tej przeglądarce. Włącz pamięć przeglądarki, zanim zapiszesz wynik sprawdzenia.",
+        "unknown": "Wynik nieznany. Ponów zapisane sprawdzenie dostawy, zanim wprowadzisz zmiany.",
+        "keepSaved": "Zachowaj zapisane sprawdzenie dostawy i ponów uzgadnianie."
+      }
+    },
+    "issue": {
+      "back": {
+        "hq": "Wróć do problemów z dostawą",
+        "salon": "Wróć do zamówienia"
+      },
+      "title": "Problem z dostawą",
+      "loading": "Wczytuję problem z dostawą",
+      "unavailable": {
+        "title": "Problem z dostawą niedostępny",
+        "body": "Może być poza Twoim dostępem. Niewysłana notatka została zachowana."
+      },
+      "progress": {
+        "label": "Pozostałe sztuki",
+        "title": "Postęp zamówienia zastępczego",
+        "received": "Otrzymane sztuki zastępcze w dobrym stanie: {{ received }} z {{ total }}",
+        "resolved": "Brakujące sztuki zastępcze w dobrym stanie zostały odebrane."
+      },
+      "original": {
+        "title": "Pierwotne sprawdzenie dostawy",
+        "open": "Otwórz pierwotne zamówienie",
+        "batch": "Partia: {{ batch }}",
+        "inspectedBy": "Sprawdził(a): {{ actor }} · {{ date }}",
+        "noSource": "Przy pierwotnym sprawdzeniu nie wybrano źródła procedury."
+      },
+      "current": {
+        "title": "Aktualne procedury dostaw",
+        "unavailable": "Aktualne procedury są niedostępne. Odśwież, aby sprawdzić ponownie, lub skontaktuj się z centralą po wskazówki."
+      },
+      "replacements": {
+        "title": "Zamówienia zastępcze",
+        "empty": "Brak zamówień zastępczych.",
+        "open": "Otwórz zamówienie zastępcze",
+        "pages": "Strony zamówień zastępczych"
+      },
+      "history": {
+        "title": "Historia problemu",
+        "pages": "Strony historii problemu"
+      },
+      "event": {
+        "OPENED": "Zgłoszono problem",
+        "REVIEW_STARTED": "Rozpoczęto przegląd",
+        "NOTE_ADDED": "Notatka centrali",
+        "REPLACEMENT_CREATED": "Utworzono zamówienie zastępcze",
+        "REPLACEMENT_REJECTED": "Odrzucono zamówienie zastępcze",
+        "REPLACEMENT_RECEIVED": "Sprawdzono dostawę zastępczą"
+      },
+      "actions": {
+        "title": "Działania centrali",
+        "locked": "Zapisana akcja jest zablokowana do czasu potwierdzenia jej wyniku.",
+        "retrySaved": "Ponów zapisaną akcję",
+        "startReview": "Rozpocznij przegląd",
+        "createReplacement": "Utwórz zamówienie zastępcze",
+        "createHint": "Tworzy powiązane zamówienie na pozostałe sztuki w dobrym stanie. Zatwierdzenie i wysyłka przebiegają jak w zwykłym zamówieniu.",
+        "note": "Notatka centrali",
+        "addNote": "Dodaj notatkę",
+        "allReceived": "Wszystkie sztuki zastępcze zostały odebrane. Pierwotne sprawdzenie dostawy pozostaje w historii."
+      },
+      "replayed": "Wcześniejsza akcja została już zapisana.",
+      "recorded": "Akcja została zapisana.",
+      "errors": {
+        "unknown": "Wynik nieznany. Ponów zapisaną akcję, zanim wprowadzisz zmiany.",
+        "keepSaved": "Zachowaj zapisaną akcję i ponów uzgadnianie."
+      }
+    },
+    "issues": {
+      "title": "Problemy z dostawami",
+      "configure": "Skonfiguruj procedury",
+      "refresh": "Odśwież problemy",
+      "statusFilter": "Status problemu z dostawą",
+      "filter": {
+        "open": "Otwarte problemy",
+        "all": "Wszystkie problemy"
+      },
+      "loading": "Wczytuję problemy z dostawami",
+      "unavailable": "Problemy z dostawami są niedostępne.",
+      "empty": "Brak problemów z dostawami w tym widoku.",
+      "openLabel": "Otwórz problem z dostawą · {{ salon }}",
+      "open": "Otwórz problem",
+      "pages": "Strony problemów z dostawami"
+    },
+    "settings": {
+      "title": "Procedury dostaw",
+      "intro": "Wybierz opublikowaną procedurę, z której personel może korzystać przy każdym problemie z dostawą.",
+      "loading": "Wczytuję procedury dostaw",
+      "none": "Brak przypisanej procedury",
+      "currentUnavailable": "Aktualne przypisanie jest niedostępne",
+      "unavailableNote": "Aktualna procedura jest niedostępna. Wybierz inny opublikowany dokument lub usuń przypisanie.",
+      "retrySave": "Ponów zapis",
+      "save": "Zapisz",
+      "loadMore": "Wczytaj więcej procedur",
+      "unavailable": "Procedury dostaw są niedostępne.",
+      "close": "Zamknij",
+      "saved": "Procedura dostawy została zapisana.",
+      "replayed": "Wcześniejszy zapis został już wykonany.",
+      "errors": {
+        "loadMore": "Nie udało się wczytać kolejnych procedur. Spróbuj ponownie.",
+        "accessChanged": "Dostęp się zmienił. Zapisana akcja została zachowana. Otwórz ponownie po przywróceniu dostępu, aby uzgodnić jej wynik.",
+        "unknown": "Wynik zapisu nieznany. Ponów zapis z tym samym wyborem.",
+        "keepSaved": "Zachowaj zapisaną akcję i otwórz ponownie, aby ją uzgodnić."
+      }
+    }
   }
 }

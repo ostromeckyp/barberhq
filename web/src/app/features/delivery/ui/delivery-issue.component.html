@@ -5,194 +5,234 @@
     (click)="facade.refresh()"
     [disabled]="facade.loading() || facade.busy()"
   >
-    Refresh</button
+    {{ 'common.actions.refresh' | transloco }}</button
   ><button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-    Back to {{ facade.view === 'HQ' ? 'delivery issues' : 'request' }}
+    {{
+      (facade.view === 'HQ' ? 'delivery.issue.back.hq' : 'delivery.issue.back.salon') | transloco
+    }}
   </button>
 </div>
-<h1>Delivery issue</h1>
+<h1>{{ 'delivery.issue.title' | transloco }}</h1>
 <mat-progress-bar
   *appDelayedLoading="facade.loading()"
   mode="indeterminate"
-  aria-label="Loading delivery issue"
+  [attr.aria-label]="'delivery.issue.loading' | transloco"
 />
-@if (facade.message()) {
-  <p role="status">{{ facade.message() }}</p>
+@if (facade.message(); as message) {
+  <p role="status">{{ message.key | transloco: message.params }}</p>
 }
-@if (facade.recoveryError()) {
-  <p role="alert">{{ facade.recoveryError() }}</p>
+@if (facade.recoveryError(); as error) {
+  <p role="alert">{{ error.key | transloco: error.params }}</p>
 }
 @if (facade.error()) {
   <section class="card">
-    <h2>Delivery issue unavailable</h2>
-    <p>It may be outside your access. Your unsent note is retained.</p>
-    <button mat-button type="button" (click)="facade.refresh()">Retry</button>
+    <h2>{{ 'delivery.issue.unavailable.title' | transloco }}</h2>
+    <p>{{ 'delivery.issue.unavailable.body' | transloco }}</p>
+    <button mat-button type="button" (click)="facade.refresh()">
+      {{ 'common.actions.retry' | transloco }}
+    </button>
   </section>
 }
 @if (facade.issue(); as issue) {
   <header class="heading">
-    <p>{{ issue.salonName }} · {{ issue.createdAt | date: 'd MMM, HH:mm' }}</p>
-    <span class="issue-status">{{ facade.statusLabel() }}</span>
+    <p>{{ issue.salonName }} · {{ issue.createdAt | appDate: 'd MMM, HH:mm' }}</p>
+    <span class="issue-status">{{ facade.statusKey() | transloco }}</span>
   </header>
   <div class="layout">
     <div>
-      <section class="card" aria-label="Outstanding units">
-        <h2>Replacement progress</h2>
+      <section class="card" [attr.aria-label]="'delivery.issue.progress.label' | transloco">
+        <h2>{{ 'delivery.issue.progress.title' | transloco }}</h2>
         @for (item of issue.items; track item.productId) {
           <div class="progress-item">
             <h3>{{ item.productName }}</h3>
-            <p class="remaining">{{ item.outstandingQuantity }} remaining</p>
+            <p class="remaining">
+              {{
+                remainingKey(item.outstandingQuantity)
+                  | transloco: { count: item.outstandingQuantity }
+              }}
+            </p>
             <p>
-              {{ item.replacementAcceptedQuantity }} good replacement units received of
-              {{ item.initialAffectedQuantity }} affected units
+              {{
+                'delivery.issue.progress.received'
+                  | transloco
+                    : {
+                        received: item.replacementAcceptedQuantity,
+                        total: item.initialAffectedQuantity,
+                      }
+              }}
             </p>
           </div>
         }
         @if (issue.status === 'RESOLVED') {
-          <p>The outstanding good replacement units have been received.</p>
+          <p>{{ 'delivery.issue.progress.resolved' | transloco }}</p>
         }
       </section>
-      <section class="card" aria-label="Original inspection">
-        <h2>Original inspection</h2>
-        <a mat-button [routerLink]="facade.requestLink(issue.rootRequestId)"
-          >Open original request</a
-        >
+      <section class="card" [attr.aria-label]="'delivery.issue.original.title' | transloco">
+        <h2>{{ 'delivery.issue.original.title' | transloco }}</h2>
+        <a mat-button [routerLink]="facade.requestLink(issue.rootRequestId)">{{
+          'delivery.issue.original.open' | transloco
+        }}</a>
         @for (item of issue.rootReceipt.items; track item.productId) {
           <h3>{{ item.productName }}</h3>
           <p>
-            {{ item.goodQuantity }} good · {{ item.damagedQuantity }} damaged ·
-            {{ item.missingQuantity }} missing
+            {{
+              'delivery.quantities'
+                | transloco
+                  : {
+                      good: item.goodQuantity,
+                      damaged: item.damagedQuantity,
+                      missing: item.missingQuantity,
+                    }
+            }}
           </p>
         }
         @if (issue.rootReceipt.report; as report) {
           <p>{{ report.description }}</p>
           @if (report.batchIdentifier) {
-            <p>Batch: {{ report.batchIdentifier }}</p>
+            <p>
+              {{ 'delivery.issue.original.batch' | transloco: { batch: report.batchIdentifier } }}
+            </p>
           }
         }
         <p class="muted">
-          Inspected by {{ issue.rootReceipt.actorLabel }} ·
-          {{ issue.rootReceipt.recordedAt | date: 'd MMM, HH:mm' }}
+          {{
+            'delivery.issue.original.inspectedBy'
+              | transloco
+                : {
+                    actor: issue.rootReceipt.actorLabel | transloco,
+                    date: issue.rootReceipt.recordedAt | appDate: 'd MMM, HH:mm',
+                  }
+          }}
         </p>
         @for (ref of issue.rootReceipt.procedureReferences; track ref.kind) {
           <button mat-stroked-button type="button" (click)="facade.openProcedure(ref)">
-            Open {{ sourceLabels[ref.kind] }} procedure
+            {{ openProcedureLabels[ref.kind] | transloco }}
           </button>
         }
         @if (!issue.rootReceipt.procedureReferences.length) {
-          <p class="muted">No procedure source was selected for the original inspection.</p>
+          <p class="muted">{{ 'delivery.issue.original.noSource' | transloco }}</p>
         }
       </section>
-      <section class="card" aria-label="Current delivery procedures">
-        <h2>Current delivery procedures</h2>
+      <section class="card" [attr.aria-label]="'delivery.issue.current.title' | transloco">
+        <h2>{{ 'delivery.issue.current.title' | transloco }}</h2>
         @if (facade.procedures(); as procedures) {
           @for (procedure of procedures; track procedure.kind) {
             @if (procedure.reference; as reference) {
-              <h3>{{ sourceLabels[procedure.kind] }}</h3>
+              <h3>{{ kindLabels[procedure.kind] | transloco }}</h3>
               <p>{{ procedure.title }}</p>
               <button mat-stroked-button type="button" (click)="facade.openProcedure(reference)">
-                Open {{ sourceLabels[procedure.kind] }} procedure
+                {{ openProcedureLabels[procedure.kind] | transloco }}
               </button>
             } @else {
               <p>
-                The {{ sourceLabels[procedure.kind] }} procedure is
-                {{ procedure.availability === 'MISSING' ? 'not assigned' : 'unavailable' }}. Contact
-                HQ for instructions.
+                {{
+                  unavailableLabels[procedure.kind][
+                    procedure.availability === 'MISSING' ? 'MISSING' : 'UNAVAILABLE'
+                  ] | transloco
+                }}
               </p>
             }
           }
         } @else {
-          <p>
-            Current procedures unavailable. Refresh to check again or contact HQ for instructions.
-          </p>
+          <p>{{ 'delivery.issue.current.unavailable' | transloco }}</p>
         }
       </section>
       <section class="card" aria-labelledby="replacements-title">
-        <h2 id="replacements-title">Replacement requests</h2>
+        <h2 id="replacements-title">{{ 'delivery.issue.replacements.title' | transloco }}</h2>
         @if (!issue.replacements.length) {
-          <p>No replacement requests yet.</p>
+          <p>{{ 'delivery.issue.replacements.empty' | transloco }}</p>
         }
         @for (child of issue.replacements; track child.id) {
           <article class="replacement">
             <div>
               <p class="reference">
-                {{ child.id.slice(0, 8) }} · {{ child.createdAt | date: 'd MMM, HH:mm' }}
+                {{ child.id.slice(0, 8) }} · {{ child.createdAt | appDate: 'd MMM, HH:mm' }}
               </p>
               <app-status-chip [state]="child.state" />
             </div>
-            <a mat-button [routerLink]="facade.requestLink(child.id)">Open replacement request</a>
+            <a mat-button [routerLink]="facade.requestLink(child.id)">{{
+              'delivery.issue.replacements.open' | transloco
+            }}</a>
           </article>
         }
-        <nav aria-label="Replacement pages">
+        <nav [attr.aria-label]="'delivery.issue.replacements.pages' | transloco">
           <button
             mat-button
             type="button"
             (click)="facade.replacementsBy(-1)"
             [disabled]="facade.replacementOffset() === 0 || facade.loading()"
           >
-            Previous replacements</button
+            {{ 'common.actions.previous' | transloco }}</button
           ><button
             mat-button
             type="button"
             (click)="facade.replacementsBy(1)"
             [disabled]="!issue.hasMoreReplacements || facade.loading()"
           >
-            Next replacements
+            {{ 'common.actions.next' | transloco }}
           </button>
         </nav>
       </section>
       <section class="card" aria-labelledby="history-title">
-        <h2 id="history-title">Issue history</h2>
+        <h2 id="history-title">{{ 'delivery.issue.history.title' | transloco }}</h2>
         <ol>
           @for (event of issue.events; track event.id) {
             <li>
-              <h3>{{ eventLabels[event.type] }}</h3>
+              <h3>{{ eventLabels[event.type] | transloco }}</h3>
               <p class="muted">
-                {{ event.actorLabel }} · {{ event.recordedAt | date: 'd MMM, HH:mm' }}
+                {{ event.actorLabel | transloco }} ·
+                {{ event.recordedAt | appDate: 'd MMM, HH:mm' }}
               </p>
               @if (event.note) {
                 <p class="note-text">{{ event.note }}</p>
               }
               @for (row of event.quantities; track row.productId) {
                 <p>
-                  {{ row.goodQuantity }} good · {{ row.damagedQuantity }} damaged ·
-                  {{ row.missingQuantity }} missing
+                  {{
+                    'delivery.quantities'
+                      | transloco
+                        : {
+                            good: row.goodQuantity,
+                            damaged: row.damagedQuantity,
+                            missing: row.missingQuantity,
+                          }
+                  }}
                 </p>
               }
             </li>
           }
         </ol>
-        <nav aria-label="Issue history pages">
+        <nav [attr.aria-label]="'delivery.issue.history.pages' | transloco">
           <button
             mat-button
             type="button"
             (click)="facade.eventsBy(-1)"
             [disabled]="facade.eventOffset() === 0 || facade.loading()"
           >
-            Previous events</button
+            {{ 'common.actions.previous' | transloco }}</button
           ><button
             mat-button
             type="button"
             (click)="facade.eventsBy(1)"
             [disabled]="!issue.hasMoreEvents || facade.loading()"
           >
-            Next events
+            {{ 'common.actions.next' | transloco }}
           </button>
         </nav>
       </section>
     </div>
     @if (facade.isHq()) {
       <section class="card actions" aria-labelledby="hq-actions-title">
-        <h2 id="hq-actions-title">HQ follow-up</h2>
+        <h2 id="hq-actions-title">{{ 'delivery.issue.actions.title' | transloco }}</h2>
         @if (facade.unknown()) {
-          <p>The saved action is locked until its result is confirmed.</p>
+          <p>{{ 'delivery.issue.actions.locked' | transloco }}</p>
           <button
             mat-flat-button
             type="button"
             (click)="facade.retry()"
             [disabled]="facade.busy() || facade.loading()"
           >
-            Retry saved action
+            {{ 'delivery.issue.actions.retrySaved' | transloco }}
           </button>
         } @else {
           @if (issue.status === 'OPEN') {
@@ -202,7 +242,7 @@
               (click)="facade.act('START_REVIEW')"
               [disabled]="!facade.canReview()"
             >
-              Start review
+              {{ 'delivery.issue.actions.startReview' | transloco }}
             </button>
           }
           @if (issue.status !== 'RESOLVED') {
@@ -212,14 +252,11 @@
               (click)="facade.act('CREATE_REPLACEMENT')"
               [disabled]="!facade.canCreate()"
             >
-              Create replacement
+              {{ 'delivery.issue.actions.createReplacement' | transloco }}
             </button>
-            <p>
-              Creates a linked request for the remaining good units. Approval and dispatch follow
-              the usual request flow.
-            </p>
+            <p>{{ 'delivery.issue.actions.createHint' | transloco }}</p>
             <mat-form-field appearance="outline"
-              ><mat-label>HQ note</mat-label
+              ><mat-label>{{ 'delivery.issue.actions.note' | transloco }}</mat-label
               ><textarea matInput rows="3" [formField]="note"></textarea></mat-form-field
             ><button
               mat-stroked-button
@@ -227,12 +264,10 @@
               (click)="facade.act('ADD_NOTE')"
               [disabled]="!facade.canNote()"
             >
-              Add note
+              {{ 'delivery.issue.actions.addNote' | transloco }}
             </button>
           } @else {
-            <p>
-              All replacement units were received. The original inspection remains in the history.
-            </p>
+            <p>{{ 'delivery.issue.actions.allReceived' | transloco }}</p>
           }
         }
       </section>

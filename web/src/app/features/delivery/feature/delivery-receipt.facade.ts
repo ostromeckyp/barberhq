@@ -15,7 +15,9 @@ import { deliveryReceiptQuery } from './delivery-return';
 import { DELIVERY_JOURNAL, scopeKey } from './delivery-journal';
 import type { DeliveryScope } from '../models/delivery-scope';
 import { deliveryReceiptScope } from './delivery-access';
+import { deliveryCommandError } from './delivery-command-error';
 import { receiptInput, receiptProcedureProblem, receiptValidation } from './delivery-receipt-input';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { runtimeConfig } from '../../../core/public-config';
 import { deliveryProcedureQuestion } from '../../procedures/procedure-question';
 @Service({ autoProvided: false })
@@ -61,8 +63,8 @@ export class DeliveryReceiptFacade {
   readonly pending = signal<RecordDeliveryInput | null>(null);
   readonly busy = signal(false);
   readonly result = signal<DeliveryCommandResult | null>(null);
-  readonly message = signal('');
-  readonly recoveryError = signal('');
+  readonly message = signal<TranslatedText | null>(null);
+  readonly recoveryError = signal<TranslatedText | null>(null);
   readonly unknown = computed(() => !!this.pending());
   readonly locked = computed(
     () =>
@@ -114,17 +116,14 @@ export class DeliveryReceiptFacade {
       this.owner = key;
       this.pending.set(null);
       this.result.set(null);
-      this.message.set('');
-      this.recoveryError.set('');
+      this.message.set(null);
+      this.recoveryError.set(null);
       try {
         const saved = this.journal.load(scope);
-        if (saved) {
-          if (saved.type !== 'RECORD_RECEIPT')
-            throw new Error('A different saved command needs review.');
-          this.pending.set(saved.input);
-        }
-      } catch (e) {
-        this.recoveryError.set(e instanceof Error ? e.message : 'Saved inspection unavailable.');
+        if (saved?.type === 'RECORD_RECEIPT') this.pending.set(saved.input);
+        else if (saved) this.recoveryError.set({ key: 'delivery.errors.differentCommand' });
+      } catch {
+        this.recoveryError.set({ key: 'delivery.errors.savedUnreadable' });
       }
     });
     effect(() => {
@@ -242,47 +241,41 @@ export class DeliveryReceiptFacade {
         input = saved.input;
         this.pending.set(input);
       } catch {
-        this.recoveryError.set(
-          'Could not save recovery data in this browser. Enable browser storage before recording the inspection.',
-        );
+        this.recoveryError.set({ key: 'delivery.receipt.errors.recoveryStorage' });
         return;
       }
     }
     this.busy.set(true);
-    this.message.set('');
+    this.message.set(null);
     try {
       const result = await this.api.recordReceipt(input);
       this.journal.clear(scope);
       if (this.scope() && scopeKey(this.scope()!) === scopeKey(scope)) {
         this.pending.set(null);
         this.result.set(result);
-        this.message.set(
-          result.replayed ? 'The earlier inspection was recorded.' : 'Inspection recorded.',
-        );
+        this.message.set({
+          key: result.replayed ? 'delivery.receipt.replayed' : 'delivery.receipt.recorded',
+        });
         this.record.reload();
       }
     } catch (error) {
       if (!this.scope() || scopeKey(this.scope()!) !== scopeKey(scope)) return;
-      const e = error as { code?: string; message?: string };
+      const e = error as { code?: string };
       if (e.code === 'FORBIDDEN' || e.code === 'UNAUTHENTICATED') {
-        this.recoveryError.set(
-          'Access changed. The saved command is retained. Reload after access is restored to reconcile it.',
-        );
+        this.recoveryError.set({ key: 'delivery.errors.accessChanged' });
         return;
       }
       if (!e.code || e.code === 'UNKNOWN') {
-        this.message.set('Outcome unknown. Retry the saved inspection before making changes.');
+        this.message.set({ key: 'delivery.receipt.errors.unknown' });
       } else {
         try {
           this.journal.clear(scope);
           this.pending.set(null);
         } catch {
-          this.message.set('Keep the saved inspection and retry reconciliation.');
+          this.message.set({ key: 'delivery.receipt.errors.keepSaved' });
           return;
         }
-        this.message.set(
-          e.message ?? 'Inspection was not recorded. Refresh and check the details.',
-        );
+        this.message.set(deliveryCommandError(e.code));
         this.record.reload();
       }
     } finally {

@@ -788,5 +788,236 @@
       "quantity": "Quantity for {{ wording }}",
       "use": "Use selection"
     }
+  },
+  "delivery": {
+    "quantities": "{{ good }} good · {{ damaged }} damaged · {{ missing }} missing",
+    "status": {
+      "OPEN": "Open",
+      "IN_REVIEW": "Under review",
+      "REPLACEMENT_IN_PROGRESS": "Replacement in progress",
+      "RESOLVED": "Resolved"
+    },
+    "count": {
+      "dispatched": {
+        "one": "{{ count }} unit dispatched",
+        "few": "{{ count }} units dispatched",
+        "many": "{{ count }} units dispatched",
+        "other": "{{ count }} units dispatched"
+      },
+      "goodUnits": {
+        "one": "{{ count }} good unit",
+        "few": "{{ count }} good units",
+        "many": "{{ count }} good units",
+        "other": "{{ count }} good units"
+      },
+      "reported": {
+        "one": "{{ count }} unit will be reported to HQ for replacement.",
+        "few": "{{ count }} units will be reported to HQ for replacement.",
+        "many": "{{ count }} units will be reported to HQ for replacement.",
+        "other": "{{ count }} units will be reported to HQ for replacement."
+      },
+      "remaining": {
+        "one": "{{ count }} unit remaining",
+        "few": "{{ count }} units remaining",
+        "many": "{{ count }} units remaining",
+        "other": "{{ count }} units remaining"
+      }
+    },
+    "errors": {
+      "differentCommand": "A different saved command needs review.",
+      "savedUnreadable": "The saved command cannot be read. Keep this browser data and contact HQ.",
+      "recoveryStorage": "Could not save recovery data in this browser. Enable browser storage before continuing.",
+      "accessChanged": "Access changed. The saved command is retained. Reload after access is restored to reconcile it.",
+      "ALREADY_ACTIVE": "An active request already covers this product. Finish it before creating a replacement.",
+      "STALE_STATE": "The details changed. Review the refreshed data before trying again.",
+      "default": "Action was not completed ({{ code }}). Refresh and check the details."
+    },
+    "validation": {
+      "unavailable": "Delivery information unavailable.",
+      "checkAll": "Check all products.",
+      "wholeQuantities": "{{ product }}: enter whole quantities from 0 to 99.",
+      "mustAddUp": "{{ product }}: quantities must add up to {{ total }}.",
+      "describe": "Describe the problem in 1–1000 characters.",
+      "batchLength": "Batch number must be 120 characters or fewer."
+    },
+    "procedure": {
+      "kind": {
+        "DAMAGED": "Damaged product",
+        "MISSING": "Missing product"
+      },
+      "open": {
+        "DAMAGED": "Open damaged product procedure",
+        "MISSING": "Open missing product procedure"
+      },
+      "notAssigned": {
+        "DAMAGED": "The damaged product procedure is not assigned. Contact HQ for instructions.",
+        "MISSING": "The missing product procedure is not assigned. Contact HQ for instructions."
+      },
+      "unavailable": {
+        "DAMAGED": "The damaged product procedure is unavailable. Contact HQ for instructions.",
+        "MISSING": "The missing product procedure is unavailable. Contact HQ for instructions."
+      }
+    },
+    "receipt": {
+      "back": "Back to request",
+      "title": {
+        "check": "Check delivery",
+        "recorded": "Inspection recorded"
+      },
+      "loading": "Loading delivery",
+      "unavailable": {
+        "title": "Delivery unavailable",
+        "body": "Your draft is retained. Refresh to check access and delivery information."
+      },
+      "route": "HQ → {{ salon }} · Request {{ id }}",
+      "recordedLabel": "Recorded quantities",
+      "inspect": {
+        "title": "Inspect the products",
+        "body": "Count good, damaged and missing units for each product. Only good units enter salon stock."
+      },
+      "markAllGood": "Mark all as good",
+      "field": {
+        "good": "Good units",
+        "goodAria": "Good units · {{ product }}",
+        "damaged": "Damaged units",
+        "damagedAria": "Damaged units · {{ product }}",
+        "missing": "Missing units",
+        "missingAria": "Missing units · {{ product }}"
+      },
+      "problem": {
+        "title": "Report a delivery problem",
+        "description": "Describe the problem",
+        "batch": "Batch number (if known)",
+        "handleTitle": "What to do with the products",
+        "handleBody": "Check your salon procedure before handling damaged or missing products."
+      },
+      "sources": {
+        "title": "Selected procedure sources",
+        "remove": "Remove source reference",
+        "selected": {
+          "DAMAGED": "Selected damaged product source",
+          "MISSING": "Selected missing product source"
+        }
+      },
+      "preview": {
+        "title": "Receipt preview",
+        "addedToStock": "Good units will be added to salon stock.",
+        "endsTransit": "Recording the inspection ends transit for this delivery.",
+        "locked": "The saved inspection is locked until its result is confirmed."
+      },
+      "submit": {
+        "busy": "Recording…",
+        "retry": "Retry saved inspection",
+        "record": "Record inspection"
+      },
+      "replayed": "The earlier inspection was recorded.",
+      "recorded": "Inspection recorded.",
+      "errors": {
+        "recoveryStorage": "Could not save recovery data in this browser. Enable browser storage before recording the inspection.",
+        "unknown": "Outcome unknown. Retry the saved inspection before making changes.",
+        "keepSaved": "Keep the saved inspection and retry reconciliation."
+      }
+    },
+    "issue": {
+      "back": {
+        "hq": "Back to delivery issues",
+        "salon": "Back to request"
+      },
+      "title": "Delivery issue",
+      "loading": "Loading delivery issue",
+      "unavailable": {
+        "title": "Delivery issue unavailable",
+        "body": "It may be outside your access. Your unsent note is retained."
+      },
+      "progress": {
+        "label": "Outstanding units",
+        "title": "Replacement progress",
+        "received": "Good replacement units received: {{ received }} of {{ total }}",
+        "resolved": "The outstanding good replacement units have been received."
+      },
+      "original": {
+        "title": "Original inspection",
+        "open": "Open original request",
+        "batch": "Batch: {{ batch }}",
+        "inspectedBy": "Inspected by {{ actor }} · {{ date }}",
+        "noSource": "No procedure source was selected for the original inspection."
+      },
+      "current": {
+        "title": "Current delivery procedures",
+        "unavailable": "Current procedures unavailable. Refresh to check again or contact HQ for instructions."
+      },
+      "replacements": {
+        "title": "Replacement requests",
+        "empty": "No replacement requests yet.",
+        "open": "Open replacement request",
+        "pages": "Replacement pages"
+      },
+      "history": {
+        "title": "Issue history",
+        "pages": "Issue history pages"
+      },
+      "event": {
+        "OPENED": "Problem reported",
+        "REVIEW_STARTED": "Review started",
+        "NOTE_ADDED": "HQ note",
+        "REPLACEMENT_CREATED": "Replacement created",
+        "REPLACEMENT_REJECTED": "Replacement rejected",
+        "REPLACEMENT_RECEIVED": "Replacement inspected"
+      },
+      "actions": {
+        "title": "HQ follow-up",
+        "locked": "The saved action is locked until its result is confirmed.",
+        "retrySaved": "Retry saved action",
+        "startReview": "Start review",
+        "createReplacement": "Create replacement",
+        "createHint": "Creates a linked request for the remaining good units. Approval and dispatch follow the usual request flow.",
+        "note": "HQ note",
+        "addNote": "Add note",
+        "allReceived": "All replacement units were received. The original inspection remains in the history."
+      },
+      "replayed": "The earlier action was recorded.",
+      "recorded": "Action recorded.",
+      "errors": {
+        "unknown": "Outcome unknown. Retry the saved action before making changes.",
+        "keepSaved": "Keep the saved action and retry reconciliation."
+      }
+    },
+    "issues": {
+      "title": "Delivery issues",
+      "configure": "Configure procedures",
+      "refresh": "Refresh issues",
+      "statusFilter": "Delivery issue status",
+      "filter": {
+        "open": "Open issues",
+        "all": "All issues"
+      },
+      "loading": "Loading delivery issues",
+      "unavailable": "Delivery issues unavailable.",
+      "empty": "No delivery issues in this view.",
+      "openLabel": "Open delivery issue · {{ salon }}",
+      "open": "Open issue",
+      "pages": "Delivery issue pages"
+    },
+    "settings": {
+      "title": "Delivery procedures",
+      "intro": "Choose the published procedure staff can consult for each delivery problem.",
+      "loading": "Loading delivery procedures",
+      "none": "No procedure assigned",
+      "currentUnavailable": "Current assignment unavailable",
+      "unavailableNote": "The current procedure is unavailable. Choose another published document or remove the assignment.",
+      "retrySave": "Retry save",
+      "save": "Save",
+      "loadMore": "Load more procedures",
+      "unavailable": "Delivery procedures unavailable.",
+      "close": "Close",
+      "saved": "Delivery procedure saved.",
+      "replayed": "The earlier save was recorded.",
+      "errors": {
+        "loadMore": "Could not load more procedures. Try again.",
+        "accessChanged": "Access changed. The saved command is retained. Reopen after access is restored to reconcile it.",
+        "unknown": "Save outcome unknown. Retry with the same selection.",
+        "keepSaved": "Keep the saved command and reopen to reconcile it."
+      }
+    }
   }
 }

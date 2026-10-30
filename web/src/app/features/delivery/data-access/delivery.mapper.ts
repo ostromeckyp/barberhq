@@ -20,7 +20,7 @@ export function toDeliveryReceipt(row: ReceiptRecord): DeliveryReceiptDto {
     id: row.id,
     requestId: row.requestId,
     recordedAt: row.recordedAt,
-    actorLabel: 'Recipient',
+    actorLabel: 'requests.actor.recipient',
     origin: row.origin,
     legacyActionReceiptId: row.legacyActionReceiptId ?? null,
     items: row.items.map((item) => ({
@@ -176,7 +176,9 @@ export function toDeliveryIssue(
       type: event.type,
       recordedAt: event.recordedAt,
       actorLabel:
-        event.type === 'OPENED' || event.type === 'REPLACEMENT_RECEIVED' ? 'Recipient' : 'HQ',
+        event.type === 'OPENED' || event.type === 'REPLACEMENT_RECEIVED'
+          ? 'requests.actor.recipient'
+          : 'requests.actor.hq',
       requestId: event.requestId ?? null,
       note: event.note ?? null,
       status: event.status,

@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, resource, signal, untracked } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,7 +8,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { DeliveryApi } from '../data-access/delivery-api';
+import { PROCEDURE_KIND_KEYS } from '../feature/procedure-kind-keys';
 import { DELIVERY_JOURNAL } from '../feature/delivery-journal';
+import type { TranslatedText } from '../../../core/models/translated-text';
+import { deliveryCommandError } from '../feature/delivery-command-error';
 import type { DeliveryProcedureOption } from '../models/delivery-procedure-option';
 import type { DeliveryScope } from '../models/delivery-scope';
 import type {
@@ -23,6 +27,7 @@ import type {
     MatSelectModule,
     MatProgressBarModule,
     DelayedLoadingDirective,
+    TranslocoPipe,
   ],
   selector: 'app-delivery-procedure-settings',
   styleUrl: './delivery-procedure-settings.scss',
@@ -40,7 +45,7 @@ export class DeliveryProcedureSettings {
       : undefined;
   });
   readonly kinds = ['DAMAGED', 'MISSING'] as const;
-  readonly labels = { DAMAGED: 'Damaged product', MISSING: 'Missing product' };
+  readonly labels = PROCEDURE_KIND_KEYS;
   readonly record = resource({
     params: () => this.identity(),
     loader: async ({ params }) => ({
@@ -61,8 +66,8 @@ export class DeliveryProcedureSettings {
   readonly pending = signal<SetDeliveryProcedureInput | null>(null);
   readonly busy = signal(false);
   readonly moreBusy = signal(false);
-  readonly message = signal('');
-  readonly recoveryError = signal('');
+  readonly message = signal<TranslatedText | null>(null);
+  readonly recoveryError = signal<TranslatedText | null>(null);
   private owner: string | undefined;
   constructor() {
     effect(() => {
@@ -112,22 +117,22 @@ export class DeliveryProcedureSettings {
   }
   private restorePending() {
     this.pending.set(null);
-    this.recoveryError.set('');
+    this.recoveryError.set(null);
     try {
       for (const kind of this.kinds) {
         const scope = this.scope(kind);
         if (!scope) return;
         const saved = this.journal.load(scope);
         if (!saved) continue;
-        if (saved.type !== 'SET_PROCEDURE')
-          throw new Error('A different saved command needs review.');
+        if (saved.type !== 'SET_PROCEDURE') {
+          this.recoveryError.set({ key: 'delivery.errors.differentCommand' });
+          return;
+        }
         this.pending.set(saved.input);
         return;
       }
-    } catch (error) {
-      this.recoveryError.set(
-        error instanceof Error ? error.message : 'Saved procedure command unavailable.',
-      );
+    } catch {
+      this.recoveryError.set({ key: 'delivery.errors.savedUnreadable' });
     }
   }
   binding(kind: DeliveryProblemKind) {
@@ -160,7 +165,7 @@ export class DeliveryProcedureSettings {
       this.nextOffset.set(page.nextOffset);
     } catch {
       if (this.identity() === identity)
-        this.message.set('Could not load more procedures. Try again.');
+        this.message.set({ key: 'delivery.settings.errors.loadMore' });
     } finally {
       this.moreBusy.set(false);
     }
@@ -193,44 +198,40 @@ export class DeliveryProcedureSettings {
         input = saved.input;
         this.pending.set(input);
       } catch {
-        this.recoveryError.set(
-          'Could not save recovery data in this browser. Enable browser storage before continuing.',
-        );
+        this.recoveryError.set({ key: 'delivery.errors.recoveryStorage' });
         return;
       }
     }
     this.busy.set(true);
     this.dialog.disableClose = true;
-    this.message.set('');
+    this.message.set(null);
     try {
       const result = await this.api.setProcedure(input);
       this.journal.clear(scope);
       if (this.identity() !== identity) return;
       this.restorePending();
-      this.message.set(
-        result.replayed ? 'The earlier save was recorded.' : 'Delivery procedure saved.',
-      );
+      this.message.set({
+        key: result.replayed ? 'delivery.settings.replayed' : 'delivery.settings.saved',
+      });
       this.record.reload();
     } catch (error) {
       if (this.identity() !== identity) return;
-      const e = error as { code?: string; message?: string };
+      const e = error as { code?: string };
       if (e.code === 'FORBIDDEN' || e.code === 'UNAUTHENTICATED') {
-        this.recoveryError.set(
-          'Access changed. The saved command is retained. Reopen after access is restored to reconcile it.',
-        );
+        this.recoveryError.set({ key: 'delivery.settings.errors.accessChanged' });
         return;
       }
       if (!e.code || e.code === 'UNKNOWN') {
-        this.message.set('Save outcome unknown. Retry with the same selection.');
+        this.message.set({ key: 'delivery.settings.errors.unknown' });
       } else {
         try {
           this.journal.clear(scope);
           this.restorePending();
         } catch {
-          this.recoveryError.set('Keep the saved command and reopen to reconcile it.');
+          this.recoveryError.set({ key: 'delivery.settings.errors.keepSaved' });
           return;
         }
-        this.message.set(e.message ?? 'Could not save the procedure.');
+        this.message.set(deliveryCommandError(e.code));
       }
     } finally {
       this.busy.set(false);

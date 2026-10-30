@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { AppDatePipe } from '../../../shared/ui/app-date.pipe';
 import { RouterLink } from '@angular/router';
 import { form, FormField, disabled, maxLength } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,13 +9,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { StatusChip } from '../../replenishment/ui/status-chip';
+import { pluralKey } from '../../../core/i18n/plural';
+import { Language } from '../../../core/language';
+import { OPEN_PROCEDURE_KEYS, PROCEDURE_KIND_KEYS } from '../feature/procedure-kind-keys';
 import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { DeliveryIssueFacade } from '../feature/delivery-issue.facade';
 @Component({
   selector: 'app-delivery-issue',
   providers: [DeliveryIssueFacade],
   imports: [
-    DatePipe,
+    AppDatePipe,
+    TranslocoPipe,
     RouterLink,
     FormField,
     MatButtonModule,
@@ -35,12 +40,27 @@ export class DeliveryIssueComponent {
     disabled(p, { when: () => this.facade.locked() || this.facade.issue()?.status === 'RESOLVED' });
   });
   readonly eventLabels = {
-    OPENED: 'Problem reported',
-    REVIEW_STARTED: 'Review started',
-    NOTE_ADDED: 'HQ note',
-    REPLACEMENT_CREATED: 'Replacement created',
-    REPLACEMENT_REJECTED: 'Replacement rejected',
-    REPLACEMENT_RECEIVED: 'Replacement inspected',
+    OPENED: 'delivery.issue.event.OPENED',
+    REVIEW_STARTED: 'delivery.issue.event.REVIEW_STARTED',
+    NOTE_ADDED: 'delivery.issue.event.NOTE_ADDED',
+    REPLACEMENT_CREATED: 'delivery.issue.event.REPLACEMENT_CREATED',
+    REPLACEMENT_REJECTED: 'delivery.issue.event.REPLACEMENT_REJECTED',
+    REPLACEMENT_RECEIVED: 'delivery.issue.event.REPLACEMENT_RECEIVED',
   };
-  readonly sourceLabels = { DAMAGED: 'damaged product', MISSING: 'missing product' };
+  readonly kindLabels = PROCEDURE_KIND_KEYS;
+  readonly openProcedureLabels = OPEN_PROCEDURE_KEYS;
+  readonly unavailableLabels = {
+    DAMAGED: {
+      MISSING: 'delivery.procedure.notAssigned.DAMAGED',
+      UNAVAILABLE: 'delivery.procedure.unavailable.DAMAGED',
+    },
+    MISSING: {
+      MISSING: 'delivery.procedure.notAssigned.MISSING',
+      UNAVAILABLE: 'delivery.procedure.unavailable.MISSING',
+    },
+  } as const;
+  private readonly language = inject(Language);
+  remainingKey(count: number): string {
+    return pluralKey('delivery.count.remaining', count, this.language.current());
+  }
 }

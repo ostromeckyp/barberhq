@@ -32,7 +32,7 @@ const issue: DeliveryIssueDto = {
     id: 'receipt',
     requestId: 'request',
     recordedAt: 'now',
-    actorLabel: 'Recipient',
+    actorLabel: 'requests.actor.recipient',
     origin: 'RECORDED',
     items: [
       {

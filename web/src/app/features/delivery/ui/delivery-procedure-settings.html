@@ -1,26 +1,26 @@
-<h2 mat-dialog-title>Delivery procedures</h2>
+<h2 mat-dialog-title>{{ 'delivery.settings.title' | transloco }}</h2>
 <mat-dialog-content>
-  <p>Choose the published procedure staff can consult for each delivery problem.</p>
+  <p>{{ 'delivery.settings.intro' | transloco }}</p>
   <mat-progress-bar
     *appDelayedLoading="record.isLoading() || busy()"
     mode="indeterminate"
-    aria-label="Loading delivery procedures"
+    [attr.aria-label]="'delivery.settings.loading' | transloco"
   />
   @if (ready()) {
     @for (kind of kinds; track kind) {
       <article>
         <div>
           <mat-form-field>
-            <mat-label>{{ labels[kind] }}</mat-label>
+            <mat-label>{{ labels[kind] | transloco }}</mat-label>
             <mat-select
               [value]="selection()[kind]"
               (selectionChange)="choose(kind, $event.value)"
               [disabled]="busy() || !!pending() || !!recoveryError()"
             >
-              <mat-option [value]="null">No procedure assigned</mat-option>
+              <mat-option [value]="null">{{ 'delivery.settings.none' | transloco }}</mat-option>
               @if (selection()[kind] && !hasOption(selection()[kind]!)) {
                 <mat-option [value]="selection()[kind]">{{
-                  binding(kind)?.title ?? 'Current assignment unavailable'
+                  binding(kind)?.title ?? ('delivery.settings.currentUnavailable' | transloco)
                 }}</mat-option>
               }
               @for (document of documents(); track document.documentId) {
@@ -31,10 +31,7 @@
             </mat-select>
           </mat-form-field>
           @if (binding(kind)?.availability === 'UNAVAILABLE') {
-            <p class="note">
-              The current procedure is unavailable. Choose another published document or remove the
-              assignment.
-            </p>
+            <p class="note">{{ 'delivery.settings.unavailableNote' | transloco }}</p>
           }
         </div>
         <button
@@ -47,29 +44,36 @@
             (!pending() && selection()[kind] === (binding(kind)?.documentId ?? null))
           "
         >
-          {{ pending()?.kind === kind ? 'Retry save' : 'Save' }}
+          {{
+            (pending()?.kind === kind ? 'delivery.settings.retrySave' : 'delivery.settings.save')
+              | transloco
+          }}
         </button>
       </article>
     }
     @if (nextOffset() !== null) {
       <button mat-button (click)="loadMore()" [disabled]="moreBusy() || busy()">
-        Load more procedures
+        {{ 'delivery.settings.loadMore' | transloco }}
       </button>
     }
   }
   @if (record.error()) {
     <p role="alert">
-      Delivery procedures unavailable. <button mat-button (click)="refresh()">Retry</button>
+      {{ 'delivery.settings.unavailable' | transloco }}
+      <button mat-button (click)="refresh()">{{ 'common.actions.retry' | transloco }}</button>
     </p>
   }
-  @if (recoveryError()) {
-    <p role="alert">{{ recoveryError() }}</p>
+  @if (recoveryError(); as error) {
+    <p role="alert">{{ error.key | transloco: error.params }}</p>
   }
-  @if (message()) {
-    <p role="status">{{ message() }}</p>
+  @if (message(); as text) {
+    <p role="status">{{ text.key | transloco: text.params }}</p>
   }
 </mat-dialog-content>
 <mat-dialog-actions align="end"
-  ><button mat-button (click)="refresh()" [disabled]="busy()">Refresh</button
-  ><button mat-button mat-dialog-close [disabled]="busy()">Close</button></mat-dialog-actions
+  ><button mat-button (click)="refresh()" [disabled]="busy()">
+    {{ 'common.actions.refresh' | transloco }}</button
+  ><button mat-button mat-dialog-close [disabled]="busy()">
+    {{ 'delivery.settings.close' | transloco }}
+  </button></mat-dialog-actions
 >

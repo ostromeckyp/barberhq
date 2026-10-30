@@ -2,6 +2,7 @@ import type {
   DeliveryReceiptContextDto,
   RecordDeliveryInput,
 } from '../../../../../../shared/contracts/delivery/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import type { DeliveryScope } from '../models/delivery-scope';
 import type { ReceiptDraft } from '../models/receipt-draft';
 
@@ -11,14 +12,15 @@ export function receiptProcedureProblem(items: ReceiptDraft['items']) {
   return damaged && missing ? 'BOTH' : damaged ? 'DAMAGED' : missing ? 'MISSING' : null;
 }
 
-/** First problem that blocks recording the inspection, or '' when the draft is valid. */
+/** First problem that blocks recording the inspection, or null when the draft is valid. */
 export function receiptValidation(
   ctx: DeliveryReceiptContextDto | undefined,
   draft: ReceiptDraft,
   affected: () => number,
-): string {
-  if (!ctx) return 'Delivery information unavailable.';
-  if (draft.items.length !== ctx.request.items.length) return 'Check all products.';
+): TranslatedText | null {
+  if (!ctx) return { key: 'delivery.validation.unavailable' };
+  if (draft.items.length !== ctx.request.items.length)
+    return { key: 'delivery.validation.checkAll' };
   for (const item of ctx.request.items) {
     const row = draft.items.find((r) => r.productId === item.productId);
     if (
@@ -27,15 +29,17 @@ export function receiptValidation(
         (q) => !Number.isInteger(q) || q < 0 || q > 99,
       )
     )
-      return `${item.productName}: enter whole quantities from 0 to 99.`;
+      return { key: 'delivery.validation.wholeQuantities', params: { product: item.productName } };
     if (row.goodQuantity + row.damagedQuantity + row.missingQuantity !== item.dispatchedQuantity)
-      return `${item.productName}: quantities must add up to ${item.dispatchedQuantity}.`;
+      return {
+        key: 'delivery.validation.mustAddUp',
+        params: { product: item.productName, total: item.dispatchedQuantity },
+      };
   }
   if (affected() && (!draft.description.trim() || draft.description.trim().length > 1000))
-    return 'Describe the problem in 1–1000 characters.';
-  if (draft.batchIdentifier.trim().length > 120)
-    return 'Batch number must be 120 characters or fewer.';
-  return '';
+    return { key: 'delivery.validation.describe' };
+  if (draft.batchIdentifier.trim().length > 120) return { key: 'delivery.validation.batchLength' };
+  return null;
 }
 
 export function receiptInput(
