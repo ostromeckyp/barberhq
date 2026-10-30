@@ -13,16 +13,22 @@ describe('AI server input schemas', () => {
       parsePrepareInput({ salonId: 'salon', message: 'hi', businessId: 'foreign' }),
     ).toThrowError(expect.objectContaining({ code: 'VALIDATION_ERROR' }));
   });
-  it('rejects blank questions and unevaluated language', () => {
+  it('rejects blank questions', () => {
     expect(() => parseProcedureInput({ question: ' ', answerLanguage: 'en' })).toThrowError(
       expect.objectContaining({ code: 'VALIDATION_ERROR' }),
     );
-    expect(() =>
-      parseProcedureInput({ question: 'safe steps?', answerLanguage: 'pl' }),
-    ).toThrowError(expect.objectContaining({ code: 'VALIDATION_ERROR' }));
+  });
+  it('accepts en and pl, rejects other languages', () => {
     expect(parseProcedureInput({ question: 'safe steps?', answerLanguage: 'en' })).toEqual({
       question: 'safe steps?',
       answerLanguage: 'en',
     });
+    expect(parseProcedureInput({ question: 'bezpieczne kroki?', answerLanguage: 'pl' })).toEqual({
+      question: 'bezpieczne kroki?',
+      answerLanguage: 'pl',
+    });
+    expect(() =>
+      parseProcedureInput({ question: 'safe steps?', answerLanguage: 'de' }),
+    ).toThrowError(expect.objectContaining({ code: 'VALIDATION_ERROR' }));
   });
 });

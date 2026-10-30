@@ -158,7 +158,7 @@ it('offers a relevant editable question without losing the inspection draft or s
     );
     expect(root.textContent).not.toContain('procedure is not assigned');
     const prompt = [...root.querySelectorAll('button')].find((b) =>
-      b.textContent?.includes('W dostawie są uszkodzone produkty.'),
+      b.textContent?.includes('Products in the delivery are damaged.'),
     );
     expect(prompt).toBeDefined();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
@@ -179,14 +179,14 @@ it('offers a relevant editable question without losing the inspection draft or s
       items: [{ productId: 'product', goodQuantity: 8, damagedQuantity: 0, missingQuantity: 2 }],
     }));
     fixture.detectChanges();
-    expect(root.textContent).toContain('W dostawie brakuje produktów.');
+    expect(root.textContent).toContain('Products are missing from the delivery.');
     h.facade.draft.model.update((v) => ({
       ...v,
       items: [{ productId: 'product', goodQuantity: 8, damagedQuantity: 1, missingQuantity: 1 }],
     }));
     fixture.detectChanges();
     expect(root.textContent).toContain(
-      'W dostawie są uszkodzone produkty i brakuje części produktów.',
+      'Products in the delivery are damaged and some are missing.',
     );
     h.facade.draft.model.update((v) => ({
       ...v,

@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { expect, it, vi } from 'vitest';
+import { Language } from '../../core/language';
 import { AssistantApi, AssistantApiError } from '../../core/assistant-api';
 import { SalonContext } from '../../core/salon-context';
 import { SessionFacade } from '../auth/feature/session.facade';
@@ -13,7 +14,7 @@ const membership = {
   role: 'HQ' as const,
   salonIds: [] as string[],
 };
-function setup(request: () => Promise<unknown>) {
+function setup(request: () => Promise<unknown>, language: 'en' | 'pl' = 'en') {
   const session = signal({ status: 'READY' as const, membership });
   const workspace = signal<{ kind: 'HQ' } | { kind: 'SALON'; salonId: string }>({ kind: 'HQ' });
   TestBed.configureTestingModule({
@@ -21,6 +22,7 @@ function setup(request: () => Promise<unknown>) {
       AssistantFacade,
       { provide: AssistantApi, useValue: { answerProcedureQuestion: request } },
       { provide: SessionFacade, useValue: { state: session } },
+      { provide: Language, useValue: { current: signal(language) } },
       { provide: SalonContext, useValue: { workspace } },
     ],
   });
@@ -141,4 +143,17 @@ it('retains delivery return on Clear, revalidates access, and clears it on works
   TestBed.flushEffects();
   expect(h.facade.deliveryBack()).toBeNull();
   expect(request).not.toHaveBeenCalled();
+});
+
+it('sends the current UI language', async () => {
+  const request = vi.fn(() =>
+    Promise.resolve({ status: 'INSUFFICIENT_EVIDENCE', message: '', sources: [] }),
+  );
+  const { facade } = setup(request, 'pl');
+  facade.question.set('Co zrobić z uszkodzonym produktem?');
+  await facade.submit();
+  expect(request).toHaveBeenCalledWith({
+    question: 'Co zrobić z uszkodzonym produktem?',
+    answerLanguage: 'pl',
+  });
 });

@@ -101,5 +101,15 @@
       "viewSalonStock": "Zobacz stan magazynowy salonu",
       "goToWorkspace": "Przejdź do obszaru roboczego"
     }
+  },
+  "procedures": {
+    "assistant": {
+      "examples": {
+        "damaged": "Otrzymaliśmy uszkodzony produkt. Co powinniśmy zrobić?",
+        "deliveryDamaged": "W dostawie są uszkodzone produkty. Jak postąpić zgodnie z procedurą?",
+        "deliveryMissing": "W dostawie brakuje produktów. Jak postąpić zgodnie z procedurą?",
+        "deliveryBoth": "W dostawie są uszkodzone produkty i brakuje części produktów. Jak postąpić zgodnie z procedurą?"
+      }
+    }
   }
 }

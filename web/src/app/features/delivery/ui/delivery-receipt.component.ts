@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, inject } from '@angular/core';
 import { FormField, form, disabled, maxLength, applyEach, min, max } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,6 +19,7 @@ import { DeliveryReceiptFacade } from '../feature/delivery-receipt.facade';
     MatInputModule,
     MatProgressBarModule,
     DelayedLoadingDirective,
+    TranslocoPipe,
   ],
   templateUrl: './delivery-receipt.component.html',
   styleUrl: './delivery-receipt.component.scss',

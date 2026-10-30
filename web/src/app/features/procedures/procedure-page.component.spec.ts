@@ -83,11 +83,11 @@ const deliveryQuery = {
   offset: '20',
 };
 it.each([
-  ['DAMAGED', 'W dostawie są uszkodzone produkty. Jak postąpić zgodnie z procedurą?'],
-  ['MISSING', 'W dostawie brakuje produktów. Jak postąpić zgodnie z procedurą?'],
+  ['DAMAGED', 'Products in the delivery are damaged. What does the procedure say to do?'],
+  ['MISSING', 'Products are missing from the delivery. What does the procedure say to do?'],
   [
     'BOTH',
-    'W dostawie są uszkodzone produkty i brakuje części produktów. Jak postąpić zgodnie z procedurą?',
+    'Products in the delivery are damaged and some are missing. What does the procedure say to do?',
   ],
 ])(
   'prefills %s without sending and keeps edits through ordinary query/tab changes',

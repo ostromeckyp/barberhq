@@ -1,8 +1,10 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
 import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../core/assistant-api';
+import { Language } from '../../core/language';
 import { SalonContext } from '../../core/salon-context';
 import { SessionFacade } from '../auth/feature/session.facade';
+import { TranslocoService } from '@jsverse/transloco';
 import type { ParamMap } from '@angular/router';
 import { deliveryReturn } from '../delivery/feature/delivery-return';
 import { deliveryProcedureQuestion } from './procedure-question';
@@ -14,6 +16,8 @@ export class AssistantFacade {
   private readonly api = inject(AssistantApi);
   private readonly session = inject(SessionFacade);
   private readonly context = inject(SalonContext);
+  private readonly language = inject(Language);
+  private readonly transloco = inject(TranslocoService);
   private generation = 0;
   private scope = '';
   private readonly deliveryQuery = signal<ParamMap | null>(null);
@@ -48,10 +52,10 @@ export class AssistantFacade {
   }
 
   suggestDeliveryQuestion(query: ParamMap): boolean {
-    const question = deliveryProcedureQuestion(query.get('deliveryProblem'));
+    const key = deliveryProcedureQuestion(query.get('deliveryProblem'));
     const state = this.session.state();
     if (
-      !question ||
+      !key ||
       state.status !== 'READY' ||
       query.get('returnTo') !== 'delivery-receipt' ||
       !deliveryReturn(query, state.membership, this.context.workspace())
@@ -60,7 +64,7 @@ export class AssistantFacade {
     // An explicit new suggestion replaces previous guidance, but never submits it.
     this.reset();
     this.deliveryQuery.set(query);
-    this.question.set(question);
+    this.question.set(this.transloco.translate(key, {}, this.language.current()));
     return true;
   }
 
@@ -83,7 +87,10 @@ export class AssistantFacade {
     this.error.set('');
     this.loading.set(true);
     try {
-      const result = await this.api.answerProcedureQuestion({ question, answerLanguage: 'en' });
+      const result = await this.api.answerProcedureQuestion({
+        question,
+        answerLanguage: this.language.current(),
+      });
       if (generation === this.generation && scope === this.currentScope()) this.result.set(result);
     } catch (error) {
       if (generation === this.generation && scope === this.currentScope()) {

@@ -25,8 +25,9 @@ const prepare = z
   })
   .strict();
 
-// Polish answer generation remains disabled until the owning flow evaluates it.
-const procedure = z.object({ question: boundedText, answerLanguage: z.literal('en') }).strict();
+const procedure = z
+  .object({ question: boundedText, answerLanguage: z.enum(['en', 'pl']) })
+  .strict();
 
 export function parsePrepareInput(input: unknown): PrepareInput {
   const result = prepare.safeParse(input);

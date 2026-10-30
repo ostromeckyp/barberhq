@@ -113,7 +113,7 @@
             /></mat-form-field>
             <h3>What to do with the products</h3>
             <p>Check your salon procedure before handling damaged or missing products.</p>
-            @if (facade.procedureQuestion(); as question) {
+            @if (facade.procedureQuestionKey(); as question) {
               <button
                 mat-stroked-button
                 type="button"
@@ -121,7 +121,7 @@
                 (click)="facade.openProcedureAssistant()"
                 [disabled]="facade.locked()"
               >
-                <mat-icon aria-hidden="true">auto_awesome</mat-icon>{{ question }}
+                <mat-icon aria-hidden="true">auto_awesome</mat-icon>{{ question | transloco }}
               </button>
             }
             @for (procedure of context.procedures; track procedure.kind) {

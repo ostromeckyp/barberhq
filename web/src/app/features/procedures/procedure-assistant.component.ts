@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,9 +19,11 @@ import { CitedAnswerComponent } from './cited-answer.component';
     MatInputModule,
     DelayedLoadingDirective,
     CitedAnswerComponent,
+    TranslocoPipe,
   ],
   template: `
     <section class="assistant" aria-label="Procedure assistant">
+      @let example = 'procedures.assistant.examples.damaged' | transloco;
       <form (ngSubmit)="facade.submit()">
         <mat-form-field appearance="outline">
           <mat-label>Question</mat-label>
@@ -40,9 +43,9 @@ import { CitedAnswerComponent } from './cited-answer.component';
             type="button"
             class="example"
             [disabled]="facade.loading()"
-            (click)="facade.question.set(exampleQuestion)"
+            (click)="facade.question.set(example)"
           >
-            <mat-icon aria-hidden="true">format_quote</mat-icon>{{ exampleQuestion }}
+            <mat-icon aria-hidden="true">format_quote</mat-icon>{{ example }}
           </button>
           <span class="spacer"></span>
           <button mat-button type="button" [disabled]="facade.loading()" (click)="facade.reset()">
@@ -197,5 +200,4 @@ import { CitedAnswerComponent } from './cited-answer.component';
 })
 export class ProcedureAssistantComponent {
   readonly facade = inject(AssistantFacade);
-  readonly exampleQuestion = 'Otrzymaliśmy uszkodzony produkt. Co powinniśmy zrobić?';
 }

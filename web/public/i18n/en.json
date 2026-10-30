@@ -101,5 +101,15 @@
       "viewSalonStock": "View salon stock",
       "goToWorkspace": "Go to workspace"
     }
+  },
+  "procedures": {
+    "assistant": {
+      "examples": {
+        "damaged": "We received a damaged product. What should we do?",
+        "deliveryDamaged": "Products in the delivery are damaged. What does the procedure say to do?",
+        "deliveryMissing": "Products are missing from the delivery. What does the procedure say to do?",
+        "deliveryBoth": "Products in the delivery are damaged and some are missing. What does the procedure say to do?"
+      }
+    }
   }
 }

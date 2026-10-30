@@ -87,7 +87,7 @@ export class DeliveryReceiptFacade {
   private readonly procedureProblem = computed(() =>
     receiptProcedureProblem(this.draft.model().items),
   );
-  readonly procedureQuestion = computed(() =>
+  readonly procedureQuestionKey = computed(() =>
     runtimeConfig.publicConfig?.ragEnabled && runtimeConfig.publicConfig.knowledgeEnabled
       ? deliveryProcedureQuestion(this.procedureProblem())
       : null,
@@ -181,7 +181,7 @@ export class DeliveryReceiptFacade {
   }
   openProcedureAssistant() {
     const scope = this.scope();
-    if (!scope || this.locked() || !this.procedureQuestion()) return;
+    if (!scope || this.locked() || !this.procedureQuestionKey()) return;
     void this.router.navigate(['/procedures'], {
       queryParams: {
         tab: 'assistant',
