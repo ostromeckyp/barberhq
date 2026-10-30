@@ -193,7 +193,7 @@ it('offers a relevant editable question without losing the inspection draft or s
       items: [{ productId: 'product', goodQuantity: 10, damagedQuantity: 0, missingQuantity: 0 }],
     }));
     fixture.detectChanges();
-    expect(root.textContent).not.toContain('Jak postąpić zgodnie z procedurą?');
+    expect(root.textContent).not.toContain('What does the procedure say to do?');
   } finally {
     runtimeConfig.publicConfig = previous;
   }
