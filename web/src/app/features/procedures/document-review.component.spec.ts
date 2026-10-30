@@ -132,12 +132,12 @@ async function setup(
   return { fixture, component: fixture.componentInstance, renderer, api };
 }
 
-it('returns from review to the Documents tab using the shared Back button', async () => {
+it('returns from review to the Documents tab using the shared back link', async () => {
   const h = await setup();
-  const back = h.fixture.nativeElement.querySelector('button.app-back-button') as HTMLButtonElement;
+  const back = h.fixture.nativeElement.querySelector('app-back-link button') as HTMLButtonElement;
   expect(back).not.toBeNull();
-  expect(back.textContent?.trim()).toBe('Back to documents');
-  expect(back.hasAttribute('mat-stroked-button')).toBe(true);
+  expect(back.textContent).toContain('Back to documents');
+  expect(back.hasAttribute('mat-button')).toBe(true);
   back.click();
   expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/procedures'], {
     queryParams: { tab: 'documents' },

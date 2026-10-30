@@ -1,3 +1,4 @@
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, inject } from '@angular/core';
 import { FormField, form, disabled, maxLength, applyEach, min, max } from '@angular/forms/signals';
@@ -15,6 +16,7 @@ import { DeliveryReceiptFacade } from '../feature/delivery-receipt.facade';
   selector: 'app-delivery-receipt',
   providers: [DeliveryReceiptFacade],
   imports: [
+    BackLink,
     FormField,
     MatButtonModule,
     MatIconModule,

@@ -1,3 +1,4 @@
+import { BackLink } from '../../shared/ui/back-link/back-link';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,6 +15,7 @@ import { AssistantFacade } from './assistant.facade';
 @Component({
   selector: 'app-procedure-page',
   imports: [
+    BackLink,
     PageHeader,
     MatTabsModule,
     MatIconModule,
@@ -26,16 +28,7 @@ import { AssistantFacade } from './assistant.facade';
     @if (assistantEnabled) {
       <section class="procedure-page">
         @if (facade.deliveryBack(); as back) {
-          <div class="app-back-navigation">
-            <button
-              mat-stroked-button
-              type="button"
-              class="app-back-button"
-              (click)="backToDelivery()"
-            >
-              {{ back.labelKey | transloco }}
-            </button>
-          </div>
+          <app-back-link [label]="back.labelKey | transloco" (back)="backToDelivery()" />
         }
         <app-page-header
           [title]="'procedures.page.title' | transloco"

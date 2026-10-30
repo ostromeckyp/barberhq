@@ -1,24 +1,10 @@
-// Back navigation sits at the right end of the title line, like the page-header actions.
-.app-back-navigation {
-  float: right;
+// Back link on the left, page-level refresh on the right (pages without an app-page-header).
+.app-page-toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
-  margin: 0 0 8px 16px;
-  position: relative;
-  z-index: 1;
-}
-
-button.app-back-button[mat-stroked-button] {
-  white-space: nowrap;
-}
-
-@media (max-width: 759px) {
-  .app-back-navigation {
-    float: none;
-    justify-content: flex-end;
-    margin: 0 0 12px;
-  }
+  margin-bottom: 8px;
 }
 
 // Side nav labels wrap to two lines instead of truncating.

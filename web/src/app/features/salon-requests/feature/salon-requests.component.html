@@ -2,8 +2,8 @@
   [eyebrow]="'requests.salon.eyebrow' | transloco"
   [title]="'requests.salon.title' | transloco"
   [description]="'requests.salon.description' | transloco"
-  ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-    {{ 'common.actions.refresh' | transloco }}
+  ><button mat-button (click)="facade.refresh()" [disabled]="facade.loading()">
+    <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button></app-page-header
 >
 <mat-button-toggle-group

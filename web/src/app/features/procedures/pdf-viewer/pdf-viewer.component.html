@@ -1,9 +1,5 @@
 <div class="source-viewer">
-  <div class="app-back-navigation">
-    <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-      {{ facade.backLabelKey() | transloco }}
-    </button>
-  </div>
+  <app-back-link [label]="facade.backLabelKey() | transloco" (back)="facade.goBack()" />
 
   <p *appDelayedLoading="facade.loading()" class="state" role="status">
     {{ 'procedures.viewer.opening' | transloco }}

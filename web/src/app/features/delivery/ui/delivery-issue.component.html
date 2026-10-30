@@ -1,15 +1,17 @@
-<div class="app-back-navigation">
+<div class="app-page-toolbar">
+  <app-back-link
+    [label]="
+      (facade.view === 'HQ' ? 'delivery.issue.back.hq' : 'delivery.issue.back.salon') | transloco
+    "
+    (back)="facade.goBack()"
+  />
   <button
     mat-button
     type="button"
     (click)="facade.refresh()"
     [disabled]="facade.loading() || facade.busy()"
   >
-    {{ 'common.actions.refresh' | transloco }}</button
-  ><button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-    {{
-      (facade.view === 'HQ' ? 'delivery.issue.back.hq' : 'delivery.issue.back.salon') | transloco
-    }}
+    <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button>
 </div>
 <h1>{{ 'delivery.issue.title' | transloco }}</h1>

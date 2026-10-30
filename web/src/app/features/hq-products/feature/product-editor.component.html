@@ -1,10 +1,9 @@
+<app-back-link link="/hq/stock" [label]="'hq.products.back' | transloco" />
 <app-page-header
   [eyebrow]="'hq.eyebrow' | transloco"
   [title]="(productId() || facade.productId() ? 'hq.products.edit' : 'hq.products.add') | transloco"
   [description]="'hq.products.description' | transloco"
->
-  <a mat-stroked-button routerLink="/hq/stock">{{ 'hq.products.back' | transloco }}</a>
-</app-page-header>
+/>
 
 <section class="card" aria-labelledby="product-details">
   <h2 id="product-details">{{ 'hq.products.details' | transloco }}</h2>

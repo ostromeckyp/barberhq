@@ -1,3 +1,4 @@
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -16,6 +17,7 @@ import { ACTION_LABELS } from './action-input';
   selector: 'app-request-detail',
   providers: [RequestDetailFacade],
   imports: [
+    BackLink,
     DelayedLoadingDirective,
     AppDatePipe,
     TranslocoPipe,

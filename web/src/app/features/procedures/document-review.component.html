@@ -1,9 +1,5 @@
 <section class="review" aria-labelledby="review-title">
-  <div class="app-back-navigation">
-    <button mat-stroked-button type="button" class="app-back-button" (click)="facade.back()">
-      {{ 'procedures.back.documents' | transloco }}
-    </button>
-  </div>
+  <app-back-link [label]="'procedures.back.documents' | transloco" (back)="facade.back()" />
   @if (facade.review(); as data) {
     <header class="review-header">
       <div>

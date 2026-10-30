@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -18,6 +19,7 @@ import { DeliveryProcedureSettings } from './delivery-procedure-settings';
     AppDatePipe,
     TranslocoPipe,
     MatButtonModule,
+    MatIconModule,
     MatProgressBarModule,
     DelayedLoadingDirective,
   ],
@@ -27,7 +29,7 @@ import { DeliveryProcedureSettings } from './delivery-procedure-settings';
       <button mat-stroked-button type="button" (click)="configure()">
         {{ 'delivery.issues.configure' | transloco }}</button
       ><button mat-button type="button" (click)="facade.refresh()" [disabled]="facade.loading()">
-        {{ 'delivery.issues.refresh' | transloco }}
+        <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'delivery.issues.refresh' | transloco }}
       </button>
     </div>
     <div

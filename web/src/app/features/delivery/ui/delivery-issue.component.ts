@@ -1,3 +1,4 @@
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppDatePipe } from '../../../shared/ui/app-date.pipe';
@@ -18,6 +19,7 @@ import { DeliveryIssueFacade } from '../feature/delivery-issue.facade';
   selector: 'app-delivery-issue',
   providers: [DeliveryIssueFacade],
   imports: [
+    BackLink,
     AppDatePipe,
     TranslocoPipe,
     RouterLink,

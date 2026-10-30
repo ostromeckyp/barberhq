@@ -1,3 +1,4 @@
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { provenanceKey } from '../provenance-key';
 import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
@@ -9,7 +10,7 @@ import { PdfViewerFacade } from './pdf-viewer.facade';
 @Component({
   selector: 'app-pdf-viewer',
   providers: [PdfViewerFacade],
-  imports: [MatIconModule, DelayedLoadingDirective, MatButtonModule, TranslocoPipe],
+  imports: [BackLink, MatIconModule, DelayedLoadingDirective, MatButtonModule, TranslocoPipe],
   templateUrl: './pdf-viewer.component.html',
   styleUrl: './pdf-viewer.component.scss',
 })

@@ -1,5 +1,6 @@
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { form, required, min, max, pattern, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,9 +34,9 @@ const sourceLabel = {
   selector: 'app-product-editor',
   providers: [ProductEditorFacade],
   imports: [
+    BackLink,
     FormField,
     TranslocoPipe,
-    RouterLink,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,

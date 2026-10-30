@@ -27,8 +27,8 @@ import { HqQueueFacade } from './hq-queue.facade';
       [eyebrow]="'hq.queue.eyebrow' | transloco"
       [title]="'hq.queue.title' | transloco"
       [description]="'hq.queue.description' | transloco"
-      ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-        {{ 'common.actions.refresh' | transloco }}
+      ><button mat-button (click)="facade.refresh()" [disabled]="facade.loading()">
+        <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
       </button></app-page-header
     >
     <div class="queue-views" role="group" [attr.aria-label]="'hq.queue.view' | transloco">

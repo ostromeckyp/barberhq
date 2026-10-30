@@ -56,6 +56,8 @@ html {
       filled-ripple-color: rgba(0, 0, 0, 0.12),
       outlined-container-height: 40px,
       text-container-height: 40px,
+      // Text buttons (back link, refresh) use ink: the brand red misses 4.5:1 on the page surface.
+      text-label-text-color: var(--ink),
     )
   );
 }

@@ -4,8 +4,8 @@
   [description]="'hq.stock.description' | transloco"
 >
   <a mat-flat-button routerLink="/hq/stock/products/new">{{ 'hq.products.add' | transloco }}</a>
-  <button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-    {{ 'common.actions.refresh' | transloco }}
+  <button mat-button (click)="facade.refresh()" [disabled]="facade.loading()">
+    <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button>
 </app-page-header>
 <mat-progress-bar

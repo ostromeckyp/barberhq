@@ -1,3 +1,4 @@
+import { BackLink } from '../../shared/ui/back-link/back-link';
 import { ProductKnowledgeReviewComponent } from './product-knowledge-review.component';
 import { ProductKnowledgeReviewFacade } from './library/product-knowledge-review.facade';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,6 +24,7 @@ import { DOCUMENT_PDF_RENDERER } from './library/document-review-renderer';
     { provide: DOCUMENT_PDF_RENDERER, useFactory: () => new PdfRenderer() },
   ],
   imports: [
+    BackLink,
     ProductKnowledgeReviewComponent,
     MatButtonModule,
     MatIconModule,

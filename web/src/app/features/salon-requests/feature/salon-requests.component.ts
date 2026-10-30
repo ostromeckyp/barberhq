@@ -2,6 +2,7 @@ import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/dela
 import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
@@ -13,6 +14,7 @@ import { SalonRequestsFacade } from './salon-requests.facade';
   imports: [
     DelayedLoadingDirective,
     MatButtonModule,
+    MatIconModule,
     MatButtonToggleModule,
     MatProgressBarModule,
     PageHeader,

@@ -1,8 +1,4 @@
-<div class="app-back-navigation">
-  <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-    {{ 'delivery.receipt.back' | transloco }}
-  </button>
-</div>
+<app-back-link [label]="'delivery.receipt.back' | transloco" (back)="facade.goBack()" />
 <h1>
   {{
     (facade.result() || (facade.context()?.summary.receipt && !facade.unknown())

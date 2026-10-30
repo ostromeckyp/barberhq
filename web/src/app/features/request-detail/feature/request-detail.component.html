@@ -1,4 +1,13 @@
-<div class="app-back-navigation">
+<div class="app-page-toolbar">
+  @if (facade.back(); as context) {
+    <app-back-link
+      [label]="
+        (context.kind === 'HQ' ? 'requests.detail.back.hq' : 'requests.detail.back.salon')
+          | transloco
+      "
+      (back)="facade.goBack()"
+    />
+  }
   <button
     mat-button
     type="button"
@@ -8,14 +17,6 @@
   >
     <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button>
-  @if (facade.back(); as context) {
-    <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-      {{
-        (context.kind === 'HQ' ? 'requests.detail.back.hq' : 'requests.detail.back.salon')
-          | transloco
-      }}
-    </button>
-  }
 </div>
 <mat-progress-bar
   *appDelayedLoading="facade.loading()"

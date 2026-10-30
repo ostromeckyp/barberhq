@@ -1,6 +1,7 @@
 import { DelayedLoadingDirective } from '../../../../shared/ui/delayed-loading/delayed-loading';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MatTableModule } from '@angular/material/table';
@@ -13,6 +14,7 @@ import { HqStockFacade } from '../hq-stock.facade';
   imports: [
     DelayedLoadingDirective,
     MatButtonModule,
+    MatIconModule,
     MatTableModule,
     MatProgressBarModule,
     PageHeader,
