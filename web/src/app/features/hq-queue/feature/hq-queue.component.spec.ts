@@ -63,3 +63,8 @@ it('switches between requests and delivery issues with one toggle group', () => 
   );
   expect(toggles).toEqual(['receipt_longRequests', 'report_problemDelivery issues (0)']);
 });
+it('shows the selected view by fill only, without a check mark', () => {
+  const { el } = render({ loading: false, loaded: true, offset: 0, hasNext: false });
+  expect(el.querySelector('.mat-button-toggle-checked')).not.toBeNull();
+  expect(el.querySelector('mat-button-toggle-group .mat-pseudo-checkbox')).toBeNull();
+});

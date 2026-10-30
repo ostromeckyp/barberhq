@@ -35,6 +35,7 @@ import { HqQueueFacade } from './hq-queue.facade';
     >
     <mat-button-toggle-group
       class="filter-toggle-group"
+      hideSingleSelectionIndicator
       [attr.aria-label]="'hq.queue.view' | transloco"
       [value]="issues.selected() ? 'issues' : 'requests'"
       (change)="issues.select($event.value === 'issues')"

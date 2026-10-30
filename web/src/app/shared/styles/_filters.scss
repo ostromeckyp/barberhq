@@ -1,5 +1,9 @@
-/* Single-row, horizontally scrollable segmented filter (mat-button-toggle-group). */
-.filter-toggle-group {
+/*
+ * Single-row, horizontally scrollable segmented filter (mat-button-toggle-group).
+ * Two classes so this beats Material's own `.mat-button-toggle-group { overflow: hidden }`,
+ * which is injected after the global stylesheet.
+ */
+.mat-button-toggle-group.filter-toggle-group {
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -9,4 +13,9 @@
 }
 .filter-toggle-group .mat-button-toggle {
   flex: none;
+}
+.filter-toggle-group .mat-button-toggle-label-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }

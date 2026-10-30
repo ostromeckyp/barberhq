@@ -203,6 +203,9 @@ p {
   color: #8c1d18;
   margin-top: 6px;
 }
+.stock {
+  container: stock-card / inline-size;
+}
 .stock h2 {
   margin-bottom: 8px;
 }
@@ -218,9 +221,13 @@ p {
   text-align: right;
   vertical-align: baseline;
   border-bottom: 1px solid var(--divider);
+}
+.stock-table tbody .stock-product {
   overflow-wrap: anywhere;
 }
 .stock-table thead th {
+  /* Wrap between words; split a word only if it alone is wider than the column (very narrow screens). */
+  overflow-wrap: break-word;
   color: var(--muted);
   font-size: 12px;
   font-weight: 500;
@@ -263,11 +270,21 @@ p {
   }
 }
 @media (max-width: 759px) {
+  .figures > div {
+    padding: 12px 8px;
+  }
+  .figures strong {
+    font-size: 28px;
+  }
+}
+
+/* Compact rows on the card's own width: it is a narrow aside on desktop too. */
+@container stock-card (max-width: 559px) {
   .stock-table,
+  .stock-table thead,
   .stock-table tbody {
     display: block;
   }
-  .stock-table thead,
   .stock-table tr {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -292,11 +309,5 @@ p {
     grid-column: 1 / -1;
     width: auto;
     padding-bottom: 0;
-  }
-  .figures > div {
-    padding: 12px 8px;
-  }
-  .figures strong {
-    font-size: 28px;
   }
 }

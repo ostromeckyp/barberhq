@@ -42,3 +42,8 @@ it('shows Next enabled when another page exists', () => {
 it('keeps Previous on a later page', () => {
   expect(render(50, null).button('Previous')).toBeTruthy();
 });
+it('shows the selected filter by fill only, without a check mark', () => {
+  const { el } = render(0, null);
+  expect(el.querySelector('.mat-button-toggle-checked')).not.toBeNull();
+  expect(el.querySelector('mat-button-toggle-group .mat-pseudo-checkbox')).toBeNull();
+});
