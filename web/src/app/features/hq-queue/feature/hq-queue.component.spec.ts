@@ -54,3 +54,12 @@ it('hides the pager on a single page and shows Next when another page exists', (
   expect(next).toBeTruthy();
   expect((next as HTMLButtonElement).disabled).toBe(false);
 });
+it('switches between requests and delivery issues with one toggle group', () => {
+  const { el } = render({ loading: false, loaded: true, offset: 0, hasNext: false });
+  const group = el.querySelector('mat-button-toggle-group') as HTMLElement;
+  expect(group.getAttribute('aria-label')).toBe('Queue view');
+  const toggles = [...group.querySelectorAll('mat-button-toggle')].map((t) =>
+    t.textContent?.replace(/\s+/g, ' ').trim(),
+  );
+  expect(toggles).toEqual(['receipt_longRequests', 'report_problemDelivery issues (0)']);
+});

@@ -742,6 +742,7 @@
     "shorthand": {
       "title": "Salon shorthand",
       "description": "Phrases each salon taught the ordering assistant. Read-only; salon staff remove them in their Settings.",
+      "emptyTitle": "No salon shorthand yet",
       "empty": "No salon has learned shorthand yet."
     },
     "products": {
@@ -1203,6 +1204,7 @@
       "requestProducts": "Request products",
       "draftProducts": "draft products",
       "closeRequest": "Close request products",
+      "stockTitle": "Products in stock",
       "viewRequests": "View requests"
     },
     "stock": {

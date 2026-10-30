@@ -58,7 +58,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
   test.describe('Given an open issue for two damaged units', () => {
     test.beforeEach(async ({ page }) => {
       await login(page, 'hq');
-      await page.getByRole('button', { name: /Delivery issues/ }).click();
+      await page.getByRole('radio', { name: /Delivery issues/ }).click();
       await page.getByRole('link', { name: 'Open delivery issue · Legnicka', exact: true }).click();
       await page.getByRole('region', { name: 'Outstanding units', exact: true }).waitFor();
     });

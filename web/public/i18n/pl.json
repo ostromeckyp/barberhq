@@ -742,6 +742,7 @@
     "shorthand": {
       "title": "Skróty salonów",
       "description": "Frazy, których poszczególne salony nauczyły asystenta zamówień. Tylko do odczytu; pracownicy salonów usuwają je w swoich ustawieniach.",
+      "emptyTitle": "Brak skrótów salonów",
       "empty": "Żaden salon nie nauczył jeszcze asystenta skrótów."
     },
     "products": {
@@ -1203,6 +1204,7 @@
       "requestProducts": "Zamów produkty",
       "draftProducts": "produkty na liście zamówienia",
       "closeRequest": "Zamknij zamawianie produktów",
+      "stockTitle": "Produkty na stanie",
       "viewRequests": "Zobacz zamówienia"
     },
     "stock": {

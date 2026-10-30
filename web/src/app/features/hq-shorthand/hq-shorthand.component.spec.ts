@@ -52,3 +52,29 @@ it('shows every salon phrase read-only with paging', async () => {
   expect(el.textContent).toContain('Łódzka');
   expect(el.querySelector('button.load-more')).toBeNull();
 });
+it('shows an empty state when no salon has learned shorthand', async () => {
+  TestBed.resetTestingModule();
+  TestBed.configureTestingModule({
+    imports: [HqShorthandComponent],
+    providers: [
+      {
+        provide: SalonShorthandApi,
+        useValue: { listHq: vi.fn().mockResolvedValue({ rows: [], nextCursor: null }) },
+      },
+      {
+        provide: SessionFacade,
+        useValue: {
+          state: signal({
+            status: 'READY',
+            membership: { userId: 'u', businessId: 'b', role: 'HQ', salonIds: [] },
+          }),
+        },
+      },
+    ],
+  });
+  const fixture = TestBed.createComponent(HqShorthandComponent);
+  fixture.detectChanges();
+  await TestBed.inject(ApplicationRef).whenStable();
+  fixture.detectChanges();
+  expect(fixture.nativeElement.querySelector('app-empty-state')).not.toBeNull();
+});

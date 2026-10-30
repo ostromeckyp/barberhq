@@ -3,7 +3,7 @@
   max-width: 1180px;
   min-width: 0;
   margin: 0 auto;
-  padding: 28px clamp(16px, 3vw, 30px) 48px;
+  padding: 0 0 48px;
 }
 .page-header {
   display: flex;
@@ -50,20 +50,12 @@ h1 {
   padding: 16px 0;
   color: var(--muted);
 }
-.empty-state,
 .state,
 .error {
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
-}
-.empty-state h2 {
-  margin: 0 0 7px;
-  font-size: 19px;
-}
-.empty-state p {
-  line-height: 1.5;
 }
 .error {
   color: var(--warning-text);

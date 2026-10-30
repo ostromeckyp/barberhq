@@ -247,7 +247,7 @@ test.describe('Feature: continue delivery work across procedures and interrupted
         });
       });
       await login(page, 'hq');
-      await page.getByRole('button', { name: /Delivery issues/ }).click();
+      await page.getByRole('radio', { name: /Delivery issues/ }).click();
       await page.getByRole('button', { name: 'Configure procedures', exact: true }).click();
       await page.getByRole('combobox', { name: 'Missing product', exact: true }).click();
       await page.getByRole('option', { name: /Delivery handling procedure/ }).click();

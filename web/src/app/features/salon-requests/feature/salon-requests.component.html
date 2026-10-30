@@ -7,6 +7,7 @@
   </button></app-page-header
 >
 <mat-button-toggle-group
+  class="filter-toggle-group"
   [attr.aria-label]="'requests.salon.statusFilter' | transloco"
   [value]="facade.context().filter"
   (change)="facade.setFilter($event.value)"

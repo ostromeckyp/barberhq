@@ -1,3 +1,4 @@
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -21,6 +22,7 @@ import type { DocumentRow } from '../../../../../shared/contracts/knowledge/inde
     MatIconModule,
     DelayedLoadingDirective,
     DocumentRowComponent,
+    EmptyStateComponent,
     TranslocoPipe,
   ],
   templateUrl: './document-library.component.html',

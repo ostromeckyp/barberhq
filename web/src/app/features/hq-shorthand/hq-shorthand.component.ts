@@ -5,6 +5,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import type { TranslatedText } from '../../core/models/translated-text';
 import type { SalonShorthand } from '../../../../../shared/contracts/product-lookup/index';
 import { DelayedLoadingDirective } from '../../shared/ui/delayed-loading/delayed-loading';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
 import { SessionFacade } from '../auth/feature/session.facade';
 import { SalonShorthandApi } from '../salon-settings/data-access/salon-shorthand-api';
@@ -17,6 +18,7 @@ import { SalonShorthandApi } from '../salon-settings/data-access/salon-shorthand
     MatProgressBarModule,
     DelayedLoadingDirective,
     PageHeader,
+    EmptyStateComponent,
     TranslocoPipe,
   ],
   styles: `
@@ -62,7 +64,11 @@ import { SalonShorthandApi } from '../salon-settings/data-access/salon-shorthand
       </p>
     }
     @if (loaded() && !error() && !rows().length) {
-      <p>{{ 'hq.shorthand.empty' | transloco }}</p>
+      <app-empty-state
+        icon="abc"
+        [title]="'hq.shorthand.emptyTitle' | transloco"
+        [message]="'hq.shorthand.empty' | transloco"
+      />
     }
     <ul>
       @for (row of rows(); track row.id) {

@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import { RequestList } from '../../replenishment/ui/request-list';
@@ -15,6 +16,7 @@ import { HqQueueFacade } from './hq-queue.facade';
   imports: [
     DelayedLoadingDirective,
     MatButtonModule,
+    MatButtonToggleModule,
     MatProgressBarModule,
     PageHeader,
     RequestList,
@@ -31,25 +33,20 @@ import { HqQueueFacade } from './hq-queue.facade';
         <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
       </button></app-page-header
     >
-    <div class="queue-views" role="group" [attr.aria-label]="'hq.queue.view' | transloco">
-      <button
-        mat-stroked-button
-        type="button"
-        [attr.aria-pressed]="!issues.selected()"
-        (click)="issues.select(false)"
-      >
+    <mat-button-toggle-group
+      class="filter-toggle-group"
+      [attr.aria-label]="'hq.queue.view' | transloco"
+      [value]="issues.selected() ? 'issues' : 'requests'"
+      (change)="issues.select($event.value === 'issues')"
+    >
+      <mat-button-toggle value="requests">
         <mat-icon aria-hidden="true">receipt_long</mat-icon>{{ 'hq.queue.requests' | transloco }}
-      </button>
-      <button
-        mat-stroked-button
-        type="button"
-        [attr.aria-pressed]="issues.selected()"
-        (click)="issues.select(true)"
-      >
+      </mat-button-toggle>
+      <mat-button-toggle value="issues">
         <mat-icon aria-hidden="true">report_problem</mat-icon
         >{{ 'hq.queue.deliveryIssues' | transloco: { count: issues.openCount() } }}
-      </button>
-    </div>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
     @if (issues.selected()) {
       <app-delivery-issues-list />
     } @else {
@@ -116,17 +113,8 @@ import { HqQueueFacade } from './hq-queue.facade';
   `,
   styles: [
     `
-      .queue-views {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
+      mat-button-toggle-group {
         margin-top: 20px;
-      }
-      .queue-views button {
-        --mat-button-outlined-label-text-color: var(--ink);
-      }
-      .queue-views button[aria-pressed='true'] {
-        background: var(--surface-alt, #eee);
       }
       section {
         background: var(--surface);

@@ -75,7 +75,7 @@ mat-progress-bar {
 @media (max-width: 759px) {
   :host {
     display: block;
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
 
   .mobile-request-trigger {

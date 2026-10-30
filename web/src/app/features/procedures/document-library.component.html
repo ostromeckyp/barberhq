@@ -36,22 +36,21 @@
     <p class="notice" role="status">{{ notice.key | transloco: notice.params }}</p>
   }
   @if (!facade.loading() && !facade.rows().length && !facade.error()) {
-    <div class="empty-state">
-      <h2>{{ 'procedures.library.empty.title' | transloco }}</h2>
-      <p>
-        @if (facade.isHqWorkspace()) {
-          {{ 'procedures.library.empty.hq' | transloco }}
-        } @else {
-          {{ 'procedures.library.empty.salon' | transloco }}
-        }
-      </p>
+    <app-empty-state
+      icon="folder_open"
+      [title]="'procedures.library.empty.title' | transloco"
+      [message]="
+        (facade.isHqWorkspace() ? 'procedures.library.empty.hq' : 'procedures.library.empty.salon')
+          | transloco
+      "
+    >
       @if (facade.isHqWorkspace()) {
         <button mat-flat-button type="button" (click)="add()">
           <mat-icon aria-hidden="true">upload_file</mat-icon
           >{{ 'procedures.library.add' | transloco }}
         </button>
       }
-    </div>
+    </app-empty-state>
   }
   @if (facade.rows().length) {
     <div
