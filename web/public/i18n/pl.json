@@ -830,7 +830,7 @@
       "accessChanged": "Dostęp się zmienił. Zapisana akcja została zachowana. Przeładuj aplikację po przywróceniu dostępu, aby uzgodnić jej wynik.",
       "ALREADY_ACTIVE": "Aktywne zamówienie obejmuje już ten produkt. Zakończ je, zanim utworzysz zamówienie zastępcze.",
       "STALE_STATE": "Dane uległy zmianie. Przejrzyj odświeżone informacje przed ponowną próbą.",
-      "default": "Nie ukończono akcji ({{ code }}). Odśwież i sprawdź dane."
+      "default": "Nie udało się wykonać operacji ({{ code }}). Odśwież i sprawdź dane."
     },
     "validation": {
       "unavailable": "Dane dostawy są niedostępne.",
@@ -902,7 +902,7 @@
       "preview": {
         "title": "Podgląd odbioru",
         "addedToStock": "Sztuki w dobrym stanie zostaną dodane do stanu magazynowego salonu.",
-        "endsTransit": "Zapisanie wyniku kończy etap „w drodze” tej dostawy.",
+        "endsTransit": "Po zapisaniu wyniku dostawa nie jest już w drodze.",
         "locked": "Zapisany wynik sprawdzenia jest zablokowany do czasu potwierdzenia rezultatu."
       },
       "submit": {
@@ -933,7 +933,7 @@
         "label": "Pozostałe sztuki",
         "title": "Postęp zamówienia zastępczego",
         "received": "Otrzymane sztuki zastępcze w dobrym stanie: {{ received }} z {{ total }}",
-        "resolved": "Brakujące sztuki zastępcze w dobrym stanie zostały odebrane."
+        "resolved": "Pozostałe sztuki zastępcze w dobrym stanie zostały odebrane."
       },
       "original": {
         "title": "Pierwotne sprawdzenie dostawy",

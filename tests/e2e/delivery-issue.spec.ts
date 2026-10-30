@@ -159,7 +159,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
           )?.goodQuantity,
         ).toBe(8);
         await expect(page.getByRole('region', { name: 'Outstanding units' })).toContainText(
-          '1 remaining',
+          '1 unit remaining',
         );
       });
     });
@@ -339,7 +339,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
         await expect(page.getByText('Under review', { exact: true })).toBeVisible();
         await expect(page.getByText('Rejected', { exact: true })).toBeVisible();
         await expect(page.getByRole('region', { name: 'Outstanding units' })).toContainText(
-          '2 remaining',
+          '2 units remaining',
         );
         await expect(
           page.getByRole('button', { name: 'Create replacement', exact: true }),
@@ -368,7 +368,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
           '8 good',
         );
         await expect(page.getByRole('region', { name: 'Outstanding units' })).toContainText(
-          '0 remaining',
+          '0 units remaining',
         );
         await expect(
           page.getByRole('button', { name: 'Create replacement', exact: true }),
