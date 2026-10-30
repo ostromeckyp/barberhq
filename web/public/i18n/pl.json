@@ -191,8 +191,8 @@
     },
     "provenance": {
       "synthetic": {
-        "procedure": "Syntetyczna procedura demonstracyjna",
-        "policy": "Syntetyczna polityka demonstracyjna",
+        "procedure": "Demonstracyjna syntetyczna procedura",
+        "policy": "Demonstracyjna syntetyczna polityka",
         "productCard": "Demonstracyjna syntetyczna karta produktu",
         "productCatalog": "Demonstracyjny syntetyczny katalog produktów"
       },
@@ -690,7 +690,7 @@
       "approveBody": "Zarezerwuj wszystkie produkty razem. Fizyczny stan magazynowy nie zmieni się do momentu wysyłki.",
       "dispatchBody": "Potwierdź dopiero, gdy wszystkie produkty opuszczą centralę.",
       "reason": "Powód odrzucenia",
-      "allIntact": "Wszystkie produkty są nieuszkodzone",
+      "allIntact": "Wszystkie produkty są w dobrym stanie",
       "receiptBlocked": "Odbiór zablokowany. Skontaktuj się z centralą w sprawie brakujących lub uszkodzonych produktów. Całe zamówienie pozostaje wysłane, dopóki wszystkie produkty nie dotrą w nienaruszonym stanie.",
       "saving": "Zapisuję akcję",
       "closeReview": "Zamknij i sprawdź",
