@@ -2,13 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Language } from '../../../core/language';
-import type { AppLanguage } from '../../../core/models/app-language';
-
-/** Each language is named in its own language, so these labels are never translated. */
-const languageOptions: readonly { value: AppLanguage; label: string }[] = [
-  { value: 'pl', label: 'Polski' },
-  { value: 'en', label: 'English' },
-];
+import { LANGUAGE_OPTIONS } from '../../../core/i18n/language-options';
 
 @Component({
   selector: 'app-language-select',
@@ -32,5 +26,5 @@ const languageOptions: readonly { value: AppLanguage; label: string }[] = [
 })
 export class LanguageSelect {
   readonly language = inject(Language);
-  readonly options = languageOptions;
+  readonly options = LANGUAGE_OPTIONS;
 }

@@ -8,7 +8,10 @@ const i18nRoot = 'web/public/i18n';
 const migratedAreas = ['shell', 'features/login', 'features/auth', 'features/access', 'shared'];
 const namespaces =
   'common|shell|auth|login|access|procedures|replenishment|requests|delivery|salon|hq';
-const keyPattern = new RegExp(`^(?:${namespaces})\\.[A-Za-z0-9_.-]+$`);
+const keyLiteralPattern = new RegExp(
+  `(['"\`])((?:${namespaces})\\.[A-Za-z0-9_.-]*[A-Za-z0-9_-])\\1`,
+  'g',
+);
 const translatedAttributes = ['aria-label', 'placeholder', 'matTooltip'];
 
 type Json = { [key: string]: Json | string };
@@ -38,9 +41,9 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
+/** Quoted key literals anywhere, including inside attribute values and inline templates. */
 function literalKeys(source: string): string[] {
-  const literals = source.matchAll(/'([^'\n\\]*)'|"([^"\n\\]*)"|`([^`$\\]*)`/g);
-  return [...literals].map((m) => m[1] ?? m[2] ?? m[3]).filter((text) => keyPattern.test(text));
+  return [...source.matchAll(keyLiteralPattern)].map((m) => m[2]);
 }
 
 /** Inline `template:` strings of a component file. */
@@ -130,6 +133,15 @@ describe('i18n keys', () => {
         .map(([k]) => `${k} must be a non-empty string`),
     ];
     expect(problems).toEqual([]);
+  });
+
+  it('finds keys inside bound attributes and inline templates', () => {
+    expect(literalKeys(`[attr.aria-label]="'shell.missing' | transloco"`)).toEqual([
+      'shell.missing',
+    ]);
+    const component = "template: `<p>{{ 'login.missing' | transloco }}</p>`, x: `hq.a.b`";
+    expect(literalKeys(component)).toEqual(['login.missing', 'hq.a.b']);
+    expect(literalKeys(`'shell.nav.' + name, "salon.name.length > 0 ? x : y"`)).toEqual([]);
   });
 
   it('every literal key used by the web app exists in en.json', () => {

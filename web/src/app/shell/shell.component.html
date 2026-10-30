@@ -37,13 +37,27 @@
     <mat-icon>account_circle</mat-icon>
   </button>
   <mat-menu #userMenu="matMenu"
-    ><div class="menu-language" (click)="$event.stopPropagation()" (keydown)="keepMenuOpen($event)">
-      <app-language-select />
-    </div>
+    ><button mat-menu-item [matMenuTriggerFor]="languageMenu">
+      <mat-icon>language</mat-icon>{{ 'common.language.label' | transloco }}
+    </button>
     <button mat-menu-item (click)="facade.signOut()">
       <mat-icon>logout</mat-icon>{{ 'common.actions.signOut' | transloco }}
     </button></mat-menu
-  ></mat-toolbar
+  >
+  <mat-menu #languageMenu="matMenu">
+    @for (option of languageOptions; track option.value) {
+      <button
+        mat-menu-item
+        role="menuitemradio"
+        [attr.lang]="option.value"
+        [attr.aria-checked]="language.current() === option.value"
+        (click)="language.set(option.value)"
+      >
+        <mat-icon>{{ language.current() === option.value ? 'check' : '' }}</mat-icon
+        >{{ option.label }}
+      </button>
+    }
+  </mat-menu></mat-toolbar
 >
 <mat-sidenav-container
   ><mat-sidenav
