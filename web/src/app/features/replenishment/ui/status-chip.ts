@@ -1,20 +1,21 @@
 import { Component, computed, input } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import type { RequestState } from '../../../../../../shared/contracts/stock/index';
-export const STATUSES: Record<RequestState, { label: string; icon: string }> = {
-  PENDING_APPROVAL: { label: 'Pending approval', icon: 'hourglass_top' },
-  RESERVED: { label: 'Approved · reserved', icon: 'lock' },
-  DISPATCHED: { label: 'Dispatched', icon: 'local_shipping' },
-  RECEIVED: { label: 'Received', icon: 'check_circle' },
-  RECEIVED_WITH_ISSUE: { label: 'Delivery with issue', icon: 'error_outline' },
-  REJECTED: { label: 'Rejected', icon: 'cancel' },
+export const STATUSES: Record<RequestState, { labelKey: string; icon: string }> = {
+  PENDING_APPROVAL: { labelKey: 'requests.status.PENDING_APPROVAL', icon: 'hourglass_top' },
+  RESERVED: { labelKey: 'requests.status.RESERVED', icon: 'lock' },
+  DISPATCHED: { labelKey: 'requests.status.DISPATCHED', icon: 'local_shipping' },
+  RECEIVED: { labelKey: 'requests.status.RECEIVED', icon: 'check_circle' },
+  RECEIVED_WITH_ISSUE: { labelKey: 'requests.status.RECEIVED_WITH_ISSUE', icon: 'error_outline' },
+  REJECTED: { labelKey: 'requests.status.REJECTED', icon: 'cancel' },
 };
 @Component({
   selector: 'app-status-chip',
-  imports: [MatChipsModule, MatIconModule],
+  imports: [MatChipsModule, MatIconModule, TranslocoPipe],
   template:
-    '<mat-chip [class]="state()"><mat-icon matChipAvatar>{{ display().icon }}</mat-icon>{{ display().label }}</mat-chip>',
+    '<mat-chip [class]="state()"><mat-icon matChipAvatar>{{ display().icon }}</mat-icon>{{ display().labelKey | transloco }}</mat-chip>',
   styles: [
     `
       mat-chip {

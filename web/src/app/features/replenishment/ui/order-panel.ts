@@ -8,10 +8,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { NgTemplateOutlet } from '@angular/common';
+import { TranslocoPipe } from '@jsverse/transloco';
+import type { DraftLine, SubmissionOutcome } from '../../../../../../shared/contracts/draft/index';
 import { OrderFacade } from '../feature/order.facade';
 import { ReplenishmentAssistantFacade } from '../feature/replenishment-assistant.facade';
 import { AssistantInput } from './assistant-input';
 import { ClarificationInput } from './clarification-input';
+import { INVENTORY_UNAVAILABLE_REASON } from '../feature/draft.store';
 import { runtimeConfig } from '../../../core/public-config';
 @Component({
   selector: 'app-order-panel',
@@ -25,6 +28,7 @@ import { runtimeConfig } from '../../../core/public-config';
     MatIconModule,
     MatTabsModule,
     NgTemplateOutlet,
+    TranslocoPipe,
     AssistantInput,
     ClarificationInput,
   ],
@@ -34,6 +38,11 @@ import { runtimeConfig } from '../../../core/public-config';
 export class OrderPanel {
   readonly facade = inject(OrderFacade);
   readonly assistant = inject(ReplenishmentAssistantFacade);
+  readonly outcomeKeys: Record<SubmissionOutcome['status'], string> = {
+    CREATED: 'replenishment.order.outcome.CREATED',
+    FAILED: 'replenishment.order.outcome.FAILED',
+    UNKNOWN: 'replenishment.order.outcome.UNKNOWN',
+  };
   readonly assistantEnabled = runtimeConfig.publicConfig?.replenishmentAiEnabled ?? false;
   readonly embedded = input(false);
   readonly fields = form(this.facade.manual, (p) => {
@@ -42,6 +51,16 @@ export class OrderPanel {
     min(p.quantity, 1);
     max(p.quantity, 99);
   });
+  /** Name shown for a line: the product, or the user's original wording while unresolved. */
+  lineName(line: DraftLine): string {
+    return line.status === 'READY' ? line.productName : line.originalWording;
+  }
+  /** Translation key when the unresolved reason was written by this app; `undefined` for server text. */
+  reasonKey(line: DraftLine): string | undefined {
+    return line.status !== 'READY' && line.reason === INVENTORY_UNAVAILABLE_REASON
+      ? INVENTORY_UNAVAILABLE_REASON
+      : undefined;
+  }
   quantity(event: Event, lineId: string) {
     this.facade.draft.editQuantity(lineId, (event.target as HTMLInputElement).valueAsNumber);
   }

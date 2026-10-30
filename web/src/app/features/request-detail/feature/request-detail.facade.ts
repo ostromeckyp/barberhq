@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { RequestActions } from './request-actions';
 import { availableRequestActions } from './action-input';
@@ -83,7 +84,7 @@ export class RequestDetailFacade {
   }
   readonly loading = this.record.isLoading;
   readonly error = computed(() => !!this.record.error());
-  readonly message = signal('');
+  readonly message = signal<TranslatedText | null>(null);
   readonly availableActions = computed(() => {
     const r = this.request(),
       s = this.session.state();
@@ -123,8 +124,9 @@ export class RequestDetailFacade {
     if (!outcome) return;
     if (outcome) {
       this.message.set(
-        outcome.error ??
-          (outcome.result?.replayed ? 'This action was already recorded.' : 'Action recorded.'),
+        outcome.error ?? {
+          key: outcome.result?.replayed ? 'requests.action.replayed' : 'requests.action.recorded',
+        },
       );
     }
     this.refresh();

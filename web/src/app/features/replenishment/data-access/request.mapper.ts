@@ -49,7 +49,12 @@ export function toRequestDetail(r: DetailRecord, inventory: InventoryRow[]): Req
     revision: t.revision,
     state: t.state as RequestState,
     at: t.createdAt,
-    actorLabel: t.action === 'SUBMIT' ? 'Requester' : t.action === 'RECEIVE' ? 'Recipient' : 'HQ',
+    actorLabel:
+      t.action === 'SUBMIT'
+        ? 'requests.actor.requester'
+        : t.action === 'RECEIVE'
+          ? 'requests.actor.recipient'
+          : 'requests.actor.hq',
     ...(t.reason ? { reason: t.reason } : {}),
   }));
   if (r.replacementCreation[0] && !r.timeline.some((event) => event.action === 'SUBMIT'))
@@ -57,7 +62,7 @@ export function toRequestDetail(r: DetailRecord, inventory: InventoryRow[]): Req
       revision: 1,
       state: 'PENDING_APPROVAL',
       at: r.replacementCreation[0].recordedAt,
-      actorLabel: 'HQ',
+      actorLabel: 'requests.actor.hq',
     });
   if (
     r.receipt &&
@@ -71,7 +76,7 @@ export function toRequestDetail(r: DetailRecord, inventory: InventoryRow[]): Req
         ? 'RECEIVED_WITH_ISSUE'
         : 'RECEIVED',
       at: r.receipt.recordedAt,
-      actorLabel: 'Recipient',
+      actorLabel: 'requests.actor.recipient',
     });
   return {
     ...toRequestSummary(r),

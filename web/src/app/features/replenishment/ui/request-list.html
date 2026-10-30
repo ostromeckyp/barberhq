@@ -1,23 +1,28 @@
 @if (requests().length) {
   @if (layout.compact()) {
-    <ul class="compact-list" aria-label="Requests">
+    <ul class="compact-list" [attr.aria-label]="'requests.list.label' | transloco">
       @for (request of requests(); track request.id) {
         <li class="compact-record">
           <div class="record-heading">
-            <h3 class="compact-title">Request {{ request.id.slice(0, 8) }}</h3>
+            <h3 class="compact-title">
+              {{ 'requests.list.title' | transloco: { id: request.id.slice(0, 8) } }}
+            </h3>
             <app-status-chip [state]="request.state" />
           </div>
           <p class="compact-meta">
-            {{ request.salonName }} · {{ request.createdAt | date: 'd MMM, HH:mm' }}
+            {{ request.salonName }} · {{ request.createdAt | appDate: 'd MMM, HH:mm' }}
           </p>
           <dl class="compact-metrics">
             <div>
-              <dt>Items</dt>
+              <dt>{{ 'requests.list.items' | transloco }}</dt>
               <dd>{{ request.itemCount }}</dd>
             </div>
             <div>
-              <dt>Total units</dt>
-              <dd>{{ request.totalUnits }} <span class="unit">pcs</span></dd>
+              <dt>{{ 'requests.list.totalUnits' | transloco }}</dt>
+              <dd>
+                {{ request.totalUnits }}
+                <span class="unit">{{ 'requests.unit.pcs' | transloco }}</span>
+              </dd>
             </div>
           </dl>
           <p class="product-summary">
@@ -27,7 +32,9 @@
               }
             }
             @if (request.items.length > 2) {
-              <span class="more-items">+{{ request.items.length - 2 }} more</span>
+              <span class="more-items">{{
+                'requests.list.more' | transloco: { count: request.items.length - 2 }
+              }}</span>
             }
           </p>
           <div class="compact-actions">
@@ -39,45 +46,65 @@
                   : ['/salons', request.salonId, 'requests', request.id]
               "
               [state]="{ listContext: context() }"
-              >Open request</a
+              >{{ 'requests.list.open' | transloco }}</a
             >
           </div>
         </li>
       }
     </ul>
   } @else {
-    <div class="table-scroll" role="region" aria-label="Requests" tabindex="0">
-      <table mat-table [dataSource]="requests()" aria-label="Requests">
+    <div
+      class="table-scroll"
+      role="region"
+      [attr.aria-label]="'requests.list.label' | transloco"
+      tabindex="0"
+    >
+      <table
+        mat-table
+        [dataSource]="requests()"
+        [attr.aria-label]="'requests.list.label' | transloco"
+      >
         <ng-container matColumnDef="request">
-          <th mat-header-cell *matHeaderCellDef>Request</th>
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'requests.list.columns.request' | transloco }}
+          </th>
           <td mat-cell *matCellDef="let request">
-            <strong>Request {{ request.id.slice(0, 8) }} · {{ request.itemCount }} items</strong>
+            <strong
+              >{{ 'requests.list.title' | transloco: { id: request.id.slice(0, 8) } }} ·
+              {{ itemsKey(request.itemCount) | transloco: { count: request.itemCount } }}</strong
+            >
             <small class="items">
               @for (item of request.items; track item.productId) {
                 {{ item.productName }} × {{ item.quantity }}{{ $last ? '' : ' · ' }}
               }
             </small>
             <small class="muted"
-              >{{ request.salonName }} · {{ request.createdAt | date: 'd MMM, HH:mm' }}</small
+              >{{ request.salonName }} · {{ request.createdAt | appDate: 'd MMM, HH:mm' }}</small
             >
           </td>
         </ng-container>
 
         <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef class="quantity-cell">Quantity</th>
+          <th mat-header-cell *matHeaderCellDef class="quantity-cell">
+            {{ 'requests.list.columns.quantity' | transloco }}
+          </th>
           <td mat-cell *matCellDef="let request" class="quantity-cell">
             <span class="quantity">{{ request.totalUnits }}</span
-            ><small>pcs</small>
+            ><small>{{ 'requests.unit.pcs' | transloco }}</small>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'requests.list.columns.status' | transloco }}
+          </th>
           <td mat-cell *matCellDef="let request"><app-status-chip [state]="request.state" /></td>
         </ng-container>
 
         <ng-container matColumnDef="action">
-          <th mat-header-cell *matHeaderCellDef>Action</th>
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'requests.list.columns.action' | transloco }}
+          </th>
           <td mat-cell *matCellDef="let request">
             <a
               mat-stroked-button
@@ -87,7 +114,7 @@
                   : ['/salons', request.salonId, 'requests', request.id]
               "
               [state]="{ listContext: context() }"
-              >Open request</a
+              >{{ 'requests.list.open' | transloco }}</a
             >
           </td>
         </ng-container>
@@ -98,5 +125,5 @@
     </div>
   }
 } @else {
-  <p class="empty">No requests in this section.</p>
+  <p class="empty">{{ 'requests.list.empty' | transloco }}</p>
 }

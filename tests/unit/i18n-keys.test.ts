@@ -12,6 +12,10 @@ const migratedAreas = [
   'features/access',
   'shared',
   'features/procedures',
+  'features/replenishment',
+  'features/request-detail',
+  'features/salon-requests',
+  'features/hq-queue',
 ];
 const namespaces =
   'common|shell|auth|login|access|procedures|replenishment|requests|delivery|salon|hq';

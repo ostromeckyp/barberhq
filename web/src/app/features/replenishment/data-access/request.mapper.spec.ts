@@ -159,12 +159,14 @@ it('shows_replacement_creation_from_the_actual_issue_event', () => {
     inventory,
   );
   expect(result.timeline).toEqual([
-    { state: 'PENDING_APPROVAL', at: '2026-10-25T10:00:00Z', actorLabel: 'HQ' },
+    { state: 'PENDING_APPROVAL', at: '2026-10-25T10:00:00Z', actorLabel: 'requests.actor.hq' },
   ]);
 });
 it('does_not_infer_salon_actor_for_submissions_that_can_come_from_hq', () => {
   const submitted = { ...record, timeline: [{ ...record.timeline[0], action: 'SUBMIT' as const }] };
-  expect(toRequestDetail(submitted, inventory).timeline[0].actorLabel).toBe('Requester');
+  expect(toRequestDetail(submitted, inventory).timeline[0].actorLabel).toBe(
+    'requests.actor.requester',
+  );
 });
 it('refuses_details_when_any_product_inventory_is_missing_or_from_another_salon', () => {
   expect(() => toRequestDetail(record, inventory.slice(1))).toThrow();

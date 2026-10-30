@@ -6,40 +6,50 @@
     (click)="facade.refresh()"
     [disabled]="facade.loading()"
   >
-    <mat-icon aria-hidden="true">refresh</mat-icon>Refresh
+    <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button>
   @if (facade.back(); as context) {
     <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-      Back to {{ context.kind === 'HQ' ? 'request queue' : 'requests' }}
+      {{
+        (context.kind === 'HQ' ? 'requests.detail.back.hq' : 'requests.detail.back.salon')
+          | transloco
+      }}
     </button>
   }
 </div>
 <mat-progress-bar
   *appDelayedLoading="facade.loading()"
   mode="indeterminate"
-  aria-label="Loading request"
+  [attr.aria-label]="'requests.detail.loading' | transloco"
 />
-@if (facade.message()) {
-  <p role="status" class="message">{{ facade.message() }}</p>
+@if (facade.message(); as message) {
+  <p role="status" class="message">{{ message.key | transloco: message.params }}</p>
 }
 @if (facade.error()) {
   <section class="card">
-    <h2>Request unavailable</h2>
-    <p>It may be unavailable or outside your access. Try refreshing.</p>
-    <button mat-button (click)="facade.refresh()">Retry</button>
+    <h2>{{ 'requests.detail.unavailable.title' | transloco }}</h2>
+    <p>{{ 'requests.detail.unavailable.body' | transloco }}</p>
+    <button mat-button (click)="facade.refresh()">{{ 'common.actions.retry' | transloco }}</button>
   </section>
 }
 @if (facade.request(); as request) {
   <header class="request-header">
     <div class="request-heading">
-      <p class="reference">{{ request.id.slice(0, 8) }} · HQ → {{ request.salonName }}</p>
+      <p class="reference">
+        {{
+          'requests.detail.reference'
+            | transloco: { id: request.id.slice(0, 8), salon: request.salonName }
+        }}
+      </p>
       <h1>
         @if (request.items.length === 1) {
           {{ request.items[0].productName }}
           <span class="title-quantity">× {{ request.items[0].quantity }}</span>
         } @else {
-          {{ request.itemCount }} products
-          <span class="title-quantity">· {{ request.totalUnits }} pcs</span>
+          {{ productsKey(request.itemCount) | transloco: { count: request.itemCount } }}
+          <span class="title-quantity">{{
+            'requests.detail.titleUnits' | transloco: { units: request.totalUnits }
+          }}</span>
         }
       </h1>
     </div>
@@ -48,9 +58,10 @@
   @if (issueLink(); as link) {
     <p>
       <a mat-button [routerLink]="link">{{
-        request.delivery?.replacementForIssueId
-          ? 'Replacement for delivery issue'
-          : 'View delivery issue'
+        (request.delivery?.replacementForIssueId
+          ? 'requests.detail.issue.replacement'
+          : 'requests.detail.issue.view'
+        ) | transloco
       }}</a>
     </p>
   }
@@ -58,35 +69,26 @@
     <div class="main-column">
       <section class="card next-step" aria-labelledby="next-step-title">
         <div class="next-copy">
-          <p class="eyebrow">NEXT STEP</p>
-          <h2 id="next-step-title">{{ nextTitle() }}</h2>
+          <p class="eyebrow">{{ 'requests.detail.next.eyebrow' | transloco }}</p>
+          <h2 id="next-step-title">{{ nextTitleKey() | transloco }}</h2>
           @switch (request.state) {
             @case ('PENDING_APPROVAL') {
-              <p>
-                HQ checks availability, then approves or rejects the whole request. Nothing is
-                reserved yet.
-              </p>
+              <p>{{ 'requests.detail.next.body.PENDING_APPROVAL' | transloco }}</p>
             }
             @case ('RESERVED') {
-              <p>
-                The products are reserved at HQ. Confirm dispatch only once the complete parcel has
-                left HQ.
-              </p>
+              <p>{{ 'requests.detail.next.body.RESERVED' | transloco }}</p>
             }
             @case ('DISPATCHED') {
-              <p>Inspect the delivery and record good, damaged and missing products.</p>
+              <p>{{ 'requests.detail.next.body.DISPATCHED' | transloco }}</p>
             }
             @case ('RECEIVED') {
-              <p>Delivery complete. The products are now in salon stock.</p>
+              <p>{{ 'requests.detail.next.body.RECEIVED' | transloco }}</p>
             }
             @case ('RECEIVED_WITH_ISSUE') {
-              <p>
-                The delivery was inspected. Good products entered salon stock; HQ handles the
-                reported problem.
-              </p>
+              <p>{{ 'requests.detail.next.body.RECEIVED_WITH_ISSUE' | transloco }}</p>
             }
             @case ('REJECTED') {
-              <p>This request was rejected. You can prepare a new request from salon inventory.</p>
+              <p>{{ 'requests.detail.next.body.REJECTED' | transloco }}</p>
             }
           }
         </div>
@@ -99,11 +101,11 @@
                   (click)="facade.act(action)"
                   [disabled]="facade.loading()"
                 >
-                  {{ labels[action] }}
+                  {{ labels[action] | transloco }}
                 </button>
               } @else {
                 <button mat-flat-button (click)="facade.act(action)" [disabled]="facade.loading()">
-                  {{ labels[action] }}
+                  {{ labels[action] | transloco }}
                 </button>
               }
             }
@@ -111,7 +113,7 @@
         }
       </section>
       <section class="card delivery" aria-labelledby="delivery-title">
-        <h2 id="delivery-title">Delivery quantities</h2>
+        <h2 id="delivery-title">{{ 'requests.detail.delivery.title' | transloco }}</h2>
         @for (item of request.items; track item.productId) {
           <div class="delivery-item">
             @if (request.items.length > 1) {
@@ -119,51 +121,77 @@
             }
             <div class="figures">
               <div>
-                <span>Ordered</span><strong>{{ item.quantity }}</strong
-                ><small>pcs</small>
+                <span>{{ 'requests.detail.delivery.ordered' | transloco }}</span
+                ><strong>{{ item.quantity }}</strong
+                ><small>{{ 'requests.unit.pcs' | transloco }}</small>
               </div>
               <div>
-                <span>Dispatched</span>
+                <span>{{ 'requests.detail.delivery.dispatched' | transloco }}</span>
                 @if (
                   request.state === 'DISPATCHED' ||
                   request.state === 'RECEIVED' ||
                   request.state === 'RECEIVED_WITH_ISSUE'
                 ) {
                   <strong>{{ item.dispatchedQuantity }}</strong
-                  ><small>pcs</small>
+                  ><small>{{ 'requests.unit.pcs' | transloco }}</small>
                 } @else {
                   <strong class="pending-value">—</strong
-                  ><small>{{ request.state === 'REJECTED' ? 'Not shipped' : 'Pending' }}</small>
+                  ><small>{{
+                    (request.state === 'REJECTED'
+                      ? 'requests.detail.delivery.notShipped'
+                      : 'requests.detail.delivery.pending'
+                    ) | transloco
+                  }}</small>
                 }
               </div>
               <div>
                 <span>{{
-                  request.state === 'RECEIVED_WITH_ISSUE' ? 'Good units' : 'Received'
+                  (request.state === 'RECEIVED_WITH_ISSUE'
+                    ? 'requests.detail.delivery.goodUnits'
+                    : 'requests.detail.delivery.received'
+                  ) | transloco
                 }}</span>
                 @if (request.state === 'RECEIVED' || request.state === 'RECEIVED_WITH_ISSUE') {
                   <strong>{{ item.receivedQuantity }}</strong
-                  ><small>pcs</small>
+                  ><small>{{ 'requests.unit.pcs' | transloco }}</small>
                 } @else {
                   <strong class="pending-value">—</strong
-                  ><small>{{ request.state === 'REJECTED' ? 'Not received' : 'Pending' }}</small>
+                  ><small>{{
+                    (request.state === 'REJECTED'
+                      ? 'requests.detail.delivery.notReceived'
+                      : 'requests.detail.delivery.pending'
+                    ) | transloco
+                  }}</small>
                 }
               </div>
             </div>
             @if (request.state === 'RECEIVED_WITH_ISSUE' && item.delivery) {
               <p
                 class="muted"
-                [attr.aria-label]="'Delivery problem quantities · ' + item.productName"
+                [attr.aria-label]="
+                  'requests.detail.delivery.problemLabel' | transloco: { product: item.productName }
+                "
               >
-                Damaged: {{ item.delivery.damagedQuantity }} · Missing:
-                {{ item.delivery.missingQuantity }}
+                {{
+                  'requests.detail.delivery.problem'
+                    | transloco
+                      : {
+                          damaged: item.delivery.damagedQuantity,
+                          missing: item.delivery.missingQuantity,
+                        }
+                }}
               </p>
             }
           </div>
         }
       </section>
       <section class="card history-card" aria-labelledby="history-title">
-        <h2 id="history-title">Status history</h2>
-        <ol class="status-history" aria-label="Request status history" role="list">
+        <h2 id="history-title">{{ 'requests.detail.history.title' | transloco }}</h2>
+        <ol
+          class="status-history"
+          [attr.aria-label]="'requests.detail.history.label' | transloco"
+          role="list"
+        >
           @for (step of history(); track step.state) {
             <li
               [class.recorded]="step.kind === 'RECORDED'"
@@ -189,14 +217,23 @@
                 }
               </div>
               <div class="history-copy">
-                <strong>{{ step.label }}</strong>
+                <strong>{{ step.label.key | transloco: step.label.params }}</strong>
                 @if (step.event; as event) {
-                  <p>{{ event.actorLabel }} · {{ event.at | date: 'd MMM, HH:mm' }}</p>
+                  <p>
+                    {{ event.actorLabel | transloco }} · {{ event.at | appDate: 'd MMM, HH:mm' }}
+                  </p>
                   @if (event.reason) {
                     <p class="rejection-reason">{{ event.reason }}</p>
                   }
                 } @else {
-                  <p>{{ step.kind === 'PENDING' ? 'Pending' : 'History record unavailable' }}</p>
+                  <p>
+                    {{
+                      (step.kind === 'PENDING'
+                        ? 'requests.detail.history.pending'
+                        : 'requests.detail.history.unavailable'
+                      ) | transloco
+                    }}
+                  </p>
                 }
               </div>
             </li>
@@ -205,25 +242,37 @@
       </section>
     </div>
     <aside class="card stock" aria-labelledby="stock-title">
-      <h2 id="stock-title">Stock now</h2>
+      <h2 id="stock-title">{{ 'requests.detail.stock.title' | transloco }}</h2>
       @for (item of request.items; track item.productId) {
         <section class="stock-item">
           <h3>{{ item.productName }}</h3>
           <dl>
             <div>
-              <dt>HQ stock<small>On the shelf</small></dt>
+              <dt>
+                {{ 'requests.detail.stock.hq' | transloco
+                }}<small>{{ 'requests.detail.stock.hqHint' | transloco }}</small>
+              </dt>
               <dd data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</dd>
             </div>
             <div>
-              <dt>Reserved at HQ<small>Approved, not yet shipped</small></dt>
+              <dt>
+                {{ 'requests.detail.stock.reserved' | transloco
+                }}<small>{{ 'requests.detail.stock.reservedHint' | transloco }}</small>
+              </dt>
               <dd>{{ item.stock.hqReserved }}</dd>
             </div>
             <div>
-              <dt>HQ available<small>Stock − reserved</small></dt>
+              <dt>
+                {{ 'requests.detail.stock.available' | transloco
+                }}<small>{{ 'requests.detail.stock.availableHint' | transloco }}</small>
+              </dt>
               <dd>{{ item.stock.hqAvailable }}</dd>
             </div>
             <div>
-              <dt>In transit<small>This product in this request</small></dt>
+              <dt>
+                {{ 'requests.detail.stock.inTransit' | transloco
+                }}<small>{{ 'requests.detail.stock.inTransitHint' | transloco }}</small>
+              </dt>
               <dd data-testid="in-transit">
                 {{
                   item.delivery?.inTransit ??
@@ -234,13 +283,16 @@
               </dd>
             </div>
             <div>
-              <dt>{{ request.salonName }} stock<small>In salon</small></dt>
+              <dt>
+                {{ 'requests.detail.stock.salon' | transloco: { salon: request.salonName }
+                }}<small>{{ 'requests.detail.stock.salonHint' | transloco }}</small>
+              </dt>
               <dd data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</dd>
             </div>
           </dl>
         </section>
       }
-      <p class="muted stock-note">Synthetic demo quantities. Refreshed from the database.</p>
+      <p class="muted stock-note">{{ 'requests.detail.stock.note' | transloco }}</p>
     </aside>
   </div>
 }

@@ -4,10 +4,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import type { ClarificationLine } from '../../../../../../shared/contracts/draft/index';
 
 @Component({
-  imports: [FormField, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule],
+  imports: [
+    FormField,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,
+    TranslocoPipe,
+  ],
   selector: 'app-clarification-input',
   styles: `
     :host {
@@ -35,7 +43,9 @@ import type { ClarificationLine } from '../../../../../../shared/contracts/draft
   `,
   template: `
     <mat-form-field appearance="outline"
-      ><mat-label>Product for {{ line().originalWording }}</mat-label>
+      ><mat-label>{{
+        'replenishment.clarify.product' | transloco: { wording: line().originalWording }
+      }}</mat-label>
       <mat-select [formField]="fields.productId">
         @for (product of choices(); track product.productId) {
           <mat-option [value]="product.productId">{{ product.productName }}</mat-option>
@@ -44,7 +54,9 @@ import type { ClarificationLine } from '../../../../../../shared/contracts/draft
     </mat-form-field>
     <div class="quantity">
       <mat-form-field appearance="outline"
-        ><mat-label>Quantity for {{ line().originalWording }}</mat-label>
+        ><mat-label>{{
+          'replenishment.clarify.quantity' | transloco: { wording: line().originalWording }
+        }}</mat-label>
         <input
           matInput
           type="number"
@@ -57,7 +69,7 @@ import type { ClarificationLine } from '../../../../../../shared/contracts/draft
         (click)="resolved.emit(model())"
         [disabled]="locked() || fields().invalid() || model().quantity % 1 !== 0"
       >
-        Use selection
+        {{ 'replenishment.clarify.use' | transloco }}
       </button>
     </div>
   `,

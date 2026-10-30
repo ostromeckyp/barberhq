@@ -1,4 +1,5 @@
 import { Service, signal, inject, effect, untracked } from '@angular/core';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import type {
   ReadyDraftLine,
   SubmissionOutcome,
@@ -28,7 +29,7 @@ export class SubmissionService {
   readonly outcomeSalonId = this.resultSalon.asReadonly();
   readonly submittedItems = this.frozenItems.asReadonly();
   readonly blocked = this.blocking.asReadonly();
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   private epoch = 0;
   private resultOwner: string | undefined;
   constructor() {
@@ -109,11 +110,11 @@ export class SubmissionService {
       },
     };
     this.result.set(undefined);
-    this.error.set('');
+    this.error.set(null);
     try {
       this.storage.save(batch);
     } catch {
-      this.error.set('Enable browser session storage before submitting. No request was sent.');
+      this.error.set({ key: 'replenishment.order.errors.storage' });
       this.sync();
       return;
     }
@@ -131,7 +132,7 @@ export class SubmissionService {
     this.resultOwner = this.identity();
     this.working.set(true);
     this.frozenItems.set(batch.payload.items.map((i) => ({ ...i })));
-    this.error.set('');
+    this.error.set(null);
     this.sync();
     let outcome: SubmissionOutcome;
     try {
@@ -156,9 +157,7 @@ export class SubmissionService {
         try {
           this.storage.clearPending();
         } catch {
-          this.error.set(
-            'Could not clear saved state. Reconcile the same request before continuing.',
-          );
+          this.error.set({ key: 'replenishment.order.errors.clearState' });
         }
       return outcome;
     } finally {

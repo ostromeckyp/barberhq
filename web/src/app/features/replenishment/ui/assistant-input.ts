@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { form, required, maxLength, disabled, FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +17,7 @@ import { OrderFacade } from '../feature/order.facade';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    TranslocoPipe,
   ],
   selector: 'app-assistant-input',
   styles: `
@@ -57,22 +59,27 @@ import { OrderFacade } from '../feature/order.facade';
   `,
   template: `
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>What do you need?</mat-label>
+      <mat-label>{{ 'replenishment.assistant.label' | transloco }}</mat-label>
       <textarea
         matInput
         rows="3"
         [formField]="fields"
-        placeholder="List the products and quantities you need"
+        [placeholder]="'replenishment.assistant.placeholder' | transloco"
       ></textarea>
     </mat-form-field>
-    <div class="examples" role="group" aria-label="Request examples">
+    <div
+      class="examples"
+      role="group"
+      [attr.aria-label]="'replenishment.assistant.examples.label' | transloco"
+    >
       <button
         mat-stroked-button
         type="button"
         (click)="useExample(singleExample())"
         [disabled]="!singleExample() || facade.loading() || order.locked()"
       >
-        <mat-icon aria-hidden="true">format_quote</mat-icon>Example
+        <mat-icon aria-hidden="true">format_quote</mat-icon
+        >{{ 'replenishment.assistant.examples.single' | transloco }}
       </button>
       <button
         mat-stroked-button
@@ -80,7 +87,8 @@ import { OrderFacade } from '../feature/order.facade';
         (click)="useExample(severalExample())"
         [disabled]="!severalExample() || facade.loading() || order.locked()"
       >
-        <mat-icon aria-hidden="true">format_list_bulleted</mat-icon>Several products
+        <mat-icon aria-hidden="true">format_list_bulleted</mat-icon
+        >{{ 'replenishment.assistant.examples.several' | transloco }}
       </button>
     </div>
     <button
@@ -90,21 +98,24 @@ import { OrderFacade } from '../feature/order.facade';
       [disabled]="!facade.canPrepare() || fields().invalid()"
     >
       <mat-icon aria-hidden="true">auto_awesome</mat-icon>
-      {{ facade.loading() ? 'Preparing proposal…' : 'Prepare proposal' }}
+      {{
+        (facade.loading() ? 'replenishment.assistant.preparing' : 'replenishment.assistant.prepare')
+          | transloco
+      }}
     </button>
-    @if (facade.error()) {
-      <p class="error" role="alert">{{ facade.error() }}</p>
+    @if (facade.error(); as error) {
+      <p class="error" role="alert">{{ error.key | transloco: error.params }}</p>
     }
-    @if (facade.notice()) {
-      <p role="status">{{ facade.notice() }}</p>
+    @if (facade.notice(); as notice) {
+      <p role="status">{{ notice.key | transloco: notice.params }}</p>
     }
-    @if (facade.shorthandNotice()) {
-      <p role="status">{{ facade.shorthandNotice() }}</p>
+    @if (facade.shorthandNotice(); as notice) {
+      <p role="status">{{ notice.key | transloco: notice.params }}</p>
     }
     @for (item of facade.excluded(); track item.productId) {
-      <a [routerLink]="['/salons', order.salonId(), 'requests', item.requestId]"
-        >Already requested · Open existing request</a
-      >
+      <a [routerLink]="['/salons', order.salonId(), 'requests', item.requestId]">{{
+        'replenishment.assistant.alreadyRequested' | transloco
+      }}</a>
     }
   `,
 })

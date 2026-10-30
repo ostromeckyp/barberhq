@@ -1,40 +1,57 @@
 <section class="panel" [class.embedded]="embedded()" aria-labelledby="order-title">
   <header>
-    <span class="eyebrow">REPLENISHMENT</span>
-    <h2 id="order-title">Request products</h2>
-    <p>Build your list. HQ approves and delivers the whole request together.</p>
+    <span class="eyebrow">{{ 'replenishment.order.eyebrow' | transloco }}</span>
+    <h2 id="order-title">{{ 'replenishment.order.title' | transloco }}</h2>
+    <p>{{ 'replenishment.order.intro' | transloco }}</p>
   </header>
   @if (facade.submission.pending()) {
     <div class="warning" role="status">
-      The saved request for {{ facade.savedSalonName() }} has a result to reconcile. Its quantities
-      are frozen until it is known.
+      {{
+        'replenishment.order.pending'
+          | transloco
+            : {
+                salon:
+                  facade.savedSalonName() ?? ('replenishment.order.savedSalonFallback' | transloco),
+              }
+      }}
     </div>
     @if (facade.pendingElsewhere()) {
-      <a mat-stroked-button [routerLink]="['/salons', facade.submission.savedSalonId()]"
-        >Open {{ facade.savedSalonName() }} to reconcile</a
-      >
+      <a mat-stroked-button [routerLink]="['/salons', facade.submission.savedSalonId()]">{{
+        'replenishment.order.openToReconcile'
+          | transloco
+            : {
+                salon:
+                  facade.savedSalonName() ?? ('replenishment.order.savedSalonFallback' | transloco),
+              }
+      }}</a>
     } @else {
       <button mat-flat-button (click)="facade.resume()" [disabled]="facade.submission.busy()">
-        {{ facade.submission.busy() ? 'Checking…' : 'Reconcile saved request' }}
+        {{
+          (facade.submission.busy()
+            ? 'replenishment.order.checking'
+            : 'replenishment.order.reconcile'
+          ) | transloco
+        }}
       </button>
     }
   }
   @if (facade.submission.blocked()) {
     <p class="warning" role="alert">
-      Saved submission data needs reconciliation before you can send a new request. Contact the demo
-      operator. Your saved data has been preserved.
+      {{ 'replenishment.order.blocked' | transloco }}
     </p>
   }
   @if (assistantEnabled) {
     <mat-tab-group [selectedIndex]="1" [preserveContent]="true" dynamicHeight>
       <mat-tab
         ><ng-template mat-tab-label
-          ><mat-icon aria-hidden="true">auto_awesome</mat-icon>Assistant</ng-template
+          ><mat-icon aria-hidden="true">auto_awesome</mat-icon
+          >{{ 'replenishment.order.tabs.assistant' | transloco }}</ng-template
         ><app-assistant-input
       /></mat-tab>
       <mat-tab
         ><ng-template mat-tab-label
-          ><mat-icon aria-hidden="true">list_alt</mat-icon>Manual</ng-template
+          ><mat-icon aria-hidden="true">list_alt</mat-icon
+          >{{ 'replenishment.order.tabs.manual' | transloco }}</ng-template
         ><ng-container [ngTemplateOutlet]="manualForm"
       /></mat-tab>
     </mat-tab-group>
@@ -43,21 +60,25 @@
   }
   <ng-template #manualForm
     ><fieldset [disabled]="facade.locked()">
-      <legend class="sr-only">Add a product</legend>
+      <legend class="sr-only">{{ 'replenishment.order.addProduct' | transloco }}</legend>
       <mat-form-field appearance="outline"
-        ><mat-label>Product</mat-label
+        ><mat-label>{{ 'replenishment.order.product' | transloco }}</mat-label
         ><mat-select [formField]="fields.productId">
           @for (row of facade.inventory.rows(); track row.productId) {
             <mat-option [value]="row.productId" [disabled]="!!facade.activeFor(row.productId)"
               >{{ row.productName
-              }}{{ facade.activeFor(row.productId) ? ' · already requested' : '' }}</mat-option
+              }}{{
+                facade.activeFor(row.productId)
+                  ? ('replenishment.order.alreadyRequested' | transloco)
+                  : ''
+              }}</mat-option
             >
           }
         </mat-select></mat-form-field
       >
       <div class="add-row">
         <mat-form-field appearance="outline"
-          ><mat-label>Quantity</mat-label
+          ><mat-label>{{ 'replenishment.order.quantity' | transloco }}</mat-label
           ><input
             matInput
             type="number"
@@ -69,16 +90,17 @@
           (click)="facade.add()"
           [disabled]="facade.locked() || fields().invalid()"
         >
-          Add to list
+          {{ 'replenishment.order.add' | transloco }}
         </button>
       </div>
     </fieldset></ng-template
   >
-  @if (facade.notice()) {
-    <p role="status">{{ facade.notice() }}</p>
+  @if (facade.notice(); as notice) {
+    <p role="status">{{ notice.key | transloco: notice.params }}</p>
   }
   <h3 class="request-list-heading">
-    Request list <span>{{ facade.draft.lines().length }}</span>
+    {{ 'replenishment.order.listHeading' | transloco }}
+    <span>{{ facade.draft.lines().length }}</span>
   </h3>
   @for (line of facade.draft.lines(); track line.lineId) {
     <article class="draft-line">
@@ -87,14 +109,17 @@
           line.origin === 'manual' ? 'edit' : 'auto_awesome'
         }}</mat-icon>
         <div class="line-name">
-          <strong>{{ line.status === 'READY' ? line.productName : line.originalWording }}</strong
-          ><small>{{ line.origin === 'manual' ? 'Added manually' : 'From assistant' }}</small>
+          <strong>{{ lineName(line) }}</strong
+          ><small>{{
+            (line.origin === 'manual'
+              ? 'replenishment.order.origin.manual'
+              : 'replenishment.order.origin.assistant'
+            ) | transloco
+          }}</small>
         </div>
         <button
           mat-icon-button
-          [attr.aria-label]="
-            'Remove ' + (line.status === 'READY' ? line.productName : line.originalWording)
-          "
+          [attr.aria-label]="'replenishment.order.remove' | transloco: { name: lineName(line) }"
           (click)="facade.draft.remove(line.lineId)"
           [disabled]="facade.locked()"
         >
@@ -106,11 +131,15 @@
           <div
             class="quantity-stepper"
             role="group"
-            [attr.aria-label]="'Quantity for ' + line.productName"
+            [attr.aria-label]="
+              'replenishment.order.quantityFor' | transloco: { name: line.productName }
+            "
           >
             <button
               mat-icon-button
-              [attr.aria-label]="'Decrease quantity for ' + line.productName"
+              [attr.aria-label]="
+                'replenishment.order.decrease' | transloco: { name: line.productName }
+              "
               [disabled]="
                 facade.locked() ||
                 line.quantity <= 1 ||
@@ -128,14 +157,18 @@
               min="1"
               max="99"
               step="1"
-              [attr.aria-label]="'Units for ' + line.productName"
+              [attr.aria-label]="
+                'replenishment.order.unitsFor' | transloco: { name: line.productName }
+              "
               [value]="line.quantity"
               (input)="quantity($event, line.lineId)"
               [disabled]="facade.locked()"
             />
             <button
               mat-icon-button
-              [attr.aria-label]="'Increase quantity for ' + line.productName"
+              [attr.aria-label]="
+                'replenishment.order.increase' | transloco: { name: line.productName }
+              "
               [disabled]="
                 facade.locked() ||
                 line.quantity >= 99 ||
@@ -148,11 +181,11 @@
             </button>
           </div>
           <div class="line-stock" [class.shortage]="line.quantity > line.hqAvailable">
-            HQ <b>{{ line.hqAvailable }}</b
-            ><span class="sr-only"> available</span>
+            {{ 'replenishment.order.hq' | transloco }} <b>{{ line.hqAvailable }}</b
+            ><span class="sr-only">{{ 'replenishment.order.available' | transloco }}</span>
           </div>
           <div class="line-stock">
-            Salon
+            {{ 'replenishment.order.salon' | transloco }}
             <b
               >{{ line.salonOnHand }} →
               @if (line.quantity >= 1 && line.quantity <= 99 && line.quantity % 1 === 0) {
@@ -163,23 +196,29 @@
             </b>
           </div>
         </div>
-        <span class="sr-only">Projected salon stock after full receipt.</span>
+        <span class="sr-only">{{ 'replenishment.order.projected' | transloco }}</span>
         @if (line.quantity > line.hqAvailable) {
           <p class="line-warning">
             <mat-icon aria-hidden="true">warning</mat-icon
-            ><span
-              >HQ has {{ line.hqAvailable }} available. You can still submit — HQ decides. Nothing
-              is swapped automatically.</span
-            >
+            ><span>{{
+              'replenishment.order.shortage' | transloco: { available: line.hqAvailable }
+            }}</span>
           </p>
         }
         @if (line.quantity < 1 || line.quantity > 99 || line.quantity % 1 !== 0) {
-          <p class="error" role="alert">Enter a whole number from 1 to 99.</p>
+          <p class="error" role="alert">{{ 'replenishment.order.quantityError' | transloco }}</p>
         }
       } @else {
         <p class="line-warning">
           <mat-icon aria-hidden="true">help</mat-icon
-          ><span>{{ line.reason }} · Qty {{ line.quantity }}</span>
+          ><span>{{
+            'replenishment.order.reasonQty'
+              | transloco
+                : {
+                    reason: reasonKey(line) ? (reasonKey(line)! | transloco) : line.reason,
+                    quantity: line.quantity,
+                  }
+          }}</span>
         </p>
         @if (assistantEnabled && line.origin === 'assistant') {
           <app-clarification-input
@@ -192,32 +231,35 @@
       }
     </article>
   } @empty {
-    <p class="muted">Your request list is empty.</p>
+    <p class="muted">{{ 'replenishment.order.empty' | transloco }}</p>
   }
   <button mat-flat-button (click)="facade.submit()" [disabled]="!facade.canSubmit()">
-    {{ facade.submission.busy() ? 'Submitting…' : 'Submit request' }}
+    {{
+      (facade.submission.busy() ? 'replenishment.order.submitting' : 'replenishment.order.submit')
+        | transloco
+    }}
   </button>
-  @if (facade.submission.error()) {
-    <p class="error" role="alert">{{ facade.submission.error() }}</p>
+  @if (facade.submission.error(); as error) {
+    <p class="error" role="alert">{{ error.key | transloco: error.params }}</p>
   }
   <div aria-live="polite">
     @if (facade.outcome(); as outcome) {
-      <p>{{ outcome.status }}</p>
+      <p>{{ outcomeKeys[outcome.status] | transloco }}</p>
       @if (outcome.status === 'CREATED') {
-        <a [routerLink]="['/salons', facade.salonId(), 'requests', outcome.requestId]"
-          >Open request</a
-        >
+        <a [routerLink]="['/salons', facade.salonId(), 'requests', outcome.requestId]">{{
+          'requests.list.open' | transloco
+        }}</a>
       } @else if (outcome.status === 'FAILED') {
         <p role="alert">
-          Request was not submitted ({{ outcome.code }}). Review the complete list before retrying.
+          {{ 'replenishment.order.failed' | transloco: { code: outcome.code } }}
         </p>
         @for (conflict of outcome.conflicts; track conflict.productId) {
-          <a [routerLink]="['/salons', facade.salonId(), 'requests', conflict.requestId]"
-            >Open existing request for {{ conflict.productId }}</a
-          >
+          <a [routerLink]="['/salons', facade.salonId(), 'requests', conflict.requestId]">{{
+            'replenishment.order.openExisting' | transloco: { product: conflict.productId }
+          }}</a>
         }
       }
     }
   </div>
-  <footer>No stock moves until HQ dispatches and you confirm receipt.</footer>
+  <footer>{{ 'replenishment.order.footer' | transloco }}</footer>
 </section>

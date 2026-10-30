@@ -7,6 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { pluralKey } from '../../../core/i18n/plural';
+import { Language } from '../../../core/language';
 import { RequestActionFacade } from '../feature/request-action.facade';
 @Component({
   selector: 'app-request-action-dialog',
@@ -20,33 +23,56 @@ import { RequestActionFacade } from '../feature/request-action.facade';
     MatCheckboxModule,
     MatButtonModule,
     MatProgressBarModule,
+    TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>{{ facade.label }}</h2>
+    <h2 mat-dialog-title>{{ facade.labelKey | transloco }}</h2>
     <mat-dialog-content>
       <p>
-        {{ facade.data.request.salonName }} · {{ facade.data.request.itemCount }} items ·
-        {{ facade.data.request.totalUnits }} units
+        {{ facade.data.request.salonName }} ·
+        {{
+          itemsKey(facade.data.request.itemCount)
+            | transloco: { count: facade.data.request.itemCount }
+        }}
+        ·
+        {{
+          unitsKey(facade.data.request.totalUnits)
+            | transloco: { count: facade.data.request.totalUnits }
+        }}
       </p>
       @for (item of facade.data.request.items; track item.productId; let index = $index) {
         <h3>{{ item.productName }} × {{ item.quantity }}</h3>
         @switch (facade.data.type) {
           @case ('APPROVE') {
             <p>
-              HQ available: {{ item.stock.hqAvailable }} →
-              {{ item.stock.hqAvailable - item.quantity }}
+              {{
+                'requests.action.hqAvailable'
+                  | transloco
+                    : { from: item.stock.hqAvailable, to: item.stock.hqAvailable - item.quantity }
+              }}
             </p>
           }
           @case ('DISPATCH') {
-            <p>HQ on hand: {{ item.stock.hqOnHand }} → {{ item.stock.hqOnHand - item.quantity }}</p>
+            <p>
+              {{
+                'requests.action.hqOnHand'
+                  | transloco
+                    : { from: item.stock.hqOnHand, to: item.stock.hqOnHand - item.quantity }
+              }}
+            </p>
           }
           @case ('RECEIVE') {
             <p>
-              Salon on hand: {{ item.stock.salonOnHand }} →
-              {{ item.stock.salonOnHand + item.quantity }}
+              {{
+                'requests.action.salonOnHand'
+                  | transloco
+                    : { from: item.stock.salonOnHand, to: item.stock.salonOnHand + item.quantity }
+              }}
             </p>
             <mat-form-field appearance="outline"
-              ><mat-label>Received quantity · {{ item.productName }}</mat-label>
+              ><mat-label>{{
+                'requests.action.receivedQuantity' | transloco: { product: item.productName }
+              }}</mat-label>
               <input
                 matInput
                 type="number"
@@ -60,43 +86,44 @@ import { RequestActionFacade } from '../feature/request-action.facade';
       }
       @switch (facade.data.type) {
         @case ('APPROVE') {
-          <p>Reserve all products together. Physical stock stays unchanged until dispatch.</p>
+          <p>{{ 'requests.action.approveBody' | transloco }}</p>
         }
         @case ('DISPATCH') {
-          <p>Confirm only after all products leave HQ.</p>
+          <p>{{ 'requests.action.dispatchBody' | transloco }}</p>
         }
         @case ('REJECT') {
           <mat-form-field appearance="outline"
-            ><mat-label>Reason for rejection</mat-label>
+            ><mat-label>{{ 'requests.action.reason' | transloco }}</mat-label>
             <textarea matInput [formField]="fields.reason"></textarea>
           </mat-form-field>
         }
         @case ('RECEIVE') {
-          <mat-checkbox [formField]="fields.allIntact">All products are intact</mat-checkbox>
+          <mat-checkbox [formField]="fields.allIntact">{{
+            'requests.action.allIntact' | transloco
+          }}</mat-checkbox>
           @if (!facade.valid()) {
-            <p class="warning" role="status">
-              Receipt blocked. Contact HQ about missing or damaged products. The whole request
-              remains dispatched until every product arrives intact.
-            </p>
+            <p class="warning" role="status">{{ 'requests.action.receiptBlocked' | transloco }}</p>
           }
         }
       }
-      @if (facade.error()) {
-        <p role="alert" class="warning">{{ facade.error() }}</p>
+      @if (facade.error(); as error) {
+        <p role="alert" class="warning">{{ error.key | transloco: error.params }}</p>
       }
       <mat-progress-bar
         *appDelayedLoading="facade.busy()"
         mode="indeterminate"
-        aria-label="Saving action" /></mat-dialog-content
+        [attr.aria-label]="'requests.action.saving' | transloco" /></mat-dialog-content
     ><mat-dialog-actions align="end"
       ><button mat-button mat-dialog-close [disabled]="facade.busy()">
-        {{ facade.unknown() ? 'Close and review' : 'Cancel' }}</button
+        {{
+          (facade.unknown() ? 'requests.action.closeReview' : 'common.actions.cancel') | transloco
+        }}</button
       ><button
         mat-flat-button
         (click)="facade.confirm()"
         [disabled]="facade.busy() || (!facade.unknown() && !facade.valid())"
       >
-        {{ facade.unknown() ? 'Retry same action' : facade.label }}
+        {{ (facade.unknown() ? 'requests.action.retrySame' : facade.labelKey) | transloco }}
       </button></mat-dialog-actions
     >
   `,
@@ -125,6 +152,13 @@ import { RequestActionFacade } from '../feature/request-action.facade';
 })
 export class RequestActionDialog {
   readonly facade = inject(RequestActionFacade);
+  private readonly language = inject(Language);
+  itemsKey(count: number): string {
+    return pluralKey('requests.count.items', count, this.language.current());
+  }
+  unitsKey(count: number): string {
+    return pluralKey('requests.count.units', count, this.language.current());
+  }
   readonly fields = form(this.facade.model, (p) => {
     disabled(p, () => this.facade.busy() || this.facade.unknown());
     maxLength(p.reason, 500);

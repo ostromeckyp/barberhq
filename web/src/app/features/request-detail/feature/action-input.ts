@@ -2,11 +2,12 @@ import type { RequestDetail, StockAction } from '../../../../../../shared/contra
 import type { Membership } from '../../../../../../shared/contracts/business/index';
 import type { Confirmation } from '../models/confirmation';
 import type { TransitionType } from '../models/transition-type';
+/** Translation key of each action's button label. */
 export const ACTION_LABELS: Record<TransitionType, string> = {
-  APPROVE: 'Approve request',
-  REJECT: 'Reject request',
-  DISPATCH: 'Confirm dispatch',
-  RECEIVE: 'Check delivery',
+  APPROVE: 'requests.action.label.APPROVE',
+  REJECT: 'requests.action.label.REJECT',
+  DISPATCH: 'requests.action.label.DISPATCH',
+  RECEIVE: 'requests.action.label.RECEIVE',
 };
 export function availableRequestActions(
   membership: Membership,

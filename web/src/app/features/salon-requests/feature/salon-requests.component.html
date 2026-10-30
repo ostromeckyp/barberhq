@@ -1,47 +1,56 @@
 <app-page-header
-  eyebrow="SALON WORKSPACE"
-  title="Requests"
-  description="Track replenishment from request to receipt."
+  [eyebrow]="'requests.salon.eyebrow' | transloco"
+  [title]="'requests.salon.title' | transloco"
+  [description]="'requests.salon.description' | transloco"
   ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-    Refresh
+    {{ 'common.actions.refresh' | transloco }}
   </button></app-page-header
 >
 <mat-button-toggle-group
-  aria-label="Request status"
+  [attr.aria-label]="'requests.salon.statusFilter' | transloco"
   [value]="facade.context().filter"
   (change)="facade.setFilter($event.value)"
 >
-  <mat-button-toggle value="ALL">All</mat-button-toggle
-  ><mat-button-toggle value="ACTIVE">Active</mat-button-toggle
-  ><mat-button-toggle value="RECEIVED">Received</mat-button-toggle
-  ><mat-button-toggle value="REJECTED">Rejected</mat-button-toggle>
+  <mat-button-toggle value="ALL">{{ 'requests.salon.filter.ALL' | transloco }}</mat-button-toggle
+  ><mat-button-toggle value="ACTIVE">{{
+    'requests.salon.filter.ACTIVE' | transloco
+  }}</mat-button-toggle
+  ><mat-button-toggle value="RECEIVED">{{
+    'requests.salon.filter.RECEIVED' | transloco
+  }}</mat-button-toggle
+  ><mat-button-toggle value="REJECTED">{{
+    'requests.salon.filter.REJECTED' | transloco
+  }}</mat-button-toggle>
 </mat-button-toggle-group>
 <mat-progress-bar
   *appDelayedLoading="facade.loading()"
   mode="indeterminate"
-  aria-label="Loading requests"
+  [attr.aria-label]="'requests.salon.loading' | transloco"
 />
 @if (!facade.loading()) {
   @if (facade.error()) {
     <p role="alert">
-      Requests unavailable. <button mat-button (click)="facade.refresh()">Retry</button>
+      {{ 'requests.salon.unavailable' | transloco }}
+      <button mat-button (click)="facade.refresh()">
+        {{ 'common.actions.retry' | transloco }}
+      </button>
     </p>
   } @else {
     <app-request-list [requests]="facade.items()" [context]="facade.context()" />
   }
 }
-<nav aria-label="Request pages">
+<nav [attr.aria-label]="'requests.salon.pages' | transloco">
   <button
     mat-button
     [disabled]="facade.context().offset === 0 || facade.loading()"
     (click)="facade.goToPage(facade.context().offset - 50)"
   >
-    Previous</button
+    {{ 'common.actions.previous' | transloco }}</button
   ><button
     mat-button
     [disabled]="facade.nextOffset() === null || facade.loading()"
     (click)="facade.goToPage(facade.nextOffset()!)"
   >
-    Next
+    {{ 'common.actions.next' | transloco }}
   </button>
 </nav>

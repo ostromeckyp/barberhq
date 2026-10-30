@@ -2,6 +2,8 @@ import { Service, signal, computed } from '@angular/core';
 import type { InventoryRow } from '../../../../../../shared/contracts/business/index';
 import type { RequestItemInput } from '../../../../../../shared/contracts/stock/index';
 import type { DraftLine, ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
+/** Translation key stored as the `reason` of a restored line whose inventory is gone. */
+export const INVENTORY_UNAVAILABLE_REASON = 'replenishment.draft.inventoryUnavailable';
 @Service({ autoProvided: false })
 export class DraftStore {
   private readonly value = signal<DraftLine[]>([]);
@@ -79,8 +81,7 @@ export class DraftStore {
             status: 'NEEDS_CLARIFICATION',
             lineId: crypto.randomUUID(),
             originalWording: item.productId,
-            reason:
-              'Product inventory unavailable. Refresh and add this product again before submitting.',
+            reason: INVENTORY_UNAVAILABLE_REASON,
             origin: 'manual',
             candidates: [],
             quantity: item.quantity,

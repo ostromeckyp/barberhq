@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
 import { CommandError } from '../../replenishment/data-access/command-error';
 import { ACTION_LABELS, canConfirm, buildAction } from './action-input';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import type { StockAction } from '../../../../../../shared/contracts/stock/index';
 import type { ActionDialogData } from '../models/action-dialog-data';
 import type { ActionOutcome } from '../models/action-outcome';
@@ -22,8 +23,9 @@ export class RequestActionFacade {
   });
   readonly busy = signal(false);
   readonly unknown = signal(false);
-  readonly error = signal('');
-  readonly label = ACTION_LABELS[this.data.type];
+  readonly error = signal<TranslatedText | null>(null);
+  /** Translation key of the action label. */
+  readonly labelKey = ACTION_LABELS[this.data.type];
   readonly valid = computed(() => canConfirm(this.data.type, this.data.request, this.model()));
   private frozen?: StockAction;
   async confirm() {
@@ -35,7 +37,7 @@ export class RequestActionFacade {
       crypto.randomUUID(),
     );
     this.busy.set(true);
-    this.error.set('');
+    this.error.set(null);
     this.dialog.disableClose = true;
     try {
       const result = await this.api.runAction(this.frozen);
@@ -44,20 +46,18 @@ export class RequestActionFacade {
       const code = error instanceof CommandError ? error.code : 'UNKNOWN';
       if (code === 'UNKNOWN') {
         this.unknown.set(true);
-        this.error.set('Outcome unknown. Retry this same action to check whether it was recorded.');
+        this.error.set({ key: 'requests.action.errors.unknown' });
       } else if (code === 'CLIENT_UPDATE_REQUIRED' && this.data.type === 'RECEIVE') {
         this.unknown.set(true);
-        this.error.set(
-          'Reload the app to inspect this delivery. Keep this saved action until its result has been reconciled.',
-        );
+        this.error.set({ key: 'requests.action.errors.clientUpdate' });
       } else
         this.dialog.close({
           error:
             code === 'STALE_STATE'
-              ? 'The request or stock changed. Review the refreshed details before trying again.'
+              ? { key: 'requests.action.errors.STALE_STATE' }
               : code === 'INSUFFICIENT_STOCK'
-                ? 'HQ has insufficient available stock.'
-                : `Action was not completed (${code}). Review the refreshed details.`,
+                ? { key: 'requests.action.errors.INSUFFICIENT_STOCK' }
+                : { key: 'requests.action.errors.default', params: { code } },
         });
     } finally {
       this.busy.set(false);

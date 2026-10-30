@@ -40,5 +40,5 @@ it('keeps the original legacy unknown command when the retired writer requests a
   expect(runAction.mock.calls[1]).toEqual(runAction.mock.calls[0]);
   expect(close).not.toHaveBeenCalled();
   expect(f.unknown()).toBe(true);
-  expect(f.error()).toContain('Reload');
+  expect(f.error()).toEqual({ key: 'requests.action.errors.clientUpdate' });
 });

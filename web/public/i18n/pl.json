@@ -10,7 +10,11 @@
     },
     "actions": {
       "signOut": "Wyloguj się",
-      "cancel": "Anuluj"
+      "cancel": "Anuluj",
+      "refresh": "Odśwież",
+      "retry": "Spróbuj ponownie",
+      "previous": "Poprzednie",
+      "next": "Następne"
     },
     "lowStock": "Niski stan",
     "pdfDropzone": {
@@ -485,6 +489,299 @@
         "many": "{{ before }} → {{ after }} produktów",
         "other": "{{ before }} → {{ after }} produktów"
       }
+    }
+  },
+  "requests": {
+    "status": {
+      "PENDING_APPROVAL": "Oczekuje na zatwierdzenie",
+      "RESERVED": "Zatwierdzone · zarezerwowane",
+      "DISPATCHED": "Wysłane",
+      "RECEIVED": "Odebrane",
+      "RECEIVED_WITH_ISSUE": "Dostawa z problemem",
+      "REJECTED": "Odrzucone"
+    },
+    "unit": {
+      "pcs": "szt."
+    },
+    "actor": {
+      "requester": "Zamawiający",
+      "recipient": "Odbiorca",
+      "hq": "Centrala"
+    },
+    "count": {
+      "items": {
+        "one": "{{ count }} pozycja",
+        "few": "{{ count }} pozycje",
+        "many": "{{ count }} pozycji",
+        "other": "{{ count }} pozycji"
+      },
+      "products": {
+        "one": "{{ count }} produkt",
+        "few": "{{ count }} produkty",
+        "many": "{{ count }} produktów",
+        "other": "{{ count }} produktów"
+      },
+      "units": {
+        "one": "{{ count }} sztuka",
+        "few": "{{ count }} sztuki",
+        "many": "{{ count }} sztuk",
+        "other": "{{ count }} sztuk"
+      }
+    },
+    "list": {
+      "label": "Zamówienia",
+      "title": "Zamówienie {{ id }}",
+      "items": "Pozycje",
+      "totalUnits": "Razem sztuk",
+      "more": "+{{ count }} więcej",
+      "open": "Otwórz zamówienie",
+      "empty": "Brak zamówień w tej sekcji.",
+      "columns": {
+        "request": "Zamówienie",
+        "quantity": "Ilość",
+        "status": "Status",
+        "action": "Akcja"
+      }
+    },
+    "salon": {
+      "eyebrow": "OBSZAR SALONU",
+      "title": "Zamówienia",
+      "description": "Śledź uzupełnienie stanu od zamówienia do odbioru.",
+      "statusFilter": "Status zamówienia",
+      "filter": {
+        "ALL": "Wszystkie",
+        "ACTIVE": "Aktywne",
+        "RECEIVED": "Odebrane",
+        "REJECTED": "Odrzucone"
+      },
+      "loading": "Wczytuję zamówienia",
+      "unavailable": "Zamówienia są niedostępne.",
+      "pages": "Strony zamówień"
+    },
+    "detail": {
+      "back": {
+        "hq": "Wróć do kolejki zamówień",
+        "salon": "Wróć do zamówień"
+      },
+      "loading": "Wczytuję zamówienie",
+      "unavailable": {
+        "title": "Zamówienie niedostępne",
+        "body": "Zamówienie może być niedostępne lub poza Twoim dostępem. Spróbuj odświeżyć."
+      },
+      "reference": "{{ id }} · Centrala → {{ salon }}",
+      "titleUnits": "· {{ units }} szt.",
+      "issue": {
+        "replacement": "Zamówienie zastępcze dla problemu z dostawą",
+        "view": "Zobacz problem z dostawą"
+      },
+      "next": {
+        "eyebrow": "NASTĘPNY KROK",
+        "title": {
+          "pendingHq": "Przejrzyj i zdecyduj",
+          "pendingSalon": "Czeka na zatwierdzenie przez centralę",
+          "reservedHq": "Gotowe do wysyłki",
+          "reservedSalon": "Zatwierdzone — czeka na wysyłkę",
+          "dispatchedHq": "Czeka na potwierdzenie odbioru",
+          "dispatchedSalon": "W drodze — sprawdź dostawę",
+          "received": "Zakończone",
+          "issue": "Zgłoszono problem z dostawą",
+          "rejected": "Odrzucone"
+        },
+        "body": {
+          "PENDING_APPROVAL": "Centrala sprawdza dostępność, a następnie zatwierdza lub odrzuca całe zamówienie. Nic nie jest jeszcze zarezerwowane.",
+          "RESERVED": "Produkty są zarezerwowane w centrali. Potwierdź wysyłkę dopiero, gdy cała paczka opuści centralę.",
+          "DISPATCHED": "Sprawdź dostawę i zapisz produkty w dobrym stanie, uszkodzone oraz brakujące.",
+          "RECEIVED": "Dostawa zakończona. Produkty są już w stanie magazynowym salonu.",
+          "RECEIVED_WITH_ISSUE": "Dostawa została sprawdzona. Produkty w dobrym stanie trafiły do stanu magazynowego salonu; zgłoszonym problemem zajmie się centrala.",
+          "REJECTED": "To zamówienie zostało odrzucone. Nowe zamówienie możesz przygotować na podstawie stanu magazynowego salonu."
+        }
+      },
+      "delivery": {
+        "title": "Ilości w dostawie",
+        "ordered": "Zamówiono",
+        "dispatched": "Wysłano",
+        "received": "Odebrano",
+        "goodUnits": "Sztuki w dobrym stanie",
+        "notShipped": "Nie wysłano",
+        "notReceived": "Nie odebrano",
+        "pending": "Oczekuje",
+        "problemLabel": "Ilości z problemem w dostawie · {{ product }}",
+        "problem": "Uszkodzone: {{ damaged }} · Brakujące: {{ missing }}"
+      },
+      "history": {
+        "title": "Historia statusów",
+        "label": "Historia statusów zamówienia",
+        "pending": "Oczekuje",
+        "unavailable": "Wpis historii niedostępny"
+      },
+      "stock": {
+        "title": "Aktualny stan",
+        "hq": "Stan centrali",
+        "hqHint": "Na półce",
+        "reserved": "Zarezerwowane w centrali",
+        "reservedHint": "Zatwierdzone, jeszcze niewysłane",
+        "available": "Dostępne w centrali",
+        "availableHint": "Stan − rezerwacje",
+        "inTransit": "W drodze",
+        "inTransitHint": "Ten produkt w tym zamówieniu",
+        "salon": "Stan: {{ salon }}",
+        "salonHint": "W salonie",
+        "note": "Syntetyczne ilości demonstracyjne. Odświeżone z bazy danych."
+      }
+    },
+    "history": {
+      "step": {
+        "PENDING_APPROVAL": "Złożone",
+        "RESERVED": "Zatwierdzone",
+        "DISPATCHED": "Wysłane",
+        "RECEIVED": "Odebrane",
+        "RECEIVED_WITH_ISSUE": "Dostawa sprawdzona · zgłoszono problem",
+        "REJECTED": "Odrzucone"
+      },
+      "reserved": "Zatwierdzone · zarezerwowano {{ units }} szt.",
+      "dispatched": "Wysłane · {{ units }} szt.",
+      "received": "Odebrane · {{ units }} szt."
+    },
+    "action": {
+      "label": {
+        "APPROVE": "Zatwierdź zamówienie",
+        "REJECT": "Odrzuć zamówienie",
+        "DISPATCH": "Potwierdź wysyłkę",
+        "RECEIVE": "Sprawdź dostawę"
+      },
+      "hqAvailable": "Dostępne w centrali: {{ from }} → {{ to }}",
+      "hqOnHand": "Stan centrali: {{ from }} → {{ to }}",
+      "salonOnHand": "Stan salonu: {{ from }} → {{ to }}",
+      "receivedQuantity": "Odebrana ilość · {{ product }}",
+      "approveBody": "Zarezerwuj wszystkie produkty razem. Fizyczny stan magazynowy nie zmieni się do momentu wysyłki.",
+      "dispatchBody": "Potwierdź dopiero, gdy wszystkie produkty opuszczą centralę.",
+      "reason": "Powód odrzucenia",
+      "allIntact": "Wszystkie produkty są nieuszkodzone",
+      "receiptBlocked": "Odbiór zablokowany. Skontaktuj się z centralą w sprawie brakujących lub uszkodzonych produktów. Całe zamówienie pozostaje wysłane, dopóki wszystkie produkty nie dotrą w nienaruszonym stanie.",
+      "saving": "Zapisuję akcję",
+      "closeReview": "Zamknij i sprawdź",
+      "retrySame": "Ponów tę samą akcję",
+      "errors": {
+        "unknown": "Wynik nieznany. Ponów tę samą akcję, aby sprawdzić, czy została zapisana.",
+        "clientUpdate": "Przeładuj aplikację, aby sprawdzić tę dostawę. Zachowaj zapisaną akcję do czasu uzgodnienia jej wyniku.",
+        "STALE_STATE": "Zamówienie lub stan magazynowy uległy zmianie. Przejrzyj odświeżone dane przed ponowną próbą.",
+        "INSUFFICIENT_STOCK": "Centrala nie ma wystarczającego dostępnego stanu magazynowego.",
+        "default": "Nie ukończono akcji ({{ code }}). Przejrzyj odświeżone dane."
+      },
+      "replayed": "Ta akcja została już zapisana.",
+      "recorded": "Akcja została zapisana."
+    }
+  },
+  "hq": {
+    "queue": {
+      "eyebrow": "OBSZAR CENTRALI",
+      "title": "Zamówienia salonów",
+      "description": "Przeglądaj zamówienia. Rezerwuj stan magazynowy. Dbaj o zaopatrzenie salonów.",
+      "view": "Widok kolejki",
+      "requests": "Zamówienia",
+      "deliveryIssues": "Problemy z dostawą ({{ count }})",
+      "loading": "Wczytuję zamówienia",
+      "unavailable": "Zamówienia są niedostępne.",
+      "pending": "Oczekujące na zatwierdzenie",
+      "ready": "Gotowe do wysyłki",
+      "other": "Wysłane i zakończone",
+      "pages": "Strony kolejki"
+    }
+  },
+  "replenishment": {
+    "order": {
+      "eyebrow": "UZUPEŁNIENIE",
+      "title": "Zamów produkty",
+      "intro": "Przygotuj listę. Centrala zatwierdza i dostarcza całe zamówienie razem.",
+      "pending": "Zapisane zamówienie dla salonu {{ salon }} wymaga uzgodnienia wyniku. Jego ilości są zablokowane do czasu poznania wyniku.",
+      "savedSalonFallback": "zapisany salon",
+      "openToReconcile": "Otwórz {{ salon }}, aby uzgodnić",
+      "reconcile": "Uzgodnij zapisane zamówienie",
+      "checking": "Trwa sprawdzanie…",
+      "blocked": "Zapisane dane wysyłki wymagają uzgodnienia, zanim wyślesz nowe zamówienie. Skontaktuj się z operatorem demo. Zapisane dane zostały zachowane.",
+      "tabs": {
+        "assistant": "Asystent",
+        "manual": "Ręcznie"
+      },
+      "addProduct": "Dodaj produkt",
+      "product": "Produkt",
+      "alreadyRequested": " · już zamówiono",
+      "quantity": "Ilość",
+      "add": "Dodaj do listy",
+      "listHeading": "Lista zamówienia",
+      "origin": {
+        "manual": "Dodano ręcznie",
+        "assistant": "Z asystenta"
+      },
+      "remove": "Usuń: {{ name }}",
+      "quantityFor": "Ilość: {{ name }}",
+      "decrease": "Zmniejsz ilość: {{ name }}",
+      "increase": "Zwiększ ilość: {{ name }}",
+      "unitsFor": "Sztuki: {{ name }}",
+      "hq": "Centrala",
+      "available": " dostępne",
+      "salon": "Salon",
+      "projected": "Przewidywany stan salonu po pełnym odbiorze.",
+      "shortage": "Centrala ma dostępne: {{ available }}. Nadal możesz wysłać zamówienie — decyduje centrala. Nic nie jest zamieniane automatycznie.",
+      "quantityError": "Wpisz liczbę całkowitą od 1 do 99.",
+      "reasonQty": "{{ reason }} · Ilość: {{ quantity }}",
+      "empty": "Lista zamówienia jest pusta.",
+      "submit": "Wyślij zamówienie",
+      "submitting": "Trwa wysyłanie…",
+      "outcome": {
+        "CREATED": "UTWORZONO",
+        "FAILED": "NIEPOWODZENIE",
+        "UNKNOWN": "NIEZNANY"
+      },
+      "failed": "Zamówienie nie zostało wysłane ({{ code }}). Przejrzyj całą listę przed ponowną próbą.",
+      "openExisting": "Otwórz istniejące zamówienie: {{ product }}",
+      "footer": "Stan magazynowy nie zmienia się, dopóki centrala nie wyśle zamówienia, a Ty nie potwierdzisz odbioru.",
+      "notices": {
+        "alreadyRequested": "Już zamówiono. Otwórz aktywne zamówienie poniżej.",
+        "maxProducts": "Lista może zawierać maksymalnie sześć produktów."
+      },
+      "errors": {
+        "storage": "Włącz pamięć sesji w przeglądarce przed wysłaniem. Żadne zamówienie nie zostało wysłane.",
+        "clearState": "Nie udało się wyczyścić zapisanego stanu. Uzgodnij to samo zamówienie, zanim przejdziesz dalej."
+      }
+    },
+    "draft": {
+      "inventoryUnavailable": "Stan magazynowy produktu jest niedostępny. Odśwież i dodaj ten produkt ponownie przed wysłaniem."
+    },
+    "assistant": {
+      "label": "Czego potrzebujesz?",
+      "placeholder": "Wypisz produkty i ilości, których potrzebujesz",
+      "examples": {
+        "label": "Przykłady zamówień",
+        "single": "Przykład",
+        "several": "Kilka produktów"
+      },
+      "prepare": "Przygotuj propozycję",
+      "preparing": "Trwa przygotowanie propozycji…",
+      "alreadyRequested": "Już zamówiono · Otwórz istniejące zamówienie",
+      "errors": {
+        "RATE_LIMITED": "Wspólny limit AI został osiągnięty. Użyj zakładki Ręcznie, aby kontynuować; lista została zachowana.",
+        "TIMEOUT": "Asystent odpowiadał zbyt długo. Użyj zakładki Ręcznie, aby kontynuować; lista została zachowana.",
+        "default": "Nie udało się przygotować propozycji. Użyj zakładki Ręcznie, aby kontynuować; lista została zachowana.",
+        "invalidClarification": "Wybierz produkt i całkowitą ilość od 1 do 99.",
+        "unmatched": "Nie udało się dopasować wyjaśnienia. Usuń pozycję i przygotuj ją ponownie.",
+        "maxItems": "Lista może zawierać maksymalnie sześć pozycji. Usuń pozycję przed dodaniem tej propozycji."
+      },
+      "notices": {
+        "unresolved": "Przejrzyj poniższe nierozwiązane pozycje.",
+        "added": "Propozycja dodana. Sprawdź ilości, a następnie wyślij zamówienie.",
+        "excluded": "Te produkty mają już aktywne zamówienia.",
+        "specify": "Podaj produkty i ilości, a następnie ponownie przygotuj propozycję."
+      },
+      "shorthand": {
+        "learned": "Zapisano jako skrót salonu. Możesz go usunąć w Ustawieniach.",
+        "notSaved": "Produkt zastosowany. Skrót salonu nie został zapisany; następnym razem wybierz ponownie."
+      }
+    },
+    "clarify": {
+      "product": "Produkt dla: {{ wording }}",
+      "quantity": "Ilość dla: {{ wording }}",
+      "use": "Zastosuj wybór"
     }
   }
 }

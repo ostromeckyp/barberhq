@@ -3,6 +3,7 @@ import { DeliveryIssuesFacade } from '../../delivery/feature/delivery-issues.fac
 import { DeliveryIssuesList } from '../../delivery/ui/delivery-issues-list';
 import { MatIconModule } from '@angular/material/icon';
 import { Component, inject } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
@@ -19,24 +20,25 @@ import { HqQueueFacade } from './hq-queue.facade';
     RequestList,
     DeliveryIssuesList,
     MatIconModule,
+    TranslocoPipe,
   ],
   template: `
     <app-page-header
-      eyebrow="HQ WORKSPACE"
-      title="Salon requests"
-      description="Review requests. Reserve stock. Keep salons supplied."
+      [eyebrow]="'hq.queue.eyebrow' | transloco"
+      [title]="'hq.queue.title' | transloco"
+      [description]="'hq.queue.description' | transloco"
       ><button mat-stroked-button (click)="facade.refresh()" [disabled]="facade.loading()">
-        Refresh
+        {{ 'common.actions.refresh' | transloco }}
       </button></app-page-header
     >
-    <div class="queue-views" role="group" aria-label="Queue view">
+    <div class="queue-views" role="group" [attr.aria-label]="'hq.queue.view' | transloco">
       <button
         mat-stroked-button
         type="button"
         [attr.aria-pressed]="!issues.selected()"
         (click)="issues.select(false)"
       >
-        <mat-icon aria-hidden="true">receipt_long</mat-icon>Requests
+        <mat-icon aria-hidden="true">receipt_long</mat-icon>{{ 'hq.queue.requests' | transloco }}
       </button>
       <button
         mat-stroked-button
@@ -44,9 +46,8 @@ import { HqQueueFacade } from './hq-queue.facade';
         [attr.aria-pressed]="issues.selected()"
         (click)="issues.select(true)"
       >
-        <mat-icon aria-hidden="true">report_problem</mat-icon>Delivery issues ({{
-          issues.openCount()
-        }})
+        <mat-icon aria-hidden="true">report_problem</mat-icon
+        >{{ 'hq.queue.deliveryIssues' | transloco: { count: issues.openCount() } }}
       </button>
     </div>
     @if (issues.selected()) {
@@ -55,16 +56,19 @@ import { HqQueueFacade } from './hq-queue.facade';
       <mat-progress-bar
         *appDelayedLoading="facade.loading()"
         mode="indeterminate"
-        aria-label="Loading requests"
+        [attr.aria-label]="'hq.queue.loading' | transloco"
       />
       @if (facade.error()) {
         <p role="alert">
-          Requests unavailable. <button mat-button (click)="facade.refresh()">Retry</button>
+          {{ 'hq.queue.unavailable' | transloco }}
+          <button mat-button (click)="facade.refresh()">
+            {{ 'common.actions.retry' | transloco }}
+          </button>
         </p>
       }
       <section>
         <h2>
-          Pending approval <span>{{ facade.pending().length }}</span>
+          {{ 'hq.queue.pending' | transloco }} <span>{{ facade.pending().length }}</span>
         </h2>
         <app-request-list
           [context]="{ kind: 'HQ', offset: facade.offset() }"
@@ -73,7 +77,7 @@ import { HqQueueFacade } from './hq-queue.facade';
       </section>
       <section>
         <h2>
-          Ready to dispatch <span>{{ facade.reserved().length }}</span>
+          {{ 'hq.queue.ready' | transloco }} <span>{{ facade.reserved().length }}</span>
         </h2>
         <app-request-list
           [context]="{ kind: 'HQ', offset: facade.offset() }"
@@ -82,26 +86,26 @@ import { HqQueueFacade } from './hq-queue.facade';
       </section>
       @if (facade.other().length) {
         <section>
-          <h2>Dispatched and completed</h2>
+          <h2>{{ 'hq.queue.other' | transloco }}</h2>
           <app-request-list
             [context]="{ kind: 'HQ', offset: facade.offset() }"
             [requests]="facade.other()"
           />
         </section>
       }
-      <nav aria-label="Queue pages">
+      <nav [attr.aria-label]="'hq.queue.pages' | transloco">
         <button
           mat-button
           (click)="facade.previous()"
           [disabled]="facade.offset() === 0 || facade.loading()"
         >
-          Previous</button
+          {{ 'common.actions.previous' | transloco }}</button
         ><button
           mat-button
           (click)="facade.next()"
           [disabled]="!facade.hasNext() || facade.loading()"
         >
-          Next
+          {{ 'common.actions.next' | transloco }}
         </button>
       </nav>
     }

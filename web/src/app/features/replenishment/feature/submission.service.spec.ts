@@ -165,7 +165,7 @@ it('blocked_journal_or_storage_failure_prevents_writes', async () => {
   } as unknown as Storage);
   await broken.service.submit('salon', [line('a')]);
   expect(send).not.toHaveBeenCalled();
-  expect(broken.service.error()).toContain('storage');
+  expect(broken.service.error()).toEqual({ key: 'replenishment.order.errors.storage' });
 });
 
 it('clears_completed_result_when_ready_identity_changes_directly', async () => {

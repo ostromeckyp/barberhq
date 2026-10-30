@@ -98,6 +98,17 @@ it('discards results from a previous salon, account or submitted draft', async (
   await submitted;
   expect(draft.lines()).toEqual([]);
 });
+it.each([
+  ['TIMEOUT', 'replenishment.assistant.errors.TIMEOUT'],
+  ['SERVICE_UNAVAILABLE', 'replenishment.assistant.errors.default'],
+] as const)('maps assistant error %s to its key', async (code, key) => {
+  const { facade } = setup(async () => {
+    throw new AssistantApiError(code);
+  });
+  facade.message.set('2 Matowa');
+  await facade.prepare();
+  expect(facade.error()).toEqual({ key });
+});
 it('provider failure preserves the manual draft and offers a manual fallback', async () => {
   const { facade, draft } = setup(async () => {
     throw new AssistantApiError('RATE_LIMITED');
@@ -106,7 +117,7 @@ it('provider failure preserves the manual draft and offers a manual fallback', a
   facade.message.set('2 Matowa');
   await facade.prepare();
   expect(draft.lines()[0]).toMatchObject({ quantity: 5, origin: 'manual' });
-  expect(facade.error()).toContain('Manual');
+  expect(facade.error()).toEqual({ key: 'replenishment.assistant.errors.RATE_LIMITED' });
   expect(facade.loading()).toBe(false);
 });
 it('clarifies only the unresolved source line without adding successful lines twice', async () => {
@@ -146,7 +157,7 @@ it('refuses a proposal exceeding draft capacity without silently dropping a line
   facade.message.set('new items');
   await facade.prepare();
   expect(draft.lines()).toHaveLength(5);
-  expect(facade.error()).toContain('six');
+  expect(facade.error()).toEqual({ key: 'replenishment.assistant.errors.maxItems' });
 });
 it.each([false, true])(
   'clarifies a duplicate product once when the unresolved source comes first: %s',
@@ -210,8 +221,7 @@ it('asks for products and quantities when extraction is empty', async () => {
   }));
   facade.message.set('hello');
   await facade.prepare();
-  expect(facade.notice()).toContain('products and quantities');
-  expect(facade.notice()).not.toContain('active requests');
+  expect(facade.notice()).toEqual({ key: 'replenishment.assistant.notices.specify' });
 });
 const receiptA = '0f8fad5b-d9cb-469f-a165-70867728950e';
 const receiptB = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
@@ -245,7 +255,7 @@ it('sends each repeated span its own receipt and keeps it through a failed retry
   await facade.prepare();
   const second = draft.lines().filter((l) => l.status === 'NEEDS_CLARIFICATION')[1].lineId;
   await facade.clarify(second, 'dry', 2);
-  expect(facade.error()).not.toBe('');
+  expect(facade.error()).not.toBeNull();
   await facade.clarify(second, 'dry', 2);
   expect(inputs[1].clarifications).toEqual([
     expect.objectContaining({ lineId: 'line-9-16', choiceReceiptId: receiptB }),
@@ -268,9 +278,7 @@ it('applies a valid choice but says when shorthand was not saved', async () => {
   await facade.prepare();
   await facade.clarify(draft.lines()[0].lineId, 'dry', 2);
   expect(draft.lines()).toEqual([expect.objectContaining({ status: 'READY', productId: 'dry' })]);
-  expect(facade.shorthandNotice()).toBe(
-    'Product applied. The salon shorthand was not saved; choose again next time.',
-  );
+  expect(facade.shorthandNotice()).toEqual({ key: 'replenishment.assistant.shorthand.notSaved' });
 });
 it('confirms learned shorthand and forgets sources after a role change', async () => {
   let calls = 0;
@@ -285,11 +293,11 @@ it('confirms learned shorthand and forgets sources after a role change', async (
   facade.message.set('2 pasta');
   await facade.prepare();
   await facade.clarify(draft.lines()[0].lineId, 'dry', 2);
-  expect(facade.shorthandNotice()).toBe('Saved as salon shorthand. You can remove it in Settings.');
+  expect(facade.shorthandNotice()).toEqual({ key: 'replenishment.assistant.shorthand.learned' });
   facade.message.set('2 pasta');
   await facade.prepare();
   session.set({ status: 'READY', membership: { ...membership, role: 'HQ' as never } });
   TestBed.flushEffects();
-  expect(facade.shorthandNotice()).toBe('');
+  expect(facade.shorthandNotice()).toBeNull();
   expect(facade.message()).toBe('');
 });

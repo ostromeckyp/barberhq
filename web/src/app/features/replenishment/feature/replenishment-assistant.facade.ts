@@ -1,6 +1,7 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
 import type { PrepareInput, ProposalResult } from '../../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { DraftStore } from './draft.store';
 import { OrderFacade } from './order.facade';
@@ -20,9 +21,9 @@ export class ReplenishmentAssistantFacade {
   >();
   readonly message = signal('');
   readonly loading = signal(false);
-  readonly error = signal('');
-  readonly notice = signal('');
-  readonly shorthandNotice = signal('');
+  readonly error = signal<TranslatedText | null>(null);
+  readonly notice = signal<TranslatedText | null>(null);
+  readonly shorthandNotice = signal<TranslatedText | null>(null);
   readonly excluded = signal<ProposalResult['excluded']>([]);
   readonly canPrepare = computed(
     () =>
@@ -59,9 +60,9 @@ export class ReplenishmentAssistantFacade {
     this.generation++;
     this.message.set('');
     this.loading.set(false);
-    this.error.set('');
-    this.notice.set('');
-    this.shorthandNotice.set('');
+    this.error.set(null);
+    this.notice.set(null);
+    this.shorthandNotice.set(null);
     this.excluded.set([]);
     this.sources.clear();
   }
@@ -84,7 +85,7 @@ export class ReplenishmentAssistantFacade {
     )
       return;
     if (!productId || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
-      this.error.set('Choose a product and a whole quantity from 1 to 99.');
+      this.error.set({ key: 'replenishment.assistant.errors.invalidClarification' });
       return;
     }
     const choice = {
@@ -109,9 +110,9 @@ export class ReplenishmentAssistantFacade {
       epoch === this.draft.clearEpoch() &&
       !this.order.locked();
     this.loading.set(true);
-    this.error.set('');
-    this.notice.set('');
-    this.shorthandNotice.set('');
+    this.error.set(null);
+    this.notice.set(null);
+    this.shorthandNotice.set(null);
     try {
       const result = await this.api.prepareReplenishment({
         salonId: this.order.salonId()!,
@@ -150,16 +151,12 @@ export class ReplenishmentAssistantFacade {
             .map((e) => ({ ...e, lineId: selection.choice.lineId }))
         : result.excluded;
       if (selection && incoming.length === 0 && excluded.length === 0) {
-        this.error.set(
-          'The clarification could not be matched. Remove the item and prepare it again.',
-        );
+        this.error.set({ key: 'replenishment.assistant.errors.unmatched' });
         return;
       }
       const local = incoming.map((l) => ({ ...l, lineId: `${attempt.prefix}:${l.lineId}` }));
       if (!this.draft.mergeProposal(local, selection ? [selection.localId] : [])) {
-        this.error.set(
-          'The list can contain up to six items. Remove an item before adding this proposal.',
-        );
+        this.error.set({ key: 'replenishment.assistant.errors.maxItems' });
         return;
       }
       attempt.choices = choices;
@@ -178,31 +175,31 @@ export class ReplenishmentAssistantFacade {
         : undefined;
       this.shorthandNotice.set(
         learned?.status === 'LEARNED'
-          ? 'Saved as salon shorthand. You can remove it in Settings.'
+          ? { key: 'replenishment.assistant.shorthand.learned' }
           : learned?.status === 'NOT_SAVED' && !unresolved
-            ? 'Product applied. The salon shorthand was not saved; choose again next time.'
-            : '',
+            ? { key: 'replenishment.assistant.shorthand.notSaved' }
+            : null,
       );
-      this.notice.set(
-        incoming.some((l) => l.status === 'NEEDS_CLARIFICATION')
-          ? 'Review the unresolved items below.'
+      this.notice.set({
+        key: incoming.some((l) => l.status === 'NEEDS_CLARIFICATION')
+          ? 'replenishment.assistant.notices.unresolved'
           : incoming.length
-            ? 'Proposal added. Review quantities, then submit the request.'
+            ? 'replenishment.assistant.notices.added'
             : excluded.length
-              ? 'These products already have active requests.'
-              : 'Specify products and quantities, then prepare the proposal again.',
-      );
+              ? 'replenishment.assistant.notices.excluded'
+              : 'replenishment.assistant.notices.specify',
+      });
     } catch (error) {
       if (current()) {
         const code = error instanceof AssistantApiError ? error.code : '';
-        this.error.set(
-          (code === 'RATE_LIMITED'
-            ? 'The shared AI limit has been reached. '
-            : code === 'TIMEOUT'
-              ? 'The assistant took too long. '
-              : 'The proposal could not be prepared. ') +
-            'Use Manual to continue; your list is preserved.',
-        );
+        this.error.set({
+          key:
+            code === 'RATE_LIMITED'
+              ? 'replenishment.assistant.errors.RATE_LIMITED'
+              : code === 'TIMEOUT'
+                ? 'replenishment.assistant.errors.TIMEOUT'
+                : 'replenishment.assistant.errors.default',
+        });
       }
     } finally {
       if (generation === this.generation) this.loading.set(false);

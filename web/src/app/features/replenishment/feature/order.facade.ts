@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonInventoryFacade } from '../../salon-dashboard/feature/salon-inventory.facade';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { ReplenishmentApi } from '../data-access/replenishment-api';
 import { DraftStore } from './draft.store';
@@ -19,7 +20,7 @@ export class OrderFacade {
   private readonly activity = inject(BrowserActivity);
   readonly salonId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('salonId'))));
   readonly manual = signal({ productId: '', quantity: 2 });
-  readonly notice = signal('');
+  readonly notice = signal<TranslatedText | null>(null);
   readonly canOrder = computed(() => {
     const state = this.session.state();
     const salonId = this.salonId();
@@ -50,10 +51,9 @@ export class OrderFacade {
   readonly pendingElsewhere = computed(
     () => !!this.submission.savedSalonId() && this.submission.savedSalonId() !== this.salonId(),
   );
+  /** Name of the salon holding the saved request, when it is known. */
   readonly savedSalonName = computed(
-    () =>
-      this.session.salons().find((s) => s.id === this.submission.savedSalonId())?.name ??
-      'saved salon',
+    () => this.session.salons().find((s) => s.id === this.submission.savedSalonId())?.name,
   );
   readonly outcome = computed(() =>
     this.submission.outcomeSalonId() === this.salonId() ? this.submission.outcome() : undefined,
@@ -76,7 +76,7 @@ export class OrderFacade {
       untracked(() => {
         this.draft.clear();
         this.manual.set({ productId: '', quantity: 2 });
-        this.notice.set('');
+        this.notice.set(null);
       });
     });
   }
@@ -92,14 +92,14 @@ export class OrderFacade {
     if (this.locked() || !row || !Number.isInteger(quantity) || quantity < 1 || quantity > 99)
       return;
     if (this.activeFor(productId)) {
-      this.notice.set('Already requested. Open the active request below.');
+      this.notice.set({ key: 'replenishment.order.notices.alreadyRequested' });
       return;
     }
     if (
       this.draft.lines().length >= 6 &&
       !this.draft.lines().some((l) => l.status === 'READY' && l.productId === productId)
     ) {
-      this.notice.set('The list can contain up to six products.');
+      this.notice.set({ key: 'replenishment.order.notices.maxProducts' });
       return;
     }
     this.draft.add({
@@ -114,7 +114,7 @@ export class OrderFacade {
       hqInventoryVersion: row.hqInventoryVersion,
       salonInventoryVersion: row.salonInventoryVersion,
     });
-    this.notice.set('');
+    this.notice.set(null);
   }
   private scopeKey() {
     const s = this.session.state();

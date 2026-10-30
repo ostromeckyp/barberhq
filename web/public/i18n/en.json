@@ -10,7 +10,11 @@
     },
     "actions": {
       "signOut": "Sign out",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "previous": "Previous",
+      "next": "Next"
     },
     "lowStock": "Low stock",
     "pdfDropzone": {
@@ -485,6 +489,299 @@
         "many": "{{ before }} → {{ after }} products",
         "other": "{{ before }} → {{ after }} products"
       }
+    }
+  },
+  "requests": {
+    "status": {
+      "PENDING_APPROVAL": "Pending approval",
+      "RESERVED": "Approved · reserved",
+      "DISPATCHED": "Dispatched",
+      "RECEIVED": "Received",
+      "RECEIVED_WITH_ISSUE": "Delivery with issue",
+      "REJECTED": "Rejected"
+    },
+    "unit": {
+      "pcs": "pcs"
+    },
+    "actor": {
+      "requester": "Requester",
+      "recipient": "Recipient",
+      "hq": "HQ"
+    },
+    "count": {
+      "items": {
+        "one": "{{ count }} item",
+        "few": "{{ count }} items",
+        "many": "{{ count }} items",
+        "other": "{{ count }} items"
+      },
+      "products": {
+        "one": "{{ count }} product",
+        "few": "{{ count }} products",
+        "many": "{{ count }} products",
+        "other": "{{ count }} products"
+      },
+      "units": {
+        "one": "{{ count }} unit",
+        "few": "{{ count }} units",
+        "many": "{{ count }} units",
+        "other": "{{ count }} units"
+      }
+    },
+    "list": {
+      "label": "Requests",
+      "title": "Request {{ id }}",
+      "items": "Items",
+      "totalUnits": "Total units",
+      "more": "+{{ count }} more",
+      "open": "Open request",
+      "empty": "No requests in this section.",
+      "columns": {
+        "request": "Request",
+        "quantity": "Quantity",
+        "status": "Status",
+        "action": "Action"
+      }
+    },
+    "salon": {
+      "eyebrow": "SALON WORKSPACE",
+      "title": "Requests",
+      "description": "Track replenishment from request to receipt.",
+      "statusFilter": "Request status",
+      "filter": {
+        "ALL": "All",
+        "ACTIVE": "Active",
+        "RECEIVED": "Received",
+        "REJECTED": "Rejected"
+      },
+      "loading": "Loading requests",
+      "unavailable": "Requests unavailable.",
+      "pages": "Request pages"
+    },
+    "detail": {
+      "back": {
+        "hq": "Back to request queue",
+        "salon": "Back to requests"
+      },
+      "loading": "Loading request",
+      "unavailable": {
+        "title": "Request unavailable",
+        "body": "It may be unavailable or outside your access. Try refreshing."
+      },
+      "reference": "{{ id }} · HQ → {{ salon }}",
+      "titleUnits": "· {{ units }} pcs",
+      "issue": {
+        "replacement": "Replacement for delivery issue",
+        "view": "View delivery issue"
+      },
+      "next": {
+        "eyebrow": "NEXT STEP",
+        "title": {
+          "pendingHq": "Review and decide",
+          "pendingSalon": "Waiting for HQ approval",
+          "reservedHq": "Ready to dispatch",
+          "reservedSalon": "Approved — waiting for dispatch",
+          "dispatchedHq": "Waiting for receipt confirmation",
+          "dispatchedSalon": "On its way — check delivery",
+          "received": "Completed",
+          "issue": "Delivery problem reported",
+          "rejected": "Rejected"
+        },
+        "body": {
+          "PENDING_APPROVAL": "HQ checks availability, then approves or rejects the whole request. Nothing is reserved yet.",
+          "RESERVED": "The products are reserved at HQ. Confirm dispatch only once the complete parcel has left HQ.",
+          "DISPATCHED": "Inspect the delivery and record good, damaged and missing products.",
+          "RECEIVED": "Delivery complete. The products are now in salon stock.",
+          "RECEIVED_WITH_ISSUE": "The delivery was inspected. Good products entered salon stock; HQ handles the reported problem.",
+          "REJECTED": "This request was rejected. You can prepare a new request from salon inventory."
+        }
+      },
+      "delivery": {
+        "title": "Delivery quantities",
+        "ordered": "Ordered",
+        "dispatched": "Dispatched",
+        "received": "Received",
+        "goodUnits": "Good units",
+        "notShipped": "Not shipped",
+        "notReceived": "Not received",
+        "pending": "Pending",
+        "problemLabel": "Delivery problem quantities · {{ product }}",
+        "problem": "Damaged: {{ damaged }} · Missing: {{ missing }}"
+      },
+      "history": {
+        "title": "Status history",
+        "label": "Request status history",
+        "pending": "Pending",
+        "unavailable": "History record unavailable"
+      },
+      "stock": {
+        "title": "Stock now",
+        "hq": "HQ stock",
+        "hqHint": "On the shelf",
+        "reserved": "Reserved at HQ",
+        "reservedHint": "Approved, not yet shipped",
+        "available": "HQ available",
+        "availableHint": "Stock − reserved",
+        "inTransit": "In transit",
+        "inTransitHint": "This product in this request",
+        "salon": "{{ salon }} stock",
+        "salonHint": "In salon",
+        "note": "Synthetic demo quantities. Refreshed from the database."
+      }
+    },
+    "history": {
+      "step": {
+        "PENDING_APPROVAL": "Submitted",
+        "RESERVED": "Approved",
+        "DISPATCHED": "Dispatched",
+        "RECEIVED": "Received",
+        "RECEIVED_WITH_ISSUE": "Delivery inspected · issue reported",
+        "REJECTED": "Rejected"
+      },
+      "reserved": "Approved · {{ units }} pcs reserved",
+      "dispatched": "Dispatched · {{ units }} pcs",
+      "received": "Received · {{ units }} pcs received"
+    },
+    "action": {
+      "label": {
+        "APPROVE": "Approve request",
+        "REJECT": "Reject request",
+        "DISPATCH": "Confirm dispatch",
+        "RECEIVE": "Check delivery"
+      },
+      "hqAvailable": "HQ available: {{ from }} → {{ to }}",
+      "hqOnHand": "HQ on hand: {{ from }} → {{ to }}",
+      "salonOnHand": "Salon on hand: {{ from }} → {{ to }}",
+      "receivedQuantity": "Received quantity · {{ product }}",
+      "approveBody": "Reserve all products together. Physical stock stays unchanged until dispatch.",
+      "dispatchBody": "Confirm only after all products leave HQ.",
+      "reason": "Reason for rejection",
+      "allIntact": "All products are intact",
+      "receiptBlocked": "Receipt blocked. Contact HQ about missing or damaged products. The whole request remains dispatched until every product arrives intact.",
+      "saving": "Saving action",
+      "closeReview": "Close and review",
+      "retrySame": "Retry same action",
+      "errors": {
+        "unknown": "Outcome unknown. Retry this same action to check whether it was recorded.",
+        "clientUpdate": "Reload the app to inspect this delivery. Keep this saved action until its result has been reconciled.",
+        "STALE_STATE": "The request or stock changed. Review the refreshed details before trying again.",
+        "INSUFFICIENT_STOCK": "HQ has insufficient available stock.",
+        "default": "Action was not completed ({{ code }}). Review the refreshed details."
+      },
+      "replayed": "This action was already recorded.",
+      "recorded": "Action recorded."
+    }
+  },
+  "hq": {
+    "queue": {
+      "eyebrow": "HQ WORKSPACE",
+      "title": "Salon requests",
+      "description": "Review requests. Reserve stock. Keep salons supplied.",
+      "view": "Queue view",
+      "requests": "Requests",
+      "deliveryIssues": "Delivery issues ({{ count }})",
+      "loading": "Loading requests",
+      "unavailable": "Requests unavailable.",
+      "pending": "Pending approval",
+      "ready": "Ready to dispatch",
+      "other": "Dispatched and completed",
+      "pages": "Queue pages"
+    }
+  },
+  "replenishment": {
+    "order": {
+      "eyebrow": "REPLENISHMENT",
+      "title": "Request products",
+      "intro": "Build your list. HQ approves and delivers the whole request together.",
+      "pending": "The saved request for {{ salon }} has a result to reconcile. Its quantities are frozen until it is known.",
+      "savedSalonFallback": "saved salon",
+      "openToReconcile": "Open {{ salon }} to reconcile",
+      "reconcile": "Reconcile saved request",
+      "checking": "Checking…",
+      "blocked": "Saved submission data needs reconciliation before you can send a new request. Contact the demo operator. Your saved data has been preserved.",
+      "tabs": {
+        "assistant": "Assistant",
+        "manual": "Manual"
+      },
+      "addProduct": "Add a product",
+      "product": "Product",
+      "alreadyRequested": " · already requested",
+      "quantity": "Quantity",
+      "add": "Add to list",
+      "listHeading": "Request list",
+      "origin": {
+        "manual": "Added manually",
+        "assistant": "From assistant"
+      },
+      "remove": "Remove {{ name }}",
+      "quantityFor": "Quantity for {{ name }}",
+      "decrease": "Decrease quantity for {{ name }}",
+      "increase": "Increase quantity for {{ name }}",
+      "unitsFor": "Units for {{ name }}",
+      "hq": "HQ",
+      "available": " available",
+      "salon": "Salon",
+      "projected": "Projected salon stock after full receipt.",
+      "shortage": "HQ has {{ available }} available. You can still submit — HQ decides. Nothing is swapped automatically.",
+      "quantityError": "Enter a whole number from 1 to 99.",
+      "reasonQty": "{{ reason }} · Qty {{ quantity }}",
+      "empty": "Your request list is empty.",
+      "submit": "Submit request",
+      "submitting": "Submitting…",
+      "outcome": {
+        "CREATED": "CREATED",
+        "FAILED": "FAILED",
+        "UNKNOWN": "UNKNOWN"
+      },
+      "failed": "Request was not submitted ({{ code }}). Review the complete list before retrying.",
+      "openExisting": "Open existing request for {{ product }}",
+      "footer": "No stock moves until HQ dispatches and you confirm receipt.",
+      "notices": {
+        "alreadyRequested": "Already requested. Open the active request below.",
+        "maxProducts": "The list can contain up to six products."
+      },
+      "errors": {
+        "storage": "Enable browser session storage before submitting. No request was sent.",
+        "clearState": "Could not clear saved state. Reconcile the same request before continuing."
+      }
+    },
+    "draft": {
+      "inventoryUnavailable": "Product inventory unavailable. Refresh and add this product again before submitting."
+    },
+    "assistant": {
+      "label": "What do you need?",
+      "placeholder": "List the products and quantities you need",
+      "examples": {
+        "label": "Request examples",
+        "single": "Example",
+        "several": "Several products"
+      },
+      "prepare": "Prepare proposal",
+      "preparing": "Preparing proposal…",
+      "alreadyRequested": "Already requested · Open existing request",
+      "errors": {
+        "RATE_LIMITED": "The shared AI limit has been reached. Use Manual to continue; your list is preserved.",
+        "TIMEOUT": "The assistant took too long. Use Manual to continue; your list is preserved.",
+        "default": "The proposal could not be prepared. Use Manual to continue; your list is preserved.",
+        "invalidClarification": "Choose a product and a whole quantity from 1 to 99.",
+        "unmatched": "The clarification could not be matched. Remove the item and prepare it again.",
+        "maxItems": "The list can contain up to six items. Remove an item before adding this proposal."
+      },
+      "notices": {
+        "unresolved": "Review the unresolved items below.",
+        "added": "Proposal added. Review quantities, then submit the request.",
+        "excluded": "These products already have active requests.",
+        "specify": "Specify products and quantities, then prepare the proposal again."
+      },
+      "shorthand": {
+        "learned": "Saved as salon shorthand. You can remove it in Settings.",
+        "notSaved": "Product applied. The salon shorthand was not saved; choose again next time."
+      }
+    },
+    "clarify": {
+      "product": "Product for {{ wording }}",
+      "quantity": "Quantity for {{ wording }}",
+      "use": "Use selection"
     }
   }
 }
