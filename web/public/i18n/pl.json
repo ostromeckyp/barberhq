@@ -68,6 +68,27 @@
       "title": "Wymagana konfiguracja obszaru roboczego",
       "notConfigured": "Połączenie z Firebase nie zostało skonfigurowane dla tej wersji.",
       "followGuide": "Postępuj zgodnie z instrukcją konfiguracji Firebase w projekcie, a następnie zbuduj aplikację ponownie."
+    },
+    "titles": {
+      "signIn": "Logowanie · BarberHQ",
+      "access": "Dostęp · BarberHQ",
+      "reviewDocument": "Przegląd dokumentu · BarberHQ",
+      "procedures": "Procedury · BarberHQ",
+      "sourcePdf": "Źródłowy PDF · BarberHQ",
+      "deliveryIssue": "Problem z dostawą · BarberHQ",
+      "checkDelivery": "Sprawdzenie dostawy · BarberHQ",
+      "salonRequest": "Zamówienie salonu · BarberHQ",
+      "hqRequest": "Zamówienie w centrali · BarberHQ",
+      "settings": "Ustawienia · BarberHQ",
+      "requests": "Zamówienia · BarberHQ",
+      "salonInventory": "Stan magazynowy salonu · BarberHQ",
+      "addProduct": "Dodaj produkt · BarberHQ",
+      "editProduct": "Edytuj produkt · BarberHQ",
+      "hqStock": "Stan magazynowy centrali · BarberHQ",
+      "salonShorthand": "Skróty salonów · BarberHQ",
+      "hq": "Centrala · BarberHQ",
+      "request": "Zamówienie · BarberHQ",
+      "notFound": "Nie znaleziono strony · BarberHQ"
     }
   },
   "auth": {
@@ -706,7 +727,7 @@
       "description": "Dostępne ilości nie obejmują stanu zarezerwowanego na dostawy do salonów.",
       "loading": "Wczytuję stan magazynowy centrali",
       "unavailable": "Stan magazynowy centrali jest niedostępny.",
-      "empty": "Brak zapisów stanu magazynowego centrali. Brak danych nie oznacza zerowego stanu.",
+      "empty": "Brak danych o stanie magazynowym centrali. Brak wpisu nie oznacza zerowego stanu.",
       "list": "Stan magazynowy centrali",
       "table": "Tabela stanu magazynowego centrali",
       "netContent": "{{ ml }} ml",
@@ -1171,8 +1192,8 @@
         "message": "Nie udało się wczytać ilości. Spróbuj ponownie, gdy będziesz online."
       },
       "empty": {
-        "title": "Brak zapisów stanu magazynowego",
-        "message": "Poproś centralę o skonfigurowanie stanu magazynowego tego salonu. Brak danych nie oznacza zerowego stanu."
+        "title": "Brak danych o stanie magazynowym",
+        "message": "Poproś centralę o skonfigurowanie stanu magazynowego tego salonu. Brak wpisu nie oznacza zerowego stanu."
       },
       "requestProducts": "Zamów produkty",
       "draftProducts": "produkty na liście zamówienia",
@@ -1193,7 +1214,7 @@
       "inStock": "Na stanie",
       "request": "Zamów",
       "requestProduct": "Zamów: {{ name }}",
-      "footer": "Ilości w sztukach. Dostępne w centrali nie obejmuje zarezerwowanych sztuk. Ilości syntetyczne · Odświeżono {{ time }}"
+      "footer": "Ilości w sztukach. Stan dostępny w centrali nie obejmuje zarezerwowanych sztuk. Ilości syntetyczne · Odświeżono {{ time }}"
     },
     "hqAvailability": {
       "title": "Dostępność w centrali",

@@ -68,6 +68,27 @@
       "title": "Workspace setup required",
       "notConfigured": "The Firebase connection has not been configured for this build.",
       "followGuide": "Follow the project’s Firebase setup guide, then rebuild the application."
+    },
+    "titles": {
+      "signIn": "Sign in · BarberHQ",
+      "access": "Access · BarberHQ",
+      "reviewDocument": "Review document · BarberHQ",
+      "procedures": "Procedures · BarberHQ",
+      "sourcePdf": "Source PDF · BarberHQ",
+      "deliveryIssue": "Delivery issue · BarberHQ",
+      "checkDelivery": "Check delivery · BarberHQ",
+      "salonRequest": "Salon request · BarberHQ",
+      "hqRequest": "HQ request · BarberHQ",
+      "settings": "Settings · BarberHQ",
+      "requests": "Requests · BarberHQ",
+      "salonInventory": "Salon inventory · BarberHQ",
+      "addProduct": "Add product · BarberHQ",
+      "editProduct": "Edit product · BarberHQ",
+      "hqStock": "HQ stock · BarberHQ",
+      "salonShorthand": "Salon shorthand · BarberHQ",
+      "hq": "HQ · BarberHQ",
+      "request": "Request · BarberHQ",
+      "notFound": "Page not found · BarberHQ"
     }
   },
   "auth": {

@@ -5,13 +5,13 @@ import { accessGuard } from './core/access.guard';
 export const routes: Routes = [
   {
     path: 'login',
-    title: 'Sign in · BarberHQ',
+    title: 'shell.titles.signIn',
     loadComponent: () =>
       import('./features/login/feature/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'no-access',
-    title: 'Access · BarberHQ',
+    title: 'shell.titles.access',
     data: { kind: 'no-access' },
     loadComponent: () =>
       import('./features/access/feature/status-page.component').then((m) => m.StatusPageComponent),
@@ -23,7 +23,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'procedures/review/:versionId',
-        title: 'Review document · BarberHQ',
+        title: 'shell.titles.reviewDocument',
         data: { kind: 'hq', workspace: 'HQ' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -33,7 +33,7 @@ export const routes: Routes = [
       },
       {
         path: 'procedures',
-        title: 'Procedures · BarberHQ',
+        title: 'shell.titles.procedures',
         canActivate: [accessGuard],
         loadComponent: () =>
           import('./features/procedures/procedure-page.component').then(
@@ -42,7 +42,7 @@ export const routes: Routes = [
       },
       {
         path: 'procedures/sources/:versionId',
-        title: 'Source PDF · BarberHQ',
+        title: 'shell.titles.sourcePdf',
         canActivate: [accessGuard],
         loadComponent: () =>
           import('./features/procedures/pdf-viewer/pdf-viewer.component').then(
@@ -51,7 +51,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq/delivery-issues/:issueId',
-        title: 'Delivery issue · BarberHQ',
+        title: 'shell.titles.deliveryIssue',
         data: { kind: 'hq', workspace: 'HQ' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -61,7 +61,7 @@ export const routes: Routes = [
       },
       {
         path: 'salons/:salonId/delivery-issues/:issueId',
-        title: 'Delivery issue · BarberHQ',
+        title: 'shell.titles.deliveryIssue',
         data: { workspace: 'SALON' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -71,7 +71,7 @@ export const routes: Routes = [
       },
       {
         path: 'salons/:salonId/requests/:requestId/receipt',
-        title: 'Check delivery · BarberHQ',
+        title: 'shell.titles.checkDelivery',
         data: { workspace: 'SALON' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -81,7 +81,7 @@ export const routes: Routes = [
       },
       {
         path: 'salons/:salonId/requests/:requestId',
-        title: 'Salon request · BarberHQ',
+        title: 'shell.titles.salonRequest',
         data: { workspace: 'SALON' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -91,7 +91,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq/requests/:requestId',
-        title: 'HQ request · BarberHQ',
+        title: 'shell.titles.hqRequest',
         data: { kind: 'hq', workspace: 'HQ' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -101,7 +101,7 @@ export const routes: Routes = [
       },
       {
         path: 'salons/:salonId/settings',
-        title: 'Settings · BarberHQ',
+        title: 'shell.titles.settings',
         canActivate: [accessGuard],
         loadComponent: () =>
           import('./features/salon-settings/feature/salon-settings.component').then(
@@ -110,7 +110,7 @@ export const routes: Routes = [
       },
       {
         path: 'salons/:salonId/requests',
-        title: 'Requests · BarberHQ',
+        title: 'shell.titles.requests',
         canActivate: [accessGuard],
         loadComponent: () =>
           import('./features/salon-requests/feature/salon-requests.component').then(
@@ -119,7 +119,7 @@ export const routes: Routes = [
       },
       {
         path: 'salons/:salonId',
-        title: 'Salon inventory · BarberHQ',
+        title: 'shell.titles.salonInventory',
         canActivate: [accessGuard],
         loadComponent: () =>
           import('./features/salon-dashboard/feature/salon-dashboard.component').then(
@@ -128,7 +128,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq/stock/products/new',
-        title: 'Add product · BarberHQ',
+        title: 'shell.titles.addProduct',
         data: { kind: 'hq' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -138,7 +138,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq/stock/products/:productId',
-        title: 'Edit product · BarberHQ',
+        title: 'shell.titles.editProduct',
         data: { kind: 'hq' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -148,7 +148,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq/stock',
-        title: 'HQ stock · BarberHQ',
+        title: 'shell.titles.hqStock',
         data: { kind: 'hq' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -158,7 +158,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq/shorthand',
-        title: 'Salon shorthand · BarberHQ',
+        title: 'shell.titles.salonShorthand',
         data: { kind: 'hq' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -168,7 +168,7 @@ export const routes: Routes = [
       },
       {
         path: 'hq',
-        title: 'HQ · BarberHQ',
+        title: 'shell.titles.hq',
         data: { kind: 'hq' },
         canActivate: [accessGuard],
         loadComponent: () =>
@@ -176,7 +176,7 @@ export const routes: Routes = [
       },
       {
         path: 'requests/:requestId',
-        title: 'Request · BarberHQ',
+        title: 'shell.titles.request',
         canActivate: [accessGuard],
         loadComponent: () =>
           import('./features/request-detail/feature/request-detail.component').then(
@@ -196,7 +196,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    title: 'Page not found · BarberHQ',
+    title: 'shell.titles.notFound',
     data: { kind: 'not-found' },
     loadComponent: () =>
       import('./features/access/feature/status-page.component').then((m) => m.StatusPageComponent),

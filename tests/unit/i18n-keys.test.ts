@@ -172,4 +172,11 @@ describe('i18n keys', () => {
     }
     expect(problems).toEqual([]);
   });
+
+  it('route titles are translation keys', () => {
+    const routes = readFileSync(join(appRoot, 'app.routes.ts'), 'utf8');
+    const titles = [...routes.matchAll(/\btitle:\s*(['"`])([^'"`]*)\1/g)].map((m) => m[2]);
+    expect(titles.length).toBeGreaterThan(0);
+    expect(titles.filter((t) => !/^shell\.titles\.[A-Za-z]+$/.test(t))).toEqual([]);
+  });
 });
