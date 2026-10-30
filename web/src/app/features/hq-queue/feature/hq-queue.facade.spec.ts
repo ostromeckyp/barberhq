@@ -8,11 +8,11 @@ import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
 import { HqQueueFacade } from './hq-queue.facade';
 
-it('keeps loaded true across a focus refresh that restarts the load', async () => {
+it('keeps loaded and the last rows across a focus refresh that restarts the load', async () => {
   const tick = signal(0);
   const listHQQueue = vi
     .fn()
-    .mockResolvedValueOnce({ items: [], nextOffset: null })
+    .mockResolvedValueOnce({ items: [{ id: 'r1', state: 'PENDING_APPROVAL' }], nextOffset: null })
     .mockReturnValue(new Promise(() => undefined));
   TestBed.configureTestingModule({
     providers: [
@@ -41,8 +41,10 @@ it('keeps loaded true across a focus refresh that restarts the load', async () =
   await TestBed.inject(ApplicationRef).whenStable();
   TestBed.tick();
   expect(f.loaded()).toBe(true);
+  expect(f.pending().map((r) => r.id)).toEqual(['r1']);
   tick.set(1);
   TestBed.tick();
   expect(f.loading()).toBe(true);
   expect(f.loaded()).toBe(true);
+  expect(f.pending().map((r) => r.id)).toEqual(['r1']);
 });

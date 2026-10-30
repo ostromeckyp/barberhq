@@ -60,7 +60,6 @@ export class ProductEditorFacade {
   readonly message = signal<TranslatedText | null>(null);
   private revision = 0;
   private formKey: string | null = null;
-
   readonly stock = signal<HqStock | null>(null);
   readonly stockDraft = signal(0);
   readonly stockMessage = signal<TranslatedText | null>(null);
@@ -83,7 +82,8 @@ export class ProductEditorFacade {
   }
   async load(productId: string): Promise<void> {
     this.loadedId = productId;
-    (this.loading.set(true), this.loadFailed.set(false));
+    this.loading.set(true);
+    this.loadFailed.set(false);
     const stale = () => this.loadedId !== productId;
     await this.read(productId)
       .catch(() => stale() || this.loadFailed.set(true))

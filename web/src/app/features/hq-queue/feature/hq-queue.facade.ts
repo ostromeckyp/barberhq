@@ -5,6 +5,7 @@ import { Service, inject, computed, linkedSignal, resource } from '@angular/core
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
+import type { RequestSummary } from '../../../../../../shared/contracts/stock/index';
 @Service({ autoProvided: false })
 export class HqQueueFacade {
   private readonly api = inject(ReplenishmentApi);
@@ -28,7 +29,11 @@ export class HqQueueFacade {
     },
     loader: ({ params }) => this.api.listHQQueue({ offset: params.offset, limit: 50 }),
   });
-  readonly rows = computed(() => (this.page.hasValue() ? this.page.value().items : []));
+  /** Last loaded rows; kept while a reload runs so sections never flash an empty state. */
+  readonly rows = linkedSignal<RequestSummary[] | undefined, RequestSummary[]>({
+    source: () => (this.page.hasValue() ? this.page.value().items : undefined),
+    computation: (items, previous) => items ?? previous?.value ?? [],
+  });
   readonly loading = this.page.isLoading;
   /** True once a page has loaded, and stays true across later reloads; counts and empty text wait for it. */
   readonly loaded = linkedSignal<boolean, boolean>({
