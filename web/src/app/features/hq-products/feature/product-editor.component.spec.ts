@@ -197,3 +197,16 @@ it('shows an empty state with Retry and no form when the product cannot load', a
   expect(el.querySelector('form')).toBeNull();
   expect(fixture).toBeTruthy();
 });
+it('Retry after a load failure brings the form back with values and Save enabled', async () => {
+  const read = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(detail);
+  const { el, fixture } = await render('b:p', read);
+  expect(el.querySelector('form')).toBeNull();
+  [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('Retry'))!.click();
+  await fixture.whenStable();
+  await new Promise((r) => setTimeout(r));
+  fixture.detectChanges();
+  expect(read).toHaveBeenCalledTimes(2);
+  expect(el.querySelector('app-empty-state')).toBeNull();
+  expect(el.querySelector<HTMLInputElement>('input')!.value).toBe('Pomada Cement');
+  expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+});

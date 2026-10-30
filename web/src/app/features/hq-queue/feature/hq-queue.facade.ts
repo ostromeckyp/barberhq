@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { pageOffset } from '../../../core/request-navigation';
-import { Service, inject, computed, resource } from '@angular/core';
+import { Service, inject, computed, linkedSignal, resource } from '@angular/core';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
@@ -30,8 +30,11 @@ export class HqQueueFacade {
   });
   readonly rows = computed(() => (this.page.hasValue() ? this.page.value().items : []));
   readonly loading = this.page.isLoading;
-  /** True once a page has loaded; counts and empty text wait for it. */
-  readonly loaded = computed(() => this.page.hasValue());
+  /** True once a page has loaded, and stays true across later reloads; counts and empty text wait for it. */
+  readonly loaded = linkedSignal<boolean, boolean>({
+    source: () => this.page.hasValue(),
+    computation: (has, previous) => has || (previous?.value ?? false),
+  });
   readonly error = computed(() => !!this.page.error());
   readonly pending = computed(() => this.rows().filter((r) => r.state === 'PENDING_APPROVAL'));
   readonly reserved = computed(() => this.rows().filter((r) => r.state === 'RESERVED'));
