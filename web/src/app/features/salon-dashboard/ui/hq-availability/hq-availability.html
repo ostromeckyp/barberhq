@@ -27,7 +27,7 @@
           {{ 'salon.hqAvailability.available' | transloco }}
         </th>
         <td mat-cell *matCellDef="let row" class="quantity-cell">
-          <strong>{{ row.hqAvailable }}</strong
+          <strong class="qty">{{ row.hqAvailable }}</strong
           ><small>{{ 'salon.hqAvailability.unit' | transloco }}</small>
         </td>
       </ng-container>

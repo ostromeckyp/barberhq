@@ -17,11 +17,11 @@
           <dl class="compact-metrics">
             <div>
               <dt>{{ 'salon.stock.columns.inSalon' | transloco }}</dt>
-              <dd [attr.data-testid]="'stock-' + row.demoId">{{ row.salonOnHand }}</dd>
+              <dd class="qty" [attr.data-testid]="'stock-' + row.demoId">{{ row.salonOnHand }}</dd>
             </div>
             <div>
               <dt>{{ 'salon.stock.columns.hqAvailable' | transloco }}</dt>
-              <dd>{{ row.hqAvailable }}</dd>
+              <dd class="qty">{{ row.hqAvailable }}</dd>
             </div>
           </dl>
           <div class="compact-actions">
@@ -66,7 +66,7 @@
           </th>
           <td mat-cell *matCellDef="let row" class="quantity-cell">
             <div class="stock-value">
-              <span class="quantity" [attr.data-testid]="'stock-' + row.demoId">{{
+              <span class="quantity qty" [attr.data-testid]="'stock-' + row.demoId">{{
                 row.salonOnHand
               }}</span>
               <small>{{ 'requests.unit.pcs' | transloco }}</small>
@@ -79,7 +79,7 @@
           </th>
           <td mat-cell *matCellDef="let row" class="quantity-cell">
             <div class="stock-value">
-              <span class="quantity">{{ row.hqAvailable }}</span>
+              <span class="quantity qty">{{ row.hqAvailable }}</span>
               <small>{{ 'requests.unit.pcs' | transloco }}</small>
             </div>
           </td>

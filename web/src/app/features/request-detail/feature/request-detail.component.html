@@ -45,10 +45,10 @@
       <h1>
         @if (request.items.length === 1) {
           {{ request.items[0].productName }}
-          <span class="title-quantity">× {{ request.items[0].quantity }}</span>
+          <span class="title-quantity qty">× {{ request.items[0].quantity }}</span>
         } @else {
           {{ productsKey(request.itemCount) | transloco: { count: request.itemCount } }}
-          <span class="title-quantity">{{
+          <span class="title-quantity qty">{{
             'requests.detail.titleUnits' | transloco: { units: request.totalUnits }
           }}</span>
         }
@@ -123,7 +123,7 @@
             <div class="figures">
               <div>
                 <span>{{ 'requests.detail.delivery.ordered' | transloco }}</span
-                ><strong>{{ item.quantity }}</strong
+                ><strong class="qty">{{ item.quantity }}</strong
                 ><small>{{ 'requests.unit.pcs' | transloco }}</small>
               </div>
               <div>
@@ -133,7 +133,7 @@
                   request.state === 'RECEIVED' ||
                   request.state === 'RECEIVED_WITH_ISSUE'
                 ) {
-                  <strong>{{ item.dispatchedQuantity }}</strong
+                  <strong class="qty">{{ item.dispatchedQuantity }}</strong
                   ><small>{{ 'requests.unit.pcs' | transloco }}</small>
                 } @else {
                   <strong class="pending-value">—</strong
@@ -153,7 +153,7 @@
                   ) | transloco
                 }}</span>
                 @if (request.state === 'RECEIVED' || request.state === 'RECEIVED_WITH_ISSUE') {
-                  <strong>{{ item.receivedQuantity }}</strong
+                  <strong class="qty">{{ item.receivedQuantity }}</strong
                   ><small>{{ 'requests.unit.pcs' | transloco }}</small>
                 } @else {
                   <strong class="pending-value">—</strong
@@ -244,55 +244,65 @@
     </div>
     <aside class="card stock" aria-labelledby="stock-title">
       <h2 id="stock-title">{{ 'requests.detail.stock.title' | transloco }}</h2>
-      @for (item of request.items; track item.productId) {
-        <section class="stock-item">
-          <h3>{{ item.productName }}</h3>
-          <dl>
-            <div>
-              <dt>
-                {{ 'requests.detail.stock.hq' | transloco
-                }}<small>{{ 'requests.detail.stock.hqHint' | transloco }}</small>
-              </dt>
-              <dd data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</dd>
-            </div>
-            <div>
-              <dt>
-                {{ 'requests.detail.stock.reserved' | transloco
-                }}<small>{{ 'requests.detail.stock.reservedHint' | transloco }}</small>
-              </dt>
-              <dd>{{ item.stock.hqReserved }}</dd>
-            </div>
-            <div>
-              <dt>
-                {{ 'requests.detail.stock.available' | transloco
-                }}<small>{{ 'requests.detail.stock.availableHint' | transloco }}</small>
-              </dt>
-              <dd>{{ item.stock.hqAvailable }}</dd>
-            </div>
-            <div>
-              <dt>
-                {{ 'requests.detail.stock.inTransit' | transloco
-                }}<small>{{ 'requests.detail.stock.inTransitHint' | transloco }}</small>
-              </dt>
-              <dd data-testid="in-transit">
+      <table class="stock-table" [attr.aria-label]="'requests.detail.stock.title' | transloco">
+        <thead>
+          <tr>
+            <th scope="col" class="stock-product">
+              {{ 'requests.detail.stock.product' | transloco }}
+            </th>
+            <th scope="col">{{ 'requests.detail.stock.hq' | transloco }}</th>
+            <th scope="col">{{ 'requests.detail.stock.reserved' | transloco }}</th>
+            <th scope="col">{{ 'requests.detail.stock.available' | transloco }}</th>
+            <th scope="col">{{ 'requests.detail.stock.inTransit' | transloco }}</th>
+            <th scope="col">
+              {{ 'requests.detail.stock.salon' | transloco: { salon: request.salonName } }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of request.items; track item.productId) {
+            <tr>
+              <th scope="row" class="stock-product">{{ item.productName }}</th>
+              <td class="qty" data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</td>
+              <td class="qty">{{ item.stock.hqReserved }}</td>
+              <td class="qty">{{ item.stock.hqAvailable }}</td>
+              <td class="qty" data-testid="in-transit">
                 {{
                   item.delivery?.inTransit ??
                     (request.state === 'RECEIVED' || request.state === 'RECEIVED_WITH_ISSUE'
                       ? 0
                       : item.dispatchedQuantity - item.receivedQuantity)
                 }}
-              </dd>
-            </div>
-            <div>
-              <dt>
-                {{ 'requests.detail.stock.salon' | transloco: { salon: request.salonName }
-                }}<small>{{ 'requests.detail.stock.salonHint' | transloco }}</small>
-              </dt>
-              <dd data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</dd>
-            </div>
-          </dl>
-        </section>
-      }
+              </td>
+              <td class="qty" data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <ul class="stock-legend muted">
+        <li>
+          <strong>{{ 'requests.detail.stock.hq' | transloco }}</strong>
+          {{ 'requests.detail.stock.hqHint' | transloco }}
+        </li>
+        <li>
+          <strong>{{ 'requests.detail.stock.reserved' | transloco }}</strong>
+          {{ 'requests.detail.stock.reservedHint' | transloco }}
+        </li>
+        <li>
+          <strong>{{ 'requests.detail.stock.available' | transloco }}</strong>
+          {{ 'requests.detail.stock.availableHint' | transloco }}
+        </li>
+        <li>
+          <strong>{{ 'requests.detail.stock.inTransit' | transloco }}</strong>
+          {{ 'requests.detail.stock.inTransitHint' | transloco }}
+        </li>
+        <li>
+          <strong>{{
+            'requests.detail.stock.salon' | transloco: { salon: request.salonName }
+          }}</strong>
+          {{ 'requests.detail.stock.salonHint' | transloco }}
+        </li>
+      </ul>
       <p class="muted stock-note">{{ 'requests.detail.stock.note' | transloco }}</p>
     </aside>
   </div>

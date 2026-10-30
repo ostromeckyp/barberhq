@@ -145,13 +145,13 @@ td small,
 }
 
 .quantity {
-  font: 20px var(--font-mono);
+  font-size: 20px;
 }
 
 .quantity-cell small {
   display: inline;
   margin-left: 4px;
-  font: 12px var(--font-mono);
+  font-size: 12px;
 }
 
 .empty {

@@ -72,17 +72,17 @@
           </ng-container>
           <ng-container matColumnDef="onHand">
             <th mat-header-cell *matHeaderCellDef>{{ 'hq.stock.columns.onHand' | transloco }}</th>
-            <td mat-cell *matCellDef="let row" class="quantity">{{ row.onHand }}</td>
+            <td mat-cell *matCellDef="let row" class="quantity qty">{{ row.onHand }}</td>
           </ng-container>
           <ng-container matColumnDef="reserved">
             <th mat-header-cell *matHeaderCellDef>{{ 'hq.stock.columns.reserved' | transloco }}</th>
-            <td mat-cell *matCellDef="let row" class="quantity">{{ row.reserved }}</td>
+            <td mat-cell *matCellDef="let row" class="quantity qty">{{ row.reserved }}</td>
           </ng-container>
           <ng-container matColumnDef="available">
             <th mat-header-cell *matHeaderCellDef>
               {{ 'hq.stock.columns.available' | transloco }}
             </th>
-            <td mat-cell *matCellDef="let row" class="quantity">{{ row.available }}</td>
+            <td mat-cell *matCellDef="let row" class="quantity qty">{{ row.available }}</td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="columns"></tr>
           <tr
