@@ -234,9 +234,7 @@ it('reports a confirmed withdrawal by its outcome, not its unchanged processing 
   });
   const facade = TestBed.inject(DocumentLibraryFacade);
   await facade.withdraw(row);
-  expect(facade.notice()).toBe(
-    'Version withdrawn. Private originals and audit records are retained.',
-  );
+  expect(facade.notice()).toEqual({ key: 'procedures.library.notices.withdrawn' });
 });
 
 it('describes a confirmed READY retry result without exposing the processing enum', async () => {
@@ -269,6 +267,5 @@ it('describes a confirmed READY retry result without exposing the processing enu
   });
   const facade = TestBed.inject(DocumentLibraryFacade);
   await facade.retry(row);
-  expect(facade.notice()).toBe('Processing completed successfully for this version.');
-  expect(facade.notice()).not.toContain('READY');
+  expect(facade.notice()).toEqual({ key: 'procedures.library.notices.READY' });
 });

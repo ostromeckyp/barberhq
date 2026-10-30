@@ -83,7 +83,7 @@ it('shows a controlled operational error without preserving the previous answer'
   facade.question.set('Can I replace it?');
   await facade.submit();
   expect(facade.result()).toBeNull();
-  expect(facade.error()).toContain('too many');
+  expect(facade.error()).toEqual({ key: 'procedures.assistant.errors.RATE_LIMITED' });
 });
 
 it('clears retained guidance when a different account enters the same workspace', async () => {
@@ -98,7 +98,7 @@ it('clears retained guidance when a different account enters the same workspace'
   TestBed.flushEffects();
   expect(facade.question()).toBe('');
   expect(facade.result()).toBeNull();
-  expect(facade.error()).toBe('');
+  expect(facade.error()).toBeNull();
 });
 
 // The answer must keep the question it actually answered, even while the next input is edited.
@@ -133,9 +133,9 @@ it('retains delivery return on Clear, revalidates access, and clears it on works
       }),
     ),
   ).toBe(true);
-  expect(h.facade.deliveryBack()?.label).toBe('Check delivery');
+  expect(h.facade.deliveryBack()?.labelKey).toBe('procedures.back.checkDelivery');
   h.facade.reset();
-  expect(h.facade.deliveryBack()?.label).toBe('Check delivery');
+  expect(h.facade.deliveryBack()?.labelKey).toBe('procedures.back.checkDelivery');
   expect(h.facade.question()).toBe('');
   h.session.set({ status: 'READY', membership });
   expect(h.facade.deliveryBack()).toBeNull();

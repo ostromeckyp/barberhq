@@ -2,6 +2,7 @@ import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/
 import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../core/assistant-api';
 import { Language } from '../../core/language';
+import type { TranslatedText } from '../../core/models/translated-text';
 import { SalonContext } from '../../core/salon-context';
 import { SessionFacade } from '../auth/feature/session.facade';
 import { TranslocoService } from '@jsverse/transloco';
@@ -32,7 +33,7 @@ export class AssistantFacade {
   readonly submittedQuestion = signal('');
   readonly loading = signal(false);
   readonly result = signal<ProcedureResult | null>(null);
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   readonly canSubmit = computed(
     () => !!this.question().trim() && !this.loading() && this.session.state().status === 'READY',
   );
@@ -73,7 +74,7 @@ export class AssistantFacade {
     this.question.set('');
     this.submittedQuestion.set('');
     this.result.set(null);
-    this.error.set('');
+    this.error.set(null);
     this.loading.set(false);
   }
 
@@ -84,7 +85,7 @@ export class AssistantFacade {
     const question = this.question().trim();
     this.submittedQuestion.set(question);
     this.result.set(null);
-    this.error.set('');
+    this.error.set(null);
     this.loading.set(true);
     try {
       const result = await this.api.answerProcedureQuestion({
@@ -94,11 +95,12 @@ export class AssistantFacade {
       if (generation === this.generation && scope === this.currentScope()) this.result.set(result);
     } catch (error) {
       if (generation === this.generation && scope === this.currentScope()) {
-        this.error.set(
-          error instanceof AssistantApiError
-            ? error.message
-            : 'The assistant is temporarily unavailable. Please try again.',
-        );
+        this.error.set({
+          key:
+            error instanceof AssistantApiError
+              ? error.key
+              : 'procedures.assistant.errors.UNAVAILABLE',
+        });
       }
     } finally {
       if (generation === this.generation && scope === this.currentScope()) this.loading.set(false);

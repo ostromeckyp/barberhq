@@ -42,7 +42,7 @@ it('maps controlled callable details without exposing provider errors', async ()
     api.answerProcedureQuestion({ question: 'What do I do?', answerLanguage: 'en' }),
   ).rejects.toMatchObject({
     code: 'SOURCE_CHANGED',
-    message: 'The sources changed. Please ask again.',
+    key: 'procedures.assistant.errors.SOURCE_CHANGED',
   });
   expect(AssistantApiError).toBeDefined();
 });

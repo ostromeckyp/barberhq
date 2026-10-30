@@ -14,22 +14,27 @@ import { isReplenishmentProposal } from './replenishment-proposal';
 export type AssistantErrorCode =
   AiOperationalCode | 'UNAUTHENTICATED' | 'FORBIDDEN' | 'VALIDATION_ERROR';
 
+const UNAVAILABLE = 'procedures.assistant.errors.UNAVAILABLE';
+/** Translation key of the user-facing message for each error code. */
 const messages: Record<AssistantErrorCode, string> = {
-  UNAUTHENTICATED: 'Sign in again to ask a procedure question.',
-  FORBIDDEN: 'This procedure is unavailable in the selected workspace.',
-  VALIDATION_ERROR: 'Enter a valid English procedure question.',
-  RATE_LIMITED: 'There are too many requests. Please try again later.',
-  TIMEOUT: 'The answer took too long. Please try again.',
-  PROVIDER_UNAVAILABLE: 'The assistant is temporarily unavailable. Please try again.',
-  SERVICE_UNAVAILABLE: 'The assistant is temporarily unavailable. Please try again.',
-  SOURCE_CHANGED: 'The sources changed. Please ask again.',
-  INVALID_MODEL_OUTPUT: 'The answer could not be verified. Please ask again.',
-  EMBEDDING_CONFIG_MISMATCH: 'The assistant is temporarily unavailable. Please try again.',
+  UNAUTHENTICATED: 'procedures.assistant.errors.UNAUTHENTICATED',
+  FORBIDDEN: 'procedures.assistant.errors.FORBIDDEN',
+  VALIDATION_ERROR: 'procedures.assistant.errors.VALIDATION_ERROR',
+  RATE_LIMITED: 'procedures.assistant.errors.RATE_LIMITED',
+  TIMEOUT: 'procedures.assistant.errors.TIMEOUT',
+  PROVIDER_UNAVAILABLE: UNAVAILABLE,
+  SERVICE_UNAVAILABLE: UNAVAILABLE,
+  SOURCE_CHANGED: 'procedures.assistant.errors.SOURCE_CHANGED',
+  INVALID_MODEL_OUTPUT: 'procedures.assistant.errors.INVALID_MODEL_OUTPUT',
+  EMBEDDING_CONFIG_MISMATCH: UNAVAILABLE,
 };
 
 export class AssistantApiError extends Error {
+  /** Translation key of the message to show; `message` carries the same key. */
+  readonly key: string;
   constructor(readonly code: AssistantErrorCode) {
     super(messages[code]);
+    this.key = messages[code];
   }
 }
 

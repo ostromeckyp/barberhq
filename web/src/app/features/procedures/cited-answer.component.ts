@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,30 +8,29 @@ import { SourceExcerptComponent } from './source-excerpt.component';
 
 @Component({
   selector: 'app-cited-answer',
-  imports: [RouterLink, MatIconModule, SourceExcerptComponent],
+  imports: [RouterLink, MatIconModule, SourceExcerptComponent, TranslocoPipe],
   template: `
-    <section class="answer" aria-label="Procedure answer">
+    <section class="answer" [attr.aria-label]="'procedures.answer.label' | transloco">
       @if (hasSyntheticSources()) {
         <div class="synthetic-banner">
           <mat-icon aria-hidden="true">science</mat-icon>
-          <span
-            >Synthetic demo procedure{{
-              allSourcesSynthetic()
-                ? ' — not an actual company policy.'
-                : ' included — check the origin of each source.'
-            }}</span
-          >
+          <span>{{
+            (allSourcesSynthetic()
+              ? 'procedures.answer.syntheticAll'
+              : 'procedures.answer.syntheticSome'
+            ) | transloco
+          }}</span>
         </div>
       }
       <div class="answer-layout">
         <div class="guidance">
           @if (question()) {
             <div class="asked-question">
-              <p class="eyebrow">QUESTION</p>
+              <p class="eyebrow">{{ 'procedures.answer.question' | transloco }}</p>
               <p>{{ question() }}</p>
             </div>
           }
-          <h2>What to do</h2>
+          <h2>{{ 'procedures.answer.whatToDo' | transloco }}</h2>
           <ol role="list">
             @for (step of answer().steps; track $index) {
               <li>
@@ -48,19 +48,26 @@ import { SourceExcerptComponent } from './source-excerpt.component';
                           returnTo: 'assistant',
                         }"
                         [attr.aria-label]="
-                          'Open paragraph ' +
-                          source.sectionId +
-                          ' in ' +
-                          source.title +
-                          ', version ' +
-                          source.version +
-                          ', page ' +
-                          source.physicalPage
+                          'procedures.answer.openParagraph'
+                            | transloco
+                              : {
+                                  section: source.sectionId,
+                                  title: source.title,
+                                  version: source.version,
+                                  page: source.physicalPage,
+                                }
                         "
                       >
                         <mat-icon aria-hidden="true">link</mat-icon>
-                        [{{ sourceNumber(source) }}] § {{ source.sectionId }} · Page
-                        {{ source.physicalPage }}
+                        {{
+                          'procedures.answer.citation'
+                            | transloco
+                              : {
+                                  number: sourceNumber(source),
+                                  section: source.sectionId,
+                                  page: source.physicalPage,
+                                }
+                        }}
                       </a>
                     }
                   </div>
@@ -69,8 +76,11 @@ import { SourceExcerptComponent } from './source-excerpt.component';
             }
           </ol>
           @if (answer().missingInformation.length) {
-            <section class="missing" aria-label="Missing information">
-              <h3>Information still needed</h3>
+            <section
+              class="missing"
+              [attr.aria-label]="'procedures.answer.missingLabel' | transloco"
+            >
+              <h3>{{ 'procedures.answer.missing' | transloco }}</h3>
               <ul>
                 @for (item of answer().missingInformation; track $index) {
                   <li>{{ item }}</li>
@@ -79,13 +89,12 @@ import { SourceExcerptComponent } from './source-excerpt.component';
             </section>
           }
           <footer>
-            Based only on the sources listed. Guidance only: nothing was filed, reserved or changed
-            in stock.
+            {{ 'procedures.answer.footer' | transloco }}
           </footer>
         </div>
-        <aside class="sources" aria-label="Supporting sources">
+        <aside class="sources" [attr.aria-label]="'procedures.answer.sourcesLabel' | transloco">
           <h2>
-            Sources <span>{{ sources().length }}</span>
+            {{ 'procedures.answer.sources' | transloco }} <span>{{ sources().length }}</span>
           </h2>
           @for (source of sources(); track source.sourceSectionId) {
             <app-source-excerpt

@@ -2,7 +2,8 @@ import { ProductKnowledgeReviewComponent } from './product-knowledge-review.comp
 import { ProductKnowledgeReviewFacade } from './library/product-knowledge-review.facade';
 import { MatDialog } from '@angular/material/dialog';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
-import { knowledgeProvenanceLabel } from '../../../../../shared/knowledge-metadata';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { provenanceKey } from './provenance-key';
 import { Component, ElementRef, effect, inject, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,6 +26,7 @@ import { DOCUMENT_PDF_RENDERER } from './library/document-review-renderer';
     MatIconModule,
     MatCheckboxModule,
     DelayedLoadingDirective,
+    TranslocoPipe,
   ],
   templateUrl: './document-review.component.html',
   styleUrl: './document-review.component.scss',
@@ -52,7 +54,7 @@ export class DocumentReviewComponent {
       },
     });
   }
-  readonly provenanceLabel = knowledgeProvenanceLabel;
+  readonly provenanceKey = provenanceKey;
   readonly facade = inject(DocumentReviewFacade);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('pageCanvas');
 

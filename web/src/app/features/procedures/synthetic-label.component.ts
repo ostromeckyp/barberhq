@@ -1,10 +1,12 @@
-import { knowledgeProvenanceLabel } from '../../../../../shared/knowledge-metadata';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { provenanceKey } from './provenance-key';
 import { Component, input } from '@angular/core';
 import type { DocumentSource } from '../../../../../shared/contracts/knowledge/index';
 
 @Component({
   selector: 'app-synthetic-label',
-  template: ` <span class="provenance">{{ label(source()) }}</span> `,
+  imports: [TranslocoPipe],
+  template: ` <span class="provenance">{{ provenanceKey(source()) | transloco }}</span> `,
   styles: [
     `
       .provenance {
@@ -20,6 +22,6 @@ import type { DocumentSource } from '../../../../../shared/contracts/knowledge/i
   ],
 })
 export class SyntheticLabelComponent {
-  readonly label = knowledgeProvenanceLabel;
+  readonly provenanceKey = provenanceKey;
   readonly source = input.required<DocumentSource>();
 }

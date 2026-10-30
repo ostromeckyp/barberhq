@@ -3,6 +3,7 @@ import type {
   KnowledgeOrigin,
 } from '../../../../../shared/contracts/knowledge/index';
 import { metadataFromLegacy } from '../../../../../shared/knowledge-metadata';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,118 +29,125 @@ import { DocumentUploadFacade } from './library/document-upload.facade';
     MatProgressBarModule,
     DelayedLoadingDirective,
     PdfDropzone,
+    TranslocoPipe,
   ],
   template: `
     <h2 mat-dialog-title>
-      {{
-        facade.data.resume
-          ? 'Resume PDF upload'
-          : facade.recoveredRegistration()
-            ? 'Recover registration'
-            : facade.data.replaceTarget
-              ? 'Replace document PDF'
-              : 'Add a new document'
-      }}
+      {{ titleKey() | transloco }}
     </h2>
     <mat-dialog-content>
       @if (!facade.data.resume) {
         @if (facade.data.replaceTarget; as target) {
           <p class="notice">
-            This creates a new version for <strong>{{ target.title }}</strong> ({{
-              target.version
-            }}, document revision {{ target.documentRevision }}). A stale revision will be rejected;
-            refresh the library and select Replace PDF again.
+            {{ 'procedures.upload.replaceBefore' | transloco }}
+            <strong>{{ target.title }}</strong>
+            {{
+              'procedures.upload.replaceAfter'
+                | transloco: { version: target.version, revision: target.documentRevision }
+            }}
           </p>
         }
-        <p>
-          Upload a text-supported PDF. Maximum 10 MiB and 30 physical pages. Scanned PDFs and OCR
-          are not supported.
-        </p>
+        <p>{{ 'procedures.upload.intro' | transloco }}</p>
         @if (facade.unknownRegistration()) {
           <p class="notice" role="status">
-            The unresolved registration is for
+            {{ 'procedures.upload.unresolved' | transloco }}
             <strong>{{ facade.recoveredRegistration()?.title }}</strong
-            >. Choose that request’s same PDF and retry; its frozen details and idempotency key will
-            be reused.
+            >{{ 'procedures.upload.unresolvedRetry' | transloco }}
           </p>
         }
         <form [formGroup]="form">
           <mat-form-field appearance="outline"
-            ><mat-label>Document title</mat-label
+            ><mat-label>{{ 'procedures.upload.fields.title' | transloco }}</mat-label
             ><input matInput formControlName="title" required />
             @if (form.controls.title.touched && form.controls.title.hasError('required')) {
-              <mat-error>A title is required.</mat-error>
+              <mat-error>{{ 'procedures.upload.fields.titleRequired' | transloco }}</mat-error>
             }
             @if (form.controls.title.touched && form.controls.title.hasError('maxlength')) {
-              <mat-error>Use 160 characters or fewer.</mat-error>
+              <mat-error>{{ 'procedures.upload.fields.titleLength' | transloco }}</mat-error>
             }
           </mat-form-field>
           <mat-form-field appearance="outline"
-            ><mat-label>Language</mat-label
+            ><mat-label>{{ 'procedures.upload.fields.language' | transloco }}</mat-label
             ><mat-select formControlName="language"
-              ><mat-option value="en">English</mat-option
-              ><mat-option value="pl">Polish</mat-option></mat-select
+              ><mat-option value="en">{{ 'procedures.language.en' | transloco }}</mat-option
+              ><mat-option value="pl">{{
+                'procedures.language.pl' | transloco
+              }}</mat-option></mat-select
             ></mat-form-field
           >
           <mat-form-field appearance="outline">
-            <mat-label>Document kind</mat-label>
+            <mat-label>{{ 'procedures.upload.fields.kind' | transloco }}</mat-label>
             <mat-select formControlName="kind">
-              <mat-option value="procedure">Procedure</mat-option>
-              <mat-option value="policy">Policy</mat-option>
-              <mat-option value="product-card">Product card</mat-option>
-              <mat-option value="product-catalog">Product catalog</mat-option>
+              <mat-option value="procedure">{{
+                'procedures.kind.procedure' | transloco
+              }}</mat-option>
+              <mat-option value="policy">{{ 'procedures.kind.policy' | transloco }}</mat-option>
+              <mat-option value="product-card">{{
+                'procedures.kind.productCard' | transloco
+              }}</mat-option>
+              <mat-option value="product-catalog">
+                {{ 'procedures.kind.productCatalog' | transloco }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline">
-            <mat-label>Origin</mat-label>
+            <mat-label>{{ 'procedures.upload.fields.origin' | transloco }}</mat-label>
             <mat-select formControlName="origin">
-              <mat-option value="synthetic">Synthetic demo</mat-option>
-              <mat-option value="official">Official</mat-option>
-              <mat-option value="public-compilation">Unofficial public compilation</mat-option>
+              <mat-option value="synthetic">{{
+                'procedures.origin.synthetic' | transloco
+              }}</mat-option>
+              <mat-option value="official">{{
+                'procedures.origin.official' | transloco
+              }}</mat-option>
+              <mat-option value="public-compilation">
+                {{ 'procedures.origin.publicCompilation' | transloco }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
           @if (form.controls.origin.value === 'public-compilation') {
             <mat-form-field appearance="outline"
-              ><mat-label>Provenance URLs (one per line)</mat-label
+              ><mat-label>{{ 'procedures.upload.fields.urls' | transloco }}</mat-label
               ><textarea matInput rows="3" formControlName="sourceUrls"></textarea>
             </mat-form-field>
             <mat-form-field appearance="outline"
-              ><mat-label>Observed on</mat-label
+              ><mat-label>{{ 'procedures.upload.fields.observedOn' | transloco }}</mat-label
               ><input matInput type="date" formControlName="observedOn"
             /></mat-form-field>
           }
         </form>
       } @else {
         <p>
-          Choose the original PDF for {{ facade.data.resume.title }} ·
-          {{ facade.data.resume.version }}. It must match the registered SHA-256 fingerprint.
+          {{
+            'procedures.upload.resumeIntro'
+              | transloco: { title: facade.data.resume.title, version: facade.data.resume.version }
+          }}
         </p>
       }
       <app-pdf-dropzone
-        [prompt]="facade.data.resume ? 'Select the matching PDF' : 'Drag a PDF here or browse'"
+        [prompt]="facade.data.resume ? ('procedures.upload.matchingPdf' | transloco) : ''"
         [fileName]="facade.fileName()"
         [disabled]="facade.busy()"
         (filesSelected)="facade.selectFiles($event)"
       />
       @if (facade.registered()) {
         <p role="status">
-          Version {{ facade.registered()!.versionId }} is registered. Uploading the matching
-          original queues extraction; it does not publish the document.
+          {{ 'procedures.upload.registered' | transloco: { id: facade.registered()!.versionId } }}
         </p>
       }
-      @if (facade.error()) {
-        <p class="error" role="alert">{{ facade.error() }}</p>
+      @if (facade.error(); as error) {
+        <p class="error" role="alert">{{ error.key | transloco: error.params }}</p>
       }
       <mat-progress-bar
         *appDelayedLoading="facade.busy()"
         mode="indeterminate"
-        aria-label="Registering or uploading PDF"
+        [attr.aria-label]="'procedures.upload.progress' | transloco"
       />
     </mat-dialog-content>
     <mat-dialog-actions align="end"
-      ><button mat-button mat-dialog-close [disabled]="facade.busy()">Cancel</button
+      ><button mat-button mat-dialog-close [disabled]="facade.busy()">
+        {{ 'common.actions.cancel' | transloco }}</button
       ><button mat-flat-button [disabled]="facade.busy() || !facade.fileName()" (click)="submit()">
-        {{ facade.submitLabel() }}
+        {{ facade.submitLabelKey() | transloco }}
       </button></mat-dialog-actions
     >
   `,
@@ -211,6 +219,13 @@ export class DocumentUploadDialogComponent {
       );
       this.form.disable({ emitEvent: false });
     });
+  }
+  titleKey(): string {
+    if (this.facade.data.resume) return 'procedures.upload.title.resume';
+    if (this.facade.recoveredRegistration()) return 'procedures.upload.title.recover';
+    return this.facade.data.replaceTarget
+      ? 'procedures.upload.title.replace'
+      : 'procedures.upload.title.add';
   }
   submit(): void {
     if (!this.facade.data.resume && !this.facade.unknownRegistration() && !this.form.valid) {

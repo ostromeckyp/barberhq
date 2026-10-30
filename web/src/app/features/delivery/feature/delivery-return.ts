@@ -25,7 +25,7 @@ export function deliveryReturn(
   query: { get(name: string): string | null },
   member: Membership,
   workspace: Workspace | undefined,
-): { commands: string[]; label: string; queryParams?: Record<string, string | number> } | null {
+): { commands: string[]; labelKey: string; queryParams?: Record<string, string | number> } | null {
   const issueId = query.get('issueId'),
     salon = query.get('salonId');
   if (
@@ -37,7 +37,7 @@ export function deliveryReturn(
     if (query.get('workspace') === 'HQ' && member.role === 'HQ' && workspace?.kind === 'HQ')
       return {
         commands: ['/hq', 'delivery-issues', issueId],
-        label: 'Delivery issue',
+        labelKey: 'procedures.back.deliveryIssue',
         ...(deliveryIssueQuery(query) ? { queryParams: deliveryIssueQuery(query) } : {}),
       };
     if (
@@ -45,7 +45,10 @@ export function deliveryReturn(
       workspace?.kind === 'SALON' &&
       workspace.salonId === salon
     )
-      return { commands: ['/salons', salon, 'delivery-issues', issueId], label: 'Delivery issue' };
+      return {
+        commands: ['/salons', salon, 'delivery-issues', issueId],
+        labelKey: 'procedures.back.deliveryIssue',
+      };
     return null;
   }
   const salonId = query.get('salonId'),
@@ -61,7 +64,7 @@ export function deliveryReturn(
     return null;
   return {
     commands: ['/salons', salonId, 'requests', requestId, 'receipt'],
-    label: 'Check delivery',
+    labelKey: 'procedures.back.checkDelivery',
     ...(deliveryReceiptQuery(query) ? { queryParams: deliveryReceiptQuery(query) } : {}),
   };
 }

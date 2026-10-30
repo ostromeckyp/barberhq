@@ -14,7 +14,7 @@ const query = new URLSearchParams({
 it('returns to an authorized receipt only in its current salon workspace', () => {
   expect(deliveryReturn(query, member, { kind: 'SALON', salonId: 'salon' })).toEqual({
     commands: ['/salons', 'salon', 'requests', 'request', 'receipt'],
-    label: 'Check delivery',
+    labelKey: 'procedures.back.checkDelivery',
   });
   expect(deliveryReturn(query, member, { kind: 'HQ' })).toBeNull();
   expect(
@@ -38,14 +38,14 @@ it('returns an HQ issue PDF to the verified HQ workspace only', () => {
   const hq = { ...member, role: 'HQ' as const };
   expect(deliveryReturn(q, hq, { kind: 'HQ' })).toEqual({
     commands: ['/hq', 'delivery-issues', 'issue'],
-    label: 'Delivery issue',
+    labelKey: 'procedures.back.deliveryIssue',
   });
   expect(deliveryReturn(q, hq, { kind: 'SALON', salonId: 'salon' })).toBeNull();
   expect(deliveryReturn(q, member, { kind: 'HQ' })).toBeNull();
   q.set('workspace', 'SALON');
   expect(deliveryReturn(q, member, { kind: 'SALON', salonId: 'salon' })).toEqual({
     commands: ['/salons', 'salon', 'delivery-issues', 'issue'],
-    label: 'Delivery issue',
+    labelKey: 'procedures.back.deliveryIssue',
   });
 });
 
@@ -60,7 +60,7 @@ it('preserves only normalized receipt list context through a PDF return', () => 
   });
   expect(deliveryReturn(q, member, { kind: 'SALON', salonId: 'salon' })).toEqual({
     commands: ['/salons', 'salon', 'requests', 'request', 'receipt'],
-    label: 'Check delivery',
+    labelKey: 'procedures.back.checkDelivery',
     queryParams: { filter: 'ACTIVE', offset: 20 },
   });
   q.set('filter', 'invented');

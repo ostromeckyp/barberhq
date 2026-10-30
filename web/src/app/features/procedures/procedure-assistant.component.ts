@@ -22,11 +22,11 @@ import { CitedAnswerComponent } from './cited-answer.component';
     TranslocoPipe,
   ],
   template: `
-    <section class="assistant" aria-label="Procedure assistant">
+    <section class="assistant" [attr.aria-label]="'procedures.assistant.label' | transloco">
       @let example = 'procedures.assistant.examples.damaged' | transloco;
       <form (ngSubmit)="facade.submit()">
         <mat-form-field appearance="outline">
-          <mat-label>Question</mat-label>
+          <mat-label>{{ 'procedures.assistant.question' | transloco }}</mat-label>
           <textarea
             matInput
             rows="2"
@@ -34,7 +34,7 @@ import { CitedAnswerComponent } from './cited-answer.component';
             maxlength="1000"
             [ngModel]="facade.question()"
             (ngModelChange)="facade.question.set($event)"
-            placeholder="Describe what happened"
+            [placeholder]="'procedures.assistant.placeholder' | transloco"
           ></textarea>
         </mat-form-field>
         <div class="actions">
@@ -49,29 +49,29 @@ import { CitedAnswerComponent } from './cited-answer.component';
           </button>
           <span class="spacer"></span>
           <button mat-button type="button" [disabled]="facade.loading()" (click)="facade.reset()">
-            Clear
+            {{ 'procedures.assistant.clear' | transloco }}
           </button>
           <button mat-flat-button type="submit" [disabled]="!facade.canSubmit()">
-            <mat-icon aria-hidden="true">search</mat-icon>Ask assistant
+            <mat-icon aria-hidden="true">search</mat-icon
+            >{{ 'procedures.assistant.ask' | transloco }}
           </button>
         </div>
       </form>
       @if (!facade.result() && !facade.loading() && !facade.error()) {
         <p class="initial">
           <mat-icon aria-hidden="true">info</mat-icon
-          ><span
-            >Ask about a delivery problem. Each step links to its source document, version and page.
-            A new question replaces the current answer.</span
-          >
+          ><span>{{ 'procedures.assistant.intro' | transloco }}</span>
         </p>
       }
       <p *appDelayedLoading="facade.loading()" role="status" class="state">
-        Looking for supporting procedure sources…
+        {{ 'procedures.assistant.searching' | transloco }}
       </p>
-      @if (facade.error()) {
+      @if (facade.error(); as error) {
         <div role="alert" class="error">
-          <p>{{ facade.error() }}</p>
-          <button mat-stroked-button type="button" (click)="facade.submit()">Try again</button>
+          <p>{{ error.key | transloco: error.params }}</p>
+          <button mat-stroked-button type="button" (click)="facade.submit()">
+            {{ 'procedures.assistant.tryAgain' | transloco }}
+          </button>
         </div>
       }
       @if (facade.result(); as result) {
@@ -82,13 +82,13 @@ import { CitedAnswerComponent } from './cited-answer.component';
             }
             @case ('NEEDS_CLARIFICATION') {
               <section class="state">
-                <h2>More detail needed</h2>
+                <h2>{{ 'procedures.assistant.clarification.title' | transloco }}</h2>
                 <p>{{ result.question }}</p>
               </section>
             }
             @case ('INSUFFICIENT_EVIDENCE') {
               <section class="state">
-                <h2>No supported answer</h2>
+                <h2>{{ 'procedures.assistant.noAnswer.title' | transloco }}</h2>
                 <p>{{ result.message }}</p>
               </section>
             }

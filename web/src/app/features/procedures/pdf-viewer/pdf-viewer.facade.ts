@@ -5,6 +5,8 @@ import type {
   DocumentSource,
   SourceSection,
 } from '../../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
+import { TranslatedError, translatedErrorText } from '../translated-error';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
@@ -26,7 +28,9 @@ export class PdfViewerFacade {
       ? deliveryReturn(query, state.membership, this.workspace.workspace())
       : null;
   });
-  readonly backLabel = computed(() => this.deliveryBack()?.label ?? 'Procedures');
+  readonly backLabelKey = computed(
+    () => this.deliveryBack()?.labelKey ?? 'procedures.back.procedures',
+  );
   private readonly params = toSignal(this.route.paramMap);
   private readonly query = toSignal(this.route.queryParamMap);
   private readonly renderer = new PdfRenderer();
@@ -47,7 +51,7 @@ export class PdfViewerFacade {
   );
   readonly loading = signal(true);
   readonly rendering = signal(false);
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   readonly page = signal(1);
   readonly zoom = signal(1);
   readonly rotation = signal(0);
@@ -124,18 +128,19 @@ export class PdfViewerFacade {
     const abort = new AbortController();
     this.abort = abort;
     this.loading.set(true);
-    this.error.set('');
+    this.error.set(null);
     try {
       const source = chunkId
         ? await this.api.getSource(versionId, chunkId)
         : await this.api.getSource(versionId);
       if (generation !== this.generation) return;
       if (source.businessId !== membership.businessId)
-        throw new Error('Source is unavailable or access was denied.');
+        throw new TranslatedError({ key: 'procedures.viewer.errors.unavailable' });
       const page = chunkId
         ? (source as SourceSection).physicalPage
         : this.validPage(requestedPage, source.pageCount);
-      if (page < 1 || page > source.pageCount) throw new Error('Source page is unavailable.');
+      if (page < 1 || page > source.pageCount)
+        throw new TranslatedError({ key: 'procedures.viewer.errors.pageUnavailable' });
       if (!reuse) {
         const bytes = await this.api.getPdf(versionId, abort.signal);
         if (generation !== this.generation) {
@@ -153,7 +158,7 @@ export class PdfViewerFacade {
         };
       }
       if (this.renderer.pageCount !== source.pageCount)
-        throw new Error('PDF page count does not match the source record.');
+        throw new TranslatedError({ key: 'procedures.viewer.errors.pageCount' });
       this.source.set(source);
       this.page.set(page);
       if (!reuse) {
@@ -164,7 +169,7 @@ export class PdfViewerFacade {
     } catch (error) {
       if (generation === this.generation) {
         this.releasePdf();
-        this.error.set(error instanceof Error ? error.message : 'Source could not be opened.');
+        this.error.set(translatedErrorText(error, { key: 'procedures.viewer.errors.openFailed' }));
       }
     } finally {
       if (generation === this.generation) this.loading.set(false);
@@ -198,10 +203,12 @@ export class PdfViewerFacade {
       if (generation !== this.renderGeneration) return;
       this.viewport.set({ width: result.width, height: result.height });
       this.overlay.set(result.rects);
-      this.error.set('');
+      this.error.set(null);
     } catch (error) {
       if (generation === this.renderGeneration)
-        this.error.set(error instanceof Error ? error.message : 'Page could not be rendered.');
+        this.error.set(
+          translatedErrorText(error, { key: 'procedures.viewer.errors.renderFailed' }),
+        );
     } finally {
       if (generation === this.renderGeneration) this.rendering.set(false);
     }

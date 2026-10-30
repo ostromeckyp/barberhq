@@ -1,13 +1,24 @@
-import { knowledgeProvenanceLabel } from '../../../../../shared/knowledge-metadata';
-import { DatePipe } from '@angular/common';
+import { AppDatePipe } from '../../shared/ui/app-date.pipe';
+import { provenanceKey } from './provenance-key';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import type { DocumentRow } from '../../../../../shared/contracts/knowledge/index';
 
+const statusKeys: Record<DocumentRow['status'], string> = {
+  STAGED: 'procedures.row.status.STAGED',
+  EXTRACTED: 'procedures.row.status.EXTRACTED',
+  NEEDS_REVIEW: 'procedures.row.status.NEEDS_REVIEW',
+  FAILED: 'procedures.row.status.FAILED',
+  REVIEWED: 'procedures.row.status.REVIEWED',
+  EMBEDDED: 'procedures.row.status.EMBEDDED',
+  READY: 'procedures.row.status.READY',
+};
+
 @Component({
   selector: 'app-document-row',
-  imports: [DatePipe, MatButtonModule, MatIconModule],
+  imports: [AppDatePipe, MatButtonModule, MatIconModule, TranslocoPipe],
   template: `
     <article class="document-row">
       <div class="identity">
@@ -15,31 +26,35 @@ import type { DocumentRow } from '../../../../../shared/contracts/knowledge/inde
         <div class="document-name">
           <h3>{{ row().title }}</h3>
           <div class="labels">
-            <span class="label synthetic">{{ provenanceLabel(row()) }}</span>
+            <span class="label synthetic">{{ provenanceKey(row()) | transloco }}</span>
             @if (row().revokedAt) {
-              <span class="label withdrawn">Withdrawn</span>
+              <span class="label withdrawn">{{ 'procedures.row.withdrawn' | transloco }}</span>
             } @else if (row().superseded) {
-              <span class="label">Superseded</span>
+              <span class="label">{{ 'procedures.row.superseded' | transloco }}</span>
             } @else if (row().publishedAt) {
-              <span class="label current">Current</span>
+              <span class="label current">{{ 'procedures.row.current' | transloco }}</span>
             } @else {
-              <span class="label">{{ statusLabel() }}</span>
+              <span class="label">{{ statusKey() | transloco }}</span>
             }
           </div>
         </div>
       </div>
       <dl class="metadata">
         <div>
-          <dt>Version</dt>
+          <dt>{{ 'procedures.row.version' | transloco }}</dt>
           <dd>{{ row().version }}</dd>
         </div>
         <div>
-          <dt>Pages</dt>
+          <dt>{{ 'procedures.row.pages' | transloco }}</dt>
           <dd>{{ row().pageCount ?? '—' }}</dd>
         </div>
         <div class="date">
-          <dt>{{ row().publishedAt ? 'Published' : 'Added' }}</dt>
-          <dd>{{ row().publishedAt || row().createdAt | date: 'd MMM y' : 'UTC' }}</dd>
+          <dt>
+            {{
+              (row().publishedAt ? 'procedures.row.published' : 'procedures.row.added') | transloco
+            }}
+          </dt>
+          <dd>{{ row().publishedAt || row().createdAt | appDate: 'd MMM y' : 'UTC' }}</dd>
         </div>
       </dl>
       <ng-content />
@@ -144,15 +159,14 @@ import type { DocumentRow } from '../../../../../shared/contracts/knowledge/inde
   ],
 })
 export class DocumentRowComponent {
-  readonly provenanceLabel = knowledgeProvenanceLabel;
+  readonly provenanceKey = provenanceKey;
   readonly row = input.required<DocumentRow>();
-  statusLabel(): string {
+  statusKey(): string {
     const row = this.row();
     if (row.status === 'STAGED')
-      return row.pendingStage === 'EXTRACT' ? 'Staged · upload/extraction pending' : 'Staged';
-    if (row.status === 'EXTRACTED') return 'Review required';
-    if (row.status === 'NEEDS_REVIEW') return 'Needs review';
-    if (row.status === 'FAILED') return 'Failed';
-    return row.status.replaceAll('_', ' ').toLowerCase();
+      return row.pendingStage === 'EXTRACT'
+        ? 'procedures.row.status.stagedPending'
+        : 'procedures.row.status.STAGED';
+    return statusKeys[row.status];
   }
 }

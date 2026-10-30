@@ -5,6 +5,8 @@ import type {
   DocumentRow,
   VersionStatus,
 } from '../../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
+import { TranslatedError, translatedErrorText } from '../translated-error';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -32,7 +34,7 @@ export class DocumentUploadFacade {
   private readonly context = inject(SalonContext);
   readonly busy = signal(false);
   readonly fileName = signal('');
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   readonly registered = signal<DocumentRow | VersionStatus | null>(this.data.resume ?? null);
   readonly unknownRegistration = signal(false);
   readonly recoveredRegistration = signal<CreateDocumentRequest | null>(null);
@@ -85,28 +87,28 @@ export class DocumentUploadFacade {
     });
   }
 
-  submitLabel(): string {
-    if (this.busy()) return 'Working…';
-    if (this.registered()) return 'Upload same version';
-    if (this.unknownRegistration()) return 'Retry same registration';
-    return 'Register and upload';
+  submitLabelKey(): string {
+    if (this.busy()) return 'procedures.upload.submit.working';
+    if (this.registered()) return 'procedures.upload.submit.uploadSame';
+    if (this.unknownRegistration()) return 'procedures.upload.submit.retryRegistration';
+    return 'procedures.upload.submit.register';
   }
   selectFiles(files: FileList | readonly File[] | null): void {
     const file = files?.[0];
     this.file = undefined;
     this.fileName.set('');
-    this.error.set('');
+    this.error.set(null);
     if (files && files.length > 1) {
-      this.error.set('Choose one PDF file at a time.');
+      this.error.set({ key: 'procedures.upload.errors.oneFile' });
       return;
     }
     if (!file) return;
     if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) {
-      this.error.set('Choose a PDF file.');
+      this.error.set({ key: 'procedures.upload.errors.notPdf' });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      this.error.set('The PDF exceeds the 10 MiB limit.');
+      this.error.set({ key: 'procedures.errors.pdfTooLarge' });
       return;
     }
     this.file = file;
@@ -115,7 +117,7 @@ export class DocumentUploadFacade {
 
   async submit(value: UploadFormValue): Promise<void> {
     if (!this.file || this.busy()) return;
-    this.error.set('');
+    this.error.set(null);
     this.busy.set(true);
     this.ref.disableClose = true;
     try {
@@ -123,20 +125,18 @@ export class DocumentUploadFacade {
       if (this.cancelled) return;
       if (this.data.resume) {
         if (sha256 !== this.data.resume.pdfSha256)
-          throw new Error('Choose the original PDF with the registered SHA-256 fingerprint.');
+          throw new TranslatedError({ key: 'procedures.upload.errors.fingerprint' });
         await this.upload(this.data.resume.versionId);
         return;
       }
       if (this.registered()) {
         if (this.frozen?.sha256 && sha256 !== this.frozen.sha256)
-          throw new Error('Choose the same PDF that was registered.');
+          throw new TranslatedError({ key: 'procedures.upload.errors.samePdf' });
         await this.upload(this.registered()!.versionId);
         return;
       }
       if (this.frozen && sha256 !== this.frozen.sha256)
-        throw new Error(
-          'Choose the PDF from the unresolved registration. Its version identity is frozen.',
-        );
+        throw new TranslatedError({ key: 'procedures.upload.errors.frozen' });
       const urls = value.sourceUrls
         .split(/\r?\n/)
         .map((url) => url.trim())
@@ -146,7 +146,7 @@ export class DocumentUploadFacade {
         value.origin === 'public-compilation' &&
         (!urls.length || !value.observedOn)
       )
-        throw new Error('Public compilations require source URLs and an observation date.');
+        throw new TranslatedError({ key: 'procedures.upload.errors.publicSources' });
       this.frozen ??= Object.freeze({
         title: value.title.trim(),
         language: value.language,
@@ -191,7 +191,7 @@ export class DocumentUploadFacade {
     if (!this.file) return;
     const expectedHash = this.data.resume?.pdfSha256 ?? this.frozen?.sha256;
     if (expectedHash && (await this.api.hashPdf(this.file)) !== expectedHash)
-      throw new Error('Choose the same PDF that was registered.');
+      throw new TranslatedError({ key: 'procedures.upload.errors.samePdf' });
     this.uploadAbort = new AbortController();
     const status = await this.api.uploadPdf(versionId, this.file, this.uploadAbort.signal);
     if (this.cancelled) return;
@@ -205,19 +205,19 @@ export class DocumentUploadFacade {
   private code(error: unknown): string {
     return typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
   }
-  private message(error: unknown): string {
+  private message(error: unknown): TranslatedText {
     const code = this.code(error);
     if (this.isUnknown(error))
-      return this.registered()
-        ? 'The upload result could not be confirmed. Retry this same version with the same PDF.'
-        : 'The registration result could not be confirmed. Retry the same registration; it keeps the same version request.';
-    if (code === 'UPLOAD_TOO_LARGE') return 'The PDF exceeds the 10 MiB limit.';
-    if (code === 'INVALID_PDF') return 'Choose a readable, text-supported PDF.';
+      return {
+        key: this.registered()
+          ? 'procedures.upload.errors.uploadUnconfirmed'
+          : 'procedures.upload.errors.registrationUnconfirmed',
+      };
+    if (code === 'UPLOAD_TOO_LARGE') return { key: 'procedures.errors.pdfTooLarge' };
+    if (code === 'INVALID_PDF') return { key: 'procedures.upload.errors.invalidPdf' };
     if (code === 'STALE_STATE' || code === 'VERSION_CONFLICT')
-      return 'The document changed. Close this dialog and refresh before replacing it.';
-    return error instanceof Error
-      ? error.message
-      : 'The document could not be uploaded. Please retry.';
+      return { key: 'procedures.upload.errors.stale' };
+    return translatedErrorText(error, { key: 'procedures.upload.errors.default' });
   }
   private restorePendingRegistration(): void {
     try {

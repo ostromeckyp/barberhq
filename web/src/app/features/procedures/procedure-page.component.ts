@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +20,7 @@ import { AssistantFacade } from './assistant.facade';
     MatButtonModule,
     DocumentLibraryComponent,
     ProcedureAssistantComponent,
+    TranslocoPipe,
   ],
   template: `
     @if (assistantEnabled) {
@@ -31,24 +33,25 @@ import { AssistantFacade } from './assistant.facade';
               class="app-back-button"
               (click)="backToDelivery()"
             >
-              Back to {{ back.label }}
+              {{ back.labelKey | transloco }}
             </button>
           </div>
         }
         <app-page-header
-          title="Procedures"
-          eyebrow="PROCEDURES"
-          description="Ask the assistant or open a document. Guidance only — nothing here changes stock, files claims or grants replacements."
+          [title]="'procedures.page.title' | transloco"
+          [eyebrow]="'procedures.page.eyebrow' | transloco"
+          [description]="'procedures.page.description' | transloco"
         />
         <mat-tab-group
           [selectedIndex]="selectedIndex()"
           (selectedIndexChange)="selectTab($event)"
-          aria-label="Procedures"
+          [aria-label]="'procedures.page.title' | transloco"
           mat-stretch-tabs="false"
         >
           <mat-tab>
             <ng-template mat-tab-label
-              ><mat-icon aria-hidden="true">auto_awesome</mat-icon>Assistant</ng-template
+              ><mat-icon aria-hidden="true">auto_awesome</mat-icon
+              >{{ 'procedures.page.tabs.assistant' | transloco }}</ng-template
             >
             @if (selectedIndex() === 0) {
               <app-procedure-assistant />
@@ -56,7 +59,8 @@ import { AssistantFacade } from './assistant.facade';
           </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label
-              ><mat-icon aria-hidden="true">folder_open</mat-icon>Documents</ng-template
+              ><mat-icon aria-hidden="true">folder_open</mat-icon
+              >{{ 'procedures.page.tabs.documents' | transloco }}</ng-template
             >
             @if (selectedIndex() === 1) {
               <app-document-library [embedded]="true" />

@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +8,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import type { KnowledgePassageRef } from '../../../../../shared/contracts/product-knowledge/index';
 import { ProductKnowledgeReviewFacade } from './library/product-knowledge-review.facade';
+const linkMethodKeys = {
+  code: 'procedures.product.method.code',
+  model: 'procedures.product.method.model',
+  hq: 'procedures.product.method.hq',
+} as const;
+const aliasSourceKeys = {
+  generated: 'procedures.product.aliasSource.generated',
+  hq: 'procedures.product.aliasSource.hq',
+} as const;
+
 @Component({
   selector: 'app-product-knowledge-review',
   imports: [
@@ -16,11 +27,14 @@ import { ProductKnowledgeReviewFacade } from './library/product-knowledge-review
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    TranslocoPipe,
   ],
   templateUrl: './product-knowledge-review.component.html',
   styleUrl: './product-knowledge-review.component.scss',
 })
 export class ProductKnowledgeReviewComponent {
+  readonly linkMethodKeys = linkMethodKeys;
+  readonly aliasSourceKeys = aliasSourceKeys;
   readonly facade = inject(ProductKnowledgeReviewFacade);
   readonly versionId = input.required<string>();
   readonly disabled = input(false);

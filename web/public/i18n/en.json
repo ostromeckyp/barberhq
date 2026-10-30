@@ -9,7 +9,8 @@
       "label": "Language"
     },
     "actions": {
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "cancel": "Cancel"
     },
     "lowStock": "Low stock",
     "pdfDropzone": {
@@ -109,6 +110,370 @@
         "deliveryDamaged": "Products in the delivery are damaged. What does the procedure say to do?",
         "deliveryMissing": "Products are missing from the delivery. What does the procedure say to do?",
         "deliveryBoth": "Products in the delivery are damaged and some are missing. What does the procedure say to do?"
+      },
+      "label": "Procedure assistant",
+      "question": "Question",
+      "placeholder": "Describe what happened",
+      "clear": "Clear",
+      "ask": "Ask assistant",
+      "intro": "Ask about a delivery problem. Each step links to its source document, version and page. A new question replaces the current answer.",
+      "searching": "Looking for supporting procedure sources…",
+      "tryAgain": "Try again",
+      "clarification": {
+        "title": "More detail needed"
+      },
+      "noAnswer": {
+        "title": "No supported answer"
+      },
+      "errors": {
+        "UNAUTHENTICATED": "Sign in again to ask a procedure question.",
+        "FORBIDDEN": "This procedure is unavailable in the selected workspace.",
+        "VALIDATION_ERROR": "Enter a valid procedure question.",
+        "RATE_LIMITED": "There are too many requests. Please try again later.",
+        "TIMEOUT": "The answer took too long. Please try again.",
+        "UNAVAILABLE": "The assistant is temporarily unavailable. Please try again.",
+        "SOURCE_CHANGED": "The sources changed. Please ask again.",
+        "INVALID_MODEL_OUTPUT": "The answer could not be verified. Please ask again."
+      }
+    },
+    "page": {
+      "title": "Procedures",
+      "eyebrow": "PROCEDURES",
+      "description": "Ask the assistant or open a document. Guidance only — nothing here changes stock, files claims or grants replacements.",
+      "tabs": {
+        "assistant": "Assistant",
+        "documents": "Documents"
+      }
+    },
+    "back": {
+      "checkDelivery": "Back to Check delivery",
+      "deliveryIssue": "Back to Delivery issue",
+      "procedures": "Back to Procedures",
+      "documents": "Back to documents"
+    },
+    "provenance": {
+      "synthetic": {
+        "procedure": "Synthetic demo procedure",
+        "policy": "Synthetic demo policy",
+        "productCard": "Synthetic demo product card",
+        "productCatalog": "Synthetic demo product catalog"
+      },
+      "official": {
+        "procedure": "Official procedure",
+        "policy": "Official policy",
+        "productCard": "Official product card",
+        "productCatalog": "Official product catalog"
+      },
+      "publicCompilation": {
+        "procedure": "Unofficial public procedure compilation",
+        "policy": "Unofficial public policy compilation",
+        "productCard": "Unofficial public product card compilation",
+        "productCatalog": "Unofficial public product catalog compilation"
+      }
+    },
+    "errors": {
+      "pdfTooLarge": "The PDF exceeds the 10 MiB limit."
+    },
+    "library": {
+      "errors": {
+        "FORBIDDEN": "This document is unavailable in the selected workspace.",
+        "UNAUTHENTICATED": "Sign in again to view documents.",
+        "STALE_STATE": "This version changed. Refresh the list and review the current version again.",
+        "VERSION_CONFLICT": "A document version changed. Refresh the list and review its current state before retrying.",
+        "INVALID_PDF": "Choose a readable, text-supported PDF file.",
+        "UNSUPPORTED_PDF": "This PDF layout is not supported. Scanned PDFs cannot be reviewed here.",
+        "OUTCOME_UNKNOWN": "The result is still being confirmed. Retry the same action to check it safely.",
+        "UPLOAD_FAILED": "The operation result could not be confirmed. Retry the same action to check it safely.",
+        "default": "The document could not be updated. Please retry."
+      },
+      "notices": {
+        "withdrawn": "Version withdrawn. Private originals and audit records are retained.",
+        "withdrawalAccepted": "Withdrawal accepted. Refreshing the version access state.",
+        "STAGED": "Processing retry queued for this version.",
+        "EXTRACTED": "Extraction completed. This version is ready for review.",
+        "REVIEWED": "Review completed for this version.",
+        "EMBEDDED": "Document indexing completed for this version.",
+        "READY": "Processing completed successfully for this version.",
+        "NEEDS_REVIEW": "Processing completed. This version needs review.",
+        "FAILED": "Processing failed. Check the version status for details."
+      },
+      "title": "Documents",
+      "eyebrow": "PROCEDURE DOCUMENTS",
+      "intro": "Open authorized procedure and product reference PDFs for this workspace.",
+      "add": "Add document",
+      "loading": "Loading documents…",
+      "retry": "Retry",
+      "empty": {
+        "title": "No documents yet",
+        "hq": "Add a supported PDF to begin a new immutable document version.",
+        "salon": "No published documents are available in this salon workspace."
+      },
+      "versions": "Document versions",
+      "openPdf": "Open PDF",
+      "replacePdf": "Replace PDF",
+      "reviewPublish": "Review and publish",
+      "retryProcessing": "Retry processing",
+      "resumeUpload": "Resume PDF upload",
+      "withdraw": "Withdraw",
+      "pages": "Document pages",
+      "previous": "Previous",
+      "next": "Next",
+      "range": "Versions {{ from }}–{{ to }}"
+    },
+    "row": {
+      "withdrawn": "Withdrawn",
+      "superseded": "Superseded",
+      "current": "Current",
+      "version": "Version",
+      "pages": "Pages",
+      "published": "Published",
+      "added": "Added",
+      "status": {
+        "STAGED": "Staged",
+        "stagedPending": "Staged · upload/extraction pending",
+        "EXTRACTED": "Review required",
+        "NEEDS_REVIEW": "Needs review",
+        "FAILED": "Failed",
+        "REVIEWED": "Reviewed",
+        "EMBEDDED": "Embedded",
+        "READY": "Ready"
+      }
+    },
+    "withdraw": {
+      "title": "Withdraw {{ title }} · {{ version }}",
+      "revokes": "This revokes access to the selected version.",
+      "retained": "Private originals and audit records are retained.",
+      "noRestore": "Withdrawing the current version does not restore an older version.",
+      "confirm": "Withdraw version"
+    },
+    "answer": {
+      "label": "Procedure answer",
+      "syntheticAll": "Synthetic demo procedure — not an actual company policy.",
+      "syntheticSome": "Synthetic demo procedure included — check the origin of each source.",
+      "question": "QUESTION",
+      "whatToDo": "What to do",
+      "openParagraph": "Open paragraph {{ section }} in {{ title }}, version {{ version }}, page {{ page }}",
+      "citation": "[{{ number }}] § {{ section }} · Page {{ page }}",
+      "missingLabel": "Missing information",
+      "missing": "Information still needed",
+      "footer": "Based only on the sources listed. Guidance only: nothing was filed, reserved or changed in stock.",
+      "sourcesLabel": "Supporting sources",
+      "sources": "Sources"
+    },
+    "source": {
+      "panelLabel": "Source {{ number }}: {{ title }}, {{ section }}, page {{ page }}",
+      "versionPage": "Version {{ version }} · Page {{ page }}",
+      "historical": "Historical version · A newer version may be available.",
+      "excerpt": "Excerpt · {{ section }} · Page {{ page }}",
+      "openPdfLabel": "Open PDF for {{ title }}, version {{ version }}, page {{ page }}",
+      "openPdf": "Open PDF at page {{ page }}"
+    },
+    "viewer": {
+      "errors": {
+        "unavailable": "Source is unavailable or access was denied.",
+        "pageUnavailable": "Source page is unavailable.",
+        "pageCount": "PDF page count does not match the source record.",
+        "openFailed": "Source could not be opened.",
+        "renderFailed": "Page could not be rendered."
+      },
+      "opening": "Opening source PDF…",
+      "retry": "Retry",
+      "eyebrow": "SOURCE DOCUMENT",
+      "meta": "Version {{ version }} · {{ language }} · {{ provenance }}",
+      "historical": "This is a historical version. A newer version may be available.",
+      "citedLabel": "Cited passage",
+      "cited": "CITED PASSAGE · PAGE {{ page }}",
+      "noHighlight": "Exact highlight unavailable",
+      "controls": "PDF controls",
+      "previousPage": "Previous page",
+      "previous": "Previous",
+      "pagePrefix": "Page",
+      "pageOf": "of {{ total }}",
+      "nextPage": "Next page",
+      "next": "Next",
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "rotateLabel": "Rotate clockwise",
+      "rotate": "Rotate ↻",
+      "download": "Download PDF",
+      "pageScroll": "PDF page",
+      "canvasLabel": "PDF page {{ page }} of {{ total }}",
+      "readText": "Read page {{ page }} text",
+      "noText": "No extracted text is available for this scanned page.",
+      "rendering": "Rendering page…"
+    },
+    "upload": {
+      "submit": {
+        "working": "Working…",
+        "uploadSame": "Upload same version",
+        "retryRegistration": "Retry same registration",
+        "register": "Register and upload"
+      },
+      "errors": {
+        "oneFile": "Choose one PDF file at a time.",
+        "notPdf": "Choose a PDF file.",
+        "fingerprint": "Choose the original PDF with the registered SHA-256 fingerprint.",
+        "samePdf": "Choose the same PDF that was registered.",
+        "frozen": "Choose the PDF from the unresolved registration. Its version identity is frozen.",
+        "publicSources": "Public compilations require source URLs and an observation date.",
+        "uploadUnconfirmed": "The upload result could not be confirmed. Retry this same version with the same PDF.",
+        "registrationUnconfirmed": "The registration result could not be confirmed. Retry the same registration; it keeps the same version request.",
+        "invalidPdf": "Choose a readable, text-supported PDF.",
+        "stale": "The document changed. Close this dialog and refresh before replacing it.",
+        "default": "The document could not be uploaded. Please retry."
+      },
+      "title": {
+        "resume": "Resume PDF upload",
+        "recover": "Recover registration",
+        "replace": "Replace document PDF",
+        "add": "Add a new document"
+      },
+      "replaceBefore": "This creates a new version for",
+      "replaceAfter": "({{ version }}, document revision {{ revision }}). A stale revision will be rejected; refresh the library and select Replace PDF again.",
+      "intro": "Upload a text-supported PDF. Maximum 10 MiB and 30 physical pages. Scanned PDFs and OCR are not supported.",
+      "unresolved": "The unresolved registration is for",
+      "unresolvedRetry": ". Choose that request’s same PDF and retry; its frozen details and idempotency key will be reused.",
+      "fields": {
+        "title": "Document title",
+        "titleRequired": "A title is required.",
+        "titleLength": "Use 160 characters or fewer.",
+        "language": "Language",
+        "kind": "Document kind",
+        "origin": "Origin",
+        "urls": "Provenance URLs (one per line)",
+        "observedOn": "Observed on"
+      },
+      "resumeIntro": "Choose the original PDF for {{ title }} · {{ version }}. It must match the registered SHA-256 fingerprint.",
+      "matchingPdf": "Select the matching PDF",
+      "registered": "Version {{ id }} is registered. Uploading the matching original queues extraction; it does not publish the document.",
+      "progress": "Registering or uploading PDF"
+    },
+    "language": {
+      "en": "English",
+      "pl": "Polish"
+    },
+    "kind": {
+      "procedure": "Procedure",
+      "policy": "Policy",
+      "productCard": "Product card",
+      "productCatalog": "Product catalog"
+    },
+    "origin": {
+      "synthetic": "Synthetic demo",
+      "official": "Official",
+      "publicCompilation": "Unofficial public compilation"
+    },
+    "review": {
+      "eyebrow": "DOCUMENT REVIEW",
+      "coverage": "{{ checked }} of {{ total }} pages reviewed",
+      "publishedNotice": "Published. This version is read-only; the original PDF and extracted text remain available for reference.",
+      "instruction": "Compare the original PDF and extracted text for every physical page. Checks reflect your review of the rendered original; server review history never checks pages for you.",
+      "navLabel": "Review page navigation",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "Page {{ page }} of {{ total }}",
+      "originalLabel": "Rendered original PDF page",
+      "originalTitle": "Original PDF · page {{ page }}",
+      "canvasLabel": "Rendered original PDF physical page",
+      "rendering": "Rendering original page…",
+      "checkPage": "I checked this original page against its extracted text",
+      "extractedLabel": "Extracted text for the current physical page",
+      "extractedTitle": "Extracted text · page {{ page }}",
+      "qualityComplete": "Text extraction complete",
+      "qualityReview": "This page needs review",
+      "blocked": "This version is not eligible for publication. Refresh the document list or resolve its server processing state.",
+      "retryLoading": "Retry loading review",
+      "retryReview": "Retry review",
+      "footer": "Publication requires the complete extracted page set and an explicit check for each page.",
+      "publish": "Publish version",
+      "retryPublication": "Retry same publication",
+      "loading": "Loading review and original PDF…",
+      "errors": {
+        "FORBIDDEN": "This document review is unavailable in the selected workspace.",
+        "UNAUTHENTICATED": "Sign in again to continue this review.",
+        "loadFailed": "The review and original PDF could not be loaded. Retry to refresh the current version.",
+        "renderFailed": "Original page could not be rendered.",
+        "changed": "The version changed during review. The latest extraction is loaded; review every page again before publishing.",
+        "unconfirmed": "The publication result could not be confirmed. Retry the same publication to check its status safely.",
+        "publishFailed": "The document could not be published. Refresh and review the current version before retrying."
+      },
+      "notices": {
+        "queued": "Publication queued. The server will finish this version in the background.",
+        "serverStatus": "Server status: {{ status }}."
+      }
+    },
+    "product": {
+      "title": "Product knowledge",
+      "intro": "Link exact PDF passages to catalog products. Generated aliases stay proposals until HQ reviews them and publishes this PDF.",
+      "readOnly": "This version is read-only. Use Replace PDF to enrich the next version.",
+      "linkPassage": "Link a source passage",
+      "sourceChunk": "Source chunk",
+      "pagePassage": "Page {{ page }} · {{ text }}",
+      "useWhole": "Use whole chunk",
+      "exactExcerpt": "Exact excerpt from this chunk",
+      "occurs": "This excerpt occurs {{ count }} times. Choose its occurrence.",
+      "occurrence": "Occurrence {{ number }} · {{ start }}",
+      "pasteExact": "Paste an exact excerpt from the selected chunk.",
+      "catalogProduct": "Catalog product",
+      "linkSelected": "Link selected passage",
+      "suggest": "Suggest product",
+      "changeWarning": "Changing or unconfirming a product removes proposals without another confirmed source passage.",
+      "sourcePage": "Source · page {{ page }}",
+      "suggested": "Suggested:",
+      "linkedProduct": "Linked product",
+      "confirm": "Confirm this product and passage",
+      "removeLink": "Remove link",
+      "currentType": "Current type:",
+      "none": "None",
+      "proposed": "Proposed:",
+      "noAssertion": "No new assertion",
+      "proposedType": "Proposed type (optional)",
+      "generate": "Generate aliases for this product",
+      "aliasPhrase": "Alias phrase",
+      "aliasKind": "Kind",
+      "kind": {
+        "name": "Name",
+        "type": "Type",
+        "phonetic": "Phonetic"
+      },
+      "decision": "Decision",
+      "decisions": {
+        "pending": "Pending review",
+        "accepted": "Accept",
+        "rejected": "Reject"
+      },
+      "addAlias": "Add alias manually",
+      "unlinked": "Unlinked passages",
+      "unlinkedHelp": "Save new links first to refresh these ranges. Acknowledge every passage left without product knowledge.",
+      "leaveUnlinked": "Leave this passage unlinked",
+      "noKnowledge": "This catalog intentionally adds no product knowledge",
+      "impact": "Collision impact",
+      "impactCounts": "{{ before }} → {{ after }} products",
+      "ambiguous": "Ambiguous; requires clarification",
+      "noImpact": "No accepted alias changes. Save draft to calculate current impact.",
+      "save": "Save draft and refresh impact",
+      "accept": "Accept product review",
+      "saveFirst": "Save draft before generating or accepting knowledge.",
+      "accepted": "Product review accepted. Publish the PDF below to activate it.",
+      "retry": "Retry same product action",
+      "reloadDiscard": "Reload latest product review and discard local edits",
+      "reload": "Reload product review",
+      "method": {
+        "code": "code",
+        "model": "model",
+        "hq": "HQ"
+      },
+      "aliasSource": {
+        "generated": "generated",
+        "hq": "HQ"
+      },
+      "errors": {
+        "loadFailed": "Product review could not be loaded. Retry loading.",
+        "catalogChanged": "The catalog changed. Your edits are preserved. Save draft again to refresh impact, then review it before accepting.",
+        "reviewChanged": "Another review changed. Your local edits are preserved. Reload the latest product review to discard these local edits deliberately.",
+        "reloadFailed": "The latest review could not be loaded. Your local edits are preserved. Retry Reload to discard them only after the latest review loads.",
+        "generateFailed": "Generation is unavailable. Your draft is preserved; edit manually or retry.",
+        "unconfirmed": "The result could not be confirmed. Retry the same action or refresh the review."
       }
     }
   }

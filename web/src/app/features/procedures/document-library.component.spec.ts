@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 import type { DocumentRow } from '../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../core/models/translated-text';
 import { DocumentLibraryComponent } from './document-library.component';
 import { DocumentLibraryFacade } from './library/document-library.facade';
 
@@ -54,9 +55,9 @@ it('shows a salon the published PDF action without HQ management controls', asyn
     nextOffset: signal(null),
     offset: signal(0),
     loading: signal(false),
-    error: signal(''),
+    error: signal<TranslatedText | null>(null),
     busyVersion: signal(null),
-    notice: signal(''),
+    notice: signal<TranslatedText | null>(null),
     isHqWorkspace: signal(false),
     isSalonWorkspace: signal(true),
     hasMore: signal(false),
@@ -97,9 +98,9 @@ it('offers replacement for failed and withdrawn logical documents with shared de
     nextOffset: signal(null),
     offset: signal(0),
     loading: signal(false),
-    error: signal(''),
+    error: signal<TranslatedText | null>(null),
     busyVersion: signal(null),
-    notice: signal(''),
+    notice: signal<TranslatedText | null>(null),
     isHqWorkspace: signal(true),
     isSalonWorkspace: signal(false),
     hasMore: signal(false),

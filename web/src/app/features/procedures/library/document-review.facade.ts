@@ -6,13 +6,15 @@ import type {
   KnowledgeReview,
   ReviewDocumentInput,
 } from '../../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
+import { translatedErrorText } from '../translated-error';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { PdfRenderer } from '../pdf-viewer/pdf-renderer';
 import { DOCUMENT_PDF_RENDERER } from './document-review-renderer';
 import {
   frozenMatches,
-  loadErrorMessage,
+  loadErrorText,
   persistFrozen,
   readFrozen,
   removeFrozen,
@@ -53,8 +55,8 @@ export class DocumentReviewFacade {
   readonly loading = signal(true);
   readonly rendering = signal(false);
   readonly busy = signal(false);
-  readonly error = signal('');
-  readonly notice = signal('');
+  readonly error = signal<TranslatedText | null>(null);
+  readonly notice = signal<TranslatedText | null>(null);
   readonly currentPage = computed(() =>
     this.review()?.pages.find((page) => page.physicalPage === this.pageNumber()),
   );
@@ -79,8 +81,8 @@ export class DocumentReviewFacade {
         this.productKnowledge?.ready() === true),
   );
   readonly hasFrozen = computed(() => this.frozenCommand() !== undefined);
-  readonly publishLabel = computed(() =>
-    this.frozenCommand() ? 'Retry same publication' : 'Publish version',
+  readonly publishLabelKey = computed(() =>
+    this.frozenCommand() ? 'procedures.review.retryPublication' : 'procedures.review.publish',
   );
 
   refresh(): void {
@@ -147,11 +149,11 @@ export class DocumentReviewFacade {
       await this.renderer.render(canvas, pageNumber, 1, 0, []);
       if (generation !== this.renderGeneration) return;
       this.renderedPages.update((current) => new Set(current).add(pageNumber));
-      this.error.set('');
+      this.error.set(null);
     } catch (error) {
       if (generation === this.renderGeneration)
         this.error.set(
-          error instanceof Error ? error.message : 'Original page could not be rendered.',
+          translatedErrorText(error, { key: 'procedures.review.errors.renderFailed' }),
         );
     } finally {
       if (generation === this.renderGeneration) this.rendering.set(false);
@@ -163,8 +165,8 @@ export class DocumentReviewFacade {
     if (!review || this.published() || (!this.frozenCommand() && !this.canPublish()) || this.busy())
       return;
     this.busy.set(true);
-    this.error.set('');
-    this.notice.set('');
+    this.error.set(null);
+    this.notice.set(null);
     const input =
       this.frozenCommand() ??
       reviewPublishInput(
@@ -180,8 +182,8 @@ export class DocumentReviewFacade {
       removeFrozen(this.frozenStorageKey);
       this.notice.set(
         result.status === 'READY'
-          ? 'Publication queued. The server will finish this version in the background.'
-          : `Server status: ${result.status}.`,
+          ? { key: 'procedures.review.notices.queued' }
+          : { key: 'procedures.review.notices.serverStatus', params: { status: result.status } },
       );
       const id = this.params()?.get('versionId');
       if (id) await this.load(id, false);
@@ -195,19 +197,13 @@ export class DocumentReviewFacade {
         const id = this.params()?.get('versionId');
         if (id) await this.load(id, false);
         if (this.productKnowledge?.workspace()) await this.productKnowledge.refresh();
-        this.error.set(
-          'The version changed during review. The latest extraction is loaded; review every page again before publishing.',
-        );
+        this.error.set({ key: 'procedures.review.errors.changed' });
       } else if (code === 'OUTCOME_UNKNOWN' || code === 'UPLOAD_FAILED') {
-        this.error.set(
-          'The publication result could not be confirmed. Retry the same publication to check its status safely.',
-        );
+        this.error.set({ key: 'procedures.review.errors.unconfirmed' });
       } else {
         this.frozenCommand.set(undefined);
         removeFrozen(this.frozenStorageKey);
-        this.error.set(
-          'The document could not be published. Refresh and review the current version before retrying.',
-        );
+        this.error.set({ key: 'procedures.review.errors.publishFailed' });
       }
     } finally {
       this.busy.set(false);
@@ -240,7 +236,7 @@ export class DocumentReviewFacade {
         previous.extractionHash === review.extractionHash;
       this.publicationAllowed.set(review.publicationAllowed);
       this.published.set(!!review.version.publishedAt && !review.version.revokedAt);
-      if (this.published()) this.notice.set('');
+      if (this.published()) this.notice.set(null);
       if (!unchanged) {
         this.renderGeneration++;
         this.checkedPages.set(new Set());
@@ -265,9 +261,9 @@ export class DocumentReviewFacade {
         }
         this.review.set(review);
       }
-      this.error.set('');
+      this.error.set(null);
     } catch (error) {
-      if (generation === this.generation) this.error.set(loadErrorMessage(error));
+      if (generation === this.generation) this.error.set(loadErrorText(error));
     } finally {
       if (this.fetchingGeneration === generation) this.fetchingGeneration = null;
       if (generation === this.generation) this.loading.set(false);
@@ -286,7 +282,7 @@ export class DocumentReviewFacade {
     this.checkedPages.set(new Set());
     this.renderedPages.set(new Set());
     this.frozenCommand.set(undefined);
-    this.error.set('');
+    this.error.set(null);
     this.loading.set(true);
     this.releasePdf();
   }

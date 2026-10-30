@@ -3,12 +3,13 @@ import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { expect, it, vi } from 'vitest';
 import type { LegacyCreateDocumentInput } from '../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../core/models/translated-text';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
 import { DocumentUploadFacade } from './library/document-upload.facade';
 
 function setup(data: Record<string, unknown> = {}, busy = false) {
   const selected = signal('');
-  const error = signal('');
+  const error = signal<TranslatedText | null>(null);
   const facade = {
     data,
     recoveredRegistration: signal(null),
@@ -17,7 +18,7 @@ function setup(data: Record<string, unknown> = {}, busy = false) {
     registered: signal(null),
     fileName: selected,
     error,
-    submitLabel: () => 'Register and upload',
+    submitLabelKey: () => 'procedures.upload.submit.register',
     selectFiles: vi.fn((files: FileList | readonly File[] | null) => {
       selected.set(files?.[0]?.name ?? '');
     }),
@@ -63,8 +64,8 @@ it('names and locks the frozen fields when recovering a new-document registratio
     busy: signal(false),
     registered: signal(null),
     fileName: signal(''),
-    error: signal(''),
-    submitLabel: () => 'Retry same registration',
+    error: signal<TranslatedText | null>(null),
+    submitLabelKey: () => 'procedures.upload.submit.retryRegistration',
     selectFiles: vi.fn(),
     submit: vi.fn(),
   };
@@ -197,7 +198,7 @@ it('keeps the hidden picker out of the tab order and exposes a visible Browse bu
 
 it('allows choosing the same PDF again after an invalid drop clears selection', () => {
   const selected = signal('');
-  const error = signal('');
+  const error = signal<TranslatedText | null>(null);
   const data = {};
   const facade = {
     data,
@@ -207,15 +208,15 @@ it('allows choosing the same PDF again after an invalid drop clears selection', 
     registered: signal(null),
     fileName: selected,
     error,
-    submitLabel: () => 'Register and upload',
+    submitLabelKey: () => 'procedures.upload.submit.register',
     submit: vi.fn(),
     selectFiles: vi.fn((files: FileList | readonly File[] | null) => {
       selected.set('');
-      error.set('');
+      error.set(null);
       const file = files?.[0];
       if (!file) return;
       if (file.type !== 'application/pdf' || !file.name.endsWith('.pdf')) {
-        error.set('Choose a PDF file.');
+        error.set({ key: 'procedures.upload.errors.notPdf' });
         return;
       }
       selected.set(file.name);

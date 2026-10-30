@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -5,19 +6,23 @@ import type { DocumentRow } from '../../../../../shared/contracts/knowledge/inde
 
 @Component({
   selector: 'app-document-delete-dialog',
-  imports: [MatButtonModule, MatDialogModule],
+  imports: [MatButtonModule, MatDialogModule, TranslocoPipe],
   template: `
-    <h2 mat-dialog-title>Withdraw {{ row.title }} · {{ row.version }}</h2>
+    <h2 mat-dialog-title>
+      {{ 'procedures.withdraw.title' | transloco: { title: row.title, version: row.version } }}
+    </h2>
     <mat-dialog-content>
-      <p>This revokes access to the selected version.</p>
-      <p>Private originals and audit records are retained.</p>
+      <p>{{ 'procedures.withdraw.revokes' | transloco }}</p>
+      <p>{{ 'procedures.withdraw.retained' | transloco }}</p>
       @if (!row.superseded && row.publishedAt) {
-        <p>Withdrawing the current version does not restore an older version.</p>
+        <p>{{ 'procedures.withdraw.noRestore' | transloco }}</p>
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button [mat-dialog-close]="true">Withdraw version</button>
+      <button mat-button mat-dialog-close>{{ 'common.actions.cancel' | transloco }}</button>
+      <button mat-flat-button [mat-dialog-close]="true">
+        {{ 'procedures.withdraw.confirm' | transloco }}
+      </button>
     </mat-dialog-actions>
   `,
   styles: [

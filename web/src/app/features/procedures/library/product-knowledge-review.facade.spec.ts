@@ -122,7 +122,7 @@ it('retains local work after a competing draft save and offers an explicit disca
     saveKnowledgeProductReview: vi.fn().mockRejectedValue({ code: 'STALE_STATE' }),
   });
   await h.facade.save();
-  expect(h.facade.error()).toContain('discard');
+  expect(h.facade.error()).toEqual({ key: 'procedures.product.errors.reviewChanged' });
   expect(h.facade.review()?.profiles[0]?.type).toBe('Unsaved manual edit');
   await h.facade.refresh();
   expect(h.facade.review()?.revision).toBe(2);

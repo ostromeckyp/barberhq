@@ -1,80 +1,95 @@
 <section class="review" aria-labelledby="review-title">
   <div class="app-back-navigation">
     <button mat-stroked-button type="button" class="app-back-button" (click)="facade.back()">
-      Back to documents
+      {{ 'procedures.back.documents' | transloco }}
     </button>
   </div>
   @if (facade.review(); as data) {
     <header class="review-header">
       <div>
         <p class="eyebrow">
-          DOCUMENT REVIEW · {{ data.version.version }} · {{ data.version.language.toUpperCase() }}
+          {{ 'procedures.review.eyebrow' | transloco }} · {{ data.version.version }} ·
+          {{ data.version.language.toUpperCase() }}
         </p>
         <h1 id="review-title">{{ data.version.title }}</h1>
-        <p class="badge">{{ provenanceLabel(data.version) }}</p>
+        <p class="badge">{{ provenanceKey(data.version) | transloco }}</p>
       </div>
       @if (!facade.published()) {
         <div class="coverage" aria-live="polite">
-          {{ facade.checkedPages().size }} of {{ facade.totalPages() }} pages reviewed
+          {{
+            'procedures.review.coverage'
+              | transloco: { checked: facade.checkedPages().size, total: facade.totalPages() }
+          }}
         </div>
       }
     </header>
     @if (facade.published()) {
       <p class="notice" role="status">
-        Published. This version is read-only; the original PDF and extracted text remain available
-        for reference.
+        {{ 'procedures.review.publishedNotice' | transloco }}
       </p>
     } @else {
       <p class="instruction">
-        Compare the original PDF and extracted text for every physical page. Checks reflect your
-        review of the rendered original; server review history never checks pages for you.
+        {{ 'procedures.review.instruction' | transloco }}
       </p>
     }
-    <div class="page-controls" role="group" aria-label="Review page navigation">
+    <div
+      class="page-controls"
+      role="group"
+      [attr.aria-label]="'procedures.review.navLabel' | transloco"
+    >
       <button
         mat-stroked-button
         type="button"
         [disabled]="facade.pageNumber() <= 1"
         (click)="facade.pageBy(-1)"
       >
-        Previous page
+        {{ 'procedures.review.previousPage' | transloco }}
       </button>
-      <span aria-live="polite">Page {{ facade.pageNumber() }} of {{ facade.totalPages() }}</span>
+      <span aria-live="polite">{{
+        'procedures.review.pageOf'
+          | transloco: { page: facade.pageNumber(), total: facade.totalPages() }
+      }}</span>
       <button
         mat-stroked-button
         type="button"
         [disabled]="facade.pageNumber() >= facade.totalPages()"
         (click)="facade.pageBy(1)"
       >
-        Next page
+        {{ 'procedures.review.nextPage' | transloco }}
       </button>
     </div>
     <div class="review-grid">
-      <section class="original" aria-label="Rendered original PDF page">
-        <h2>Original PDF · page {{ facade.pageNumber() }}</h2>
+      <section class="original" [attr.aria-label]="'procedures.review.originalLabel' | transloco">
+        <h2>{{ 'procedures.review.originalTitle' | transloco: { page: facade.pageNumber() } }}</h2>
         <div class="page-scroll">
           <div class="page-frame">
-            <canvas #pageCanvas aria-label="Rendered original PDF physical page"></canvas>
+            <canvas
+              #pageCanvas
+              [attr.aria-label]="'procedures.review.canvasLabel' | transloco"
+            ></canvas>
           </div>
         </div>
         <p *appDelayedLoading="facade.rendering()" class="state" role="status">
-          Rendering original page…
+          {{ 'procedures.review.rendering' | transloco }}
         </p>
         @if (!facade.published()) {
           <mat-checkbox
             [checked]="facade.checkedPages().has(facade.pageNumber())"
             [disabled]="!facade.renderedPages().has(facade.pageNumber()) || facade.busy()"
             (change)="facade.togglePage($event.checked)"
-            >I checked this original page against its extracted text</mat-checkbox
+            >{{ 'procedures.review.checkPage' | transloco }}</mat-checkbox
           >
         }
       </section>
-      <section class="extracted" aria-label="Extracted text for the current physical page">
-        <h2>Extracted text · page {{ facade.pageNumber() }}</h2>
+      <section class="extracted" [attr.aria-label]="'procedures.review.extractedLabel' | transloco">
+        <h2>{{ 'procedures.review.extractedTitle' | transloco: { page: facade.pageNumber() } }}</h2>
         @if (facade.currentPage(); as page) {
           <p class="quality">
             {{
-              page.quality === 'COMPLETE' ? 'Text extraction complete' : 'This page needs review'
+              (page.quality === 'COMPLETE'
+                ? 'procedures.review.qualityComplete'
+                : 'procedures.review.qualityReview'
+              ) | transloco
             }}
           </p>
           <pre>{{ page.text }}</pre>
@@ -93,46 +108,49 @@
       />
     }
     @if (facade.published()) {
-      <button mat-stroked-button type="button" (click)="replace()">Replace PDF</button>
+      <button mat-stroked-button type="button" (click)="replace()">
+        {{ 'procedures.library.replacePdf' | transloco }}
+      </button>
     }
     @if (!facade.published() && !facade.publicationAllowed()) {
       <p class="blocked">
-        This version is not eligible for publication. Refresh the document list or resolve its
-        server processing state.
+        {{ 'procedures.review.blocked' | transloco }}
       </p>
     }
-    @if (facade.error()) {
+    @if (facade.error(); as error) {
       <p class="error" role="alert">
-        {{ facade.error() }}
-        <button mat-button type="button" (click)="facade.refresh()">Retry loading review</button>
+        {{ error.key | transloco: error.params }}
+        <button mat-button type="button" (click)="facade.refresh()">
+          {{ 'procedures.review.retryLoading' | transloco }}
+        </button>
       </p>
     }
-    @if (!facade.published() && facade.notice()) {
-      <p class="notice" role="status">{{ facade.notice() }}</p>
+    @if (!facade.published() && facade.notice(); as notice) {
+      <p class="notice" role="status">{{ notice.key | transloco: notice.params }}</p>
     }
     @if (!facade.published()) {
       <footer class="review-footer">
-        <p>
-          Publication requires the complete extracted page set and an explicit check for each page.
-        </p>
+        <p>{{ 'procedures.review.footer' | transloco }}</p>
         <button
           mat-flat-button
           type="button"
           [disabled]="!facade.canPublish() && !facade.hasFrozen()"
           (click)="facade.publish()"
         >
-          {{ facade.publishLabel() }}
+          {{ facade.publishLabelKey() | transloco }}
         </button>
       </footer>
     }
   } @else {
     <p *appDelayedLoading="facade.loading()" class="state" role="status">
-      Loading review and original PDF…
+      {{ 'procedures.review.loading' | transloco }}
     </p>
-    @if (facade.error()) {
+    @if (facade.error(); as error) {
       <p class="error" role="alert">
-        {{ facade.error() }}
-        <button mat-button type="button" (click)="facade.refresh()">Retry review</button>
+        {{ error.key | transloco: error.params }}
+        <button mat-button type="button" (click)="facade.refresh()">
+          {{ 'procedures.review.retryReview' | transloco }}
+        </button>
       </p>
     }
   }

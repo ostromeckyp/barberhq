@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +21,7 @@ import type { DocumentRow } from '../../../../../shared/contracts/knowledge/inde
     MatIconModule,
     DelayedLoadingDirective,
     DocumentRowComponent,
+    TranslocoPipe,
   ],
   templateUrl: './document-library.component.html',
   styleUrl: './document-library.component.scss',

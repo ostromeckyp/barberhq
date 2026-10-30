@@ -1,37 +1,35 @@
 <section class="product-review" aria-labelledby="product-review-title">
-  <h2 id="product-review-title">Product knowledge</h2>
-  <p>
-    Link exact PDF passages to catalog products. Generated aliases stay proposals until HQ reviews
-    them and publishes this PDF.
-  </p>
+  <h2 id="product-review-title">{{ 'procedures.product.title' | transloco }}</h2>
+  <p>{{ 'procedures.product.intro' | transloco }}</p>
   @if (facade.workspace(); as workspace) {
     @if (workspace.readOnly) {
-      <p role="status">This version is read-only. Use Replace PDF to enrich the next version.</p>
+      <p role="status">{{ 'procedures.product.readOnly' | transloco }}</p>
     }
     @if (!workspace.readOnly) {
       <fieldset [disabled]="facade.blocked()" class="passage-editor">
-        <legend>Link a source passage</legend>
+        <legend>{{ 'procedures.product.linkPassage' | transloco }}</legend>
         <mat-form-field appearance="outline"
-          ><mat-label>Source chunk</mat-label
+          ><mat-label>{{ 'procedures.product.sourceChunk' | transloco }}</mat-label
           ><mat-select
             [value]="chunkId()"
             [disabled]="facade.blocked()"
             (selectionChange)="chooseChunk($event.value)"
           >
             @for (p of workspace.passages; track p.ref.chunkId) {
-              <mat-option [value]="p.ref.chunkId"
-                >Page {{ p.physicalPage }} · {{ p.text.slice(0, 65) }}</mat-option
-              >
+              <mat-option [value]="p.ref.chunkId">{{
+                'procedures.product.pagePassage'
+                  | transloco: { page: p.physicalPage, text: p.text.slice(0, 65) }
+              }}</mat-option>
             }
           </mat-select></mat-form-field
         >
         @if (chunk(); as source) {
           <pre class="source">{{ source.text }}</pre>
           <button mat-button type="button" [disabled]="facade.blocked()" (click)="useWholeChunk()">
-            Use whole chunk
+            {{ 'procedures.product.useWhole' | transloco }}
           </button>
           <mat-form-field appearance="outline"
-            ><mat-label>Exact excerpt from this chunk</mat-label
+            ><mat-label>{{ 'procedures.product.exactExcerpt' | transloco }}</mat-label
             ><textarea
               matInput
               #excerptInput
@@ -42,7 +40,7 @@
             ></textarea>
           </mat-form-field>
           @if (occurrences().length > 1) {
-            <p>This excerpt occurs {{ occurrences().length }} times. Choose its occurrence.</p>
+            <p>{{ 'procedures.product.occurs' | transloco: { count: occurrences().length } }}</p>
             @for (start of occurrences(); track start; let index = $index) {
               <button
                 mat-stroked-button
@@ -51,15 +49,17 @@
                 [attr.aria-pressed]="occurrence() === start"
                 (click)="occurrence.set(start)"
               >
-                Occurrence {{ index + 1 }} · {{ start }}
+                {{
+                  'procedures.product.occurrence' | transloco: { number: index + 1, start: start }
+                }}
               </button>
             }
           }
           @if (excerpt() && !occurrences().length) {
-            <p class="error">Paste an exact excerpt from the selected chunk.</p>
+            <p class="error">{{ 'procedures.product.pasteExact' | transloco }}</p>
           }
           <mat-form-field appearance="outline"
-            ><mat-label>Catalog product</mat-label
+            ><mat-label>{{ 'procedures.product.catalogProduct' | transloco }}</mat-label
             ><mat-select
               [value]="productId()"
               [disabled]="facade.blocked()"
@@ -77,38 +77,37 @@
               [disabled]="!selectedPassage() || !productId() || facade.blocked()"
               (click)="link()"
             >
-              Link selected passage</button
+              {{ 'procedures.product.linkSelected' | transloco }}</button
             ><button
               mat-button
               type="button"
               [disabled]="!selectedPassage() || facade.blocked() || facade.dirty()"
               (click)="suggest()"
             >
-              Suggest product
+              {{ 'procedures.product.suggest' | transloco }}
             </button>
           </div>
         }
       </fieldset>
     }
-    <p>
-      Changing or unconfirming a product removes proposals without another confirmed source passage.
-    </p>
+    <p>{{ 'procedures.product.changeWarning' | transloco }}</p>
     @for (link of workspace.review.links; track link.id) {
       <article class="link">
         <h3>
-          Source · page {{ page(link.passage) }} <span class="origin">{{ link.method }}</span>
+          {{ 'procedures.product.sourcePage' | transloco: { page: page(link.passage) } }}
+          <span class="origin">{{ linkMethodKeys[link.method] | transloco }}</span>
         </h3>
         <pre>{{ text(link.passage) }}</pre>
         @if (link.candidateProductIds?.length) {
           <p>
-            Suggested:
+            {{ 'procedures.product.suggested' | transloco }}
             @for (id of link.candidateProductIds; track id) {
               <span>{{ name(id) }} </span>
             }
           </p>
         }
         <mat-form-field appearance="outline"
-          ><mat-label>Linked product</mat-label
+          ><mat-label>{{ 'procedures.product.linkedProduct' | transloco }}</mat-label
           ><mat-select
             [value]="link.productId"
             [disabled]="facade.blocked()"
@@ -124,14 +123,14 @@
             [checked]="link.confirmed"
             [disabled]="facade.blocked() || !link.productId"
             (change)="facade.changeLink(link.id, link.productId ?? '', $event.checked)"
-            >Confirm this product and passage</mat-checkbox
+            >{{ 'procedures.product.confirm' | transloco }}</mat-checkbox
           ><button
             mat-button
             type="button"
             [disabled]="facade.blocked()"
             (click)="facade.removeLink(link.id)"
           >
-            Remove link
+            {{ 'procedures.product.removeLink' | transloco }}
           </button>
         </div>
       </article>
@@ -140,11 +139,13 @@
       <article class="profile">
         <h3>{{ name(id) }}</h3>
         <p>
-          Current type: <strong>{{ currentType(id) || 'None' }}</strong> → Proposed:
-          <strong>{{ profileType(id) || 'No new assertion' }}</strong>
+          {{ 'procedures.product.currentType' | transloco }}
+          <strong>{{ currentType(id) || ('procedures.product.none' | transloco) }}</strong> →
+          {{ 'procedures.product.proposed' | transloco }}
+          <strong>{{ profileType(id) || ('procedures.product.noAssertion' | transloco) }}</strong>
         </p>
         <mat-form-field appearance="outline"
-          ><mat-label>Proposed type (optional)</mat-label
+          ><mat-label>{{ 'procedures.product.proposedType' | transloco }}</mat-label
           ><input
             matInput
             #typeInput
@@ -159,12 +160,12 @@
           [disabled]="facade.blocked() || facade.dirty()"
           (click)="facade.generate(id)"
         >
-          Generate aliases for this product
+          {{ 'procedures.product.generate' | transloco }}
         </button>
         @for (alias of profileAliases(id); track alias.id) {
           <div class="alias-row">
             <mat-form-field appearance="outline"
-              ><mat-label>Alias phrase</mat-label
+              ><mat-label>{{ 'procedures.product.aliasPhrase' | transloco }}</mat-label
               ><input
                 matInput
                 #phrase
@@ -176,40 +177,55 @@
                 "
             /></mat-form-field>
             <mat-form-field appearance="outline"
-              ><mat-label>Kind</mat-label
+              ><mat-label>{{ 'procedures.product.aliasKind' | transloco }}</mat-label
               ><mat-select
                 [value]="alias.kind"
                 [disabled]="facade.blocked()"
                 (selectionChange)="
                   facade.editAlias(id, alias.id, { kind: $event.value, decision: 'pending' })
                 "
-                ><mat-option value="name">Name</mat-option><mat-option value="type">Type</mat-option
-                ><mat-option value="phonetic">Phonetic</mat-option></mat-select
+                ><mat-option value="name">{{
+                  'procedures.product.kind.name' | transloco
+                }}</mat-option
+                ><mat-option value="type">{{
+                  'procedures.product.kind.type' | transloco
+                }}</mat-option
+                ><mat-option value="phonetic">{{
+                  'procedures.product.kind.phonetic' | transloco
+                }}</mat-option></mat-select
               ></mat-form-field
             >
             <mat-form-field appearance="outline"
-              ><mat-label>Language</mat-label
+              ><mat-label>{{ 'procedures.upload.fields.language' | transloco }}</mat-label
               ><mat-select
                 [value]="alias.lang"
                 [disabled]="facade.blocked()"
                 (selectionChange)="
                   facade.editAlias(id, alias.id, { lang: $event.value, decision: 'pending' })
                 "
-                ><mat-option value="pl">Polish</mat-option
-                ><mat-option value="en">English</mat-option></mat-select
+                ><mat-option value="pl">{{ 'procedures.language.pl' | transloco }}</mat-option
+                ><mat-option value="en">{{
+                  'procedures.language.en' | transloco
+                }}</mat-option></mat-select
               ></mat-form-field
             >
             <mat-form-field appearance="outline"
-              ><mat-label>Decision</mat-label
+              ><mat-label>{{ 'procedures.product.decision' | transloco }}</mat-label
               ><mat-select
                 [value]="alias.decision"
                 [disabled]="facade.blocked()"
                 (selectionChange)="facade.editAlias(id, alias.id, { decision: $event.value })"
-                ><mat-option value="pending">Pending review</mat-option
-                ><mat-option value="accepted">Accept</mat-option
-                ><mat-option value="rejected">Reject</mat-option></mat-select
+                ><mat-option value="pending">{{
+                  'procedures.product.decisions.pending' | transloco
+                }}</mat-option
+                ><mat-option value="accepted">{{
+                  'procedures.product.decisions.accepted' | transloco
+                }}</mat-option
+                ><mat-option value="rejected">{{
+                  'procedures.product.decisions.rejected' | transloco
+                }}</mat-option></mat-select
               ></mat-form-field
-            ><small>{{ alias.source }}</small>
+            ><small>{{ aliasSourceKeys[alias.source] | transloco }}</small>
           </div>
         }
         <button
@@ -218,24 +234,23 @@
           [disabled]="facade.blocked()"
           (click)="facade.addAlias(id)"
         >
-          Add alias manually
+          {{ 'procedures.product.addAlias' | transloco }}
         </button>
       </article>
     }
     @if (workspace.review.unlinkedPassages.length) {
-      <h3>Unlinked passages</h3>
-      <p>
-        Save new links first to refresh these ranges. Acknowledge every passage left without product
-        knowledge.
-      </p>
+      <h3>{{ 'procedures.product.unlinked' | transloco }}</h3>
+      <p>{{ 'procedures.product.unlinkedHelp' | transloco }}</p>
       @for (ref of workspace.review.unlinkedPassages; track key(ref)) {
         <div class="unlinked">
-          <pre>Page {{ page(ref) }} · {{ text(ref) }}</pre>
+          <pre>{{
+            'procedures.product.pagePassage' | transloco: { page: page(ref), text: text(ref) }
+          }}</pre>
           <mat-checkbox
             [checked]="acknowledged(ref)"
             [disabled]="facade.blocked()"
             (change)="facade.acknowledge(ref, $event.checked)"
-            >Leave this passage unlinked</mat-checkbox
+            >{{ 'procedures.product.leaveUnlinked' | transloco }}</mat-checkbox
           >
         </div>
       }
@@ -245,24 +260,29 @@
         [checked]="workspace.review.emptyKnowledgeAcknowledged"
         [disabled]="facade.blocked()"
         (change)="facade.acknowledgeEmpty($event.checked)"
-        >This catalog intentionally adds no product knowledge</mat-checkbox
+        >{{ 'procedures.product.noKnowledge' | transloco }}</mat-checkbox
       >
     }
-    <h3>Collision impact</h3>
+    <h3>{{ 'procedures.product.impact' | transloco }}</h3>
     @if (workspace.review.impact.length) {
       <ul>
         @for (impact of workspace.review.impact; track impact.normalized) {
           <li>
             <strong>{{ impact.normalized }}</strong
-            >: {{ impact.beforeProductIds.length }} → {{ impact.afterProductIds.length }} products
+            >:
+            {{
+              'procedures.product.impactCounts'
+                | transloco
+                  : { before: impact.beforeProductIds.length, after: impact.afterProductIds.length }
+            }}
             @if (impact.collision) {
-              <span> · Ambiguous; requires clarification</span>
+              <span> · {{ 'procedures.product.ambiguous' | transloco }}</span>
             }
           </li>
         }
       </ul>
     } @else {
-      <p>No accepted alias changes. Save draft to calculate current impact.</p>
+      <p>{{ 'procedures.product.noImpact' | transloco }}</p>
     }
     @if (!workspace.readOnly) {
       <div class="actions">
@@ -272,7 +292,7 @@
           [disabled]="facade.blocked()"
           (click)="facade.save()"
         >
-          Save draft and refresh impact</button
+          {{ 'procedures.product.save' | transloco }}</button
         ><button
           mat-flat-button
           type="button"
@@ -280,23 +300,23 @@
           [disabled]="!facade.canAccept()"
           (click)="facade.accept()"
         >
-          Accept product review
+          {{ 'procedures.product.accept' | transloco }}
         </button>
       </div>
       @if (facade.dirty()) {
-        <p>Save draft before generating or accepting knowledge.</p>
+        <p>{{ 'procedures.product.saveFirst' | transloco }}</p>
       }
       @if (facade.ready()) {
-        <p role="status">Product review accepted. Publish the PDF below to activate it.</p>
+        <p role="status">{{ 'procedures.product.accepted' | transloco }}</p>
       }
     }
   }
-  @if (facade.error()) {
-    <p role="alert" class="error">{{ facade.error() }}</p>
+  @if (facade.error(); as error) {
+    <p role="alert" class="error">{{ error.key | transloco: error.params }}</p>
   }
   @if (facade.pending() && !facade.busy()) {
     <button mat-stroked-button type="button" (click)="facade.retry()">
-      Retry same product action
+      {{ 'procedures.product.retry' | transloco }}
     </button>
   }
   <button
@@ -306,9 +326,8 @@
     (click)="facade.refresh()"
   >
     {{
-      facade.conflict()
-        ? 'Reload latest product review and discard local edits'
-        : 'Reload product review'
+      (facade.conflict() ? 'procedures.product.reloadDiscard' : 'procedures.product.reload')
+        | transloco
     }}
   </button>
 </section>

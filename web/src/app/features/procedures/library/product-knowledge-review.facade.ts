@@ -9,6 +9,7 @@ import type {
   GenerateKnowledgeProductAliasesInput,
   SuggestKnowledgeProductLinkInput,
 } from '../../../../../../shared/contracts/product-knowledge/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -29,7 +30,7 @@ export class ProductKnowledgeReviewFacade {
   readonly workspace = signal<KnowledgeProductWorkspace | null>(null);
   readonly review = computed(() => this.workspace()?.review ?? null);
   readonly busy = signal(false);
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   readonly dirty = signal(false);
   readonly conflict = signal(false);
   readonly pending = signal<Pending | null>(null);
@@ -87,7 +88,7 @@ export class ProductKnowledgeReviewFacade {
     this.pending.set(null);
     this.dirty.set(false);
     this.conflict.set(false);
-    this.error.set('');
+    this.error.set(null);
     this.busy.set(false);
     this.versionId = '';
   }
@@ -109,10 +110,10 @@ export class ProductKnowledgeReviewFacade {
       this.workspace.set(data);
       this.conflict.set(false);
       this.dirty.set(false);
-      this.error.set('');
+      this.error.set(null);
     } catch {
       if (generation === this.generation)
-        this.error.set('Product review could not be loaded. Retry loading.');
+        this.error.set({ key: 'procedures.product.errors.loadFailed' });
     } finally {
       if (generation === this.generation) this.busy.set(false);
     }
@@ -218,7 +219,7 @@ export class ProductKnowledgeReviewFacade {
     const generation = this.generation;
     this.pending.set(command);
     this.busy.set(true);
-    this.error.set('');
+    this.error.set(null);
     try {
       const result = await (command.action === 'save'
         ? this.api.saveKnowledgeProductReview(command.input)
@@ -253,28 +254,23 @@ export class ProductKnowledgeReviewFacade {
                 reviewedHash: null,
               },
             });
-            this.error.set(
-              'The catalog changed. Your edits are preserved. Save draft again to refresh impact, then review it before accepting.',
-            );
+            this.error.set({ key: 'procedures.product.errors.catalogChanged' });
           } else {
             this.conflict.set(true);
-            this.error.set(
-              'Another review changed. Your local edits are preserved. Reload the latest product review to discard these local edits deliberately.',
-            );
+            this.error.set({ key: 'procedures.product.errors.reviewChanged' });
           }
         } catch {
           if (generation !== this.generation) return;
           this.conflict.set(true);
-          this.error.set(
-            'The latest review could not be loaded. Your local edits are preserved. Retry Reload to discard them only after the latest review loads.',
-          );
+          this.error.set({ key: 'procedures.product.errors.reloadFailed' });
         }
       } else
-        this.error.set(
-          command.action === 'generate'
-            ? 'Generation is unavailable. Your draft is preserved; edit manually or retry.'
-            : 'The result could not be confirmed. Retry the same action or refresh the review.',
-        );
+        this.error.set({
+          key:
+            command.action === 'generate'
+              ? 'procedures.product.errors.generateFailed'
+              : 'procedures.product.errors.unconfirmed',
+        });
     } finally {
       if (generation === this.generation) this.busy.set(false);
     }

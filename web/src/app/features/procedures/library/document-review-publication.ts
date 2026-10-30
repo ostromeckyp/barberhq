@@ -2,6 +2,7 @@ import type {
   KnowledgeReview,
   ReviewDocumentInput,
 } from '../../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import type { SessionState } from '../../../../../../shared/contracts/business/index';
 
 /** A new publish command for every checked page of this review, frozen for a safe retry. */
@@ -25,11 +26,11 @@ export function reviewPublishInput(
 export function reviewErrorCode(error: unknown): string {
   return typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
 }
-export function loadErrorMessage(error: unknown): string {
+export function loadErrorText(error: unknown): TranslatedText {
   const code = reviewErrorCode(error);
-  if (code === 'FORBIDDEN') return 'This document review is unavailable in the selected workspace.';
-  if (code === 'UNAUTHENTICATED') return 'Sign in again to continue this review.';
-  return 'The review and original PDF could not be loaded. Retry to refresh the current version.';
+  if (code === 'FORBIDDEN') return { key: 'procedures.review.errors.FORBIDDEN' };
+  if (code === 'UNAUTHENTICATED') return { key: 'procedures.review.errors.UNAUTHENTICATED' };
+  return { key: 'procedures.review.errors.loadFailed' };
 }
 
 /** Review identity and storage owner for the signed-in member and the routed version. */

@@ -1,3 +1,4 @@
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Component, input, linkedSignal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +15,7 @@ import { SyntheticLabelComponent } from './synthetic-label.component';
     MatExpansionModule,
     MatIconModule,
     SyntheticLabelComponent,
+    TranslocoPipe,
   ],
   template: `
     <mat-expansion-panel
@@ -24,21 +26,24 @@ import { SyntheticLabelComponent } from './synthetic-label.component';
     >
       <mat-expansion-panel-header
         [attr.aria-label]="
-          'Source ' +
-          number() +
-          ': ' +
-          source().title +
-          ', ' +
-          source().sectionId +
-          ', page ' +
-          source().physicalPage
+          'procedures.source.panelLabel'
+            | transloco
+              : {
+                  number: number(),
+                  title: source().title,
+                  section: source().sectionId,
+                  page: source().physicalPage,
+                }
         "
       >
         <mat-panel-title>
           <span class="source-number">{{ number() }}</span>
           <span class="metadata"
             ><strong>{{ source().title }}</strong
-            ><span>Version {{ source().version }} · Page {{ source().physicalPage }}</span
+            ><span>{{
+              'procedures.source.versionPage'
+                | transloco: { version: source().version, page: source().physicalPage }
+            }}</span
             ><span>{{ source().sectionId }}</span></span
           >
         </mat-panel-title>
@@ -49,10 +54,15 @@ import { SyntheticLabelComponent } from './synthetic-label.component';
           ><app-synthetic-label [source]="source()" />
         </div>
         @if (source().superseded) {
-          <p class="history">Historical version · A newer version may be available.</p>
+          <p class="history">{{ 'procedures.source.historical' | transloco }}</p>
         }
         <blockquote>{{ source().excerpt }}</blockquote>
-        <p>Excerpt · {{ source().sectionId }} · Page {{ source().physicalPage }}</p>
+        <p>
+          {{
+            'procedures.source.excerpt'
+              | transloco: { section: source().sectionId, page: source().physicalPage }
+          }}
+        </p>
         <a
           mat-stroked-button
           [routerLink]="['/procedures/sources', source().versionId]"
@@ -62,16 +72,17 @@ import { SyntheticLabelComponent } from './synthetic-label.component';
             returnTo: 'assistant',
           }"
           [attr.aria-label]="
-            'Open PDF for ' +
-            source().title +
-            ', version ' +
-            source().version +
-            ', page ' +
-            source().physicalPage
+            'procedures.source.openPdfLabel'
+              | transloco
+                : {
+                    title: source().title,
+                    version: source().version,
+                    page: source().physicalPage,
+                  }
           "
         >
-          <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>Open PDF at page
-          {{ source().physicalPage }}
+          <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+          {{ 'procedures.source.openPdf' | transloco: { page: source().physicalPage } }}
         </a>
       </div>
     </mat-expansion-panel>

@@ -100,7 +100,7 @@ it('rejects multiple files instead of silently selecting the first PDF', () => {
   ];
   h.facade.selectFiles(files);
   expect(h.facade.fileName()).toBe('');
-  expect(h.facade.error()).toBe('Choose one PDF file at a time.');
+  expect(h.facade.error()).toEqual({ key: 'procedures.upload.errors.oneFile' });
 });
 
 it('rejects a PDF larger than 10 MiB and clears the previous valid selection', () => {
@@ -111,7 +111,7 @@ it('rejects a PDF larger than 10 MiB and clears the previous valid selection', (
   });
   h.facade.selectFiles([oversized]);
   expect(h.facade.fileName()).toBe('');
-  expect(h.facade.error()).toBe('The PDF exceeds the 10 MiB limit.');
+  expect(h.facade.error()).toEqual({ key: 'procedures.errors.pdfTooLarge' });
 });
 
 it('uses the explicitly selected logical document and revision for replacement', async () => {
@@ -330,7 +330,7 @@ it('requires public provenance for every document kind and sends independent can
       sourceUrls: '',
       observedOn: '',
     });
-    expect(facade.error()).toContain('require');
+    expect(facade.error()).toEqual({ key: 'procedures.upload.errors.publicSources' });
     expect(sent).toBeUndefined();
   }
   await facade.submit({ ...form, kind: 'product-card', origin: 'synthetic' });

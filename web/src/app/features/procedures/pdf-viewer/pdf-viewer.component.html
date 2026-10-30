@@ -1,70 +1,88 @@
 <div class="source-viewer">
   <div class="app-back-navigation">
     <button mat-stroked-button type="button" class="app-back-button" (click)="facade.goBack()">
-      Back to {{ facade.backLabel() }}
+      {{ facade.backLabelKey() | transloco }}
     </button>
   </div>
 
-  <p *appDelayedLoading="facade.loading()" class="state" role="status">Opening source PDF…</p>
+  <p *appDelayedLoading="facade.loading()" class="state" role="status">
+    {{ 'procedures.viewer.opening' | transloco }}
+  </p>
   @if (facade.error(); as error) {
     <div class="error" role="alert">
-      <p>{{ error }}</p>
-      <button mat-stroked-button type="button" (click)="facade.retry()">Retry</button>
+      <p>{{ error.key | transloco: error.params }}</p>
+      <button mat-stroked-button type="button" (click)="facade.retry()">
+        {{ 'procedures.viewer.retry' | transloco }}
+      </button>
     </div>
   }
   @if (facade.source(); as source) {
     <header class="source-header">
       <div>
-        <p class="eyebrow">SOURCE DOCUMENT</p>
+        <p class="eyebrow">{{ 'procedures.viewer.eyebrow' | transloco }}</p>
         <h1>{{ source.title }}</h1>
         <p class="metadata">
-          Version {{ source.version }} · {{ source.language }} ·
-          {{ provenanceLabel(source) }}
+          {{
+            'procedures.viewer.meta'
+              | transloco
+                : {
+                    version: source.version,
+                    language: source.language,
+                    provenance: (provenanceKey(source) | transloco),
+                  }
+          }}
         </p>
       </div>
     </header>
     @if (source.superseded) {
-      <p class="notice">This is a historical version. A newer version may be available.</p>
+      <p class="notice">{{ 'procedures.viewer.historical' | transloco }}</p>
     }
     @if (facade.section(); as section) {
-      <aside class="excerpt" aria-label="Cited passage">
-        <p class="eyebrow">CITED PASSAGE · PAGE {{ section.physicalPage }}</p>
+      <aside class="excerpt" [attr.aria-label]="'procedures.viewer.citedLabel' | transloco">
+        <p class="eyebrow">
+          {{ 'procedures.viewer.cited' | transloco: { page: section.physicalPage } }}
+        </p>
         <blockquote>{{ section.excerpt }}</blockquote>
         @if (section.geometryStatus !== 'VERIFIED' || section.rects.length === 0) {
-          <p class="geometry-fallback">Exact highlight unavailable</p>
+          <p class="geometry-fallback">{{ 'procedures.viewer.noHighlight' | transloco }}</p>
         }
       </aside>
     }
-    <div class="toolbar" role="toolbar" aria-label="PDF controls">
+    <div
+      class="toolbar"
+      role="toolbar"
+      [attr.aria-label]="'procedures.viewer.controls' | transloco"
+    >
       <div class="toolbar-group">
         <button
           mat-stroked-button
           type="button"
-          aria-label="Previous page"
+          [attr.aria-label]="'procedures.viewer.previousPage' | transloco"
           [disabled]="facade.page() <= 1"
           (click)="facade.pageBy(-1)"
         >
-          Previous
+          {{ 'procedures.viewer.previous' | transloco }}
         </button>
         <span class="page-counter" aria-live="polite"
-          >Page <span data-testid="pdf-page-number">{{ facade.page() }}</span> of
-          {{ source.pageCount }}</span
+          >{{ 'procedures.viewer.pagePrefix' | transloco }}
+          <span data-testid="pdf-page-number">{{ facade.page() }}</span>
+          {{ 'procedures.viewer.pageOf' | transloco: { total: source.pageCount } }}</span
         >
         <button
           mat-stroked-button
           type="button"
-          aria-label="Next page"
+          [attr.aria-label]="'procedures.viewer.nextPage' | transloco"
           [disabled]="facade.page() >= source.pageCount"
           (click)="facade.pageBy(1)"
         >
-          Next
+          {{ 'procedures.viewer.next' | transloco }}
         </button>
       </div>
       <div class="toolbar-group">
         <button
           mat-stroked-button
           type="button"
-          aria-label="Zoom out"
+          [attr.aria-label]="'procedures.viewer.zoomOut' | transloco"
           [disabled]="facade.zoom() <= 0.5"
           (click)="facade.setZoom(facade.zoom() - 0.25)"
         >
@@ -74,7 +92,7 @@
         <button
           mat-stroked-button
           type="button"
-          aria-label="Zoom in"
+          [attr.aria-label]="'procedures.viewer.zoomIn' | transloco"
           [disabled]="facade.zoom() >= 2"
           (click)="facade.setZoom(facade.zoom() + 0.25)"
         >
@@ -83,15 +101,22 @@
         <button
           mat-stroked-button
           type="button"
-          aria-label="Rotate clockwise"
+          [attr.aria-label]="'procedures.viewer.rotateLabel' | transloco"
           (click)="facade.rotate()"
         >
-          Rotate ↻
+          {{ 'procedures.viewer.rotate' | transloco }}
         </button>
       </div>
-      <button mat-flat-button type="button" (click)="facade.download()">Download PDF</button>
+      <button mat-flat-button type="button" (click)="facade.download()">
+        {{ 'procedures.viewer.download' | transloco }}
+      </button>
     </div>
-    <div class="page-scroll" aria-label="PDF page" tabindex="0" data-testid="pdf-page-scroll">
+    <div
+      class="page-scroll"
+      [attr.aria-label]="'procedures.viewer.pageScroll' | transloco"
+      tabindex="0"
+      data-testid="pdf-page-scroll"
+    >
       <div
         class="page-frame"
         [style.width.px]="facade.viewport()?.width ?? null"
@@ -101,7 +126,10 @@
           #pageCanvas
           data-testid="pdf-page-canvas"
           role="img"
-          [attr.aria-label]="'PDF page ' + facade.page() + ' of ' + source.pageCount"
+          [attr.aria-label]="
+            'procedures.viewer.canvasLabel'
+              | transloco: { page: facade.page(), total: source.pageCount }
+          "
           aria-describedby="pdf-page-transcript"
         ></canvas>
         <div class="highlight-layer" aria-hidden="true">
@@ -119,13 +147,15 @@
       </div>
     </div>
     <details id="pdf-page-transcript" class="page-transcript" data-testid="pdf-page-transcript">
-      <summary>Read page {{ facade.page() }} text</summary>
+      <summary>{{ 'procedures.viewer.readText' | transloco: { page: facade.page() } }}</summary>
       @if (facade.pageText().trim()) {
         <p>{{ facade.pageText() }}</p>
       } @else {
-        <p>No extracted text is available for this scanned page.</p>
+        <p>{{ 'procedures.viewer.noText' | transloco }}</p>
       }
     </details>
-    <p *appDelayedLoading="facade.rendering()" class="rendering" role="status">Rendering page…</p>
+    <p *appDelayedLoading="facade.rendering()" class="rendering" role="status">
+      {{ 'procedures.viewer.rendering' | transloco }}
+    </p>
   }
 </div>

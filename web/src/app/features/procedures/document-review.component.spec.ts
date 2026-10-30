@@ -212,7 +212,7 @@ it('clears page checks and requires a fresh review after a version conflict resp
   expect(h.component.facade.checkedPages().size).toBe(2);
   await h.component.facade.publish();
   expect(h.component.facade.checkedPages().size).toBe(0);
-  expect(h.component.facade.error()).toContain('review every page again');
+  expect(h.component.facade.error()).toEqual({ key: 'procedures.review.errors.changed' });
 });
 
 it('reuses the exact review command and key after an unknown publication result', async () => {
@@ -231,7 +231,7 @@ it('reuses the exact review command and key after an unknown publication result'
   TestBed.tick();
   h.component.facade.togglePage(true);
   await h.component.facade.publish();
-  expect(h.component.facade.publishLabel()).toBe('Retry same publication');
+  expect(h.component.facade.publishLabelKey()).toBe('procedures.review.retryPublication');
   h.fixture.detectChanges();
   expect(h.fixture.nativeElement.textContent).toContain('Retry same publication');
   await h.component.facade.publish();

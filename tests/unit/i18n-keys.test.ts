@@ -5,7 +5,14 @@ import { describe, expect, it } from 'vitest';
 const appRoot = 'web/src/app';
 const i18nRoot = 'web/public/i18n';
 // Areas whose templates must not contain hard-coded text. Each translation task extends it.
-const migratedAreas = ['shell', 'features/login', 'features/auth', 'features/access', 'shared'];
+const migratedAreas = [
+  'shell',
+  'features/login',
+  'features/auth',
+  'features/access',
+  'shared',
+  'features/procedures',
+];
 const namespaces =
   'common|shell|auth|login|access|procedures|replenishment|requests|delivery|salon|hq';
 const keyLiteralPattern = new RegExp(

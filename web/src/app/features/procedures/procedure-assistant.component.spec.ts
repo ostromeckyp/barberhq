@@ -3,10 +3,11 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { expect, it, vi } from 'vitest';
 import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
+import type { TranslatedText } from '../../core/models/translated-text';
 import { AssistantFacade } from './assistant.facade';
 import { ProcedureAssistantComponent } from './procedure-assistant.component';
 
-function render(result: ProcedureResult | null, error = '') {
+function render(result: ProcedureResult | null, error: TranslatedText | null = null) {
   const facade = {
     question: signal('What does the procedure say?'),
     loading: signal(false),
@@ -47,6 +48,6 @@ it('shows a clarification request and operational error as distinct states', () 
   expect(clarified.root.textContent).toContain('Which product was affected?');
   expect(clarified.root.querySelector('app-cited-answer')).toBeNull();
   TestBed.resetTestingModule();
-  const failed = render(null, 'There are too many requests. Please try again later.');
+  const failed = render(null, { key: 'procedures.assistant.errors.RATE_LIMITED' });
   expect(failed.root.querySelector('[role="alert"]')?.textContent).toContain('too many requests');
 });

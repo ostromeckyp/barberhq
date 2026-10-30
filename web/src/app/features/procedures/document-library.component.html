@@ -3,46 +3,52 @@
     <div>
       @if (embedded()) {
         <h2 id="library-title">
-          Documents
+          {{ 'procedures.library.title' | transloco }}
           <span class="document-count" aria-hidden="true">{{ facade.rows().length }}</span>
         </h2>
       } @else {
-        <p class="eyebrow">PROCEDURE DOCUMENTS</p>
-        <h1 id="library-title">Documents</h1>
+        <p class="eyebrow">{{ 'procedures.library.eyebrow' | transloco }}</p>
+        <h1 id="library-title">{{ 'procedures.library.title' | transloco }}</h1>
         <p class="intro">
-          Open authorized procedure and product reference PDFs for this workspace.
+          {{ 'procedures.library.intro' | transloco }}
         </p>
       }
     </div>
     @if (facade.isHqWorkspace()) {
       <button mat-flat-button type="button" (click)="add()">
-        <mat-icon aria-hidden="true">upload_file</mat-icon>Add document
+        <mat-icon aria-hidden="true">upload_file</mat-icon
+        >{{ 'procedures.library.add' | transloco }}
       </button>
     }
   </header>
-  <p *appDelayedLoading="facade.loading()" class="state" role="status">Loading documents…</p>
-  @if (facade.error()) {
+  <p *appDelayedLoading="facade.loading()" class="state" role="status">
+    {{ 'procedures.library.loading' | transloco }}
+  </p>
+  @if (facade.error(); as error) {
     <div class="error" role="alert">
-      <p>{{ facade.error() }}</p>
-      <button mat-stroked-button type="button" (click)="facade.refresh()">Retry</button>
+      <p>{{ error.key | transloco: error.params }}</p>
+      <button mat-stroked-button type="button" (click)="facade.refresh()">
+        {{ 'procedures.library.retry' | transloco }}
+      </button>
     </div>
   }
-  @if (facade.notice()) {
-    <p class="notice" role="status">{{ facade.notice() }}</p>
+  @if (facade.notice(); as notice) {
+    <p class="notice" role="status">{{ notice.key | transloco: notice.params }}</p>
   }
   @if (!facade.loading() && !facade.rows().length && !facade.error()) {
     <div class="empty-state">
-      <h2>No documents yet</h2>
+      <h2>{{ 'procedures.library.empty.title' | transloco }}</h2>
       <p>
         @if (facade.isHqWorkspace()) {
-          Add a supported PDF to begin a new immutable document version.
+          {{ 'procedures.library.empty.hq' | transloco }}
         } @else {
-          No published documents are available in this salon workspace.
+          {{ 'procedures.library.empty.salon' | transloco }}
         }
       </p>
       @if (facade.isHqWorkspace()) {
         <button mat-flat-button type="button" (click)="add()">
-          <mat-icon aria-hidden="true">upload_file</mat-icon>Add document
+          <mat-icon aria-hidden="true">upload_file</mat-icon
+          >{{ 'procedures.library.add' | transloco }}
         </button>
       }
     </div>
@@ -50,7 +56,7 @@
   @if (facade.rows().length) {
     <div
       class="list"
-      aria-label="Document versions"
+      [attr.aria-label]="'procedures.library.versions' | transloco"
       style="--document-library-columns: minmax(0, 1.5fr) minmax(210px, 0.9fr) minmax(0, 1fr)"
     >
       @for (row of facade.rows(); track row.versionId) {
@@ -58,16 +64,21 @@
           <div class="actions">
             @if (row.publishedAt && !row.revokedAt) {
               <button mat-stroked-button type="button" (click)="openPdf(row)">
-                <mat-icon aria-hidden="true">visibility</mat-icon>Open PDF
+                <mat-icon aria-hidden="true">visibility</mat-icon
+                >{{ 'procedures.library.openPdf' | transloco }}
               </button>
             }
             @if (facade.isHqWorkspace()) {
-              <button mat-stroked-button type="button" (click)="replace(row)">Replace PDF</button>
+              <button mat-stroked-button type="button" (click)="replace(row)">
+                {{ 'procedures.library.replacePdf' | transloco }}
+              </button>
               @if (
                 row.status === 'EXTRACTED' ||
                 (row.status === 'READY' && row.errorCode === 'STALE_STATE' && !row.publishedAt)
               ) {
-                <a mat-flat-button [routerLink]="reviewUrl(row)">Review and publish</a>
+                <a mat-flat-button [routerLink]="reviewUrl(row)">{{
+                  'procedures.library.reviewPublish' | transloco
+                }}</a>
               }
               @if (row.retryable) {
                 <button
@@ -76,17 +87,17 @@
                   [disabled]="facade.busyVersion() === row.versionId"
                   (click)="retry(row)"
                 >
-                  Retry processing
+                  {{ 'procedures.library.retryProcessing' | transloco }}
                 </button>
               }
               @if (row.status === 'STAGED' && !row.revokedAt) {
                 <button mat-stroked-button type="button" (click)="resume(row)">
-                  Resume PDF upload
+                  {{ 'procedures.library.resumeUpload' | transloco }}
                 </button>
               }
               @if (!row.revokedAt) {
                 <button mat-button type="button" class="withdraw" (click)="withdraw(row)">
-                  Withdraw
+                  {{ 'procedures.library.withdraw' | transloco }}
                 </button>
               }
             }
@@ -94,23 +105,26 @@
         </app-document-row>
       }
     </div>
-    <nav class="pagination" aria-label="Document pages">
+    <nav class="pagination" [attr.aria-label]="'procedures.library.pages' | transloco">
       <button
         mat-stroked-button
         type="button"
         [disabled]="facade.offset() === 0 || facade.loading()"
         (click)="facade.previous()"
       >
-        Previous
+        {{ 'procedures.library.previous' | transloco }}
       </button>
-      <span>Versions {{ facade.offset() + 1 }}–{{ facade.offset() + facade.rows().length }}</span>
+      <span>{{
+        'procedures.library.range'
+          | transloco: { from: facade.offset() + 1, to: facade.offset() + facade.rows().length }
+      }}</span>
       <button
         mat-stroked-button
         type="button"
         [disabled]="!facade.hasMore() || facade.loading()"
         (click)="facade.next()"
       >
-        Next
+        {{ 'procedures.library.next' | transloco }}
       </button>
     </nav>
   }

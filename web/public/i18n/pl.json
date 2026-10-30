@@ -9,7 +9,8 @@
       "label": "Język"
     },
     "actions": {
-      "signOut": "Wyloguj się"
+      "signOut": "Wyloguj się",
+      "cancel": "Anuluj"
     },
     "lowStock": "Niski stan",
     "pdfDropzone": {
@@ -109,6 +110,370 @@
         "deliveryDamaged": "W dostawie są uszkodzone produkty. Jak postąpić zgodnie z procedurą?",
         "deliveryMissing": "W dostawie brakuje produktów. Jak postąpić zgodnie z procedurą?",
         "deliveryBoth": "W dostawie są uszkodzone produkty i brakuje części produktów. Jak postąpić zgodnie z procedurą?"
+      },
+      "label": "Asystent procedur",
+      "question": "Pytanie",
+      "placeholder": "Opisz, co się stało",
+      "clear": "Wyczyść",
+      "ask": "Zapytaj asystenta",
+      "intro": "Zapytaj o problem z dostawą. Każdy krok odsyła do dokumentu źródłowego, wersji i strony. Nowe pytanie zastępuje bieżącą odpowiedź.",
+      "searching": "Szukam źródeł procedur potwierdzających odpowiedź…",
+      "tryAgain": "Spróbuj ponownie",
+      "clarification": {
+        "title": "Potrzebne więcej szczegółów"
+      },
+      "noAnswer": {
+        "title": "Brak potwierdzonej odpowiedzi"
+      },
+      "errors": {
+        "UNAUTHENTICATED": "Zaloguj się ponownie, aby zadać pytanie o procedurę.",
+        "FORBIDDEN": "Ta procedura jest niedostępna w wybranym obszarze roboczym.",
+        "VALIDATION_ERROR": "Wpisz poprawne pytanie o procedurę.",
+        "RATE_LIMITED": "Zbyt wiele zapytań. Spróbuj ponownie później.",
+        "TIMEOUT": "Odpowiedź trwała zbyt długo. Spróbuj ponownie.",
+        "UNAVAILABLE": "Asystent jest chwilowo niedostępny. Spróbuj ponownie.",
+        "SOURCE_CHANGED": "Źródła uległy zmianie. Zadaj pytanie ponownie.",
+        "INVALID_MODEL_OUTPUT": "Nie udało się zweryfikować odpowiedzi. Zadaj pytanie ponownie."
+      }
+    },
+    "page": {
+      "title": "Procedury",
+      "eyebrow": "PROCEDURY",
+      "description": "Zapytaj asystenta lub otwórz dokument. To tylko wskazówki — nic tutaj nie zmienia stanu magazynowego, nie zgłasza reklamacji ani nie przyznaje wymiany.",
+      "tabs": {
+        "assistant": "Asystent",
+        "documents": "Dokumenty"
+      }
+    },
+    "back": {
+      "checkDelivery": "Wróć do sprawdzenia dostawy",
+      "deliveryIssue": "Wróć do problemu z dostawą",
+      "procedures": "Wróć do procedur",
+      "documents": "Wróć do dokumentów"
+    },
+    "provenance": {
+      "synthetic": {
+        "procedure": "Syntetyczna procedura demonstracyjna",
+        "policy": "Syntetyczna polityka demonstracyjna",
+        "productCard": "Syntetyczna karta produktu demonstracyjna",
+        "productCatalog": "Syntetyczny katalog produktów demonstracyjny"
+      },
+      "official": {
+        "procedure": "Oficjalna procedura",
+        "policy": "Oficjalna polityka",
+        "productCard": "Oficjalna karta produktu",
+        "productCatalog": "Oficjalny katalog produktów"
+      },
+      "publicCompilation": {
+        "procedure": "Nieoficjalna publiczna kompilacja procedur",
+        "policy": "Nieoficjalna publiczna kompilacja polityk",
+        "productCard": "Nieoficjalna publiczna kompilacja kart produktów",
+        "productCatalog": "Nieoficjalna publiczna kompilacja katalogów produktów"
+      }
+    },
+    "errors": {
+      "pdfTooLarge": "Plik PDF przekracza limit 10 MiB."
+    },
+    "library": {
+      "errors": {
+        "FORBIDDEN": "Ten dokument jest niedostępny w wybranym obszarze roboczym.",
+        "UNAUTHENTICATED": "Zaloguj się ponownie, aby wyświetlić dokumenty.",
+        "STALE_STATE": "Ta wersja uległa zmianie. Odśwież listę i sprawdź bieżącą wersję ponownie.",
+        "VERSION_CONFLICT": "Wersja dokumentu uległa zmianie. Odśwież listę i sprawdź jej aktualny stan przed ponowną próbą.",
+        "INVALID_PDF": "Wybierz czytelny plik PDF z obsługiwanym tekstem.",
+        "UNSUPPORTED_PDF": "Ten układ PDF nie jest obsługiwany. Zeskanowanych plików PDF nie można tu sprawdzić.",
+        "OUTCOME_UNKNOWN": "Wynik jest nadal potwierdzany. Ponów tę samą akcję, aby bezpiecznie to sprawdzić.",
+        "UPLOAD_FAILED": "Nie udało się potwierdzić wyniku operacji. Ponów tę samą akcję, aby bezpiecznie to sprawdzić.",
+        "default": "Nie udało się zaktualizować dokumentu. Spróbuj ponownie."
+      },
+      "notices": {
+        "withdrawn": "Wersja wycofana. Prywatne oryginały i zapisy audytu są zachowane.",
+        "withdrawalAccepted": "Wycofanie przyjęte. Odświeżam stan dostępu do wersji.",
+        "STAGED": "Ponowne przetwarzanie tej wersji zostało zakolejkowane.",
+        "EXTRACTED": "Ekstrakcja zakończona. Ta wersja jest gotowa do sprawdzenia.",
+        "REVIEWED": "Sprawdzanie tej wersji zakończone.",
+        "EMBEDDED": "Indeksowanie dokumentu dla tej wersji zakończone.",
+        "READY": "Przetwarzanie tej wersji zakończone pomyślnie.",
+        "NEEDS_REVIEW": "Przetwarzanie zakończone. Ta wersja wymaga sprawdzenia.",
+        "FAILED": "Przetwarzanie nie powiodło się. Szczegóły znajdziesz w statusie wersji."
+      },
+      "title": "Dokumenty",
+      "eyebrow": "DOKUMENTY PROCEDUR",
+      "intro": "Otwórz autoryzowane pliki PDF z procedurami i materiałami o produktach dla tego obszaru roboczego.",
+      "add": "Dodaj dokument",
+      "loading": "Wczytuję dokumenty…",
+      "retry": "Spróbuj ponownie",
+      "empty": {
+        "title": "Brak dokumentów",
+        "hq": "Dodaj obsługiwany plik PDF, aby utworzyć nową, niezmienną wersję dokumentu.",
+        "salon": "W tym obszarze roboczym salonu nie ma opublikowanych dokumentów."
+      },
+      "versions": "Wersje dokumentów",
+      "openPdf": "Otwórz PDF",
+      "replacePdf": "Zastąp PDF",
+      "reviewPublish": "Sprawdź i opublikuj",
+      "retryProcessing": "Ponów przetwarzanie",
+      "resumeUpload": "Wznów wysyłanie PDF",
+      "withdraw": "Wycofaj",
+      "pages": "Strony dokumentów",
+      "previous": "Poprzednie",
+      "next": "Następne",
+      "range": "Wersje {{ from }}–{{ to }}"
+    },
+    "row": {
+      "withdrawn": "Wycofana",
+      "superseded": "Zastąpiona",
+      "current": "Aktualna",
+      "version": "Wersja",
+      "pages": "Strony",
+      "published": "Opublikowano",
+      "added": "Dodano",
+      "status": {
+        "STAGED": "Przygotowana",
+        "stagedPending": "Przygotowana · oczekuje na wysłanie/ekstrakcję",
+        "EXTRACTED": "Wymaga sprawdzenia",
+        "NEEDS_REVIEW": "Do sprawdzenia",
+        "FAILED": "Nie powiodło się",
+        "REVIEWED": "Sprawdzona",
+        "EMBEDDED": "Zindeksowana",
+        "READY": "Gotowa"
+      }
+    },
+    "withdraw": {
+      "title": "Wycofaj {{ title }} · {{ version }}",
+      "revokes": "To odbiera dostęp do wybranej wersji.",
+      "retained": "Prywatne oryginały i zapisy audytu są zachowane.",
+      "noRestore": "Wycofanie bieżącej wersji nie przywraca starszej wersji.",
+      "confirm": "Wycofaj wersję"
+    },
+    "answer": {
+      "label": "Odpowiedź z procedury",
+      "syntheticAll": "Syntetyczna procedura demonstracyjna — to nie jest rzeczywista polityka firmy.",
+      "syntheticSome": "Uwzględniono syntetyczną procedurę demonstracyjną — sprawdź pochodzenie każdego źródła.",
+      "question": "PYTANIE",
+      "whatToDo": "Co zrobić",
+      "openParagraph": "Otwórz akapit {{ section }} w dokumencie {{ title }}, wersja {{ version }}, strona {{ page }}",
+      "citation": "[{{ number }}] § {{ section }} · Strona {{ page }}",
+      "missingLabel": "Brakujące informacje",
+      "missing": "Potrzebne dodatkowe informacje",
+      "footer": "Na podstawie wyłącznie wymienionych źródeł. Tylko wskazówki: nic nie zostało zgłoszone, zarezerwowane ani zmienione w stanie magazynowym.",
+      "sourcesLabel": "Źródła potwierdzające",
+      "sources": "Źródła"
+    },
+    "source": {
+      "panelLabel": "Źródło {{ number }}: {{ title }}, {{ section }}, strona {{ page }}",
+      "versionPage": "Wersja {{ version }} · Strona {{ page }}",
+      "historical": "Wersja archiwalna · Może być dostępna nowsza wersja.",
+      "excerpt": "Fragment · {{ section }} · Strona {{ page }}",
+      "openPdfLabel": "Otwórz PDF dokumentu {{ title }}, wersja {{ version }}, strona {{ page }}",
+      "openPdf": "Otwórz PDF na stronie {{ page }}"
+    },
+    "viewer": {
+      "errors": {
+        "unavailable": "Źródło jest niedostępne lub odmówiono dostępu.",
+        "pageUnavailable": "Strona źródła jest niedostępna.",
+        "pageCount": "Liczba stron PDF nie zgadza się z rekordem źródła.",
+        "openFailed": "Nie udało się otworzyć źródła.",
+        "renderFailed": "Nie udało się wyświetlić strony."
+      },
+      "opening": "Otwieram źródłowy PDF…",
+      "retry": "Spróbuj ponownie",
+      "eyebrow": "DOKUMENT ŹRÓDŁOWY",
+      "meta": "Wersja {{ version }} · {{ language }} · {{ provenance }}",
+      "historical": "To wersja archiwalna. Może być dostępna nowsza wersja.",
+      "citedLabel": "Cytowany fragment",
+      "cited": "CYTOWANY FRAGMENT · STRONA {{ page }}",
+      "noHighlight": "Dokładne podświetlenie niedostępne",
+      "controls": "Sterowanie PDF",
+      "previousPage": "Poprzednia strona",
+      "previous": "Poprzednia",
+      "pagePrefix": "Strona",
+      "pageOf": "z {{ total }}",
+      "nextPage": "Następna strona",
+      "next": "Następna",
+      "zoomOut": "Pomniejsz",
+      "zoomIn": "Powiększ",
+      "rotateLabel": "Obróć zgodnie z ruchem wskazówek zegara",
+      "rotate": "Obróć ↻",
+      "download": "Pobierz PDF",
+      "pageScroll": "Strona PDF",
+      "canvasLabel": "Strona PDF {{ page }} z {{ total }}",
+      "readText": "Przeczytaj tekst strony {{ page }}",
+      "noText": "Dla tej zeskanowanej strony nie ma wyodrębnionego tekstu.",
+      "rendering": "Wyświetlam stronę…"
+    },
+    "upload": {
+      "submit": {
+        "working": "Pracuję…",
+        "uploadSame": "Wyślij tę samą wersję",
+        "retryRegistration": "Ponów tę samą rejestrację",
+        "register": "Zarejestruj i wyślij"
+      },
+      "errors": {
+        "oneFile": "Wybierz naraz tylko jeden plik PDF.",
+        "notPdf": "Wybierz plik PDF.",
+        "fingerprint": "Wybierz oryginalny plik PDF z zarejestrowanym odciskiem SHA-256.",
+        "samePdf": "Wybierz ten sam plik PDF, który został zarejestrowany.",
+        "frozen": "Wybierz plik PDF z niezakończonej rejestracji. Tożsamość jego wersji jest zablokowana.",
+        "publicSources": "Publiczne kompilacje wymagają adresów URL źródeł i daty obserwacji.",
+        "uploadUnconfirmed": "Nie udało się potwierdzić wyniku wysyłania. Ponów tę samą wersję z tym samym plikiem PDF.",
+        "registrationUnconfirmed": "Nie udało się potwierdzić wyniku rejestracji. Ponów tę samą rejestrację — zachowa to to samo żądanie wersji.",
+        "invalidPdf": "Wybierz czytelny plik PDF z obsługiwanym tekstem.",
+        "stale": "Dokument uległ zmianie. Zamknij to okno i odśwież widok przed zastąpieniem dokumentu.",
+        "default": "Nie udało się wysłać dokumentu. Spróbuj ponownie."
+      },
+      "title": {
+        "resume": "Wznów wysyłanie PDF",
+        "recover": "Odzyskaj rejestrację",
+        "replace": "Zastąp PDF dokumentu",
+        "add": "Dodaj nowy dokument"
+      },
+      "replaceBefore": "To utworzy nową wersję dokumentu",
+      "replaceAfter": "({{ version }}, rewizja dokumentu {{ revision }}). Nieaktualna rewizja zostanie odrzucona; odśwież bibliotekę i ponownie wybierz Zastąp PDF.",
+      "intro": "Wyślij plik PDF z obsługiwanym tekstem. Maksymalnie 10 MiB i 30 stron fizycznych. Zeskanowane pliki PDF i OCR nie są obsługiwane.",
+      "unresolved": "Niezakończona rejestracja dotyczy dokumentu",
+      "unresolvedRetry": ". Wybierz ten sam plik PDF dla tego żądania i spróbuj ponownie; zablokowane dane i klucz idempotentności zostaną użyte ponownie.",
+      "fields": {
+        "title": "Tytuł dokumentu",
+        "titleRequired": "Tytuł jest wymagany.",
+        "titleLength": "Użyj najwyżej 160 znaków.",
+        "language": "Język",
+        "kind": "Rodzaj dokumentu",
+        "origin": "Pochodzenie",
+        "urls": "Adresy URL źródeł (po jednym w wierszu)",
+        "observedOn": "Data obserwacji"
+      },
+      "resumeIntro": "Wybierz oryginalny plik PDF dla dokumentu {{ title }} · {{ version }}. Musi pasować do zarejestrowanego odcisku SHA-256.",
+      "matchingPdf": "Wybierz pasujący plik PDF",
+      "registered": "Wersja {{ id }} jest zarejestrowana. Wysłanie pasującego oryginału zakolejkuje ekstrakcję; nie publikuje dokumentu.",
+      "progress": "Rejestrowanie lub wysyłanie PDF"
+    },
+    "language": {
+      "en": "Angielski",
+      "pl": "Polski"
+    },
+    "kind": {
+      "procedure": "Procedura",
+      "policy": "Polityka",
+      "productCard": "Karta produktu",
+      "productCatalog": "Katalog produktów"
+    },
+    "origin": {
+      "synthetic": "Syntetyczne demo",
+      "official": "Oficjalne",
+      "publicCompilation": "Nieoficjalna kompilacja publiczna"
+    },
+    "review": {
+      "eyebrow": "PRZEGLĄD DOKUMENTU",
+      "coverage": "Sprawdzono {{ checked }} z {{ total }} stron",
+      "publishedNotice": "Opublikowano. Ta wersja jest tylko do odczytu; oryginalny PDF i wyodrębniony tekst pozostają dostępne jako materiał pomocniczy.",
+      "instruction": "Porównaj oryginalny PDF z wyodrębnionym tekstem na każdej stronie fizycznej. Zaznaczenia odzwierciedlają Twoje sprawdzenie wyświetlonego oryginału; historia sprawdzeń na serwerze nigdy nie zaznacza stron za Ciebie.",
+      "navLabel": "Nawigacja po stronach przeglądu",
+      "previousPage": "Poprzednia strona",
+      "nextPage": "Następna strona",
+      "pageOf": "Strona {{ page }} z {{ total }}",
+      "originalLabel": "Wyświetlona strona oryginalnego PDF",
+      "originalTitle": "Oryginalny PDF · strona {{ page }}",
+      "canvasLabel": "Wyświetlona strona fizyczna oryginalnego PDF",
+      "rendering": "Wyświetlam oryginalną stronę…",
+      "checkPage": "Sprawdzono tę stronę oryginału z wyodrębnionym tekstem",
+      "extractedLabel": "Wyodrębniony tekst bieżącej strony fizycznej",
+      "extractedTitle": "Wyodrębniony tekst · strona {{ page }}",
+      "qualityComplete": "Ekstrakcja tekstu zakończona",
+      "qualityReview": "Ta strona wymaga sprawdzenia",
+      "blocked": "Tej wersji nie można opublikować. Odśwież listę dokumentów lub rozwiąż stan jej przetwarzania na serwerze.",
+      "retryLoading": "Ponów wczytywanie przeglądu",
+      "retryReview": "Ponów przegląd",
+      "footer": "Publikacja wymaga kompletnego zestawu wyodrębnionych stron i jawnego sprawdzenia każdej strony.",
+      "publish": "Opublikuj wersję",
+      "retryPublication": "Ponów tę samą publikację",
+      "loading": "Wczytuję przegląd i oryginalny PDF…",
+      "errors": {
+        "FORBIDDEN": "Przegląd tego dokumentu jest niedostępny w wybranym obszarze roboczym.",
+        "UNAUTHENTICATED": "Zaloguj się ponownie, aby kontynuować ten przegląd.",
+        "loadFailed": "Nie udało się wczytać przeglądu i oryginalnego PDF. Spróbuj ponownie, aby odświeżyć bieżącą wersję.",
+        "renderFailed": "Nie udało się wyświetlić oryginalnej strony.",
+        "changed": "Wersja zmieniła się podczas przeglądu. Wczytano najnowszą ekstrakcję; przed publikacją sprawdź ponownie każdą stronę.",
+        "unconfirmed": "Nie udało się potwierdzić wyniku publikacji. Ponów tę samą publikację, aby bezpiecznie sprawdzić jej status.",
+        "publishFailed": "Nie udało się opublikować dokumentu. Odśwież i sprawdź bieżącą wersję przed ponowną próbą."
+      },
+      "notices": {
+        "queued": "Publikacja zakolejkowana. Serwer dokończy tę wersję w tle.",
+        "serverStatus": "Status serwera: {{ status }}."
+      }
+    },
+    "product": {
+      "title": "Wiedza o produktach",
+      "intro": "Powiąż dokładne fragmenty PDF z produktami z katalogu. Wygenerowane aliasy pozostają propozycjami, dopóki centrala ich nie sprawdzi i nie opublikuje tego PDF.",
+      "readOnly": "Ta wersja jest tylko do odczytu. Użyj Zastąp PDF, aby wzbogacić następną wersję.",
+      "linkPassage": "Powiąż fragment źródłowy",
+      "sourceChunk": "Fragment źródłowy",
+      "pagePassage": "Strona {{ page }} · {{ text }}",
+      "useWhole": "Użyj całego fragmentu",
+      "exactExcerpt": "Dokładny wycinek z tego fragmentu",
+      "occurs": "Ten wycinek występuje {{ count }} razy. Wybierz wystąpienie.",
+      "occurrence": "Wystąpienie {{ number }} · {{ start }}",
+      "pasteExact": "Wklej dokładny wycinek z wybranego fragmentu.",
+      "catalogProduct": "Produkt z katalogu",
+      "linkSelected": "Powiąż wybrany fragment",
+      "suggest": "Zaproponuj produkt",
+      "changeWarning": "Zmiana lub cofnięcie potwierdzenia produktu usuwa propozycje bez innego potwierdzonego fragmentu źródłowego.",
+      "sourcePage": "Źródło · strona {{ page }}",
+      "suggested": "Propozycje:",
+      "linkedProduct": "Powiązany produkt",
+      "confirm": "Potwierdź ten produkt i fragment",
+      "removeLink": "Usuń powiązanie",
+      "currentType": "Obecny typ:",
+      "none": "Brak",
+      "proposed": "Proponowany:",
+      "noAssertion": "Brak nowego twierdzenia",
+      "proposedType": "Proponowany typ (opcjonalnie)",
+      "generate": "Wygeneruj aliasy dla tego produktu",
+      "aliasPhrase": "Fraza aliasu",
+      "aliasKind": "Rodzaj",
+      "kind": {
+        "name": "Nazwa",
+        "type": "Typ",
+        "phonetic": "Fonetyczny"
+      },
+      "decision": "Decyzja",
+      "decisions": {
+        "pending": "Oczekuje na sprawdzenie",
+        "accepted": "Zaakceptuj",
+        "rejected": "Odrzuć"
+      },
+      "addAlias": "Dodaj alias ręcznie",
+      "unlinked": "Niepowiązane fragmenty",
+      "unlinkedHelp": "Najpierw zapisz nowe powiązania, aby odświeżyć te zakresy. Potwierdź każdy fragment pozostawiony bez wiedzy o produkcie.",
+      "leaveUnlinked": "Zostaw ten fragment niepowiązany",
+      "noKnowledge": "Ten katalog celowo nie dodaje wiedzy o produktach",
+      "impact": "Wpływ kolizji",
+      "impactCounts": "{{ before }} → {{ after }} produktów",
+      "ambiguous": "Niejednoznaczne; wymaga doprecyzowania",
+      "noImpact": "Brak zaakceptowanych zmian aliasów. Zapisz wersję roboczą, aby obliczyć bieżący wpływ.",
+      "save": "Zapisz wersję roboczą i odśwież wpływ",
+      "accept": "Zaakceptuj przegląd produktów",
+      "saveFirst": "Zapisz wersję roboczą przed generowaniem lub akceptacją wiedzy.",
+      "accepted": "Przegląd produktów zaakceptowany. Opublikuj poniższy PDF, aby go aktywować.",
+      "retry": "Ponów tę samą akcję dla produktu",
+      "reloadDiscard": "Wczytaj najnowszy przegląd produktów i odrzuć lokalne zmiany",
+      "reload": "Wczytaj ponownie przegląd produktów",
+      "method": {
+        "code": "kod",
+        "model": "model",
+        "hq": "centrala"
+      },
+      "aliasSource": {
+        "generated": "wygenerowany",
+        "hq": "centrala"
+      },
+      "errors": {
+        "loadFailed": "Nie udało się wczytać przeglądu produktów. Spróbuj wczytać ponownie.",
+        "catalogChanged": "Katalog uległ zmianie. Twoje zmiany zostały zachowane. Zapisz wersję roboczą ponownie, aby odświeżyć wpływ, i sprawdź go przed akceptacją.",
+        "reviewChanged": "Inny przegląd uległ zmianie. Twoje lokalne zmiany zostały zachowane. Wczytaj najnowszy przegląd produktów, aby celowo odrzucić te zmiany.",
+        "reloadFailed": "Nie udało się wczytać najnowszego przeglądu. Twoje lokalne zmiany zostały zachowane. Ponów wczytywanie, aby odrzucić je dopiero po wczytaniu najnowszego przeglądu.",
+        "generateFailed": "Generowanie jest niedostępne. Wersja robocza została zachowana; edytuj ręcznie lub spróbuj ponownie.",
+        "unconfirmed": "Nie udało się potwierdzić wyniku. Ponów tę samą akcję lub odśwież przegląd."
       }
     }
   }

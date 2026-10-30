@@ -6,6 +6,7 @@ import type {
   RetryDocumentInput,
   VersionStatus,
 } from '../../../../../../shared/contracts/knowledge/index';
+import type { TranslatedText } from '../../../core/models/translated-text';
 import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -30,9 +31,9 @@ export class DocumentLibraryFacade {
   readonly nextOffset = signal<number | null>(null);
   readonly offset = signal(0);
   readonly loading = signal(true);
-  readonly error = signal('');
+  readonly error = signal<TranslatedText | null>(null);
   readonly busyVersion = signal<string | null>(null);
-  readonly notice = signal('');
+  readonly notice = signal<TranslatedText | null>(null);
   readonly isHqWorkspace = computed(() => this.context.workspace()?.kind === 'HQ');
   readonly isSalonWorkspace = computed(() => this.context.workspace()?.kind === 'SALON');
   readonly hasMore = computed(() => this.nextOffset() !== null);
@@ -66,8 +67,8 @@ export class DocumentLibraryFacade {
       this.rows.set([]);
       this.nextOffset.set(null);
       this.offset.set(0);
-      this.error.set('');
-      this.notice.set('');
+      this.error.set(null);
+      this.notice.set(null);
       if (state.status === 'READY') void this.load(0, true);
       else this.loading.set(false);
     });
@@ -131,7 +132,7 @@ export class DocumentLibraryFacade {
     operation: () => Promise<VersionStatus>,
   ): Promise<void> {
     this.busyVersion.set(versionId);
-    this.notice.set('');
+    this.notice.set(null);
     try {
       const result = await operation();
       this.notice.set(this.statusMessage(result, key));
@@ -162,7 +163,7 @@ export class DocumentLibraryFacade {
     if (this.inFlightGeneration === generation || this.session.state().status !== 'READY') return;
     this.inFlightGeneration = generation;
     if (showLoading && !this.rows().length) this.loading.set(true);
-    this.error.set('');
+    this.error.set(null);
     try {
       const page: Page<DocumentRow> = await this.api.listDocuments({ limit: PAGE_SIZE, offset });
       if (generation !== this.generation || this.session.state().status !== 'READY') return;
@@ -193,39 +194,38 @@ export class DocumentLibraryFacade {
       ? String(error.code)
       : 'UPLOAD_FAILED';
   }
-  private messageFor(code: string): string {
+  private messageFor(code: string): TranslatedText {
     const messages: Record<string, string> = {
-      FORBIDDEN: 'This document is unavailable in the selected workspace.',
-      UNAUTHENTICATED: 'Sign in again to view documents.',
-      STALE_STATE: 'This version changed. Refresh the list and review the current version again.',
-      VERSION_CONFLICT:
-        'A document version changed. Refresh the list and review its current state before retrying.',
-      UPLOAD_TOO_LARGE: 'The PDF exceeds the 10 MiB limit.',
-      INVALID_PDF: 'Choose a readable, text-supported PDF file.',
-      UNSUPPORTED_PDF: 'This PDF layout is not supported. Scanned PDFs cannot be reviewed here.',
-      OUTCOME_UNKNOWN:
-        'The result is still being confirmed. Retry the same action to check it safely.',
-      UPLOAD_FAILED:
-        'The operation result could not be confirmed. Retry the same action to check it safely.',
+      FORBIDDEN: 'procedures.library.errors.FORBIDDEN',
+      UNAUTHENTICATED: 'procedures.library.errors.UNAUTHENTICATED',
+      STALE_STATE: 'procedures.library.errors.STALE_STATE',
+      VERSION_CONFLICT: 'procedures.library.errors.VERSION_CONFLICT',
+      UPLOAD_TOO_LARGE: 'procedures.errors.pdfTooLarge',
+      INVALID_PDF: 'procedures.library.errors.INVALID_PDF',
+      UNSUPPORTED_PDF: 'procedures.library.errors.UNSUPPORTED_PDF',
+      OUTCOME_UNKNOWN: 'procedures.library.errors.OUTCOME_UNKNOWN',
+      UPLOAD_FAILED: 'procedures.library.errors.UPLOAD_FAILED',
     };
-    return messages[code] ?? 'The document could not be updated. Please retry.';
+    return { key: messages[code] ?? 'procedures.library.errors.default' };
   }
-  private statusMessage(status: VersionStatus, operation: string): string {
+  private statusMessage(status: VersionStatus, operation: string): TranslatedText {
     if (operation.startsWith('withdraw:')) {
-      return status.revokedAt
-        ? 'Version withdrawn. Private originals and audit records are retained.'
-        : 'Withdrawal accepted. Refreshing the version access state.';
+      return {
+        key: status.revokedAt
+          ? 'procedures.library.notices.withdrawn'
+          : 'procedures.library.notices.withdrawalAccepted',
+      };
     }
     const messages: Record<VersionStatus['status'], string> = {
-      STAGED: 'Processing retry queued for this version.',
-      EXTRACTED: 'Extraction completed. This version is ready for review.',
-      REVIEWED: 'Review completed for this version.',
-      EMBEDDED: 'Document indexing completed for this version.',
-      READY: 'Processing completed successfully for this version.',
-      NEEDS_REVIEW: 'Processing completed. This version needs review.',
-      FAILED: 'Processing failed. Check the version status for details.',
+      STAGED: 'procedures.library.notices.STAGED',
+      EXTRACTED: 'procedures.library.notices.EXTRACTED',
+      REVIEWED: 'procedures.library.notices.REVIEWED',
+      EMBEDDED: 'procedures.library.notices.EMBEDDED',
+      READY: 'procedures.library.notices.READY',
+      NEEDS_REVIEW: 'procedures.library.notices.NEEDS_REVIEW',
+      FAILED: 'procedures.library.notices.FAILED',
     };
-    return messages[status.status];
+    return { key: messages[status.status] };
   }
   private restoreCommands(): void {
     try {
