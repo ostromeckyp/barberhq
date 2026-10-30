@@ -143,10 +143,10 @@ mat-tab-group mat-icon {
   color: var(--ink);
   border: 0;
   text-align: center;
-  font: inherit;
+  /* Family and numerals come from the shared .qty class; no font shorthand, which would reset them. */
+  line-height: inherit;
   font-size: 16px;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -162,7 +162,6 @@ mat-tab-group mat-icon {
 .line-stock b {
   font-size: 13px;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
   color: var(--ink);
   white-space: nowrap;
 }

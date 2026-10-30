@@ -190,6 +190,14 @@ it('disables the form and Save and shows a progress bar while the product loads'
   expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
   expect(el.querySelector<HTMLInputElement>('input')!.disabled).toBe(true);
 });
+it('hides add-only fields on the edit screen while the product loads', async () => {
+  const { el } = await render('b:p', vi.fn().mockReturnValue(new Promise(() => undefined)));
+  const labels = [...el.querySelectorAll('mat-label')].map((l) => l.textContent?.trim());
+  expect(labels).toContain('Name');
+  expect(labels).not.toContain('HQ quantity');
+  expect(el.querySelector('[data-testid="pdf-dropzone"]')).toBeNull();
+  expect(el.querySelector('button[type="submit"]')?.textContent).toContain('Save product');
+});
 it('shows an empty state with Retry and no form when the product cannot load', async () => {
   const { el, fixture } = await render('b:p', vi.fn().mockRejectedValue(new Error('offline')));
   expect(el.querySelector('app-empty-state')).not.toBeNull();

@@ -75,13 +75,12 @@
         ><mat-label>{{ 'hq.products.fields.summary' | transloco }}</mat-label
         ><textarea matInput rows="3" [formField]="fields.summary"></textarea>
       </mat-form-field>
-      @if (!facade.productId()) {
+      <!-- Add-only fields follow the route, not the loaded product, so they never show on Edit. -->
+      @if (!productId()) {
         <mat-form-field appearance="outline"
           ><mat-label>{{ 'hq.products.fields.hqQuantity' | transloco }}</mat-label
           ><input matInput type="number" [formField]="fields.hqOnHand"
         /></mat-form-field>
-      }
-      @if (!facade.productId()) {
         <div style="grid-column: 1 / -1">
           <h3>{{ 'hq.products.pendingCard.title' | transloco }}</h3>
           <p>{{ 'hq.products.pendingCard.hint' | transloco }}</p>
@@ -99,7 +98,7 @@
           type="submit"
           [disabled]="facade.saving() || facade.loading() || fields().invalid()"
         >
-          {{ (facade.productId() ? 'hq.products.save' : 'hq.products.add') | transloco }}
+          {{ (productId() ? 'hq.products.save' : 'hq.products.add') | transloco }}
         </button>
         @if (facade.message(); as message) {
           <span role="status">{{ message.key | transloco: message.params }}</span>

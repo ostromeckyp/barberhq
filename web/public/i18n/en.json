@@ -1209,7 +1209,6 @@
       "viewRequests": "View requests"
     },
     "stock": {
-      "title": "Salon stock",
       "table": "Salon stock table",
       "list": "Salon stock",
       "columns": {

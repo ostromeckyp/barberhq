@@ -151,7 +151,7 @@
               <mat-icon aria-hidden="true">remove</mat-icon>
             </button>
             <input
-              class="line-quantity"
+              class="line-quantity qty"
               type="number"
               inputmode="numeric"
               min="1"
@@ -181,12 +181,12 @@
             </button>
           </div>
           <div class="line-stock" [class.shortage]="line.quantity > line.hqAvailable">
-            {{ 'replenishment.order.hq' | transloco }} <b>{{ line.hqAvailable }}</b
+            {{ 'replenishment.order.hq' | transloco }} <b class="qty">{{ line.hqAvailable }}</b
             ><span class="sr-only">{{ 'replenishment.order.available' | transloco }}</span>
           </div>
           <div class="line-stock">
             {{ 'replenishment.order.salon' | transloco }}
-            <b
+            <b class="qty"
               >{{ line.salonOnHand }} →
               @if (line.quantity >= 1 && line.quantity <= 99 && line.quantity % 1 === 0) {
                 {{ line.salonOnHand + line.quantity }}

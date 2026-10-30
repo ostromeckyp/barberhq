@@ -1209,7 +1209,6 @@
       "viewRequests": "Zobacz zamówienia"
     },
     "stock": {
-      "title": "Stan magazynowy salonu",
       "table": "Tabela stanu magazynowego salonu",
       "list": "Stan magazynowy salonu",
       "columns": {
