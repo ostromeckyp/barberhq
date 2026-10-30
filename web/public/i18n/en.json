@@ -745,6 +745,11 @@
       "empty": "No salon has learned shorthand yet."
     },
     "products": {
+      "loading": "Loading product",
+      "loadFailed": {
+        "title": "Product could not be loaded",
+        "message": "Check your connection and try again."
+      },
       "add": "Add product",
       "edit": "Edit product",
       "description": "Catalog details, HQ quantity and the phrases the ordering assistant understands.",

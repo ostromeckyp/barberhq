@@ -39,18 +39,20 @@
     <app-request-list [requests]="facade.items()" [context]="facade.context()" />
   }
 }
-<nav [attr.aria-label]="'requests.salon.pages' | transloco">
-  <button
-    mat-button
-    [disabled]="facade.context().offset === 0 || facade.loading()"
-    (click)="facade.goToPage(facade.context().offset - 50)"
-  >
-    {{ 'common.actions.previous' | transloco }}</button
-  ><button
-    mat-button
-    [disabled]="facade.nextOffset() === null || facade.loading()"
-    (click)="facade.goToPage(facade.nextOffset()!)"
-  >
-    {{ 'common.actions.next' | transloco }}
-  </button>
-</nav>
+@if (facade.context().offset > 0 || facade.nextOffset() !== null) {
+  <nav [attr.aria-label]="'requests.salon.pages' | transloco">
+    <button
+      mat-button
+      [disabled]="facade.context().offset === 0 || facade.loading()"
+      (click)="facade.goToPage(facade.context().offset - 50)"
+    >
+      {{ 'common.actions.previous' | transloco }}</button
+    ><button
+      mat-button
+      [disabled]="facade.nextOffset() === null || facade.loading()"
+      (click)="facade.goToPage(facade.nextOffset()!)"
+    >
+      {{ 'common.actions.next' | transloco }}
+    </button>
+  </nav>
+}

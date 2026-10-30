@@ -66,48 +66,52 @@ import { HqQueueFacade } from './hq-queue.facade';
           </button>
         </p>
       }
-      <section>
-        <h2>
-          {{ 'hq.queue.pending' | transloco }} <span>{{ facade.pending().length }}</span>
-        </h2>
-        <app-request-list
-          [context]="{ kind: 'HQ', offset: facade.offset() }"
-          [requests]="facade.pending()"
-        />
-      </section>
-      <section>
-        <h2>
-          {{ 'hq.queue.ready' | transloco }} <span>{{ facade.reserved().length }}</span>
-        </h2>
-        <app-request-list
-          [context]="{ kind: 'HQ', offset: facade.offset() }"
-          [requests]="facade.reserved()"
-        />
-      </section>
-      @if (facade.other().length) {
+      @if (facade.loaded()) {
         <section>
-          <h2>{{ 'hq.queue.other' | transloco }}</h2>
+          <h2>
+            {{ 'hq.queue.pending' | transloco }} <span>{{ facade.pending().length }}</span>
+          </h2>
           <app-request-list
             [context]="{ kind: 'HQ', offset: facade.offset() }"
-            [requests]="facade.other()"
+            [requests]="facade.pending()"
           />
         </section>
+        <section>
+          <h2>
+            {{ 'hq.queue.ready' | transloco }} <span>{{ facade.reserved().length }}</span>
+          </h2>
+          <app-request-list
+            [context]="{ kind: 'HQ', offset: facade.offset() }"
+            [requests]="facade.reserved()"
+          />
+        </section>
+        @if (facade.other().length) {
+          <section>
+            <h2>{{ 'hq.queue.other' | transloco }}</h2>
+            <app-request-list
+              [context]="{ kind: 'HQ', offset: facade.offset() }"
+              [requests]="facade.other()"
+            />
+          </section>
+        }
       }
-      <nav [attr.aria-label]="'hq.queue.pages' | transloco">
-        <button
-          mat-button
-          (click)="facade.previous()"
-          [disabled]="facade.offset() === 0 || facade.loading()"
-        >
-          {{ 'common.actions.previous' | transloco }}</button
-        ><button
-          mat-button
-          (click)="facade.next()"
-          [disabled]="!facade.hasNext() || facade.loading()"
-        >
-          {{ 'common.actions.next' | transloco }}
-        </button>
-      </nav>
+      @if (facade.offset() > 0 || facade.hasNext()) {
+        <nav [attr.aria-label]="'hq.queue.pages' | transloco">
+          <button
+            mat-button
+            (click)="facade.previous()"
+            [disabled]="facade.offset() === 0 || facade.loading()"
+          >
+            {{ 'common.actions.previous' | transloco }}</button
+          ><button
+            mat-button
+            (click)="facade.next()"
+            [disabled]="!facade.hasNext() || facade.loading()"
+          >
+            {{ 'common.actions.next' | transloco }}
+          </button>
+        </nav>
+      }
     }
   `,
   styles: [

@@ -157,23 +157,25 @@
             }}</a>
           </article>
         }
-        <nav [attr.aria-label]="'delivery.issue.replacements.pages' | transloco">
-          <button
-            mat-button
-            type="button"
-            (click)="facade.replacementsBy(-1)"
-            [disabled]="facade.replacementOffset() === 0 || facade.loading()"
-          >
-            {{ 'common.actions.previous' | transloco }}</button
-          ><button
-            mat-button
-            type="button"
-            (click)="facade.replacementsBy(1)"
-            [disabled]="!issue.hasMoreReplacements || facade.loading()"
-          >
-            {{ 'common.actions.next' | transloco }}
-          </button>
-        </nav>
+        @if (facade.replacementOffset() > 0 || issue.hasMoreReplacements) {
+          <nav [attr.aria-label]="'delivery.issue.replacements.pages' | transloco">
+            <button
+              mat-button
+              type="button"
+              (click)="facade.replacementsBy(-1)"
+              [disabled]="facade.replacementOffset() === 0 || facade.loading()"
+            >
+              {{ 'common.actions.previous' | transloco }}</button
+            ><button
+              mat-button
+              type="button"
+              (click)="facade.replacementsBy(1)"
+              [disabled]="!issue.hasMoreReplacements || facade.loading()"
+            >
+              {{ 'common.actions.next' | transloco }}
+            </button>
+          </nav>
+        }
       </section>
       <section class="card" aria-labelledby="history-title">
         <h2 id="history-title">{{ 'delivery.issue.history.title' | transloco }}</h2>
@@ -204,23 +206,25 @@
             </li>
           }
         </ol>
-        <nav [attr.aria-label]="'delivery.issue.history.pages' | transloco">
-          <button
-            mat-button
-            type="button"
-            (click)="facade.eventsBy(-1)"
-            [disabled]="facade.eventOffset() === 0 || facade.loading()"
-          >
-            {{ 'common.actions.previous' | transloco }}</button
-          ><button
-            mat-button
-            type="button"
-            (click)="facade.eventsBy(1)"
-            [disabled]="!issue.hasMoreEvents || facade.loading()"
-          >
-            {{ 'common.actions.next' | transloco }}
-          </button>
-        </nav>
+        @if (facade.eventOffset() > 0 || issue.hasMoreEvents) {
+          <nav [attr.aria-label]="'delivery.issue.history.pages' | transloco">
+            <button
+              mat-button
+              type="button"
+              (click)="facade.eventsBy(-1)"
+              [disabled]="facade.eventOffset() === 0 || facade.loading()"
+            >
+              {{ 'common.actions.previous' | transloco }}</button
+            ><button
+              mat-button
+              type="button"
+              (click)="facade.eventsBy(1)"
+              [disabled]="!issue.hasMoreEvents || facade.loading()"
+            >
+              {{ 'common.actions.next' | transloco }}
+            </button>
+          </nav>
+        }
       </section>
     </div>
     @if (facade.isHq()) {

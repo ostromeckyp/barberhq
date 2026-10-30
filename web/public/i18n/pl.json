@@ -745,6 +745,11 @@
       "empty": "Żaden salon nie nauczył jeszcze asystenta skrótów."
     },
     "products": {
+      "loading": "Wczytywanie produktu",
+      "loadFailed": {
+        "title": "Nie udało się wczytać produktu",
+        "message": "Sprawdź połączenie i spróbuj ponownie."
+      },
       "add": "Dodaj produkt",
       "edit": "Edytuj produkt",
       "description": "Dane katalogowe, ilość w centrali i frazy, które rozumie asystent zamówień.",

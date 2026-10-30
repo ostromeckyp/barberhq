@@ -2,12 +2,15 @@ import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { form, required, min, max, pattern, FormField } from '@angular/forms/signals';
+import { form, required, min, max, pattern, disabled, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DelayedLoadingDirective } from '../../../shared/ui/delayed-loading/delayed-loading';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import {
   productCategories,
@@ -35,6 +38,9 @@ const sourceLabel = {
   providers: [ProductEditorFacade],
   imports: [
     BackLink,
+    DelayedLoadingDirective,
+    EmptyStateComponent,
+    MatProgressBarModule,
     FormField,
     TranslocoPipe,
     MatButtonModule,
@@ -115,6 +121,7 @@ export class ProductEditorComponent implements OnInit {
     );
   }
   readonly fields = form(this.facade.model, (p) => {
+    disabled(p, () => this.facade.loading());
     required(p.category);
     for (const field of [p.name, p.brand, p.summary, p.sourceCode, p.sourceUrl, p.observedOn])
       required(field);

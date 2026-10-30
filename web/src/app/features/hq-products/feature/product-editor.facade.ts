@@ -54,6 +54,9 @@ export class ProductEditorFacade {
   readonly productId = signal<string | null>(null);
   readonly model = signal<ProductDraft>(emptyDraft());
   readonly saving = signal(false);
+  readonly loading = signal(false);
+  readonly loadFailed = signal(false);
+  private loadedId: string | null = null;
   readonly message = signal<TranslatedText | null>(null);
   private revision = 0;
   private formKey: string | null = null;
@@ -79,6 +82,15 @@ export class ProductEditorFacade {
     this.formKey = null;
   }
   async load(productId: string): Promise<void> {
+    this.loadedId = productId;
+    this.loading.set(true);
+    this.loadFailed.set(false);
+    await this.read(productId)
+      .catch(() => this.loadFailed.set(true))
+      .finally(() => this.loading.set(false));
+  }
+  retryLoad = () => (this.loadedId ? this.load(this.loadedId) : Promise.resolve());
+  private async read(productId: string): Promise<void> {
     const detail = await this.api.read(productId);
     this.productId.set(detail.id);
     this.model.set({

@@ -5,147 +5,308 @@
   [description]="'hq.products.description' | transloco"
 />
 
-<section class="card" aria-labelledby="product-details">
-  <h2 id="product-details">{{ 'hq.products.details' | transloco }}</h2>
-  <form class="grid" (submit)="$event.preventDefault(); saveProduct()">
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.name' | transloco }}</mat-label
-      ><input matInput [formField]="fields.name"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.brand' | transloco }}</mat-label
-      ><input matInput [formField]="fields.brand"
-    /></mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'hq.products.fields.category' | transloco }}</mat-label>
-      <mat-select
-        [aria-label]="'hq.products.fields.category' | transloco"
-        [formField]="fields.category"
-      >
-        @for (c of categories; track c) {
-          <mat-option [value]="c">{{ c }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.type' | transloco }}</mat-label
-      ><input matInput [formField]="fields.type"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.sourceCode' | transloco }}</mat-label
-      ><input matInput [formField]="fields.sourceCode"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.netContent' | transloco }}</mat-label
-      ><input matInput type="number" [formField]="fields.netContentMl"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.price' | transloco }}</mat-label
-      ><input matInput type="number" [formField]="fields.retailPriceGrosz"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.scent' | transloco }}</mat-label
-      ><input matInput [formField]="fields.scent"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.sourceUrl' | transloco }}</mat-label
-      ><input matInput [formField]="fields.sourceUrl"
-    /></mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>{{ 'hq.products.fields.observedOn' | transloco }}</mat-label
-      ><input matInput type="date" [formField]="fields.observedOn"
-    /></mat-form-field>
-    <mat-form-field appearance="outline" style="grid-column: 1 / -1"
-      ><mat-label>{{ 'hq.products.fields.summary' | transloco }}</mat-label
-      ><textarea matInput rows="3" [formField]="fields.summary"></textarea>
-    </mat-form-field>
-    @if (!facade.productId()) {
+<mat-progress-bar
+  *appDelayedLoading="facade.loading()"
+  mode="indeterminate"
+  [attr.aria-label]="'hq.products.loading' | transloco"
+/>
+@if (facade.loadFailed()) {
+  <app-empty-state
+    icon="error_outline"
+    [title]="'hq.products.loadFailed.title' | transloco"
+    [message]="'hq.products.loadFailed.message' | transloco"
+  >
+    <button mat-flat-button type="button" (click)="facade.retryLoad()">
+      {{ 'common.actions.retry' | transloco }}
+    </button>
+  </app-empty-state>
+} @else {
+  <section class="card" aria-labelledby="product-details">
+    <h2 id="product-details">{{ 'hq.products.details' | transloco }}</h2>
+    <form class="grid" (submit)="$event.preventDefault(); saveProduct()">
       <mat-form-field appearance="outline"
-        ><mat-label>{{ 'hq.products.fields.hqQuantity' | transloco }}</mat-label
-        ><input matInput type="number" [formField]="fields.hqOnHand"
+        ><mat-label>{{ 'hq.products.fields.name' | transloco }}</mat-label
+        ><input matInput [formField]="fields.name"
       /></mat-form-field>
-    }
-    @if (!facade.productId()) {
-      <div style="grid-column: 1 / -1">
-        <h3>{{ 'hq.products.pendingCard.title' | transloco }}</h3>
-        <p>{{ 'hq.products.pendingCard.hint' | transloco }}</p>
-        <app-pdf-dropzone
-          [label]="'hq.products.card.pdfLabel' | transloco"
-          [fileName]="pendingCard()?.name ?? ''"
-          [disabled]="facade.saving()"
-          (filesSelected)="pickPendingCard($event)"
-        />
-      </div>
-    }
-    <div class="row" style="grid-column: 1 / -1">
-      <button mat-flat-button type="submit" [disabled]="facade.saving() || fields().invalid()">
-        {{ (facade.productId() ? 'hq.products.save' : 'hq.products.add') | transloco }}
-      </button>
-      @if (facade.message(); as message) {
-        <span role="status">{{ message.key | transloco: message.params }}</span>
-      }
-    </div>
-  </form>
-</section>
-
-@if (facade.productId() && facade.stock(); as stock) {
-  <section class="card" aria-labelledby="hq-quantity">
-    <h2 id="hq-quantity">{{ 'hq.products.stock.title' | transloco }}</h2>
-    <p>
-      {{
-        'hq.products.stock.reserved'
-          | transloco: { reserved: stock.reserved, available: stock.available }
-      }}
-    </p>
-    <div class="row">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>{{ 'hq.products.stock.onHand' | transloco }}</mat-label>
-        <input
-          matInput
-          type="number"
-          min="0"
-          [value]="facade.stockDraft()"
-          (input)="facade.stockDraft.set($any($event.target).valueAsNumber)"
-        />
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.brand' | transloco }}</mat-label
+        ><input matInput [formField]="fields.brand"
+      /></mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'hq.products.fields.category' | transloco }}</mat-label>
+        <mat-select
+          [aria-label]="'hq.products.fields.category' | transloco"
+          [formField]="fields.category"
+        >
+          @for (c of categories; track c) {
+            <mat-option [value]="c">{{ c }}</mat-option>
+          }
+        </mat-select>
       </mat-form-field>
-      <button mat-stroked-button (click)="facade.saveStock()">
-        {{ 'hq.products.stock.save' | transloco }}
-      </button>
-    </div>
-    @if (facade.stockMessage(); as message) {
-      <p role="status">{{ message.key | transloco: message.params }}</p>
-    }
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.type' | transloco }}</mat-label
+        ><input matInput [formField]="fields.type"
+      /></mat-form-field>
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.sourceCode' | transloco }}</mat-label
+        ><input matInput [formField]="fields.sourceCode"
+      /></mat-form-field>
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.netContent' | transloco }}</mat-label
+        ><input matInput type="number" [formField]="fields.netContentMl"
+      /></mat-form-field>
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.price' | transloco }}</mat-label
+        ><input matInput type="number" [formField]="fields.retailPriceGrosz"
+      /></mat-form-field>
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.scent' | transloco }}</mat-label
+        ><input matInput [formField]="fields.scent"
+      /></mat-form-field>
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.sourceUrl' | transloco }}</mat-label
+        ><input matInput [formField]="fields.sourceUrl"
+      /></mat-form-field>
+      <mat-form-field appearance="outline"
+        ><mat-label>{{ 'hq.products.fields.observedOn' | transloco }}</mat-label
+        ><input matInput type="date" [formField]="fields.observedOn"
+      /></mat-form-field>
+      <mat-form-field appearance="outline" style="grid-column: 1 / -1"
+        ><mat-label>{{ 'hq.products.fields.summary' | transloco }}</mat-label
+        ><textarea matInput rows="3" [formField]="fields.summary"></textarea>
+      </mat-form-field>
+      @if (!facade.productId()) {
+        <mat-form-field appearance="outline"
+          ><mat-label>{{ 'hq.products.fields.hqQuantity' | transloco }}</mat-label
+          ><input matInput type="number" [formField]="fields.hqOnHand"
+        /></mat-form-field>
+      }
+      @if (!facade.productId()) {
+        <div style="grid-column: 1 / -1">
+          <h3>{{ 'hq.products.pendingCard.title' | transloco }}</h3>
+          <p>{{ 'hq.products.pendingCard.hint' | transloco }}</p>
+          <app-pdf-dropzone
+            [label]="'hq.products.card.pdfLabel' | transloco"
+            [fileName]="pendingCard()?.name ?? ''"
+            [disabled]="facade.saving()"
+            (filesSelected)="pickPendingCard($event)"
+          />
+        </div>
+      }
+      <div class="row" style="grid-column: 1 / -1">
+        <button
+          mat-flat-button
+          type="submit"
+          [disabled]="facade.saving() || facade.loading() || fields().invalid()"
+        >
+          {{ (facade.productId() ? 'hq.products.save' : 'hq.products.add') | transloco }}
+        </button>
+        @if (facade.message(); as message) {
+          <span role="status">{{ message.key | transloco: message.params }}</span>
+        }
+      </div>
+    </form>
   </section>
 
-  <section class="card" aria-labelledby="product-aliases">
-    <h2 id="product-aliases">{{ 'hq.products.aliases.title' | transloco }}</h2>
-    <p>{{ 'hq.products.aliases.intro' | transloco }}</p>
-    @for (group of aliasGroups(); track group.kind) {
-      <h3 class="kind">{{ kindLabel(group.kind) | transloco }}</h3>
-      <ul>
-        @for (alias of group.aliases; track alias.id) {
-          <li>
-            @if (editingId() === alias.id) {
-              <div class="row alias-edit phrase">
+  @if (facade.productId() && facade.stock(); as stock) {
+    <section class="card" aria-labelledby="hq-quantity">
+      <h2 id="hq-quantity">{{ 'hq.products.stock.title' | transloco }}</h2>
+      <p>
+        {{
+          'hq.products.stock.reserved'
+            | transloco: { reserved: stock.reserved, available: stock.available }
+        }}
+      </p>
+      <div class="row">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'hq.products.stock.onHand' | transloco }}</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            [value]="facade.stockDraft()"
+            (input)="facade.stockDraft.set($any($event.target).valueAsNumber)"
+          />
+        </mat-form-field>
+        <button mat-stroked-button (click)="facade.saveStock()">
+          {{ 'hq.products.stock.save' | transloco }}
+        </button>
+      </div>
+      @if (facade.stockMessage(); as message) {
+        <p role="status">{{ message.key | transloco: message.params }}</p>
+      }
+    </section>
+
+    <section class="card" aria-labelledby="product-aliases">
+      <h2 id="product-aliases">{{ 'hq.products.aliases.title' | transloco }}</h2>
+      <p>{{ 'hq.products.aliases.intro' | transloco }}</p>
+      @for (group of aliasGroups(); track group.kind) {
+        <h3 class="kind">{{ kindLabel(group.kind) | transloco }}</h3>
+        <ul>
+          @for (alias of group.aliases; track alias.id) {
+            <li>
+              @if (editingId() === alias.id) {
+                <div class="row alias-edit phrase">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>{{ 'hq.products.aliases.phrase' | transloco }}</mat-label>
+                    <input
+                      matInput
+                      [attr.aria-label]="
+                        'hq.products.aliases.editPhrase' | transloco: { phrase: alias.phrase }
+                      "
+                      [value]="editPhrase()"
+                      (input)="editPhrase.set($any($event.target).value)"
+                    />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="kind">
+                    <mat-label>{{ 'hq.products.aliases.kindLabel' | transloco }}</mat-label>
+                    <mat-select
+                      [aria-label]="
+                        'hq.products.aliases.editKind' | transloco: { phrase: alias.phrase }
+                      "
+                      [value]="editKind()"
+                      (valueChange)="editKind.set($event)"
+                    >
+                      @for (k of kinds; track k.value) {
+                        <mat-option [value]="k.value">{{ k.label | transloco }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <button
+                  mat-button
+                  [attr.aria-label]="
+                    'hq.products.aliases.saveAlias' | transloco: { phrase: alias.phrase }
+                  "
+                  [disabled]="!editPhrase().trim()"
+                  (click)="saveEdit(alias)"
+                >
+                  {{ 'common.actions.save' | transloco }}
+                </button>
+                <button mat-button (click)="editingId.set(null)">
+                  {{ 'common.actions.cancel' | transloco }}
+                </button>
+              } @else {
+                <span class="phrase">{{ alias.phrase }}</span>
+                <span class="badge">{{ sourceLabel[alias.source] | transloco }}</span>
+                @if (alias.editable) {
+                  <button
+                    mat-icon-button
+                    [attr.aria-label]="
+                      'hq.products.aliases.edit' | transloco: { phrase: alias.phrase }
+                    "
+                    (click)="startEdit(alias)"
+                  >
+                    <mat-icon aria-hidden="true">edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    [attr.aria-label]="
+                      'hq.products.aliases.remove' | transloco: { phrase: alias.phrase }
+                    "
+                    (click)="facade.removeAlias(alias)"
+                  >
+                    <mat-icon aria-hidden="true">delete</mat-icon>
+                  </button>
+                }
+              }
+            </li>
+          }
+        </ul>
+      } @empty {
+        <p>{{ 'hq.products.aliases.empty' | transloco }}</p>
+      }
+      <div class="row">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'hq.products.aliases.new' | transloco }}</mat-label>
+          <input matInput [value]="newAlias()" (input)="newAlias.set($any($event.target).value)" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 0 1 180px">
+          <mat-label>{{ 'hq.products.aliases.kindLabel' | transloco }}</mat-label>
+          <mat-select
+            [value]="facade.newAliasKind()"
+            (valueChange)="facade.newAliasKind.set($event)"
+          >
+            @for (k of kinds; track k.value) {
+              <mat-option [value]="k.value">{{ k.label | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button mat-stroked-button [disabled]="!newAlias().trim()" (click)="addAlias()">
+          {{ 'hq.products.aliases.add' | transloco }}
+        </button>
+      </div>
+      @for (c of facade.collisions(); track c.phrase) {
+        <p class="warning" role="status">
+          {{
+            'hq.products.aliases.collision'
+              | transloco: { phrase: c.phrase, products: c.productNames.join(', ') }
+          }}
+        </p>
+      }
+      @if (facade.aliasMessage(); as message) {
+        <p role="alert">
+          {{ message.key | transloco: message.params }}
+          <button mat-button (click)="facade.retryAliases()">
+            {{ 'common.actions.retry' | transloco }}
+          </button>
+        </p>
+      }
+    </section>
+
+    <section class="card" aria-labelledby="product-card">
+      <h2 id="product-card">{{ 'hq.products.card.title' | transloco }}</h2>
+      <p>{{ 'hq.products.card.intro' | transloco }}</p>
+      <app-pdf-dropzone
+        [label]="'hq.products.card.pdfLabel' | transloco"
+        [fileName]="attachedName()"
+        [disabled]="cardBusy()"
+        (filesSelected)="attach($event)"
+      />
+      @if (facade.card(); as card) {
+        <p role="status">
+          {{
+            'hq.products.card.status' | transloco: { status: cardStatus[card.status] | transloco }
+          }}
+        </p>
+      }
+      @if (facade.suggestions().length) {
+        <div class="suggestions-head">
+          <h3>
+            {{ 'hq.products.card.suggestions' | transloco: { count: facade.suggestions().length } }}
+          </h3>
+          <button
+            mat-flat-button
+            [attr.aria-label]="'hq.products.card.acceptAllLabel' | transloco"
+            (click)="acceptAll()"
+          >
+            {{ 'hq.products.card.acceptAll' | transloco }}
+          </button>
+        </div>
+        <p class="muted">{{ 'hq.products.card.suggestionsHint' | transloco }}</p>
+        <ul>
+          @for (s of facade.suggestions(); track s.phrase) {
+            <li class="suggestion">
+              <div class="suggestion-fields">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                   <mat-label>{{ 'hq.products.aliases.phrase' | transloco }}</mat-label>
                   <input
                     matInput
                     [attr.aria-label]="
-                      'hq.products.aliases.editPhrase' | transloco: { phrase: alias.phrase }
+                      'hq.products.card.suggestedPhrase' | transloco: { phrase: s.phrase }
                     "
-                    [value]="editPhrase()"
-                    (input)="editPhrase.set($any($event.target).value)"
+                    [value]="suggestionText(s)"
+                    (input)="suggestionEdits.set(s.phrase, $any($event.target).value)"
                   />
                 </mat-form-field>
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="kind">
                   <mat-label>{{ 'hq.products.aliases.kindLabel' | transloco }}</mat-label>
                   <mat-select
                     [aria-label]="
-                      'hq.products.aliases.editKind' | transloco: { phrase: alias.phrase }
+                      'hq.products.card.suggestedKind' | transloco: { phrase: s.phrase }
                     "
-                    [value]="editKind()"
-                    (valueChange)="editKind.set($event)"
+                    [value]="suggestionKind(s)"
+                    (valueChange)="suggestionKinds.set(s.phrase, $event)"
                   >
                     @for (k of kinds; track k.value) {
                       <mat-option [value]="k.value">{{ k.label | transloco }}</mat-option>
@@ -153,179 +314,47 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              <button
-                mat-button
-                [attr.aria-label]="
-                  'hq.products.aliases.saveAlias' | transloco: { phrase: alias.phrase }
-                "
-                [disabled]="!editPhrase().trim()"
-                (click)="saveEdit(alias)"
-              >
-                {{ 'common.actions.save' | transloco }}
-              </button>
-              <button mat-button (click)="editingId.set(null)">
-                {{ 'common.actions.cancel' | transloco }}
-              </button>
-            } @else {
-              <span class="phrase">{{ alias.phrase }}</span>
-              <span class="badge">{{ sourceLabel[alias.source] | transloco }}</span>
-              @if (alias.editable) {
+              <div class="suggestion-actions">
                 <button
-                  mat-icon-button
+                  mat-stroked-button
                   [attr.aria-label]="
-                    'hq.products.aliases.edit' | transloco: { phrase: alias.phrase }
+                    'hq.products.card.acceptPhrase' | transloco: { phrase: s.phrase }
                   "
-                  (click)="startEdit(alias)"
+                  (click)="acceptSuggestion(s)"
                 >
-                  <mat-icon aria-hidden="true">edit</mat-icon>
+                  {{ 'hq.products.card.accept' | transloco }}
                 </button>
                 <button
                   mat-icon-button
-                  [attr.aria-label]="
-                    'hq.products.aliases.remove' | transloco: { phrase: alias.phrase }
-                  "
-                  (click)="facade.removeAlias(alias)"
+                  [attr.aria-label]="'hq.products.card.reject' | transloco: { phrase: s.phrase }"
+                  (click)="facade.rejectSuggestion(s)"
                 >
-                  <mat-icon aria-hidden="true">delete</mat-icon>
+                  <mat-icon aria-hidden="true">close</mat-icon>
                 </button>
+              </div>
+              @if (s.collisions.length) {
+                <p class="collision">
+                  <mat-icon aria-hidden="true">warning</mat-icon
+                  >{{
+                    'hq.products.card.alsoMatches'
+                      | transloco: { products: s.collisions.join(', ') }
+                  }}
+                </p>
               }
-            }
-          </li>
-        }
-      </ul>
-    } @empty {
-      <p>{{ 'hq.products.aliases.empty' | transloco }}</p>
-    }
-    <div class="row">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>{{ 'hq.products.aliases.new' | transloco }}</mat-label>
-        <input matInput [value]="newAlias()" (input)="newAlias.set($any($event.target).value)" />
-      </mat-form-field>
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 0 1 180px">
-        <mat-label>{{ 'hq.products.aliases.kindLabel' | transloco }}</mat-label>
-        <mat-select [value]="facade.newAliasKind()" (valueChange)="facade.newAliasKind.set($event)">
-          @for (k of kinds; track k.value) {
-            <mat-option [value]="k.value">{{ k.label | transloco }}</mat-option>
+            </li>
           }
-        </mat-select>
-      </mat-form-field>
-      <button mat-stroked-button [disabled]="!newAlias().trim()" (click)="addAlias()">
-        {{ 'hq.products.aliases.add' | transloco }}
-      </button>
-    </div>
-    @for (c of facade.collisions(); track c.phrase) {
-      <p class="warning" role="status">
-        {{
-          'hq.products.aliases.collision'
-            | transloco: { phrase: c.phrase, products: c.productNames.join(', ') }
-        }}
-      </p>
-    }
-    @if (facade.aliasMessage(); as message) {
-      <p role="alert">
-        {{ message.key | transloco: message.params }}
-        <button mat-button (click)="facade.retryAliases()">
-          {{ 'common.actions.retry' | transloco }}
-        </button>
-      </p>
-    }
-  </section>
-
-  <section class="card" aria-labelledby="product-card">
-    <h2 id="product-card">{{ 'hq.products.card.title' | transloco }}</h2>
-    <p>{{ 'hq.products.card.intro' | transloco }}</p>
-    <app-pdf-dropzone
-      [label]="'hq.products.card.pdfLabel' | transloco"
-      [fileName]="attachedName()"
-      [disabled]="cardBusy()"
-      (filesSelected)="attach($event)"
-    />
-    @if (facade.card(); as card) {
-      <p role="status">
-        {{ 'hq.products.card.status' | transloco: { status: cardStatus[card.status] | transloco } }}
-      </p>
-    }
-    @if (facade.suggestions().length) {
-      <div class="suggestions-head">
-        <h3>
-          {{ 'hq.products.card.suggestions' | transloco: { count: facade.suggestions().length } }}
-        </h3>
-        <button
-          mat-flat-button
-          [attr.aria-label]="'hq.products.card.acceptAllLabel' | transloco"
-          (click)="acceptAll()"
-        >
-          {{ 'hq.products.card.acceptAll' | transloco }}
-        </button>
-      </div>
-      <p class="muted">{{ 'hq.products.card.suggestionsHint' | transloco }}</p>
-      <ul>
-        @for (s of facade.suggestions(); track s.phrase) {
-          <li class="suggestion">
-            <div class="suggestion-fields">
-              <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                <mat-label>{{ 'hq.products.aliases.phrase' | transloco }}</mat-label>
-                <input
-                  matInput
-                  [attr.aria-label]="
-                    'hq.products.card.suggestedPhrase' | transloco: { phrase: s.phrase }
-                  "
-                  [value]="suggestionText(s)"
-                  (input)="suggestionEdits.set(s.phrase, $any($event.target).value)"
-                />
-              </mat-form-field>
-              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="kind">
-                <mat-label>{{ 'hq.products.aliases.kindLabel' | transloco }}</mat-label>
-                <mat-select
-                  [aria-label]="'hq.products.card.suggestedKind' | transloco: { phrase: s.phrase }"
-                  [value]="suggestionKind(s)"
-                  (valueChange)="suggestionKinds.set(s.phrase, $event)"
-                >
-                  @for (k of kinds; track k.value) {
-                    <mat-option [value]="k.value">{{ k.label | transloco }}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="suggestion-actions">
-              <button
-                mat-stroked-button
-                [attr.aria-label]="
-                  'hq.products.card.acceptPhrase' | transloco: { phrase: s.phrase }
-                "
-                (click)="acceptSuggestion(s)"
-              >
-                {{ 'hq.products.card.accept' | transloco }}
-              </button>
-              <button
-                mat-icon-button
-                [attr.aria-label]="'hq.products.card.reject' | transloco: { phrase: s.phrase }"
-                (click)="facade.rejectSuggestion(s)"
-              >
-                <mat-icon aria-hidden="true">close</mat-icon>
-              </button>
-            </div>
-            @if (s.collisions.length) {
-              <p class="collision">
-                <mat-icon aria-hidden="true">warning</mat-icon
-                >{{
-                  'hq.products.card.alsoMatches' | transloco: { products: s.collisions.join(', ') }
-                }}
-              </p>
-            }
-          </li>
-        }
-      </ul>
-    }
-    @if (facade.cardMessage() || facade.card()?.status === 'FAILED') {
-      @let cardMessage =
-        facade.cardMessage() ?? { key: 'hq.products.card.failed', params: undefined };
-      <p role="alert">
-        {{ cardMessage.key | transloco: cardMessage.params }}
-        <button mat-button (click)="facade.retryCard()">
-          {{ 'hq.products.card.retry' | transloco }}
-        </button>
-      </p>
-    }
-  </section>
+        </ul>
+      }
+      @if (facade.cardMessage() || facade.card()?.status === 'FAILED') {
+        @let cardMessage =
+          facade.cardMessage() ?? { key: 'hq.products.card.failed', params: undefined };
+        <p role="alert">
+          {{ cardMessage.key | transloco: cardMessage.params }}
+          <button mat-button (click)="facade.retryCard()">
+            {{ 'hq.products.card.retry' | transloco }}
+          </button>
+        </p>
+      }
+    </section>
+  }
 }

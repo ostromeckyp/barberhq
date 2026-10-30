@@ -30,6 +30,8 @@ export class HqQueueFacade {
   });
   readonly rows = computed(() => (this.page.hasValue() ? this.page.value().items : []));
   readonly loading = this.page.isLoading;
+  /** True once a page has loaded; counts and empty text wait for it. */
+  readonly loaded = computed(() => this.page.hasValue());
   readonly error = computed(() => !!this.page.error());
   readonly pending = computed(() => this.rows().filter((r) => r.state === 'PENDING_APPROVAL'));
   readonly reserved = computed(() => this.rows().filter((r) => r.state === 'RESERVED'));

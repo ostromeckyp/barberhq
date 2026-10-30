@@ -25,9 +25,9 @@ const detail = {
   revision: 7,
   catalogRevision: 7,
 };
-async function render(productId?: string) {
+async function render(productId?: string, read = vi.fn().mockResolvedValue(detail)) {
   const api = {
-    read: vi.fn().mockResolvedValue(detail),
+    read,
     listAliases: vi.fn().mockResolvedValue({
       aliases: [
         { id: 'a', phrase: 'beton', kind: 'NAME', source: 'HQ', editable: true, revision: 1 },
@@ -178,4 +178,22 @@ it('removes an accepted suggestion even after HQ edited its phrase', async () =>
   (el.querySelector('button[aria-label="Accept betonik"]') as HTMLButtonElement).click();
   await new Promise((r) => setTimeout(r));
   expect(facade.suggestions()).toEqual([]);
+});
+it('disables the form and Save and shows a progress bar while the product loads', async () => {
+  const { el, fixture } = await render(
+    'b:p',
+    vi.fn().mockReturnValue(new Promise(() => undefined)),
+  );
+  await new Promise((r) => setTimeout(r, 250));
+  fixture.detectChanges();
+  expect(el.querySelector('[role="progressbar"]')).not.toBeNull();
+  expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
+  expect(el.querySelector<HTMLInputElement>('input')!.disabled).toBe(true);
+});
+it('shows an empty state with Retry and no form when the product cannot load', async () => {
+  const { el, fixture } = await render('b:p', vi.fn().mockRejectedValue(new Error('offline')));
+  expect(el.querySelector('app-empty-state')).not.toBeNull();
+  expect(el.textContent).toContain('Retry');
+  expect(el.querySelector('form')).toBeNull();
+  expect(fixture).toBeTruthy();
 });

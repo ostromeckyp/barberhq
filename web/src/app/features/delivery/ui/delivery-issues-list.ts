@@ -97,23 +97,25 @@ import { DeliveryProcedureSettings } from './delivery-procedure-settings';
         }
       </div>
     }
-    <nav [attr.aria-label]="'delivery.issues.pages' | transloco">
-      <button
-        mat-button
-        type="button"
-        (click)="facade.previous()"
-        [disabled]="facade.offset() === 0 || facade.loading()"
-      >
-        {{ 'common.actions.previous' | transloco }}</button
-      ><button
-        mat-button
-        type="button"
-        (click)="facade.next()"
-        [disabled]="!facade.hasNext() || facade.loading()"
-      >
-        {{ 'common.actions.next' | transloco }}
-      </button>
-    </nav>
+    @if (facade.offset() > 0 || facade.hasNext()) {
+      <nav [attr.aria-label]="'delivery.issues.pages' | transloco">
+        <button
+          mat-button
+          type="button"
+          (click)="facade.previous()"
+          [disabled]="facade.offset() === 0 || facade.loading()"
+        >
+          {{ 'common.actions.previous' | transloco }}</button
+        ><button
+          mat-button
+          type="button"
+          (click)="facade.next()"
+          [disabled]="!facade.hasNext() || facade.loading()"
+        >
+          {{ 'common.actions.next' | transloco }}
+        </button>
+      </nav>
+    }
   `,
   styles: `
     :host {
