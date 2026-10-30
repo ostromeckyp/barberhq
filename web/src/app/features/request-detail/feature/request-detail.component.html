@@ -244,29 +244,35 @@
     </div>
     <aside class="card stock" aria-labelledby="stock-title">
       <h2 id="stock-title">{{ 'requests.detail.stock.title' | transloco }}</h2>
-      <table class="stock-table" [attr.aria-label]="'requests.detail.stock.title' | transloco">
-        <thead>
-          <tr>
-            <th scope="col" class="stock-product">
+      <table class="stock-table" role="table" aria-labelledby="stock-title">
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader" class="stock-product">
               {{ 'requests.detail.stock.product' | transloco }}
             </th>
-            <th scope="col">{{ 'requests.detail.stock.hq' | transloco }}</th>
-            <th scope="col">{{ 'requests.detail.stock.reserved' | transloco }}</th>
-            <th scope="col">{{ 'requests.detail.stock.available' | transloco }}</th>
-            <th scope="col">{{ 'requests.detail.stock.inTransit' | transloco }}</th>
-            <th scope="col">
+            <th scope="col" role="columnheader">{{ 'requests.detail.stock.hq' | transloco }}</th>
+            <th scope="col" role="columnheader">
+              {{ 'requests.detail.stock.reserved' | transloco }}
+            </th>
+            <th scope="col" role="columnheader">
+              {{ 'requests.detail.stock.available' | transloco }}
+            </th>
+            <th scope="col" role="columnheader">
+              {{ 'requests.detail.stock.inTransit' | transloco }}
+            </th>
+            <th scope="col" role="columnheader">
               {{ 'requests.detail.stock.salon' | transloco: { salon: request.salonName } }}
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           @for (item of request.items; track item.productId) {
-            <tr>
-              <th scope="row" class="stock-product">{{ item.productName }}</th>
-              <td class="qty" data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</td>
-              <td class="qty">{{ item.stock.hqReserved }}</td>
-              <td class="qty">{{ item.stock.hqAvailable }}</td>
-              <td class="qty" data-testid="in-transit">
+            <tr role="row">
+              <th scope="row" role="rowheader" class="stock-product">{{ item.productName }}</th>
+              <td role="cell" class="qty" data-testid="hq-on-hand">{{ item.stock.hqOnHand }}</td>
+              <td role="cell" class="qty">{{ item.stock.hqReserved }}</td>
+              <td role="cell" class="qty">{{ item.stock.hqAvailable }}</td>
+              <td role="cell" class="qty" data-testid="in-transit">
                 {{
                   item.delivery?.inTransit ??
                     (request.state === 'RECEIVED' || request.state === 'RECEIVED_WITH_ISSUE'
@@ -274,7 +280,9 @@
                       : item.dispatchedQuantity - item.receivedQuantity)
                 }}
               </td>
-              <td class="qty" data-testid="salon-on-hand">{{ item.stock.salonOnHand }}</td>
+              <td role="cell" class="qty" data-testid="salon-on-hand">
+                {{ item.stock.salonOnHand }}
+              </td>
             </tr>
           }
         </tbody>

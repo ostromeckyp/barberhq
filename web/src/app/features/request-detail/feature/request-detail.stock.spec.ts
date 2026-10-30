@@ -75,3 +75,15 @@ it('explains the columns once in a legend, not per row', () => {
   expect(el.querySelectorAll('aside .stock-legend')).toHaveLength(1);
   expect(el.textContent?.match(/On the shelf/g)).toHaveLength(1);
 });
+
+it('keeps table semantics with explicit roles', () => {
+  const el = render();
+  const table = el.querySelector('aside table')!;
+  expect(table.getAttribute('role')).toBe('table');
+  expect(table.getAttribute('aria-labelledby')).toBe('stock-title');
+  expect(table.querySelectorAll('thead[role="rowgroup"], tbody[role="rowgroup"]')).toHaveLength(2);
+  expect(table.querySelectorAll('tr[role="row"]')).toHaveLength(3);
+  expect(table.querySelectorAll('th[role="columnheader"]')).toHaveLength(6);
+  expect(table.querySelectorAll('th[role="rowheader"]')).toHaveLength(2);
+  expect(table.querySelectorAll('td[role="cell"]')).toHaveLength(10);
+});

@@ -143,7 +143,10 @@ mat-tab-group mat-icon {
   color: var(--ink);
   border: 0;
   text-align: center;
-  font: 600 16px var(--font-mono);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -157,7 +160,9 @@ mat-tab-group mat-icon {
   color: var(--muted);
 }
 .line-stock b {
-  font: 600 13px var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--ink);
   white-space: nowrap;
 }
