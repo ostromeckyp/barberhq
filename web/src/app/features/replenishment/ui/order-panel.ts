@@ -14,7 +14,7 @@ import { OrderFacade } from '../feature/order.facade';
 import { ReplenishmentAssistantFacade } from '../feature/replenishment-assistant.facade';
 import { AssistantInput } from './assistant-input';
 import { ClarificationInput } from './clarification-input';
-import { INVENTORY_UNAVAILABLE_REASON } from '../feature/draft.store';
+import { clarificationReasonKey } from '../feature/clarification-reason';
 import { runtimeConfig } from '../../../core/public-config';
 @Component({
   selector: 'app-order-panel',
@@ -57,9 +57,7 @@ export class OrderPanel {
   }
   /** Translation key when the unresolved reason was written by this app; `undefined` for server text. */
   reasonKey(line: DraftLine): string | undefined {
-    return line.status !== 'READY' && line.reason === INVENTORY_UNAVAILABLE_REASON
-      ? INVENTORY_UNAVAILABLE_REASON
-      : undefined;
+    return clarificationReasonKey(line);
   }
   quantity(event: Event, lineId: string) {
     this.facade.draft.editQuantity(lineId, (event.target as HTMLInputElement).valueAsNumber);

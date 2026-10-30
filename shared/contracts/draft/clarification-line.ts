@@ -4,6 +4,8 @@ export type ClarificationLine = {
   lineId: string;
   originalWording: string;
   reason: string;
+  /** Stable code for `reason`, so clients can show it in their own language. */
+  reasonCode?: 'BATCH_LIMIT' | 'CHOOSE_PRODUCT' | 'ENTER_QUANTITY';
   origin: LineOrigin;
   candidates: { productId: string; productName: string }[];
   quantity?: number;

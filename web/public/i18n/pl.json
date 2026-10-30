@@ -698,7 +698,7 @@
       "openToReconcile": "Otwórz {{ salon }}, aby uzgodnić",
       "reconcile": "Uzgodnij zapisane zamówienie",
       "checking": "Trwa sprawdzanie…",
-      "blocked": "Zapisane dane wysyłki wymagają uzgodnienia, zanim wyślesz nowe zamówienie. Skontaktuj się z operatorem demo. Zapisane dane zostały zachowane.",
+      "blocked": "Zapisane dane zamówienia wymagają uzgodnienia, zanim złożysz nowe zamówienie. Skontaktuj się z operatorem demo. Zapisane dane zostały zachowane.",
       "tabs": {
         "assistant": "Asystent",
         "manual": "Ręcznie"
@@ -722,18 +722,18 @@
       "available": " dostępne",
       "salon": "Salon",
       "projected": "Przewidywany stan salonu po pełnym odbiorze.",
-      "shortage": "Centrala ma dostępne: {{ available }}. Nadal możesz wysłać zamówienie — decyduje centrala. Nic nie jest zamieniane automatycznie.",
+      "shortage": "Centrala ma dostępne: {{ available }}. Nadal możesz złożyć zamówienie — decyduje centrala. Nic nie jest zamieniane automatycznie.",
       "quantityError": "Wpisz liczbę całkowitą od 1 do 99.",
       "reasonQty": "{{ reason }} · Ilość: {{ quantity }}",
       "empty": "Lista zamówienia jest pusta.",
-      "submit": "Wyślij zamówienie",
-      "submitting": "Trwa wysyłanie…",
+      "submit": "Złóż zamówienie",
+      "submitting": "Trwa składanie zamówienia…",
       "outcome": {
         "CREATED": "UTWORZONO",
         "FAILED": "NIEPOWODZENIE",
         "UNKNOWN": "NIEZNANY"
       },
-      "failed": "Zamówienie nie zostało wysłane ({{ code }}). Przejrzyj całą listę przed ponowną próbą.",
+      "failed": "Zamówienie nie zostało złożone ({{ code }}). Przejrzyj całą listę przed ponowną próbą.",
       "openExisting": "Otwórz istniejące zamówienie: {{ product }}",
       "footer": "Stan magazynowy nie zmienia się, dopóki centrala nie wyśle zamówienia, a Ty nie potwierdzisz odbioru.",
       "notices": {
@@ -741,12 +741,12 @@
         "maxProducts": "Lista może zawierać maksymalnie sześć produktów."
       },
       "errors": {
-        "storage": "Włącz pamięć sesji w przeglądarce przed wysłaniem. Żadne zamówienie nie zostało wysłane.",
+        "storage": "Włącz pamięć sesji w przeglądarce przed złożeniem zamówienia. Żadne zamówienie nie zostało złożone.",
         "clearState": "Nie udało się wyczyścić zapisanego stanu. Uzgodnij to samo zamówienie, zanim przejdziesz dalej."
       }
     },
     "draft": {
-      "inventoryUnavailable": "Stan magazynowy produktu jest niedostępny. Odśwież i dodaj ten produkt ponownie przed wysłaniem."
+      "inventoryUnavailable": "Stan magazynowy produktu jest niedostępny. Odśwież i dodaj ten produkt ponownie przed złożeniem zamówienia."
     },
     "assistant": {
       "label": "Czego potrzebujesz?",
@@ -769,13 +769,18 @@
       },
       "notices": {
         "unresolved": "Przejrzyj poniższe nierozwiązane pozycje.",
-        "added": "Propozycja dodana. Sprawdź ilości, a następnie wyślij zamówienie.",
+        "added": "Propozycja dodana. Sprawdź ilości, a następnie złóż zamówienie.",
         "excluded": "Te produkty mają już aktywne zamówienia.",
         "specify": "Podaj produkty i ilości, a następnie ponownie przygotuj propozycję."
       },
       "shorthand": {
         "learned": "Zapisano jako skrót salonu. Możesz go usunąć w Ustawieniach.",
         "notSaved": "Produkt zastosowany. Skrót salonu nie został zapisany; następnym razem wybierz ponownie."
+      },
+      "reasons": {
+        "BATCH_LIMIT": "Przygotuj najwyżej sześć pozycji naraz. Żadna pozycja nie została odrzucona.",
+        "CHOOSE_PRODUCT": "Wybierz produkt z katalogu.",
+        "ENTER_QUANTITY": "Wpisz całkowitą ilość od 1 do 99."
       }
     },
     "clarify": {

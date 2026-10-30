@@ -366,7 +366,27 @@ describe('verified replenishment tools', () => {
       })),
     );
     expect(result.status).toBe('NEEDS_CLARIFICATION');
-    expect(result.lines[0]).toMatchObject({ status: 'NEEDS_CLARIFICATION', originalWording: text });
+    expect(result.lines[0]).toMatchObject({
+      status: 'NEEDS_CLARIFICATION',
+      originalWording: text,
+      reasonCode: 'BATCH_LIMIT',
+    });
+  });
+  it('gives each clarification a stable reason code next to the English reason', async () => {
+    const result = await tools('2 szampon, 0 Matowa').calculateProposal([
+      { originalWording: '2 szampon', productQuery: 'szampon', quantity: 2 },
+      { originalWording: '0 Matowa', productQuery: 'Matowa', quantity: 0 },
+    ]);
+    expect(result.lines).toEqual([
+      expect.objectContaining({
+        reason: 'Choose a catalog product.',
+        reasonCode: 'CHOOSE_PRODUCT',
+      }),
+      expect.objectContaining({
+        reason: 'Enter a whole quantity from 1 to 99.',
+        reasonCode: 'ENTER_QUANTITY',
+      }),
+    ]);
   });
   it('preserves a second occurrence when only the first identical wording was clarified', async () => {
     const text = '2 matte and 2 matte';

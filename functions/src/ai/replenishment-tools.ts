@@ -117,6 +117,7 @@ export function createReplenishmentTools(options: {
           lineId: `line-0-${input.message.length}`,
           originalWording: input.message,
           reason: 'Prepare up to six items at a time. No items were discarded.',
+          reasonCode: 'BATCH_LIMIT',
           origin: 'assistant',
           candidates: [],
         });
@@ -143,6 +144,7 @@ export function createReplenishmentTools(options: {
               found.length !== 1
                 ? 'Choose a catalog product.'
                 : 'Enter a whole quantity from 1 to 99.',
+            reasonCode: found.length !== 1 ? 'CHOOSE_PRODUCT' : 'ENTER_QUANTITY',
             candidates: candidates.map(({ productId, productName }) => ({
               productId,
               productName,

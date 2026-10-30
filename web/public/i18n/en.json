@@ -776,6 +776,11 @@
       "shorthand": {
         "learned": "Saved as salon shorthand. You can remove it in Settings.",
         "notSaved": "Product applied. The salon shorthand was not saved; choose again next time."
+      },
+      "reasons": {
+        "BATCH_LIMIT": "Prepare up to six items at a time. No items were discarded.",
+        "CHOOSE_PRODUCT": "Choose a catalog product.",
+        "ENTER_QUANTITY": "Enter a whole quantity from 1 to 99."
       }
     },
     "clarify": {
