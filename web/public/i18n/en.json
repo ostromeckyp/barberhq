@@ -365,7 +365,6 @@
     },
     "review": {
       "eyebrow": "DOCUMENT REVIEW",
-      "coverage": "{{ checked }} of {{ total }} pages reviewed",
       "publishedNotice": "Published. This version is read-only; the original PDF and extracted text remain available for reference.",
       "instruction": "Compare the original PDF and extracted text for every physical page. Checks reflect your review of the rendered original; server review history never checks pages for you.",
       "navLabel": "Review page navigation",
@@ -400,6 +399,12 @@
       "notices": {
         "queued": "Publication queued. The server will finish this version in the background.",
         "serverStatus": "Server status: {{ status }}."
+      },
+      "coverage": {
+        "one": "{{ checked }} of {{ total }} page reviewed",
+        "few": "{{ checked }} of {{ total }} pages reviewed",
+        "many": "{{ checked }} of {{ total }} pages reviewed",
+        "other": "{{ checked }} of {{ total }} pages reviewed"
       }
     },
     "product": {
@@ -448,7 +453,6 @@
       "leaveUnlinked": "Leave this passage unlinked",
       "noKnowledge": "This catalog intentionally adds no product knowledge",
       "impact": "Collision impact",
-      "impactCounts": "{{ before }} → {{ after }} products",
       "ambiguous": "Ambiguous; requires clarification",
       "noImpact": "No accepted alias changes. Save draft to calculate current impact.",
       "save": "Save draft and refresh impact",
@@ -474,6 +478,12 @@
         "reloadFailed": "The latest review could not be loaded. Your local edits are preserved. Retry Reload to discard them only after the latest review loads.",
         "generateFailed": "Generation is unavailable. Your draft is preserved; edit manually or retry.",
         "unconfirmed": "The result could not be confirmed. Retry the same action or refresh the review."
+      },
+      "impactCounts": {
+        "one": "{{ before }} → {{ after }} product",
+        "few": "{{ before }} → {{ after }} products",
+        "many": "{{ before }} → {{ after }} products",
+        "other": "{{ before }} → {{ after }} products"
       }
     }
   }

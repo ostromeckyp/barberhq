@@ -1,4 +1,6 @@
 import { TranslocoPipe } from '@jsverse/transloco';
+import { Language } from '../../core/language';
+import { pluralKey } from '../../core/i18n/plural';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,6 +38,10 @@ export class ProductKnowledgeReviewComponent {
   readonly linkMethodKeys = linkMethodKeys;
   readonly aliasSourceKeys = aliasSourceKeys;
   readonly facade = inject(ProductKnowledgeReviewFacade);
+  private readonly language = inject(Language);
+  impactKey(after: number): string {
+    return pluralKey('procedures.product.impactCounts', after, this.language.current());
+  }
   readonly versionId = input.required<string>();
   readonly disabled = input(false);
   readonly chunkId = signal('');

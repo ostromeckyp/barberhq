@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { provenanceKey } from './provenance-key';
+import { Language } from '../../core/language';
+import { pluralKey } from '../../core/i18n/plural';
 import { Component, ElementRef, effect, inject, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -55,6 +57,10 @@ export class DocumentReviewComponent {
     });
   }
   readonly provenanceKey = provenanceKey;
+  private readonly language = inject(Language);
+  coverageKey(total: number): string {
+    return pluralKey('procedures.review.coverage', total, this.language.current());
+  }
   readonly facade = inject(DocumentReviewFacade);
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('pageCanvas');
 

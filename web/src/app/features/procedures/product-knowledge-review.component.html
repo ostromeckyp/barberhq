@@ -271,7 +271,7 @@
             <strong>{{ impact.normalized }}</strong
             >:
             {{
-              'procedures.product.impactCounts'
+              impactKey(impact.afterProductIds.length)
                 | transloco
                   : { before: impact.beforeProductIds.length, after: impact.afterProductIds.length }
             }}

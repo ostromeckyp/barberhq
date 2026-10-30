@@ -17,7 +17,7 @@
       @if (!facade.published()) {
         <div class="coverage" aria-live="polite">
           {{
-            'procedures.review.coverage'
+            coverageKey(facade.totalPages())
               | transloco: { checked: facade.checkedPages().size, total: facade.totalPages() }
           }}
         </div>
