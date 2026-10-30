@@ -41,7 +41,7 @@ async function classify(page: Page, good: string, damaged: string) {
 }
 async function returnFromPdf(page: Page, label: string) {
   await page.getByTestId('pdf-page-canvas').waitFor();
-  await page.getByRole('button', { name: label, exact: true }).click();
+  await page.getByRole('button', { name: `Back to ${label}`, exact: true }).click();
 }
 async function createIssue(reference = true) {
   return executeDelivery(h, 'legnicka', {
@@ -207,7 +207,7 @@ test.describe('Feature: continue delivery work across procedures and interrupted
       test.beforeEach(async ({ page }) => {
         await returnFromPdf(page, 'Check delivery');
         await page.getByRole('button', { name: 'Back to request', exact: true }).click();
-        await page.getByRole('button', { name: 'Requests', exact: true }).click();
+        await page.getByRole('button', { name: 'Back to requests', exact: true }).click();
       });
       test('Then the validated filter and page survive the entire round trip', async ({ page }) => {
         await expect(page).toHaveURL(new RegExp(`/requests\\?filter=ACTIVE&offset=20$`));

@@ -200,13 +200,14 @@ test.describe('Feature: design fidelity for request and procedure controls', () 
   });
   test.describe('Given the procedure assistant', () => {
     test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => localStorage.setItem('barberhq.language', 'pl'));
       await page.setViewportSize({ width: 320, height: 900 });
       await page.goto('/procedures');
     });
     test.describe('When a Polish question is entered', () => {
       test.beforeEach(async ({ page }) => {
         await page
-          .getByRole('textbox', { name: 'Question', exact: true })
+          .getByRole('textbox', { name: 'Pytanie', exact: true })
           .fill('Co zrobić z uszkodzoną dostawą?');
       });
       test('Then the form accepts it without an English-only hint and tabs retain their names', async ({
@@ -214,13 +215,13 @@ test.describe('Feature: design fidelity for request and procedure controls', () 
       }) => {
         await expect(page.getByText('English questions only', { exact: true })).toHaveCount(0);
         await expect(
-          page.getByRole('button', { name: 'Ask assistant', exact: true }),
+          page.getByRole('button', { name: 'Zapytaj asystenta', exact: true }),
         ).toBeEnabled();
         await expect(
-          page.getByRole('tab', { name: 'Assistant', exact: true }).locator('mat-icon'),
+          page.getByRole('tab', { name: 'Asystent', exact: true }).locator('mat-icon'),
         ).toHaveText('auto_awesome');
         await expect(
-          page.getByRole('tab', { name: 'Documents', exact: true }).locator('mat-icon'),
+          page.getByRole('tab', { name: 'Dokumenty', exact: true }).locator('mat-icon'),
         ).toHaveText('folder_open');
         await page.screenshot({
           path: `${evidence}/procedures-${phase}-320.png`,
@@ -242,7 +243,7 @@ test.describe('Feature: design fidelity for request and procedure controls', () 
       test('Then it fills a Polish question without starting an answer request', async ({
         page,
       }) => {
-        await expect(page.getByRole('textbox', { name: 'Question', exact: true })).toHaveValue(
+        await expect(page.getByRole('textbox', { name: 'Pytanie', exact: true })).toHaveValue(
           'Otrzymaliśmy uszkodzony produkt. Co powinniśmy zrobić?',
         );
         expect(aiCalls).toBe(0);

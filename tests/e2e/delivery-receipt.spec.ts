@@ -171,7 +171,7 @@ test.describe('Feature: inspect a salon delivery and keep the evidence', () => {
           .getByRole('heading', { name: 'Delivery handling procedure', exact: true })
           .waitFor();
         await page.getByTestId('pdf-page-canvas').waitFor();
-        await page.getByRole('button', { name: 'Check delivery', exact: true }).click();
+        await page.getByRole('button', { name: 'Back to Check delivery', exact: true }).click();
         await page.getByRole('heading', { name: 'Check delivery', exact: true }).waitFor();
         await page.screenshot({ path: `${evidence}/receipt-pdf-return.png`, fullPage: true });
       });
