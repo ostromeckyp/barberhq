@@ -3,8 +3,14 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 8px;
+}
+
+// Refresh stays on the right even when the back link is absent.
+.app-page-toolbar > button:last-child {
+  margin-left: auto;
 }
 
 // Side nav labels wrap to two lines instead of truncating.
