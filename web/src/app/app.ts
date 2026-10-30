@@ -1,11 +1,25 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationSkipped,
+  Router,
+  RouterOutlet,
+} from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { filter, map, take } from 'rxjs';
 import { runtimeConfig } from './core/public-config';
+import { BootSplash } from './shared/ui/boot-splash/boot-splash';
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TranslocoPipe],
+  imports: [RouterOutlet, TranslocoPipe, BootSplash],
   template: `@if (configured) {
+      @if (booting()) {
+        <app-boot-splash />
+      }
       <router-outlet />
     } @else {
       <main class="setup">
@@ -25,4 +39,19 @@ import { runtimeConfig } from './core/public-config';
 })
 export class App {
   readonly configured = runtimeConfig.publicConfig !== null;
+  /** True until the first navigation settles; route guards wait for the session meanwhile. */
+  protected readonly booting = toSignal(
+    inject(Router).events.pipe(
+      filter(
+        (event) =>
+          event instanceof NavigationEnd ||
+          event instanceof NavigationCancel ||
+          event instanceof NavigationError ||
+          event instanceof NavigationSkipped,
+      ),
+      take(1),
+      map(() => false),
+    ),
+    { initialValue: true },
+  );
 }
