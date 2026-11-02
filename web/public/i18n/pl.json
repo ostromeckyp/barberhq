@@ -1265,6 +1265,15 @@
         "forbidden": "Nie możesz usunąć tego skrótu.",
         "failed": "Nie udało się usunąć tego skrótu."
       }
+    },
+    "push": {
+      "title": "Powiadomienia",
+      "enable": "Włącz powiadomienia",
+      "on": "Powiadomienia włączone na tym urządzeniu",
+      "disable": "Wyłącz",
+      "denied": "Powiadomienia są zablokowane w ustawieniach przeglądarki",
+      "install": "Dodaj BarberHQ do ekranu głównego, żeby dostawać powiadomienia",
+      "error": "Nie udało się włączyć powiadomień"
     }
   },
   "app": {

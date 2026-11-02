@@ -9,6 +9,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import { SalonSettingsFacade } from './salon-settings.facade';
 import { SalonShorthandFacade } from './salon-shorthand.facade';
+import { PushSettingsComponent } from '../ui/push-settings.component';
 import { SalonShorthandComponent } from '../ui/salon-shorthand.component';
 @Component({
   selector: 'app-salon-settings',
@@ -23,6 +24,7 @@ import { SalonShorthandComponent } from '../ui/salon-shorthand.component';
     MatProgressBarModule,
     PageHeader,
     SalonShorthandComponent,
+    PushSettingsComponent,
   ],
   templateUrl: './salon-settings.component.html',
   styleUrl: './salon-settings.component.scss',
