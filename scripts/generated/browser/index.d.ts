@@ -1087,6 +1087,11 @@ export interface Product_Key {
   __typename?: 'Product_Key';
 }
 
+export interface PushToken_Key {
+  token: string;
+  __typename?: 'PushToken_Key';
+}
+
 export interface ReplenishmentChoiceReceipt_Key {
   id: string;
   __typename?: 'ReplenishmentChoiceReceipt_Key';

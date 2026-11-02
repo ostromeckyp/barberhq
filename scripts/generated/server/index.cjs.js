@@ -633,6 +633,34 @@ function saveProductCardAttachment(dcOrVarsOrOptions, varsOrOptions, options) {
 }
 exports.saveProductCardAttachment = saveProductCardAttachment;
 
+function upsertPushToken(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('UpsertPushToken', inputVars, inputOpts);
+}
+exports.upsertPushToken = upsertPushToken;
+
+function deletePushToken(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('DeletePushToken', inputVars, inputOpts);
+}
+exports.deletePushToken = deletePushToken;
+
+function deletePushTokens(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeMutation('DeletePushTokens', inputVars, inputOpts);
+}
+exports.deletePushTokens = deletePushTokens;
+
+function pushRecipients(dcOrVarsOrOptions, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
+  dcInstance.useGen(true);
+  return dcInstance.executeQuery('PushRecipients', inputVars, inputOpts);
+}
+exports.pushRecipients = pushRecipients;
+
 function readReplenishmentSnapshotHeader(dcOrVarsOrOptions, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts} = validateAdminArgs(connectorConfig, dcOrVarsOrOptions, varsOrOptions, options, true, true);
   dcInstance.useGen(true);
