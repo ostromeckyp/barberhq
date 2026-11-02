@@ -77,11 +77,18 @@ test('mobile sheet preserves the draft through dismissal and desktop resize', as
     await page.setViewportSize({ width: 1280, height: 900 });
     await expect(sheet).toBeHidden();
     await expect(page.getByLabel('Units for Pomada Matowa')).toHaveValue('3');
-    await page.setViewportSize({ width: 320, height: 800 });
     const historyLink = page.getByRole('link', {
       name: 'View requests',
       exact: true,
     });
+    const tableBounds = await page.locator('app-stock-table').boundingBox();
+    const desktopHistoryBounds = await historyLink.boundingBox();
+    expect(
+      tableBounds &&
+        desktopHistoryBounds &&
+        desktopHistoryBounds.y - (tableBounds.y + tableBounds.height),
+    ).toBeLessThanOrEqual(48);
+    await page.setViewportSize({ width: 320, height: 800 });
     await historyLink.scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await expect(trigger).toBeInViewport();

@@ -57,13 +57,16 @@
     [class.with-order-panel]="!mobile() && !!order?.canOrder()"
     [attr.aria-busy]="facade.loading()"
   >
-    <app-stock-table
-      [rows]="facade.rows()"
-      [threshold]="facade.threshold()"
-      [updated]="facade.updated()"
-      [requestEnabled]="!!order?.canOrder()"
-      (requestProduct)="requestProduct($event)"
-    />
+    <div class="inventory-main">
+      <app-stock-table
+        [rows]="facade.rows()"
+        [threshold]="facade.threshold()"
+        [updated]="facade.updated()"
+        [requestEnabled]="!!order?.canOrder()"
+        (requestProduct)="requestProduct($event)"
+      />
+      <ng-container *ngTemplateOutlet="requestsLink" />
+    </div>
     @if (!mobile() && order?.canOrder()) {
       <app-order-panel />
     }
@@ -88,12 +91,18 @@
   </button>
 }
 
-<a
-  class="requests-link"
-  mat-stroked-button
-  [routerLink]="['/salons', context.salonId(), 'requests']"
-  >{{ 'salon.dashboard.viewRequests' | transloco }}</a
->
+@if (!facade.rows().length) {
+  <ng-container *ngTemplateOutlet="requestsLink" />
+}
+
+<ng-template #requestsLink>
+  <a
+    class="requests-link"
+    mat-stroked-button
+    [routerLink]="['/salons', context.salonId(), 'requests']"
+    >{{ 'salon.dashboard.viewRequests' | transloco }}</a
+  >
+</ng-template>
 
 <ng-template #requestSheet>
   <div class="request-sheet-content">

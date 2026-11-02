@@ -16,6 +16,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ResponsiveLayout } from '../../../core/responsive-layout';
@@ -45,6 +46,7 @@ import { SalonInventoryFacade } from './salon-inventory.facade';
     StaleBannerComponent,
     StockTable,
     OrderPanel,
+    NgTemplateOutlet,
     RouterLink,
     TranslocoPipe,
   ],
