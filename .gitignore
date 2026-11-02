@@ -33,3 +33,5 @@ functions-debug.log*
 .idea/
 __pycache__/
 firepit-log.txt
+
+*.swp
