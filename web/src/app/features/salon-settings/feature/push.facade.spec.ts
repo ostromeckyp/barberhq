@@ -130,3 +130,20 @@ it('init never asks for permission', async () => {
   await h.facade.init();
   expect(h.messaging.enable).not.toHaveBeenCalled();
 });
+
+it('a failing silent init keeps the status and shows no error', async () => {
+  const h = setup('granted');
+  h.messaging.currentToken.mockRejectedValueOnce(new Error('sw'));
+  await h.facade.init();
+  expect(h.facade.status()).toBe('granted');
+  h.messaging.status.mockRejectedValueOnce(new Error('sw'));
+  await h.facade.init();
+  expect(h.facade.status()).not.toBe('error');
+});
+
+it('a failing user-initiated enable shows the error', async () => {
+  const h = setup();
+  h.messaging.enable.mockRejectedValueOnce(new Error('x'));
+  await h.facade.enable();
+  expect(h.facade.status()).toBe('error');
+});

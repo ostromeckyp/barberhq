@@ -64,3 +64,15 @@ it('shows the error banner with a retry that calls enable', async () => {
   h.el.querySelector<HTMLButtonElement>('app-stale-banner button')!.click();
   expect(h.facade.enable).toHaveBeenCalled();
 });
+
+it('re-runs the silent init on mount when the status is unsupported', async () => {
+  const h = setup('unsupported');
+  await h.fixture.whenStable();
+  expect(h.facade.init).toHaveBeenCalled();
+});
+
+it('does not re-init on mount when the status is already known', async () => {
+  const h = setup('granted');
+  await h.fixture.whenStable();
+  expect(h.facade.init).not.toHaveBeenCalled();
+});

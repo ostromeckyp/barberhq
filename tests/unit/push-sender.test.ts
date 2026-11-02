@@ -36,7 +36,7 @@ describe('notifyRequestState', () => {
     expect(sendEachForMulticast).toHaveBeenCalledTimes(2);
     const first = sendEachForMulticast.mock.calls[0]![0] as never as {
       tokens: string[];
-      webpush: { notification: Record<string, unknown>; fcmOptions: { link: string } };
+      webpush: { notification: Record<string, unknown> } & Record<string, unknown>;
     };
     expect(first.tokens).toEqual(['a', 'c']);
     const n = first.webpush.notification;
@@ -55,7 +55,7 @@ describe('notifyRequestState', () => {
         },
       },
     });
-    expect(first.webpush.fcmOptions.link).toBe(`/salons/s1/requests/${id}`);
+    expect(first.webpush).not.toHaveProperty('fcmOptions');
     const second = sendEachForMulticast.mock.calls[1]![0] as never as {
       tokens: string[];
       webpush: { notification: { title: string } };
@@ -93,6 +93,33 @@ describe('notifyRequestState', () => {
     }));
     await notifyRequestState({ dc, messaging: { sendEachForMulticast } as never }, id);
     expect(sql.deletePushTokens).toHaveBeenCalledWith(dc, { tokens: ['a', 'c'] });
+  });
+
+  it('logs a warning with the distinct non-dead error codes, never tokens', async () => {
+    recipients([
+      { token: 'secret-a', locale: 'en' },
+      { token: 'secret-b', locale: 'en' },
+      { token: 'secret-c', locale: 'en' },
+    ]);
+    const log = vi.fn();
+    const sendEachForMulticast = vi.fn(async () => ({
+      failureCount: 3,
+      responses: [
+        { success: false, error: { code: 'messaging/internal-error' } },
+        { success: false, error: { code: 'messaging/internal-error' } },
+        { success: false, error: { code: 'messaging/registration-token-not-registered' } },
+      ],
+    }));
+    await notifyRequestState({ dc, messaging: { sendEachForMulticast } as never, log }, id);
+    expect(log).toHaveBeenCalledOnce();
+    const [, fields] = log.mock.calls[0]!;
+    expect(fields).toMatchObject({
+      requestId: id,
+      failureCount: 3,
+      errorCodes: ['messaging/internal-error'],
+    });
+    expect(JSON.stringify(log.mock.calls)).not.toContain('secret');
+    expect(sql.deletePushTokens).toHaveBeenCalledWith(dc, { tokens: ['secret-c'] });
   });
 
   it('logs and swallows a send failure', async () => {

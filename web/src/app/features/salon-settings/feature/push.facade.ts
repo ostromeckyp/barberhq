@@ -60,7 +60,7 @@ export class PushFacade {
       const token = await this.messaging.currentToken();
       if (token) await this.api.register(token, this.language.current());
     } catch {
-      this.status.set('error');
+      /* Silent: the user did not ask for this, so keep the current status and show no error. */
     }
   }
 

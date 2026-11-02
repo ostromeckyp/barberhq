@@ -32,6 +32,8 @@ async function send(deps: PushDeps, requestId: string): Promise<void> {
   }
   const url = `/salons/${row.salonId}/requests/${requestId}`;
   const dead: string[] = [];
+  const otherCodes = new Set<string>();
+  let failureCount = 0;
   for (const [locale, list] of byLocale) {
     const { title, body } = buildRequestPush({
       state,
@@ -54,14 +56,23 @@ async function send(deps: PushDeps, requestId: string): Promise<void> {
             onActionClick: { default: { operation: 'navigateLastFocusedOrOpen', url } },
           },
         },
-        fcmOptions: { link: url },
       },
     });
+    failureCount += result.failureCount ?? 0;
     result.responses.forEach((r, i) => {
+      if (r.success || !r.error) return;
       const token = list[i];
-      if (!r.success && token && r.error && DEAD.has(r.error.code)) dead.push(token);
+      if (DEAD.has(r.error.code)) {
+        if (token) dead.push(token);
+      } else otherCodes.add(r.error.code);
     });
   }
+  if (failureCount > 0)
+    deps.log?.('push delivery failures', {
+      requestId,
+      failureCount,
+      errorCodes: [...otherCodes],
+    });
   if (dead.length) await sql.deletePushTokens(deps.dc, { tokens: dead });
 }
 

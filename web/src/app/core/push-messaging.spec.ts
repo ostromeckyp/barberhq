@@ -55,6 +55,41 @@ describe('PushMessaging', () => {
     expect(await svc().status()).toBe('unsupported');
   });
 
+  it('waits for a late service worker registration before deciding', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Chrome',
+        maxTouchPoints: 0,
+        serviceWorker: {
+          getRegistration: async () => undefined,
+          ready: new Promise((resolve) => setTimeout(() => resolve(registration), 5000)),
+        },
+      });
+      const pending = svc().status();
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(await pending).toBe('default');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('is unsupported when no registration appears within the bound', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Chrome',
+        maxTouchPoints: 0,
+        serviceWorker: { getRegistration: async () => undefined, ready: new Promise(() => {}) },
+      });
+      const pending = svc().status();
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(await pending).toBe('unsupported');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('requires install on iOS outside standalone, otherwise reports permission', async () => {
     env({ ua: 'iPhone', permission: 'granted' });
     expect(await svc().status()).toBe('install-required');

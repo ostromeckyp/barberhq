@@ -10,6 +10,8 @@ export class PushDeniedError extends Error {
   }
 }
 
+const registrationWaitMs = 10_000;
+
 const isIos = () =>
   /iPhone|iPad/.test(navigator.userAgent) ||
   (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
@@ -47,8 +49,23 @@ export class PushMessaging {
     await deleteToken(getMessaging(getApp()));
   }
 
-  private registration() {
-    return navigator.serviceWorker?.getRegistration();
+  private async registration(): Promise<ServiceWorkerRegistration | undefined> {
+    const sw = navigator.serviceWorker;
+    if (!sw) return undefined;
+    const existing = await sw.getRegistration();
+    if (existing) return existing;
+    // ngsw registers late (registerWhenStable); give a fresh install a bounded wait.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<undefined>((done) => {
+      timer = setTimeout(() => done(undefined), registrationWaitMs);
+    });
+    try {
+      return await Promise.race([sw.ready, timeout]);
+    } catch {
+      return undefined;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   private async token(): Promise<string> {

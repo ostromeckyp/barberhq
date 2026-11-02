@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { StaleBannerComponent } from '../../../shared/ui/stale-banner/stale-banner.component';
@@ -44,4 +44,9 @@ import { PushFacade } from '../feature/push.facade';
 })
 export class PushSettingsComponent {
   readonly facade = inject(PushFacade);
+
+  constructor() {
+    // The service worker may have registered after the sign-in check: retry silently.
+    if (untracked(this.facade.status) === 'unsupported') void this.facade.init();
+  }
 }
