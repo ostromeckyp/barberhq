@@ -39,6 +39,7 @@ describe('function router', () => {
   for (const [name, data] of [
     ['rejects an unknown op', { op: 'nope', input: {} }],
     ['rejects a missing op', { input: {} }],
+    ['rejects a missing input', { op: 'a' }],
     ['rejects non-object data', 'a'],
   ] as const) {
     it(name, async () => {
@@ -69,9 +70,9 @@ describe('function router', () => {
         throw thrown;
       }),
     };
-    expect(await rejected(Promise.resolve(createRouter({ a: op })(request({ op: 'a' }))))).toBe(
-      thrown,
-    );
+    expect(
+      await rejected(Promise.resolve(createRouter({ a: op })(request({ op: 'a', input: null })))),
+    ).toBe(thrown);
   });
 
   it('covers the contract exactly', () => {

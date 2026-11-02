@@ -16,7 +16,8 @@ export function createRouter(ops: Record<string, RoutedOperation>) {
       throw new HttpsError('invalid-argument', 'INVALID_OPERATION');
     }
     const { op, input } = data as { op?: unknown; input?: unknown };
-    if (typeof op !== 'string' || !Object.hasOwn(ops, op)) {
+    // `input` must be present; `input: null` stays valid for ops that take no arguments.
+    if (typeof op !== 'string' || !Object.hasOwn(ops, op) || !Object.hasOwn(data, 'input')) {
       throw new HttpsError('invalid-argument', 'INVALID_OPERATION');
     }
     return ops[op].run({ ...request, data: input });
