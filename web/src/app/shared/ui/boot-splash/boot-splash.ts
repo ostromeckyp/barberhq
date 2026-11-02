@@ -22,7 +22,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
       color: var(--ink);
     }
     strong {
-      font-family: 'Archivo Variable', sans-serif;
+      font-family: 'Archivo', sans-serif;
       font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.04em;

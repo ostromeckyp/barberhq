@@ -120,7 +120,7 @@ const statusKeys: Record<DocumentRow['status'], string> = {
       }
       .date dd {
         font:
-          500 13px 'Archivo Variable',
+          500 13px 'Archivo',
           sans-serif;
       }
       .labels {
