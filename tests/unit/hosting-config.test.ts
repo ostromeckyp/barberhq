@@ -213,3 +213,14 @@ it('rejects an incorrect PDF worker MIME at the worker MIME gate', async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+it('allows the public web app manifest', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'barberhq-artifact-'));
+  try {
+    writeFileSync(join(dir, 'index.html'), '<html>app</html>');
+    writeFileSync(join(dir, 'manifest.webmanifest'), '{"name":"BarberHQ"}');
+    expect(inspectArtifact(dir).files).toEqual(['index.html', 'manifest.webmanifest']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

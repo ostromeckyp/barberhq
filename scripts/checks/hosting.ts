@@ -23,7 +23,7 @@ export function inspectArtifact(dir: string): {
       }
       const publicPdfWorker = path === 'pdf.worker.min.mjs';
       if (
-        (!/\.(html|js|css|svg|png|jpg|jpeg|ico|webp|json|woff2?|ttf|txt)$/.test(path) &&
+        (!/\.(html|js|css|svg|png|jpg|jpeg|ico|webp|json|webmanifest|woff2?|ttf|txt)$/.test(path) &&
           !publicPdfWorker) ||
         /(^|\/)(\.|.*\.local\.)|credentials|service.account|ngsw/i.test(path)
       )
