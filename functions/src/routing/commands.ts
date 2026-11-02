@@ -22,6 +22,7 @@ import {
   setHqStockFunction,
   updateProductFunction,
 } from '../products/callables.js';
+import { registerPushTokenFunction, unregisterPushTokenFunction } from '../push/callables.js';
 import { stockCommand } from '../stock/commands.js';
 import { createRouter } from './router.js';
 
@@ -52,6 +53,8 @@ export const commandHandlers = {
   deleteKnowledgeVersion: deleteKnowledgeVersionFunction(),
   saveKnowledgeProductReview: saveKnowledgeProductReviewFunction(),
   acceptKnowledgeProductReview: acceptKnowledgeProductReviewFunction(),
+  registerPushToken: registerPushTokenFunction(),
+  unregisterPushToken: unregisterPushTokenFunction(),
 } satisfies Record<CommandOp, unknown>;
 
 export const commands = onCall(

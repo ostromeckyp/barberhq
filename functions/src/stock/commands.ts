@@ -1,11 +1,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getDataConnect } from 'firebase-admin/data-connect';
-import type { StockAction } from '../../../shared/contracts/stock/index.js';
+import type { CommandResult, StockAction } from '../../../shared/contracts/stock/index.js';
 import { StockRepository } from './repository.js';
 import { parseAction } from './schemas.js';
 import { StockError } from './errors.js';
 import { stockConnectorConfig } from './runtime.js';
 import { CLOUD } from '../cloud-config.js';
+import { notifyAfterStockCommand } from '../push/after-stock-command.js';
 
 export function getStockDataConnect() {
   const emulator = process.env.FUNCTIONS_EMULATOR === 'true';
@@ -28,9 +29,10 @@ export function stockCommand(type: StockAction['type']) {
     },
     async (request) => {
       if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to continue.');
+      let result: CommandResult;
       try {
         const action = parseAction(type, request.data);
-        return await new StockRepository(getStockDataConnect()).execute(request.auth.uid, action);
+        result = await new StockRepository(getStockDataConnect()).execute(request.auth.uid, action);
       } catch (error) {
         if (error instanceof StockError) {
           const code =
@@ -47,6 +49,8 @@ export function stockCommand(type: StockAction['type']) {
         // Do not promise failure: SQL may have committed before its response was lost.
         throw new HttpsError('unavailable', 'Outcome unknown. Retry with the same action key.');
       }
+      await notifyAfterStockCommand(getStockDataConnect(), type, result);
+      return result;
     },
   );
 }

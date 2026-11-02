@@ -26,4 +26,6 @@ export const commandOps = [
   'deleteKnowledgeVersion',
   'saveKnowledgeProductReview',
   'acceptKnowledgeProductReview',
+  'registerPushToken',
+  'unregisterPushToken',
 ] as const;
