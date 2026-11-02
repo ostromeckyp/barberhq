@@ -88,4 +88,14 @@ describe('PushMessaging', () => {
     await svc().disable();
     expect(deleteToken).toHaveBeenCalled();
   });
+
+  it('status and currentToken never request permission', async () => {
+    env({ permission: 'default' });
+    await svc().status();
+    await svc().currentToken();
+    env({ permission: 'granted' });
+    await svc().status();
+    await svc().currentToken();
+    expect(Notification.requestPermission).not.toHaveBeenCalled();
+  });
 });

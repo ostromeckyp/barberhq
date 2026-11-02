@@ -1,12 +1,13 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
+import { StaleBannerComponent } from '../../../shared/ui/stale-banner/stale-banner.component';
 import { PushFacade } from '../feature/push.facade';
 
 /** Notifications section of salon settings; hidden when this device cannot receive push. */
 @Component({
   selector: 'app-push-settings',
-  imports: [MatButtonModule, TranslocoPipe],
+  imports: [MatButtonModule, StaleBannerComponent, TranslocoPipe],
   template: `
     @if (facade.available() && facade.status() !== 'unsupported') {
       <section aria-labelledby="push-settings">
@@ -30,17 +31,17 @@ import { PushFacade } from '../feature/push.facade';
             <p>{{ 'salon.push.install' | transloco }}</p>
           }
           @case ('error') {
-            <p role="alert">{{ 'salon.push.error' | transloco }}</p>
+            <app-stale-banner [message]="'salon.push.error' | transloco">
+              <button mat-button [disabled]="facade.busy()" (click)="facade.enable()">
+                {{ 'salon.push.retry' | transloco }}
+              </button>
+            </app-stale-banner>
           }
         }
       </section>
     }
   `,
 })
-export class PushSettingsComponent implements OnInit {
+export class PushSettingsComponent {
   readonly facade = inject(PushFacade);
-
-  ngOnInit(): void {
-    void this.facade.init();
-  }
 }

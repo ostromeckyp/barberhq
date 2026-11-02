@@ -1,11 +1,14 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { expect, it, vi } from 'vitest';
+import { beforeEach, expect, it, vi } from 'vitest';
+import { ApplicationRef } from '@angular/core';
 import { Language } from '../../../core/language';
 import { PushDeniedError, PushMessaging } from '../../../core/push-messaging';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { PushApi } from '../data-access/push-api';
 import { PushFacade } from './push.facade';
+
+beforeEach(() => localStorage.clear());
 
 function setup(status = 'default', role = 'SALON') {
   const messaging = {
@@ -82,4 +85,48 @@ it('unregisterOnSignOut resolves when unregister rejects', async () => {
 
 it('is available for salon staff only', () => {
   expect(setup('granted', 'HQ').facade.available()).toBe(false);
+});
+
+it('turn off survives a new visit: no re-register, status default', async () => {
+  const first = setup('granted');
+  await first.facade.disable();
+  TestBed.resetTestingModule();
+  const second = setup('granted');
+  await second.facade.init();
+  expect(second.api.register).not.toHaveBeenCalled();
+  expect(second.facade.status()).toBe('default');
+});
+
+it('enable clears the opt-out', async () => {
+  const h = setup('granted');
+  await h.facade.disable();
+  await h.facade.enable();
+  TestBed.resetTestingModule();
+  const next = setup('granted');
+  await next.facade.init();
+  expect(next.api.register).toHaveBeenCalledTimes(1);
+});
+
+it('re-registers on sign-in for salon staff without visiting settings', async () => {
+  const h = setup('granted');
+  TestBed.tick();
+  await TestBed.inject(ApplicationRef).whenStable();
+  expect(h.api.register).toHaveBeenCalledTimes(1);
+});
+
+it('HQ devices never call getToken or unregister', async () => {
+  const h = setup('granted', 'HQ');
+  TestBed.tick();
+  await TestBed.inject(ApplicationRef).whenStable();
+  await h.facade.init();
+  await h.facade.unregisterOnSignOut();
+  expect(h.messaging.currentToken).not.toHaveBeenCalled();
+  expect(h.api.register).not.toHaveBeenCalled();
+  expect(h.api.unregister).not.toHaveBeenCalled();
+});
+
+it('init never asks for permission', async () => {
+  const h = setup('default');
+  await h.facade.init();
+  expect(h.messaging.enable).not.toHaveBeenCalled();
 });

@@ -1273,7 +1273,8 @@
       "disable": "Turn off",
       "denied": "Notifications are blocked in browser settings",
       "install": "Add BarberHQ to the Home Screen to get notifications",
-      "error": "Could not turn on notifications"
+      "error": "Could not turn on notifications",
+      "retry": "Try again"
     }
   },
   "app": {

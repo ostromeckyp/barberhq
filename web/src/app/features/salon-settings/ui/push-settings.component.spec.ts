@@ -29,7 +29,6 @@ it('shows the enable button for default and calls enable on click', async () => 
   expect(button.textContent).toContain('Enable notifications');
   button.click();
   expect(h.facade.enable).toHaveBeenCalled();
-  expect(h.facade.init).toHaveBeenCalled();
 });
 
 it('renders granted, denied, install and error copy', async () => {
@@ -37,7 +36,6 @@ it('renders granted, denied, install and error copy', async () => {
     ['granted', 'Notifications are on on this device'],
     ['denied', 'Notifications are blocked in browser settings'],
     ['install-required', 'Add BarberHQ to the Home Screen'],
-    ['error', 'Could not turn on notifications'],
   ]) {
     TestBed.resetTestingModule();
     const h = setup(status);
@@ -55,4 +53,14 @@ it('is hidden when unsupported or not available', async () => {
   const g = setup('default', false);
   await g.fixture.whenStable();
   expect(g.el.querySelector('section')).toBeNull();
+});
+
+it('shows the error banner with a retry that calls enable', async () => {
+  const h = setup('error');
+  await h.fixture.whenStable();
+  expect(h.el.querySelector('app-stale-banner')?.textContent).toContain(
+    'Could not turn on notifications',
+  );
+  h.el.querySelector<HTMLButtonElement>('app-stale-banner button')!.click();
+  expect(h.facade.enable).toHaveBeenCalled();
 });
