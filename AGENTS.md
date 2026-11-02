@@ -15,3 +15,38 @@
 - Respect `.code-review-graphignore` and the privacy rules above. Never override exclusions to populate the graph. The graph and Python environment remain local in ignored `.code-review-graph/`.
 - Full builds index Git-tracked files; newly untracked code may be absent. Check coverage and inspect allowed source directly when missing. Angular templates, DI, GraphQL and runtime links can be incomplete; an empty graph result does not prove there are no dependencies.
 - Setup and usage: `docs/implementation/code-review-graph.md`.
+
+## Project
+
+- BarberHQ: salon stock and replenishment demo for "Not Bad Stuff" (DevFest talk). HQ manages products and stock; salons see inventory, request products, receive deliveries; a RAG assistant answers procedure questions from cited PDFs.
+- Stack: Angular 22 (standalone, signals, zoneless, Angular Material, Signal Forms, Transloco) in `web/`; Firebase Functions + Genkit in `functions/`; Firebase SQL Connect (Data Connect) schema and operations in `dataconnect/`; Auth and Storage; types shared by web and functions in `shared/contracts/`; tooling, seed, ingest and checks in `scripts/`.
+- Firebase projects: `demo-barberhq` is the local emulator project, `notbad-6be95` is production. Hosting serves `web/dist/barberhq/browser`, with a preview channel `foundation` and `live`.
+- Commands: `docs/commands.md`. Angular layering and signal patterns: `docs/implementation/angular-architecture.md`. Shared UI rules: `web/src/app/shared/ui/README.md`. Design authority: `design_handoff_barberhq/SPEC.md`.
+
+## Git and GitHub
+
+- Repo: https://github.com/ostromeckyp/barberhq (public). `main` is protected: changes land only through a pull request, no force push, no direct push, admins included.
+- Work on a branch, commit with Conventional Commits, push the branch and open a PR with `gh pr create`. Commit, push or open a PR only when the owner asks.
+- Commit authorship uses the GitHub noreply address. Never commit personal emails, phone numbers or real customer data; the repo and its history are public.
+
+## Code rules
+
+- Web layering: route component → feature facade → data-access → generated SDK. Components never call Firebase directly. Folders: `core/`, `features/<name>/{data-access,feature,ui,models}`, `shared/ui`, `shared/styles`, `shell/`.
+- `tests/unit/code-structure.test.ts` enforces: one exported model per file, named after it (web models in `features/<feature>/models/`, function models in `models/`); logic files at most 300 lines. Split a file before it grows past the limit.
+- Reuse shared UI before adding new patterns: `app-page-header`, `app-back-link`, `app-empty-state`, `app-stale-banner`, `*appDelayedLoading` (200 ms), `app-boot-splash`, the `.qty` class for quantities, the `.app-page-toolbar` layout.
+- Every user-visible text is a Transloco key in both `web/public/i18n/en.json` and `web/public/i18n/pl.json`; `tests/unit/i18n-keys.test.ts` checks parity. Polish copy is short, natural UI Polish.
+- TDD: write the failing test first (Vitest for web and unit tests, Playwright for e2e), watch it fail, then fix.
+
+## Verification
+
+- `npm run typecheck`, `npm run test:unit`, `npm run test:web`, `npm run format:check`.
+- E2E needs the emulators (`npm run dev:emulators`, seed once with `npm run dev:seed`) and the web dev server (`npm run dev:web`), then `BARBERHQ_TEST_MODE=emulator npm run test:e2e`. Run specs one file group at a time when they share emulator data; parallel files can collide.
+- Starting the emulators regenerates `scripts/generated/browser/index.d.ts` and `web/src/app/core/generated/index.d.ts`. Revert them with `git checkout --` and never commit them.
+- When done, stop the emulators with `npm run dev:stop` (it exports their data) and stop the web dev server.
+
+## Deployment
+
+- Every write to production (`notbad-6be95`: deploy, seed, reset, database migration) needs the owner's explicit approval for that specific change.
+- Web release: `npm run build:prod` (the Hosting predeploy check rejects dev or emulator builds), then `npm run deploy:preview`, and the owner tests the `foundation` channel. Promote with `npm run deploy:promote` only after the owner says so.
+- Functions: `npm run deploy:functions`. Database: `npm run deploy:db:diff` first, then `npm run deploy:db`. Details and rollback are in `docs/commands.md`.
+- App Check enforcement stays off until after the demo.
