@@ -152,6 +152,22 @@ npm run functions:instances -- 0   # back to scale-to-zero after the demo
 
 The script runs `gcloud run services update <service> --min-instances <n>` and then prints each service's `minScale`. The next `npm run deploy:functions` (or `deploy:functions:routers`) resets the minimum to 0, so run it again after any Functions deploy.
 
+## PWA and push
+
+The installable app and push notifications ship with the production build only. The service worker is off in the emulator and dev builds, so the salon settings "Notifications" section is hidden there. It is also hidden in a production build whose local config has no `messaging.vapidKey`.
+
+Owner steps for production, in order (each is a production change that needs the owner's approval):
+
+1. Firebase console → Project settings → Cloud Messaging → Web Push certificates → Generate key pair. Put the public key in the local config as `messaging.vapidKey` and confirm `firebase.messagingSenderId`.
+2. `gcloud services enable fcm.googleapis.com --project notbad-6be95`
+3. `gcloud projects add-iam-policy-binding notbad-6be95 --member="serviceAccount:baberhq-runtime@notbad-6be95.iam.gserviceaccount.com" --role="roles/firebasecloudmessaging.admin" --condition=None`
+4. `npm run deploy:db:diff`, then `npm run deploy:db` (adds `push_token`).
+5. `npm run deploy:functions`
+6. `npm run build:prod`, then `npm run deploy:preview`. On the phone open the preview URL, install the app, enable notifications in salon settings, then approve, reject or dispatch from HQ on the laptop with the app closed. Tapping the notification opens the request.
+7. Promote (`npm run deploy:promote`) only after the owner's OK.
+
+iOS delivers push only to the app opened from the Home Screen. Notifications and installs are per origin, so the preview and live URLs are separate and each needs its own install and permission.
+
 ## Roll back
 
 - Web app: `npx firebase hosting:clone notbad-6be95@<VERSION_ID> notbad-6be95:live --project notbad-6be95`. Version IDs are in the Firebase console, Hosting → release history.

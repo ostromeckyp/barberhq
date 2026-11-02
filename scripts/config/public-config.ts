@@ -26,6 +26,7 @@ const schema = z
     }),
     hostingSiteId: identifier,
     appCheck: z.strictObject({ siteKey: z.string().min(1) }),
+    messaging: z.strictObject({ vapidKey: z.string().min(1) }).optional(),
     pdfReadUrl: httpsUrl.optional(),
     pdfUploadUrl: httpsUrl.optional(),
     replenishmentEnabled: z.boolean(),

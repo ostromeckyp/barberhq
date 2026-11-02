@@ -6,7 +6,7 @@ import type { SessionState } from '../../../../../../shared/contracts/business/i
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { LoginComponent } from './login.component';
 
-function setup() {
+function setup(returnUrl?: string, salonIds: string[] = []) {
   const state = signal<SessionState>({ status: 'SIGNED_OUT' });
   let complete!: () => void, fail!: (error: Error) => void;
   const signIn = vi.fn(
@@ -20,10 +20,20 @@ function setup() {
     imports: [LoginComponent],
     providers: [
       provideRouter([]),
-      { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({}) } } },
+      {
+        provide: ActivatedRoute,
+        useValue: {
+          snapshot: { queryParamMap: convertToParamMap(returnUrl ? { returnUrl } : {}) },
+        },
+      },
       {
         provide: SessionFacade,
-        useValue: { state, signIn, salons: signal([]), home: () => '/hq' },
+        useValue: {
+          state,
+          signIn,
+          salons: signal(salonIds.map((id) => ({ id }))),
+          home: () => '/hq',
+        },
       },
     ],
   });
@@ -138,4 +148,21 @@ it('shows only the failure message in the shared footer, restoring help for a ne
   expect(h.root.querySelector('[role="alert"]')).toBeNull();
   h.complete();
   await retry;
+});
+
+it.each([
+  ['/salons/b:legnicka/requests/r1', true],
+  ['/salons/b%3Alegnicka/requests/r1', true],
+  ['/salons/b:other/requests/r1', false],
+  ['/salons/b:legnickaX/requests/r1', false],
+  ['https://example.com/salons/b:legnicka', false],
+  ['//example.com', false],
+])('restores the deep link %s after sign-in only inside the user salons: %s', (url, allowed) => {
+  const h = setup(url, ['b:legnicka']);
+  h.state.set({
+    status: 'READY',
+    membership: { userId: 'user', businessId: 'b', role: 'SALON', salonIds: ['b:legnicka'] },
+  });
+  h.fixture.detectChanges();
+  expect(h.navigate).toHaveBeenCalledWith(allowed ? url : '/hq');
 });

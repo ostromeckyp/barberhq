@@ -3,6 +3,12 @@ import { resolve, join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
+const angularWorkerFiles = new Set([
+  'ngsw-worker.js',
+  'ngsw.json',
+  'safety-worker.js',
+  'worker-basic.min.js',
+]);
 export function inspectArtifact(dir: string): {
   files: string[];
   buildHash: string;
@@ -23,9 +29,10 @@ export function inspectArtifact(dir: string): {
       }
       const publicPdfWorker = path === 'pdf.worker.min.mjs';
       if (
-        (!/\.(html|js|css|svg|png|jpg|jpeg|ico|webp|json|woff2?|ttf|txt)$/.test(path) &&
+        (!/\.(html|js|css|svg|png|jpg|jpeg|ico|webp|json|webmanifest|woff2?|ttf|txt)$/.test(path) &&
           !publicPdfWorker) ||
-        /(^|\/)(\.|.*\.local\.)|credentials|service.account|ngsw/i.test(path)
+        /(^|\/)(\.|.*\.local\.)|credentials|service.account/i.test(path) ||
+        (/ngsw/i.test(path) && !angularWorkerFiles.has(path))
       )
         throw new Error(`Private or unexpected Hosting artifact: ${path}`);
       const bytes = readFileSync(full);

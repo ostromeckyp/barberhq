@@ -2,12 +2,14 @@ import { Service, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SalonContext } from '../core/salon-context';
 import { SessionFacade } from '../features/auth/feature/session.facade';
+import { PushFacade } from '../features/salon-settings/feature/push.facade';
 import type { TranslatedText } from '../core/models/translated-text';
 
 @Service({ autoProvided: false })
 export class ShellFacade {
   private readonly session = inject(SessionFacade);
   private readonly router = inject(Router);
+  private readonly push = inject(PushFacade);
   private readonly failure = signal('');
   readonly salonContext = inject(SalonContext);
   readonly salons = this.session.salons;
@@ -47,6 +49,7 @@ export class ShellFacade {
   async signOut() {
     this.failure.set('');
     try {
+      await this.push.unregisterOnSignOut().catch(() => undefined);
       await this.session.signOut();
     } catch {
       this.failure.set('shell.errors.signOut');

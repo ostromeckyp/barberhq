@@ -130,6 +130,29 @@ it('allows only the public PDF.js worker module and scans it for credentials', (
   }
 });
 
+import { readFileSync as readText } from 'node:fs';
+it('allows only the four Angular service worker files', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'barberhq-artifact-'));
+  try {
+    writeFileSync(join(dir, 'index.html'), '<html>app</html>');
+    const workerFiles = ['ngsw-worker.js', 'ngsw.json', 'safety-worker.js', 'worker-basic.min.js'];
+    for (const name of workerFiles) writeFileSync(join(dir, name), '{}');
+    expect(inspectArtifact(dir).files).toEqual(['index.html', ...workerFiles].sort());
+    writeFileSync(join(dir, 'ngsw-evil.js'), '{}');
+    expect(() => inspectArtifact(dir)).toThrow();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+it('keeps no-cache on every Hosting path so the worker and ngsw.json stay fresh', () => {
+  const firebase = JSON.parse(readText('firebase.json', 'utf8')) as {
+    hosting: { headers: { source: string; headers: { key: string; value: string }[] }[] };
+  };
+  const all = firebase.hosting.headers.find((entry) => entry.source === '**');
+  expect(all?.headers).toContainEqual({ key: 'Cache-Control', value: 'no-cache' });
+});
+
 import { verifyRelease } from '../../scripts/checks/release.ts';
 it('blocks emulator artifacts, stale builds and a different deployment project', () => {
   const record = {
@@ -211,5 +234,16 @@ it('rejects an incorrect PDF worker MIME at the worker MIME gate', async () => {
     );
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+it('allows the public web app manifest', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'barberhq-artifact-'));
+  try {
+    writeFileSync(join(dir, 'index.html'), '<html>app</html>');
+    writeFileSync(join(dir, 'manifest.webmanifest'), '{"name":"BarberHQ"}');
+    expect(inspectArtifact(dir).files).toEqual(['index.html', 'manifest.webmanifest']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });

@@ -433,6 +433,23 @@ export interface CreateProductAdminVariables {
   payloadHash: string;
 }
 
+export interface DeletePushTokenData {
+  result?: number | null;
+}
+
+export interface DeletePushTokenVariables {
+  uid: string;
+  token: string;
+}
+
+export interface DeletePushTokensData {
+  result?: number | null;
+}
+
+export interface DeletePushTokensVariables {
+  tokens: string[];
+}
+
 export interface DeliveryActionKey_Key {
   businessId: string;
   actorUid: string;
@@ -965,6 +982,20 @@ export interface PublishKnowledgeVersionVariables {
   versionRevision: number;
   extractionHash: string;
   configHash: string;
+}
+
+export interface PushRecipientsData {
+  request?: unknown[] | null;
+  tokens?: unknown[] | null;
+}
+
+export interface PushRecipientsVariables {
+  requestId: string;
+}
+
+export interface PushToken_Key {
+  token: string;
+  __typename?: 'PushToken_Key';
 }
 
 export interface ReadAiActorData {
@@ -2400,6 +2431,16 @@ export interface UpsertProductVariables {
   observedOn: DateString;
 }
 
+export interface UpsertPushTokenData {
+  result?: number | null;
+}
+
+export interface UpsertPushTokenVariables {
+  uid: string;
+  token: string;
+  locale: string;
+}
+
 export interface UpsertSalonAccessData {
   salonAccess_upsert: SalonAccess_Key;
 }
@@ -2761,6 +2802,26 @@ export function readProductCardAttachment(vars: ReadProductCardAttachmentVariabl
 export function saveProductCardAttachment(dc: DataConnect, vars: SaveProductCardAttachmentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveProductCardAttachmentData>>;
 /** Generated Node Admin SDK operation action function for the 'SaveProductCardAttachment' Mutation. Allow users to pass in custom DataConnect instances. */
 export function saveProductCardAttachment(vars: SaveProductCardAttachmentVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<SaveProductCardAttachmentData>>;
+
+/** Generated Node Admin SDK operation action function for the 'UpsertPushToken' Mutation. Allow users to execute without passing in DataConnect. */
+export function upsertPushToken(dc: DataConnect, vars: UpsertPushTokenVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpsertPushTokenData>>;
+/** Generated Node Admin SDK operation action function for the 'UpsertPushToken' Mutation. Allow users to pass in custom DataConnect instances. */
+export function upsertPushToken(vars: UpsertPushTokenVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<UpsertPushTokenData>>;
+
+/** Generated Node Admin SDK operation action function for the 'DeletePushToken' Mutation. Allow users to execute without passing in DataConnect. */
+export function deletePushToken(dc: DataConnect, vars: DeletePushTokenVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<DeletePushTokenData>>;
+/** Generated Node Admin SDK operation action function for the 'DeletePushToken' Mutation. Allow users to pass in custom DataConnect instances. */
+export function deletePushToken(vars: DeletePushTokenVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<DeletePushTokenData>>;
+
+/** Generated Node Admin SDK operation action function for the 'DeletePushTokens' Mutation. Allow users to execute without passing in DataConnect. */
+export function deletePushTokens(dc: DataConnect, vars: DeletePushTokensVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<DeletePushTokensData>>;
+/** Generated Node Admin SDK operation action function for the 'DeletePushTokens' Mutation. Allow users to pass in custom DataConnect instances. */
+export function deletePushTokens(vars: DeletePushTokensVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<DeletePushTokensData>>;
+
+/** Generated Node Admin SDK operation action function for the 'PushRecipients' Query. Allow users to execute without passing in DataConnect. */
+export function pushRecipients(dc: DataConnect, vars: PushRecipientsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<PushRecipientsData>>;
+/** Generated Node Admin SDK operation action function for the 'PushRecipients' Query. Allow users to pass in custom DataConnect instances. */
+export function pushRecipients(vars: PushRecipientsVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<PushRecipientsData>>;
 
 /** Generated Node Admin SDK operation action function for the 'ReadReplenishmentSnapshotHeader' Query. Allow users to execute without passing in DataConnect. */
 export function readReplenishmentSnapshotHeader(dc: DataConnect, vars: ReadReplenishmentSnapshotHeaderVariables, options?: OperationOptions): Promise<ExecuteOperationResponse<ReadReplenishmentSnapshotHeaderData>>;

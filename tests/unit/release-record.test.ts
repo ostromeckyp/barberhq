@@ -186,6 +186,7 @@ it('rejects a fabricated build-record configuration hash even when its length is
     authDomain: 'notbad-6be95.firebaseapp.com',
   });
   config.appCheck.siteKey = 'public-site';
+  config.messaging.vapidKey = 'public-vapid';
   expect(() => assertBuildConfigurationHash(config, 'd'.repeat(64))).toThrow(/configuration hash/i);
 });
 
@@ -197,6 +198,7 @@ it('verifies a candidate locally before publication without requiring a hosted c
     authDomain: 'notbad-6be95.firebaseapp.com',
   });
   config.appCheck.siteKey = 'public-site';
+  config.messaging.vapidKey = 'public-vapid';
   directory = mkdtempSync(join(tmpdir(), 'release-preflight-'));
   const site = join(directory, 'site');
   mkdirSync(site);

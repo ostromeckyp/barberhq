@@ -1,0 +1,47 @@
+# Server-only web push tokens: register, remove, and resolve recipients of a request notification.
+mutation UpsertPushToken($uid: String!, $token: String!, $locale: String!)
+@auth(level: NO_ACCESS)
+@transaction {
+  result: _execute(
+    sql: """
+    INSERT INTO push_token(token,membership_uid,locale,created_at,updated_at)
+    SELECT $2,m.uid,$3,transaction_timestamp(),transaction_timestamp()
+    FROM membership m WHERE m.uid=$1 AND m.role::text='SALON'
+    ON CONFLICT (token) DO UPDATE SET membership_uid=EXCLUDED.membership_uid,locale=EXCLUDED.locale,
+    updated_at=EXCLUDED.updated_at
+    """
+    params: [$uid, $token, $locale]
+  ) @check(expr: "this > 0", message: "FORBIDDEN")
+}
+
+mutation DeletePushToken($uid: String!, $token: String!) @auth(level: NO_ACCESS) {
+  result: _execute(
+    sql: "DELETE FROM push_token WHERE token=$2 AND membership_uid=$1"
+    params: [$uid, $token]
+  )
+}
+
+mutation DeletePushTokens($tokens: [String!]!) @auth(level: NO_ACCESS) {
+  result: _execute(sql: "DELETE FROM push_token WHERE token = ANY($1::text[])", params: [$tokens])
+}
+
+query PushRecipients($requestId: String!) @auth(level: NO_ACCESS) {
+  request: _select(
+    sql: """
+    SELECT r.id,r.state::text AS state,r.salon_id AS "salonId",l.name AS "salonName",
+    (SELECT a.reason FROM action_receipt a WHERE a.request_id=r.id AND a.action::text='REJECT'
+    ORDER BY a.created_at DESC LIMIT 1) AS reason
+    FROM replenishment_request r JOIN location l ON l.id=r.salon_id WHERE r.id=$1
+    """
+    params: [$requestId]
+  )
+  tokens: _select(
+    sql: """
+    SELECT t.token,t.locale FROM push_token t
+    JOIN salon_access sa ON sa.membership_uid=t.membership_uid
+    JOIN replenishment_request r ON r.salon_id=sa.location_id
+    WHERE r.id=$1 ORDER BY t.token
+    """
+    params: [$requestId]
+  )
+}

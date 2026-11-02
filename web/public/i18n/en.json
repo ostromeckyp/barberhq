@@ -1265,6 +1265,22 @@
         "forbidden": "You cannot remove this shorthand.",
         "failed": "This shorthand could not be removed."
       }
+    },
+    "push": {
+      "title": "Notifications",
+      "enable": "Enable notifications",
+      "on": "Notifications are on on this device",
+      "disable": "Turn off",
+      "denied": "Notifications are blocked in browser settings",
+      "install": "Add BarberHQ to the Home Screen to get notifications",
+      "error": "Could not turn on notifications",
+      "retry": "Try again"
+    }
+  },
+  "app": {
+    "update": {
+      "ready": "New version available",
+      "reload": "Reload"
     }
   }
 }

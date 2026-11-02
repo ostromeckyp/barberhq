@@ -82,6 +82,13 @@ describe('function router', () => {
     expect(commandOps.filter((op) => ai.has(op))).toEqual([]);
   });
 
+  it('routes the push token ops', () => {
+    for (const op of ['registerPushToken', 'unregisterPushToken'] as const) {
+      expect(commandOps).toContain(op);
+      expect(commandHandlers[op]).toBeDefined();
+    }
+  });
+
   it('index exports only the routed and standalone functions', () => {
     const source = readFileSync('functions/src/index.ts', 'utf8');
     const names = [...source.matchAll(/^export const (\w+)/gm)].map((m) => m[1]);

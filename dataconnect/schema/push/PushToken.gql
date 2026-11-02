@@ -1,0 +1,7 @@
+type PushToken @table(key: "token") {
+  token: String!
+  membership: Membership!
+  locale: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
