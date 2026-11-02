@@ -194,7 +194,7 @@ export class KnowledgeApi {
       : endpoint;
     const headers = new Headers({ Authorization: `Bearer ${await getIdToken(user)}` });
     if (!runtimeConfig.useEmulators) {
-      const appCheck = this.firebase.appCheck;
+      const appCheck = await this.firebase.appCheck();
       if (!appCheck) throw new Error('Application verification is unavailable.');
       headers.set('X-Firebase-AppCheck', (await getAppCheckToken(appCheck)).token);
     }

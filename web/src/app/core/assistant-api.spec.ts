@@ -9,7 +9,10 @@ vi.mock('firebase/functions', () => ({ httpsCallable: vi.fn() }));
 beforeEach(() => {
   vi.resetAllMocks();
   TestBed.configureTestingModule({
-    providers: [AssistantApi, { provide: FIREBASE, useValue: { functions: {} } }],
+    providers: [
+      AssistantApi,
+      { provide: FIREBASE, useValue: { functions: {}, appCheck: () => Promise.resolve(null) } },
+    ],
   });
 });
 

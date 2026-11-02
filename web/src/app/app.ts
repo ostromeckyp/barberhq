@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -10,6 +10,7 @@ import {
 } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { filter, map, take } from 'rxjs';
+import { FIREBASE } from './core/firebase.providers';
 import { runtimeConfig } from './core/public-config';
 import { BootSplash } from './shared/ui/boot-splash/boot-splash';
 
@@ -39,19 +40,29 @@ import { BootSplash } from './shared/ui/boot-splash/boot-splash';
 })
 export class App {
   readonly configured = runtimeConfig.publicConfig !== null;
-  /** True until the first navigation settles; route guards wait for the session meanwhile. */
-  protected readonly booting = toSignal(
-    inject(Router).events.pipe(
-      filter(
-        (event) =>
-          event instanceof NavigationEnd ||
-          event instanceof NavigationCancel ||
-          event instanceof NavigationError ||
-          event instanceof NavigationSkipped,
-      ),
-      take(1),
-      map(() => false),
+  private readonly firebase = this.configured ? inject(FIREBASE) : null;
+  private readonly firstNavigation = inject(Router).events.pipe(
+    filter(
+      (event) =>
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError ||
+        event instanceof NavigationSkipped,
     ),
-    { initialValue: true },
+    take(1),
   );
+  /** True until the first navigation settles; route guards wait for the session meanwhile. */
+  protected readonly booting = toSignal(this.firstNavigation.pipe(map(() => false)), {
+    initialValue: true,
+  });
+
+  constructor() {
+    const firebase = this.firebase;
+    if (!firebase) return;
+    this.firstNavigation.pipe(takeUntilDestroyed()).subscribe(() => {
+      const start = () => void firebase.appCheck();
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(start, { timeout: 2000 });
+      else setTimeout(start, 0);
+    });
+  }
 }

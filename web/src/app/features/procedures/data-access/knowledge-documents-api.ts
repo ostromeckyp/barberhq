@@ -165,13 +165,12 @@ export class KnowledgeDocumentsApi {
     if (!config || !user) throw new KnowledgeApiError('UNAUTHENTICATED');
     const endpoint = this.uploadEndpoint(config);
     const authToken = await getIdToken(user);
-    const appCheckToken = runtimeConfig.useEmulators
-      ? null
-      : this.firebase.appCheck
-        ? (await getAppCheckToken(this.firebase.appCheck)).token
-        : (() => {
-            throw new KnowledgeApiError('UNAUTHENTICATED');
-          })();
+    let appCheckToken: string | null = null;
+    if (!runtimeConfig.useEmulators) {
+      const appCheck = await this.firebase.appCheck();
+      if (!appCheck) throw new KnowledgeApiError('UNAUTHENTICATED');
+      appCheckToken = (await getAppCheckToken(appCheck)).token;
+    }
     return uploadKnowledgePdf({ url: endpoint, versionId, file, authToken, appCheckToken, signal });
   }
 
