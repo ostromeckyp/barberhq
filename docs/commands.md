@@ -109,6 +109,8 @@ npm run deploy:promote     # https://notbad-6be95.web.app
 
 Full release verification (bundle hashes, headers, backend revisions) is in [release verification](implementation/release-verification.md).
 
+Deploy note: the user-facing functions are two Cloud Run services, `commands` and `ai`. Each has `maxInstances: 5` shared by all its operations; before the merge several knowledge and product callables were uncapped, so heavy parallel use now queues behind that cap.
+
 ### 4. Demo data reset (optional)
 
 Same as the local reset, against production. It deletes everything salons and HQ did since the last reset, including uploaded documents.
@@ -117,6 +119,23 @@ Same as the local reset, against production. It deletes everything salons and HQ
 npm run reset:prod -- --dry-run
 npm run reset:prod -- --apply
 ```
+
+## Demo day
+
+Cold starts make the first call to each function slow. Warm them shortly before going on stage:
+
+```sh
+npm run functions:warm     # no credentials; prints "name status ms" for commands, ai, getSourcePdf
+```
+
+To keep instances alive during the demo, set a minimum (0 to 3) on `commands`, `ai` and `getsourcepdf`. This needs `gcloud` logged in with access to `notbad-6be95` and the owner's approval like any production change. It costs money while above 0.
+
+```sh
+npm run functions:instances -- 1   # keep one instance of each service warm
+npm run functions:instances -- 0   # back to scale-to-zero after the demo
+```
+
+The script runs `gcloud run services update <service> --min-instances <n>` and then prints each service's `minScale`. The next `npm run deploy:functions` resets the minimum to 0, so run it again after any Functions deploy.
 
 ## Roll back
 
