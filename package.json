@@ -31,6 +31,7 @@
     "deploy:db:diff": "node --import tsx scripts/config/prepare-knowledge-cloud.ts --include-browser && cd artifacts/cloud-knowledge && ../../node_modules/.bin/firebase dataconnect:sql:diff --project notbad-6be95 --config firebase.json",
     "deploy:db": "node --import tsx scripts/config/prepare-knowledge-cloud.ts --include-browser && cd artifacts/cloud-knowledge && ../../node_modules/.bin/firebase deploy --only dataconnect:notbad-6be95-service:schema,dataconnect:notbad-6be95-service:server,dataconnect:notbad-6be95-service:vector,dataconnect:notbad-6be95-service:browser --project notbad-6be95 --config firebase.json",
     "deploy:functions": "firebase deploy --only functions:stock --project notbad-6be95",
+    "deploy:functions:routers": "firebase deploy --only functions:stock:commands,functions:stock:ai --project notbad-6be95",
     "functions:warm": "node --import tsx scripts/dev/functions-warm.ts",
     "functions:instances": "node --import tsx scripts/dev/functions-instances.ts",
     "deploy:preview": "firebase hosting:channel:deploy foundation --project notbad-6be95 --expires 7d",

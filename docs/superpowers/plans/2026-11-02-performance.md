@@ -135,4 +135,4 @@
 ## Controller steps (not tasks)
 
 - Spec §6 (the 103 s attachment read): the controller reads production logs (read-only) and either files a finding in the ledger or adds a task if the cause is in our code.
-- Rollout and proof after the owner approves each step: `build:prod` → `deploy:functions` (new services only, old ones kept) → `deploy:preview` → re-run Lighthouse and the throttled tour on preview → owner checks → delete the 31 old services → `deploy:promote`.
+- Rollout and proof after the owner approves each step: `build:prod` → `deploy:functions:routers` (new services only, old ones kept; never `--force`) → `deploy:preview` → re-run Lighthouse and the throttled tour on preview → owner checks → `deploy:promote` → delete the 31 old functions with `firebase functions:delete` (list in docs/commands.md) → plain `deploy:functions` is safe again.

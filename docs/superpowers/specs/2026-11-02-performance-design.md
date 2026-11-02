@@ -47,7 +47,7 @@ A first visit on slow 4G shows a usable page with its icons in under 3 s; the de
 - Each merged service is one `onCall` taking `{ op, input }`. `op` is validated against a closed list; an unknown `op` is `invalid-argument`. Each operation keeps its existing handler unchanged in behaviour: same auth checks, same App Check enforcement, same input validation, same errors. The router passes the handler a request whose `data` is `input`.
 - `ai` keeps the longest timeout, memory and secrets any of its operations needs today; `commands` keeps `maxInstances: 5`, `region: europe-west1`.
 - The web keeps its data-access APIs; only the callable name changes to `commands` or `ai` with `op` set to the old export name. E2E route mocks that match old function URLs move to the new ones (matching on `op` where they distinguish operations).
-- Production rollout: deploy the new services first, check the app on the preview channel, then delete the 35 old services. The deletion is a production change and gets its own approval at that step.
+- Production rollout: deploy the new services first, check the app on the preview channel, then delete the 31 old functions (the three that survive unchanged are getSourcePdf, uploadKnowledgePdf and processKnowledgeTask). Use `deploy:functions:routers` for the first deploy; plain `deploy:functions` would abort or, with `--force`, delete the old functions before the web is switched. The deletion is a production change and gets its own approval at that step.
 
 ### 5. Warm-up and instance control (owner: npm scripts, documented in AGENTS.md; deploy resets to 0)
 
