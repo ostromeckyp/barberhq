@@ -80,19 +80,30 @@ describe('stockCommand notifications', () => {
     expect(m.notifier).not.toHaveBeenCalled();
   });
 
+  for (const type of ['REJECT', 'DISPATCH'] as const)
+    it(`notifies once after a fresh ${type}`, async () => {
+      m.execute.mockResolvedValue(result(false));
+      await call(stockCommand(type) as never, inputs[type]);
+      expect(m.notifier).toHaveBeenCalledOnce();
+      expect(m.notifier.mock.calls[0]![1]).toBe('r1');
+    });
+
   it('does not notify for RECEIVE or SUBMIT', async () => {
     m.execute.mockResolvedValue(result(false));
     await call(stockCommand('RECEIVE') as never, {
       requestId: 'r1',
       expectedRevision: 1,
       idempotencyKey: key,
-      items: [{ productId: 'p', quantity: 1 }],
-    }).catch(() => undefined);
+      items: [{ productId: 'p', receivedQuantity: 1 }],
+      allIntact: true,
+    });
+    expect(m.execute).toHaveBeenCalledTimes(1);
     await call(stockCommand('SUBMIT') as never, {
       salonId: 's',
       items: [{ productId: 'p', quantity: 1 }],
       idempotencyKey: key,
-    }).catch(() => undefined);
+    });
+    expect(m.execute).toHaveBeenCalledTimes(2);
     expect(m.notifier).not.toHaveBeenCalled();
   });
 
