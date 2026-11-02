@@ -19,13 +19,13 @@ export class LoginFacade {
       const state = this.session.state();
       if (state.status === 'READY') {
         const requested = this.route.snapshot.queryParamMap.get('returnUrl');
-        const allowed = this.session
+        const roots = this.session
           .salons()
           .flatMap((s) => [`/salons/${s.id}`, `/salons/${encodeURIComponent(s.id)}`]);
-        if (state.membership.role === 'HQ') allowed.push('/hq');
-        void this.router.navigateByUrl(
-          requested && allowed.includes(requested) ? requested : this.session.home(),
-        );
+        if (state.membership.role === 'HQ') roots.push('/hq');
+        const allowed =
+          !!requested && roots.some((r) => requested === r || requested.startsWith(`${r}/`));
+        void this.router.navigateByUrl(allowed ? requested : this.session.home());
       } else if (state.status === 'NO_ACCESS' || state.status === 'ERROR') {
         void this.router.navigateByUrl('/no-access');
       }

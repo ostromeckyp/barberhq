@@ -57,7 +57,7 @@ export function renderPublicConfig(
     config.dataConnect.browserConnectorId !== sdkTarget.connector
   )
     throw new Error('Public configuration and generated SDK target differ');
-  return `// Generated from explicitly selected PUBLIC configuration. Never edit.\nexport const runtimeConfig = ${JSON.stringify({ publicConfig: config, useEmulators })};\n`;
+  return `// Generated from explicitly selected PUBLIC configuration. Never edit.\nimport type { PublicConfig } from '../../../../scripts/config/public-config';\nexport const runtimeConfig: { publicConfig: PublicConfig | null; useEmulators: boolean } = ${JSON.stringify({ publicConfig: config, useEmulators })};\n`;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   rmSync(resolve(root, 'artifacts/build-record.json'), { force: true });
