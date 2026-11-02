@@ -58,6 +58,19 @@ describe('public config', () => {
       }),
     ).toThrow();
   });
+  it('accepts an optional messaging.vapidKey', () => {
+    const result = parsePublicConfig({ ...validConfig, messaging: { vapidKey: 'BAbc' } });
+    expect(result.messaging?.vapidKey).toBe('BAbc');
+  });
+  it('rejects an empty vapidKey', () =>
+    expect(() => parsePublicConfig({ ...validConfig, messaging: { vapidKey: '' } })).toThrow());
+  it('rejects unknown messaging keys', () =>
+    expect(() =>
+      parsePublicConfig({
+        ...validConfig,
+        messaging: { vapidKey: 'B', privateKey: 'x' },
+      }),
+    ).toThrow());
   it('rejects AI flags without their parent feature', () =>
     expect(() => parsePublicConfig({ ...validConfig, ragEnabled: true })).toThrow());
   it('rejects obsolete thresholds and missing identifiers', () => {
