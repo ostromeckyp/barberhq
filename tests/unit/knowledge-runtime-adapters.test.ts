@@ -169,15 +169,19 @@ describe('knowledge runtime adapter contracts', () => {
       new URL('../../functions/src/knowledge/source.ts', import.meta.url),
       'utf8',
     );
+    const commands = readFileSync(
+      new URL('../../functions/src/routing/commands.ts', import.meta.url),
+      'utf8',
+    );
     for (const name of [
       'createDocumentUpload',
       'reviewAndPublishDocument',
       'retryDocumentProcessing',
       'deleteKnowledgeVersion',
-      'uploadKnowledgePdf',
-      'processKnowledgeTask',
-      'getSourcePdf',
     ]) {
+      expect(commands).toContain(`  ${name}: `);
+    }
+    for (const name of ['uploadKnowledgePdf', 'processKnowledgeTask', 'getSourcePdf']) {
       expect(entry).toContain(`export const ${name} =`);
     }
     expect(worker).toMatch(/region:\s*'europe-west1',\s*timeoutSeconds:\s*300/);
