@@ -9,7 +9,10 @@ vi.mock('firebase/functions', () => ({ httpsCallable: vi.fn() }));
 beforeEach(() => {
   vi.resetAllMocks();
   TestBed.configureTestingModule({
-    providers: [AssistantApi, { provide: FIREBASE, useValue: { functions: {} } }],
+    providers: [
+      AssistantApi,
+      { provide: FIREBASE, useValue: { functions: {}, appCheck: () => Promise.resolve(null) } },
+    ],
   });
 });
 
@@ -26,8 +29,11 @@ it('calls the procedure function with the English request and returns its result
     message: 'No source supports this.',
     sources: [],
   });
-  expect(httpsCallable).toHaveBeenCalledWith(expect.anything(), 'answerProcedureQuestion');
-  expect(call).toHaveBeenCalledWith({ question: 'What do I do?', answerLanguage: 'en' });
+  expect(httpsCallable).toHaveBeenCalledWith(expect.anything(), 'ai');
+  expect(call).toHaveBeenCalledWith({
+    op: 'answerProcedureQuestion',
+    input: { question: 'What do I do?', answerLanguage: 'en' },
+  });
 });
 
 it('maps controlled callable details without exposing provider errors', async () => {
@@ -96,7 +102,7 @@ it('returns only a valid replenishment proposal and rejects malformed stock', as
   await expect(
     api.prepareReplenishment({ salonId: 'salon', message: '2 Matowa' }),
   ).rejects.toMatchObject({ code: 'INVALID_MODEL_OUTPUT' });
-  expect(httpsCallable).toHaveBeenCalledWith(expect.anything(), 'prepareReplenishment');
+  expect(httpsCallable).toHaveBeenCalledWith(expect.anything(), 'ai');
 });
 
 it('accepts canonical product-card citations and rejects inconsistent provenance', async () => {

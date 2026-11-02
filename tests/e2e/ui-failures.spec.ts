@@ -120,7 +120,7 @@ test.describe('Feature: honest failure and recovery states', () => {
         const gate = new Promise<void>((resolve) => {
           release = resolve;
         });
-        await page.route('**/europe-west1/approveRequest', async (route) => {
+        await page.route('**/commands', async (route) => {
           const headers = {
             'access-control-allow-origin': new URL(page.url()).origin,
             'access-control-allow-methods': 'POST, OPTIONS',
@@ -129,7 +129,9 @@ test.describe('Feature: honest failure and recovery states', () => {
           };
           if (route.request().method() === 'OPTIONS')
             return route.fulfill({ status: 204, headers });
-          commands.push(route.request().postDataJSON().data);
+          const { op, input } = route.request().postDataJSON().data;
+          if (op !== 'approveRequest') return route.fallback();
+          commands.push(input);
           if (commands.length === 1) {
             await gate;
             await route.abort();

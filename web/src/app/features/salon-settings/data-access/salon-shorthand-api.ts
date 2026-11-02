@@ -1,6 +1,6 @@
 import { Service, inject } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
 import { QueryFetchPolicy } from 'firebase/data-connect';
+import { callFunction } from '../../../core/call-function';
 import { FIREBASE } from '../../../core/firebase.providers';
 import { listHqShorthand, listSalonShorthand } from '../../../core/generated';
 import type { SalonShorthand } from '../../../../../../shared/contracts/product-lookup/index';
@@ -74,11 +74,11 @@ export class SalonShorthandApi {
   }
   async remove(input: RemoveShorthandInput): Promise<SalonShorthand> {
     try {
-      const response = await httpsCallable<RemoveShorthandInput, SalonShorthand>(
-        this.firebase.functions,
+      const row = await callFunction<RemoveShorthandInput, SalonShorthand>(
+        this.firebase,
         'removeSalonShorthand',
-      )(input);
-      const row = response.data;
+        input,
+      );
       if (row?.id !== input.aliasId || row.status !== 'retired') throw Error('UNKNOWN');
       return row;
     } catch (error) {

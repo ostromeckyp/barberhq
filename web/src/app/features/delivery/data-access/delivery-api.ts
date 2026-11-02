@@ -1,6 +1,7 @@
 import { Service, inject } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
 import { QueryFetchPolicy } from 'firebase/data-connect';
+import type { CommandOp } from '../../../../../../shared/contracts/functions/index';
+import { callFunction } from '../../../core/call-function';
 import { FIREBASE } from '../../../core/firebase.providers';
 import * as sdk from '../../../core/generated';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
@@ -19,7 +20,7 @@ import type {
 } from '../../../../../../shared/contracts/delivery/index';
 import type { Page, PageInput } from '../../../../../../shared/contracts/business/index';
 import type { DeliveryProcedureOption } from '../models/delivery-procedure-option';
-const names = {
+const names: Record<DeliveryAction['type'], CommandOp> = {
   RECORD_RECEIPT: 'recordDeliveryReceipt',
   START_REVIEW: 'startDeliveryIssueReview',
   ADD_NOTE: 'addDeliveryIssueNote',
@@ -33,12 +34,11 @@ export class DeliveryApi {
   private readonly requests = inject(ReplenishmentApi);
   private async run(action: DeliveryAction): Promise<DeliveryCommandResult> {
     try {
-      return (
-        await httpsCallable<DeliveryAction['input'], DeliveryCommandResult>(
-          this.firebase.functions,
-          names[action.type],
-        )(action.input)
-      ).data;
+      return await callFunction<DeliveryAction['input'], DeliveryCommandResult>(
+        this.firebase,
+        names[action.type],
+        action.input,
+      );
     } catch (error) {
       throw commandError(error);
     }
@@ -66,12 +66,10 @@ export class DeliveryApi {
   async getProcedures(requestId: string): Promise<DeliveryProcedureDto[]> {
     let procedures: DeliveryProcedureDto[];
     try {
-      procedures = (
-        await httpsCallable<{ requestId: string; kinds: string[] }, DeliveryProcedureDto[]>(
-          this.firebase.functions,
-          'getDeliveryProcedures',
-        )({ requestId, kinds: ['DAMAGED', 'MISSING'] })
-      ).data;
+      procedures = await callFunction<
+        { requestId: string; kinds: string[] },
+        DeliveryProcedureDto[]
+      >(this.firebase, 'getDeliveryProcedures', { requestId, kinds: ['DAMAGED', 'MISSING'] });
     } catch (error) {
       const parsed = commandError(error);
       if (['FORBIDDEN', 'UNAUTHENTICATED'].includes(parsed.code)) throw parsed;

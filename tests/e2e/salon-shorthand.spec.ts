@@ -38,8 +38,8 @@ async function serve(page: Page) {
     prepareReplenishment: (uid, data) => prepare(uid, data),
     removeSalonShorthand: (uid, data) => commands.remove(uid, data),
   };
-  for (const name of Object.keys(operations))
-    await page.route(`**/${name}`, async (route) => {
+  for (const router of ['commands', 'ai'])
+    await page.route(`**/${router}`, async (route) => {
       const headers = {
         'access-control-allow-origin': new URL(page.url()).origin,
         'access-control-allow-methods': 'POST, OPTIONS',
@@ -47,10 +47,12 @@ async function serve(page: Page) {
           'authorization, content-type, firebase-instance-id-token, x-firebase-appcheck',
       };
       if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+      const { op, input } = route.request().postDataJSON().data;
+      if (!(op in operations)) return route.fallback();
       const token = route.request().headers()['authorization']?.slice(7) ?? '';
       try {
         const { uid } = await auth.verifyIdToken(token, true);
-        const result = await operations[name](uid, route.request().postDataJSON().data as never);
+        const result = await operations[op](uid, input as never);
         await route.fulfill({
           status: 200,
           headers,

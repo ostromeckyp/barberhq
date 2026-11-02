@@ -1,5 +1,6 @@
 import { Service, inject } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
+import { callFunction } from '../../../core/call-function';
+import type { AiOp, CommandOp } from '../../../../../../shared/contracts/functions/index';
 import { FIREBASE } from '../../../core/firebase.providers';
 import { KnowledgeDocumentsApi } from '../../procedures/data-access/knowledge-documents-api';
 import type {
@@ -40,9 +41,9 @@ const known: ProductAdminErrorCode[] = [
 export class ProductAdminApi {
   private readonly firebase = inject(FIREBASE);
   private readonly documents = inject(KnowledgeDocumentsApi);
-  private async call<I, O>(name: string, input: I): Promise<O> {
+  private async call<I, O>(name: CommandOp | AiOp, input: I): Promise<O> {
     try {
-      return (await httpsCallable<I, O>(this.firebase.functions, name)(input)).data;
+      return await callFunction<I, O>(this.firebase, name, input);
     } catch (error) {
       const details = (error as { details?: { code?: string } })?.details?.code;
       const code = known.find((c) => c === details) ?? 'UNKNOWN';

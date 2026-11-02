@@ -208,7 +208,7 @@ import { SourceExcerptComponent } from './source-excerpt.component';
       background: transparent;
       color: var(--ink);
       font:
-        500 12.5px 'Archivo Variable',
+        500 12.5px 'Archivo',
         sans-serif;
       cursor: pointer;
       text-align: left;

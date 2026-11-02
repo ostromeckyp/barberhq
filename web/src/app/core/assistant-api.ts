@@ -1,6 +1,5 @@
 import { knowledgeKinds, knowledgeOrigins } from '../../../../shared/knowledge-metadata';
 import { Service, inject } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
 import type {
   ProcedureInput,
   ProcedureResult,
@@ -8,6 +7,7 @@ import type {
   PrepareInput,
   ProposalResult,
 } from '../../../../shared/contracts/ai/index';
+import { callFunction } from './call-function';
 import { FIREBASE } from './firebase.providers';
 import { isReplenishmentProposal } from './replenishment-proposal';
 
@@ -122,29 +122,29 @@ function isProcedureResult(value: unknown): value is ProcedureResult {
 
 @Service()
 export class AssistantApi {
-  private readonly functions = inject(FIREBASE).functions;
+  private readonly firebase = inject(FIREBASE);
   async prepareReplenishment(input: PrepareInput): Promise<ProposalResult> {
     try {
-      const response = await httpsCallable<PrepareInput, unknown>(
-        this.functions,
+      const data = await callFunction<PrepareInput, unknown>(
+        this.firebase,
         'prepareReplenishment',
-      )(input);
-      if (!isReplenishmentProposal(response.data))
-        throw new AssistantApiError('INVALID_MODEL_OUTPUT');
-      return response.data;
+        input,
+      );
+      if (!isReplenishmentProposal(data)) throw new AssistantApiError('INVALID_MODEL_OUTPUT');
+      return data;
     } catch (error) {
       throw this.controlledError(error);
     }
   }
   async answerProcedureQuestion(input: ProcedureInput): Promise<ProcedureResult> {
     try {
-      const callable = httpsCallable<ProcedureInput, unknown>(
-        this.functions,
+      const data = await callFunction<ProcedureInput, unknown>(
+        this.firebase,
         'answerProcedureQuestion',
+        input,
       );
-      const response = await callable(input);
-      if (!isProcedureResult(response.data)) throw new AssistantApiError('INVALID_MODEL_OUTPUT');
-      return response.data;
+      if (!isProcedureResult(data)) throw new AssistantApiError('INVALID_MODEL_OUTPUT');
+      return data;
     } catch (error) {
       throw this.controlledError(error);
     }

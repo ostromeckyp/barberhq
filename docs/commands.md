@@ -90,6 +90,21 @@ Never use `--force` to skip a destructive migration warning.
 npm run deploy:functions
 ```
 
+**Release that merged the 31 callables into `commands` and `ai` (one-time rollout).** Production still runs the 31 old functions and the live web calls them. Plain `deploy:functions` finds them missing from source: non-interactive it aborts, interactive it prompts (default No keeps them), and with `--force` it deletes all 31 at once and breaks the live web. Never use `--force` on the first deploy after this change. Order:
+
+1. `npm run deploy:functions:routers` deploys only `commands` and `ai`, alongside the old functions.
+2. Build and deploy the web to the preview channel (step 3), sign in and check it.
+3. `npm run deploy:promote` to put that web version live.
+4. Only then delete the 31 old functions (production change, needs the owner's approval):
+
+```sh
+firebase functions:delete submitRequest approveRequest rejectRequest dispatchTransfer receiveTransfer recordDeliveryReceipt startDeliveryIssueReview addDeliveryIssueNote createDeliveryReplacement setDeliveryProcedure getDeliveryProcedures removeSalonShorthand getProductAdmin createProduct updateProduct setHqStock listProductAliases saveProductAliases attachProductCard getProductCardAttachment createDocumentUpload reviewAndPublishDocument retryDocumentProcessing deleteKnowledgeVersion saveKnowledgeProductReview acceptKnowledgeProductReview prepareReplenishment answerProcedureQuestion suggestKnowledgeProductLink generateKnowledgeProductAliases processProductCard --region europe-west1 --project notbad-6be95
+```
+
+5. From now on the normal `npm run deploy:functions` is safe again.
+
+`getSourcePdf`, `uploadKnowledgePdf` and `processKnowledgeTask` are unchanged and stay.
+
 Public settings (SQL service, bucket, Vertex model, allowed origins) live in `functions/config/cloud.json`. The deploy asks no questions. Functions hold no secrets; a future secret belongs in Secret Manager (`defineSecret`), never in the repo.
 
 ### 3. Web app
@@ -109,6 +124,8 @@ npm run deploy:promote     # https://notbad-6be95.web.app
 
 Full release verification (bundle hashes, headers, backend revisions) is in [release verification](implementation/release-verification.md).
 
+Deploy note: the user-facing functions are two Cloud Run services, `commands` and `ai`. Each has `maxInstances: 5` shared by all its operations; before the merge several knowledge and product callables were uncapped, so heavy parallel use now queues behind that cap.
+
 ### 4. Demo data reset (optional)
 
 Same as the local reset, against production. It deletes everything salons and HQ did since the last reset, including uploaded documents.
@@ -118,10 +135,28 @@ npm run reset:prod -- --dry-run
 npm run reset:prod -- --apply
 ```
 
+## Demo day
+
+Cold starts make the first call to each function slow. Warm them shortly before going on stage:
+
+```sh
+npm run functions:warm     # no credentials; prints "name status ms" for commands, ai, getSourcePdf
+```
+
+To keep instances alive during the demo, set a minimum (0 to 3) on `commands`, `ai` and `getsourcepdf`. This needs `gcloud` logged in with access to `notbad-6be95` and the owner's approval like any production change. It costs money while above 0.
+
+```sh
+npm run functions:instances -- 1   # keep one instance of each service warm
+npm run functions:instances -- 0   # back to scale-to-zero after the demo
+```
+
+The script runs `gcloud run services update <service> --min-instances <n>` and then prints each service's `minScale`. The next `npm run deploy:functions` (or `deploy:functions:routers`) resets the minimum to 0, so run it again after any Functions deploy.
+
 ## Roll back
 
 - Web app: `npx firebase hosting:clone notbad-6be95@<VERSION_ID> notbad-6be95:live --project notbad-6be95`. Version IDs are in the Firebase console, Hosting → release history.
 - Functions: check out the previous commit and run `npm run deploy:functions`.
+- A web rollback to a version from before the `commands`/`ai` release also needs the Functions from that commit (the old function names). Deploying them will prompt to delete `commands` and `ai`; answer only after the rolled-back web is live, and never use `--force` while the current web still calls them.
 - Database: no automatic rollback. Schema changes must stay additive.
 
 ## Security notes

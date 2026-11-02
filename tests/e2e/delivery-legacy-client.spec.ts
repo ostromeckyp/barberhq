@@ -27,14 +27,11 @@ async function call(page: Page) {
     async ({ input, token }) => {
       const recovery = window as unknown as { legacyReceive?: ReceiveInput };
       recovery.legacyReceive ??= Object.freeze(input);
-      const result = await fetch(
-        'http://127.0.0.1:5001/demo-barberhq/europe-west1/receiveTransfer',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-          body: JSON.stringify({ data: recovery.legacyReceive }),
-        },
-      );
+      const result = await fetch('http://127.0.0.1:5001/demo-barberhq/europe-west1/commands', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+        body: JSON.stringify({ data: { op: 'receiveTransfer', input: recovery.legacyReceive } }),
+      });
       return await result.json();
     },
     { input, token },

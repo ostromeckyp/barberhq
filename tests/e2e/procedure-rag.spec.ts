@@ -37,12 +37,17 @@ test.describe('Procedure assistant cited source', () => {
     harness = await createCloudHarness('procedure-rag');
     fixture = await seedProcedureCitation(harness);
     modelCalls = 0;
-    await page.route('**/answerProcedureQuestion', async (route) => {
+    await page.route('**/ai', async (route) => {
       const headers = callableHeaders(new URL(page.url()).origin);
       if (route.request().method() === 'OPTIONS') {
         await route.fulfill({ status: 204, headers });
         return;
       }
+      if (
+        route.request().method() !== 'POST' ||
+        route.request().postDataJSON()?.data?.op !== 'answerProcedureQuestion'
+      )
+        return route.fallback();
       modelCalls++;
       await route.fulfill({
         status: 200,
@@ -75,7 +80,11 @@ test.describe('Procedure assistant cited source', () => {
     await signIn(page);
     await page.goto('/procedures');
     await expect(page.getByRole('heading', { name: 'Procedures', exact: true })).toBeVisible();
-    const response = page.waitForResponse('**/answerProcedureQuestion');
+    const response = page.waitForResponse(
+      (r) =>
+        r.url().endsWith('/ai') &&
+        r.request().postDataJSON()?.data?.op === 'answerProcedureQuestion',
+    );
     await page
       .getByRole('textbox', { name: 'Question' })
       .fill('What should the Zakładowa salon do under DEMO-DAMAGE-01?');
@@ -216,7 +225,9 @@ test.describe('Procedure assistant cited source', () => {
           .fill('Next question, not submitted yet');
         await page.getByRole('link', { name: /^Open paragraph / }).click();
         await expect(page.getByTestId('pdf-highlight').first()).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Back to Procedures', exact: true })).toBeVisible({
+        await expect(
+          page.getByRole('button', { name: 'Back to Procedures', exact: true }),
+        ).toBeVisible({
           timeout: 3000,
         });
         await page.getByRole('button', { name: 'Back to Procedures', exact: true }).click();

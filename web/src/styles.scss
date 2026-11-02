@@ -3,9 +3,6 @@
 @use './app/shared/styles/navigation';
 @use './app/shared/styles/quantity';
 @use './app/shared/styles/filters';
-@use '@fontsource-variable/archivo/index.css';
-@use '@fontsource/ibm-plex-mono/500.css' as plex;
-@use 'material-symbols/outlined.css';
 :root {
   @include tokens.properties;
   color-scheme: light;
@@ -15,7 +12,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--ink);
-  font-family: 'Archivo Variable', sans-serif;
+  font-family: 'Archivo', sans-serif;
   font-size: 14px;
   line-height: 1.45;
 }
