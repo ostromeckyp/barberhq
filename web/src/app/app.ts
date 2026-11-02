@@ -10,6 +10,7 @@ import {
 } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { filter, map, take } from 'rxjs';
+import { AppUpdate } from './core/app-update';
 import { FIREBASE } from './core/firebase.providers';
 import { runtimeConfig } from './core/public-config';
 import { BootSplash } from './shared/ui/boot-splash/boot-splash';
@@ -57,6 +58,7 @@ export class App {
   });
 
   constructor() {
+    inject(AppUpdate).start();
     const firebase = this.firebase;
     if (!firebase) return;
     this.firstNavigation.pipe(takeUntilDestroyed()).subscribe(() => {

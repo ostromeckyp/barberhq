@@ -1,5 +1,7 @@
 import { importProvidersFrom } from '@angular/core';
+import { SwUpdate } from '@angular/service-worker';
 import { TranslocoTestingModule } from '@jsverse/transloco';
+import { EMPTY } from 'rxjs';
 import en from '../../public/i18n/en.json';
 import { registerAppLocales } from '../app/core/i18n/app-locales';
 import { LANGUAGE_STORAGE } from '../app/core/i18n/language-storage';
@@ -15,6 +17,7 @@ export default [
       preloadLangs: true,
     }),
   ),
+  { provide: SwUpdate, useValue: { isEnabled: false, versionUpdates: EMPTY } },
   {
     provide: LANGUAGE_STORAGE,
     useValue: { getItem: () => 'en', setItem: () => undefined },

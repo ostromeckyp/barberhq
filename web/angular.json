@@ -38,6 +38,7 @@
           },
           "configurations": {
             "production": {
+              "serviceWorker": "ngsw-config.json",
               "budgets": [
                 {
                   "type": "initial",
@@ -68,6 +69,7 @@
               "sourceMap": true
             },
             "emulator": {
+              "serviceWorker": false,
               "optimization": false,
               "sourceMap": true,
               "fileReplacements": [

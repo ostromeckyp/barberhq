@@ -1266,5 +1266,11 @@
         "failed": "This shorthand could not be removed."
       }
     }
+  },
+  "app": {
+    "update": {
+      "ready": "New version available",
+      "reload": "Reload"
+    }
   }
 }
