@@ -60,7 +60,10 @@ export class App {
     const firebase = this.firebase;
     if (!firebase) return;
     this.firstNavigation.pipe(takeUntilDestroyed()).subscribe(() => {
-      const start = () => void firebase.appCheck();
+      const start = () =>
+        void firebase
+          .appCheck()
+          .catch((error: unknown) => console.error('App Check failed to start', error));
       if (typeof requestIdleCallback === 'function') requestIdleCallback(start, { timeout: 2000 });
       else setTimeout(start, 0);
     });

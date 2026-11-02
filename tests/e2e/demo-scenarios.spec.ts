@@ -95,7 +95,8 @@ async function aiFixture(page: Page, unavailable = false) {
         'authorization, content-type, firebase-instance-id-token, x-firebase-appcheck',
     };
     if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
-    const { op } = route.request().postDataJSON().data;
+    if (route.request().method() !== 'POST') return route.fallback();
+    const op = route.request().postDataJSON()?.data?.op;
     if (op !== 'prepareReplenishment' && op !== 'answerProcedureQuestion') return route.fallback();
     const procedure = op === 'answerProcedureQuestion';
     await route.fulfill({

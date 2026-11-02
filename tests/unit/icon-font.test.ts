@@ -36,12 +36,19 @@ function iconNames(): string[] {
   return value ? value.split(',') : [];
 }
 
-function usedIcons(): string[] {
+// Signal input defaults such as `icon = input('x')` or `iconName = input<string>('x')`.
+function inputDefaults(text: string): string[] {
+  return [...text.matchAll(/\bicon[A-Za-z]*\s*=\s*input(?:<[^>]*>)?\(\s*'([^']+)'/g)].map(
+    (match) => match[1],
+  );
+}
+
+function usedIcons(files: string[] = sourceFiles(appRoot)): string[] {
   const used = new Set<string>();
   const add = (candidate: string): void => {
     if (iconName.test(candidate)) used.add(candidate);
   };
-  for (const file of sourceFiles(appRoot)) {
+  for (const file of files) {
     const text = readFileSync(file, 'utf8');
     for (const [, body] of text.matchAll(/<mat-icon\b[^>]*>([\s\S]*?)<\/mat-icon/g)) {
       for (const literal of renderedLiterals(body)) add(literal);
@@ -50,6 +57,7 @@ function usedIcons(): string[] {
     }
     for (const [, name] of text.matchAll(/\bfontIcon="([^"]+)"/g)) add(name);
     for (const [, name] of text.matchAll(/(?<![\w\[-])icon="([^"]+)"/g)) add(name);
+    for (const name of inputDefaults(text)) add(name);
     for (const [, name] of text.matchAll(/\bicon[A-Za-z]*\s*:\s*'([^']+)'/g)) add(name);
     for (const [, binding] of text.matchAll(/\[icon\]="([^"]*)"/g)) {
       for (const literal of renderedLiterals(binding)) add(literal);
@@ -73,6 +81,15 @@ describe('icon font subset', () => {
     const used = usedIcons();
     expect(used.length).toBeGreaterThan(10);
     expect(used.filter((name) => !names.includes(name))).toEqual([]);
+  });
+
+  it('collects component input defaults', () => {
+    expect(inputDefaults(`readonly icon = input('inventory_2');`)).toEqual(['inventory_2']);
+    expect(inputDefaults(`iconName = input<string>('add_circle');`)).toEqual(['add_circle']);
+    expect(inputDefaults(`title = input('not_an_icon');`)).toEqual([]);
+    expect(usedIcons([`${appRoot}/shared/ui/empty-state/empty-state.component.ts`])).toEqual([
+      'inventory_2',
+    ]);
   });
 
   it('loads text fonts from Google Fonts, not npm packages', () => {

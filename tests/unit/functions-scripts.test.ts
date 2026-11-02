@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { warmTargets } from '../../scripts/dev/functions-warm.ts';
-import { instancesCommands } from '../../scripts/dev/functions-instances.ts';
+import { warmLine, warmTargets } from '../../scripts/dev/functions-warm.ts';
+import {
+  describeCommand,
+  instancesCommands,
+  minScaleLine,
+} from '../../scripts/dev/functions-instances.ts';
 
 describe('functions warm-up targets', () => {
   it('lists commands and ai as POST and getSourcePdf as GET', () => {
@@ -48,5 +52,28 @@ describe('functions min-instances commands', () => {
 
   it.each([-1, 4, 1.5, Number.NaN])('rejects %s', (n) => {
     expect(() => instancesCommands(n, 'p', 'r')).toThrow();
+  });
+});
+
+describe('functions script output', () => {
+  it('labels min scale lines and maps empty to 0', () => {
+    expect(minScaleLine('commands', '1\n')).toBe('commands: 1');
+    expect(minScaleLine('ai', '\n')).toBe('ai: 0');
+  });
+
+  it('builds the describe argv', () => {
+    expect(describeCommand('ai', 'p', 'r').slice(0, 5)).toEqual([
+      'gcloud',
+      'run',
+      'services',
+      'describe',
+      'ai',
+    ]);
+  });
+
+  it('formats warm lines including timeout', () => {
+    expect(warmLine('commands', 401, 12)).toBe('commands 401 12ms');
+    expect(warmLine('ai', 'timeout', 60000)).toBe('ai timeout 60000ms');
+    expect(warmLine('ai', 'error', 5, 'boom')).toBe('ai error 5ms boom');
   });
 });

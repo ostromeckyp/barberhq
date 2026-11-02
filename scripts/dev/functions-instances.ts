@@ -23,7 +23,7 @@ export function instancesCommands(n: number, project: string, region: string): s
   ]);
 }
 
-function describeCommand(svc: string, project: string, region: string): string[] {
+export function describeCommand(svc: string, project: string, region: string): string[] {
   return [
     'gcloud',
     'run',
@@ -38,9 +38,19 @@ function describeCommand(svc: string, project: string, region: string): string[]
   ];
 }
 
+export function minScaleLine(svc: string, stdout: string): string {
+  return `${svc}: ${stdout.trim() || '0'}`;
+}
+
 function run(argv: string[]): number {
   console.log(argv.join(' '));
   const result = spawnSync(argv[0], argv.slice(1), { stdio: 'inherit' });
+  if (result.error) {
+    console.error(
+      `${argv[0]} not found or failed to start (${result.error.message}). Install the Google Cloud SDK and run gcloud auth login.`,
+    );
+    return 1;
+  }
   return result.status ?? 1;
 }
 
@@ -60,5 +70,18 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     const status = run(argv);
     if (status !== 0) process.exit(status);
   }
-  for (const svc of SERVICES) run(describeCommand(svc, project, region));
+  let describeFailed = false;
+  for (const svc of SERVICES) {
+    const argv = describeCommand(svc, project, region);
+    const result = spawnSync(argv[0], argv.slice(1), { encoding: 'utf8' });
+    if (result.error || result.status !== 0) {
+      describeFailed = true;
+      console.error(
+        `${svc}: describe failed${result.error ? ` (${result.error.message})` : ''} ${result.stderr ?? ''}`.trim(),
+      );
+      continue;
+    }
+    console.log(minScaleLine(svc, result.stdout));
+  }
+  if (describeFailed) process.exit(1);
 }

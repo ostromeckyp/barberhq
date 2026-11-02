@@ -98,4 +98,33 @@ describe('boot splash', () => {
     expect(appCheck).toHaveBeenCalledTimes(1);
     vi.unstubAllGlobals();
   });
+
+  it('logs an App Check start failure at idle instead of leaving it unhandled', async () => {
+    runtimeConfig.publicConfig = {} as PublicConfig;
+    const failure = new Error('recaptcha down');
+    const appCheck = vi.fn(() => Promise.reject(failure));
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    let idle: (() => void) | undefined;
+    vi.stubGlobal('requestIdleCallback', (callback: () => void) => {
+      idle = callback;
+      return 1;
+    });
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([{ path: '', component: HomePage }]),
+        { provide: FIREBASE, useValue: { appCheck } },
+      ],
+    });
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    TestBed.inject(Router).initialNavigation();
+    await fixture.whenStable();
+
+    idle?.();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(error).toHaveBeenCalledWith('App Check failed to start', failure);
+    error.mockRestore();
+    vi.unstubAllGlobals();
+  });
 });

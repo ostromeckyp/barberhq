@@ -48,7 +48,11 @@ async function respond(
       await route.fulfill({ status: 204, headers });
       return;
     }
-    if (route.request().postDataJSON().data.op !== 'prepareReplenishment') return route.fallback();
+    if (
+      route.request().method() !== 'POST' ||
+      route.request().postDataJSON()?.data?.op !== 'prepareReplenishment'
+    )
+      return route.fallback();
     const value = result();
     await route.fulfill({
       status: 'error' in value ? 429 : 200,

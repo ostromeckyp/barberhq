@@ -43,7 +43,10 @@ test.describe('Procedure assistant cited source', () => {
         await route.fulfill({ status: 204, headers });
         return;
       }
-      if (route.request().postDataJSON().data.op !== 'answerProcedureQuestion')
+      if (
+        route.request().method() !== 'POST' ||
+        route.request().postDataJSON()?.data?.op !== 'answerProcedureQuestion'
+      )
         return route.fallback();
       modelCalls++;
       await route.fulfill({
