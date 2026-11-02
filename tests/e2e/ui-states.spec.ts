@@ -27,7 +27,7 @@ async function mockAnswer(page: Page, body: unknown, status = 200, held = false)
         release = resolve;
       })
     : Promise.resolve();
-  await page.route('**/answerProcedureQuestion', async (route) => {
+  await page.route('**/ai', async (route) => {
     const headers = {
       'access-control-allow-origin': new URL(page.url()).origin,
       'access-control-allow-methods': 'POST, OPTIONS',
@@ -38,6 +38,8 @@ async function mockAnswer(page: Page, body: unknown, status = 200, held = false)
       await route.fulfill({ status: 204, headers });
       return;
     }
+    if (route.request().postDataJSON().data.op !== 'answerProcedureQuestion')
+      return route.fallback();
     calls++;
     await gate;
     await route.fulfill({

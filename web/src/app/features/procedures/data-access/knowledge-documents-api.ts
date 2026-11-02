@@ -8,7 +8,6 @@ import type {
 } from '../../../../../../shared/contracts/product-knowledge/index';
 import { mapProductKnowledgeWorkspace } from './product-knowledge.mapper';
 import { Service, inject } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
 import { QueryFetchPolicy } from 'firebase/data-connect';
 import { getIdToken } from 'firebase/auth';
 import { getToken as getAppCheckToken } from 'firebase/app-check';
@@ -23,6 +22,8 @@ import type {
   VersionStatus,
 } from '../../../../../../shared/contracts/knowledge/index';
 import * as sdk from '../../../core/generated';
+import { callFunction } from '../../../core/call-function';
+import type { AiOp, CommandOp } from '../../../../../../shared/contracts/functions/index';
 import { FIREBASE } from '../../../core/firebase.providers';
 import { SalonContext } from '../../../core/salon-context';
 import { runtimeConfig } from '../../../core/public-config';
@@ -174,9 +175,12 @@ export class KnowledgeDocumentsApi {
     return uploadKnowledgePdf({ url: endpoint, versionId, file, authToken, appCheckToken, signal });
   }
 
-  private async call<Input, Output = VersionStatus>(name: string, input: Input): Promise<Output> {
+  private async call<Input, Output = VersionStatus>(
+    name: CommandOp | AiOp,
+    input: Input,
+  ): Promise<Output> {
     try {
-      return (await httpsCallable<Input, Output>(this.firebase.functions, name)(input)).data;
+      return await callFunction<Input, Output>(this.firebase, name, input);
     } catch (error) {
       throw mapKnowledgeError(error);
     }

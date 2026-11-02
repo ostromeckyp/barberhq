@@ -37,7 +37,7 @@ async function respond(
   result: () =>
     ProposalResult | { error: { status: string; message: string; details: { code: string } } },
 ) {
-  await page.route('**/prepareReplenishment', async (route) => {
+  await page.route('**/ai', async (route) => {
     const headers = {
       'access-control-allow-origin': new URL(page.url()).origin,
       'access-control-allow-methods': 'POST, OPTIONS',
@@ -48,6 +48,7 @@ async function respond(
       await route.fulfill({ status: 204, headers });
       return;
     }
+    if (route.request().postDataJSON().data.op !== 'prepareReplenishment') return route.fallback();
     const value = result();
     await route.fulfill({
       status: 'error' in value ? 429 : 200,

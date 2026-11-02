@@ -281,11 +281,18 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
       await open(page);
       let lost = false;
       page.on('request', (r) => {
-        if (r.method() === 'POST' && r.url().endsWith('/createDeliveryReplacement'))
-          posted.push(r.postDataJSON());
+        if (r.method() === 'POST' && r.url().endsWith('/commands')) {
+          const { op, input } = r.postDataJSON().data;
+          if (op === 'createDeliveryReplacement') posted.push({ data: input });
+        }
       });
-      await page.route('**/createDeliveryReplacement', async (route) => {
-        if (route.request().method() !== 'POST' || lost) return route.continue();
+      await page.route('**/commands', async (route) => {
+        if (
+          route.request().method() !== 'POST' ||
+          route.request().postDataJSON().data.op !== 'createDeliveryReplacement' ||
+          lost
+        )
+          return route.fallback();
         lost = true;
         await route.fetch();
         await route.fulfill({

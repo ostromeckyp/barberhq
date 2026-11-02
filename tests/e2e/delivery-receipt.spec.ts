@@ -50,8 +50,10 @@ test.describe('Feature: inspect a salon delivery and keep the evidence', () => {
     delivery = await seedDispatchedDelivery(h);
     posted = [];
     page.on('request', (request) => {
-      if (request.method() === 'POST' && request.url().endsWith('/recordDeliveryReceipt'))
-        posted.push(request.postDataJSON());
+      if (request.method() === 'POST' && request.url().endsWith('/commands')) {
+        const { op, input } = request.postDataJSON().data;
+        if (op === 'recordDeliveryReceipt') posted.push({ data: input });
+      }
     });
     await login(page);
   });
@@ -197,8 +199,13 @@ test.describe('Feature: inspect a salon delivery and keep the evidence', () => {
       await fill(page, '8', '2');
       await page.getByLabel('Describe the problem').fill('Two cracked jars');
       let lost = false;
-      await page.route('**/recordDeliveryReceipt', async (route) => {
-        if (route.request().method() !== 'POST' || lost) return route.continue();
+      await page.route('**/commands', async (route) => {
+        if (
+          route.request().method() !== 'POST' ||
+          route.request().postDataJSON().data.op !== 'recordDeliveryReceipt' ||
+          lost
+        )
+          return route.fallback();
         lost = true;
         await route.fetch();
         await route.fulfill({

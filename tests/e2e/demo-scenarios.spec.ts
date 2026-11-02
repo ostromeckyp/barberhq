@@ -87,7 +87,7 @@ async function submit(page: Page) {
   return page.url().split('/').at(-1)!;
 }
 async function aiFixture(page: Page, unavailable = false) {
-  await page.route(/\/(prepareReplenishment|answerProcedureQuestion)$/, async (route) => {
+  await page.route('**/ai', async (route) => {
     const headers = {
       'access-control-allow-origin': new URL(page.url()).origin,
       'access-control-allow-methods': 'POST, OPTIONS',
@@ -95,7 +95,9 @@ async function aiFixture(page: Page, unavailable = false) {
         'authorization, content-type, firebase-instance-id-token, x-firebase-appcheck',
     };
     if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
-    const procedure = route.request().url().endsWith('answerProcedureQuestion');
+    const { op } = route.request().postDataJSON().data;
+    if (op !== 'prepareReplenishment' && op !== 'answerProcedureQuestion') return route.fallback();
+    const procedure = op === 'answerProcedureQuestion';
     await route.fulfill({
       status: unavailable ? 503 : 200,
       headers,

@@ -78,11 +78,11 @@ test.describe('Feature: continue delivery work across procedures and interrupted
     delivery = await seedDispatchedDelivery(h);
     posted = [];
     page.on('request', (request) => {
-      if (
-        request.method() === 'POST' &&
-        /\/(recordDeliveryReceipt|setDeliveryProcedure)$/.test(request.url())
-      )
-        posted.push(request.postDataJSON());
+      if (request.method() === 'POST' && request.url().endsWith('/commands')) {
+        const { op, input } = request.postDataJSON().data;
+        if (op === 'recordDeliveryReceipt' || op === 'setDeliveryProcedure')
+          posted.push({ data: input });
+      }
     });
     await page.route('**/getSourcePdf?*', (route) =>
       route.fulfill({ status: 200, contentType: 'application/pdf', body: source.bytes }),
@@ -237,8 +237,13 @@ test.describe('Feature: continue delivery work across procedures and interrupted
   test.describe('Given a procedure save committed with a lost response', () => {
     test.beforeEach(async ({ page }) => {
       let lost = false;
-      await page.route('**/setDeliveryProcedure', async (route) => {
-        if (route.request().method() !== 'POST' || lost) return route.continue();
+      await page.route('**/commands', async (route) => {
+        if (
+          route.request().method() !== 'POST' ||
+          route.request().postDataJSON().data.op !== 'setDeliveryProcedure' ||
+          lost
+        )
+          return route.fallback();
         lost = true;
         await route.fetch();
         await route.fulfill({
@@ -275,8 +280,13 @@ test.describe('Feature: continue delivery work across procedures and interrupted
   test.describe('Given a committed inspection with a lost response followed by revoked salon access', () => {
     test.beforeEach(async ({ page }) => {
       let lost = false;
-      await page.route('**/recordDeliveryReceipt', async (route) => {
-        if (route.request().method() !== 'POST' || lost) return route.continue();
+      await page.route('**/commands', async (route) => {
+        if (
+          route.request().method() !== 'POST' ||
+          route.request().postDataJSON().data.op !== 'recordDeliveryReceipt' ||
+          lost
+        )
+          return route.fallback();
         lost = true;
         await route.fetch();
         await route.fulfill({

@@ -1,6 +1,7 @@
 import { Service, inject } from '@angular/core';
-import { httpsCallable } from 'firebase/functions';
 import { QueryFetchPolicy } from 'firebase/data-connect';
+import type { CommandOp } from '../../../../../../shared/contracts/functions/index';
+import { callFunction } from '../../../core/call-function';
 import { FIREBASE } from '../../../core/firebase.providers';
 import * as sdk from '../../../core/generated';
 import { InventoryApi } from '../../salon-dashboard/data-access/inventory-api';
@@ -14,7 +15,7 @@ import type {
 import type { Page, PageInput } from '../../../../../../shared/contracts/business/index';
 import { commandError } from './command-error';
 import { toRequestSummary, toRequestDetail } from './request.mapper';
-const names = {
+const names: Record<StockAction['type'], CommandOp> = {
   SUBMIT: 'submitRequest',
   APPROVE: 'approveRequest',
   REJECT: 'rejectRequest',
@@ -28,12 +29,11 @@ export class ReplenishmentApi {
   private readonly inventory = inject(InventoryApi);
   async runAction(action: StockAction): Promise<CommandResult> {
     try {
-      return (
-        await httpsCallable<StockAction['input'], CommandResult>(
-          this.firebase.functions,
-          names[action.type],
-        )(action.input)
-      ).data;
+      return await callFunction<StockAction['input'], CommandResult>(
+        this.firebase,
+        names[action.type],
+        action.input,
+      );
     } catch (error) {
       throw commandError(error);
     }

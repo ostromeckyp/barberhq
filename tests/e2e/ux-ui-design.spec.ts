@@ -22,7 +22,7 @@ test.describe('Feature: design fidelity for request and procedure controls', () 
       throw Error('UX checks require isolated local fixtures');
     h = await createCloudHarness('ux-ui');
     aiCalls = 0;
-    await page.route(/\/(prepareReplenishment|answerProcedureQuestion)$/, async (route) => {
+    await page.route('**/ai', async (route) => {
       if (route.request().method() !== 'OPTIONS') aiCalls++;
       await route.abort();
     });

@@ -151,9 +151,11 @@ test('one_three_item_request_survives_committed_lost_response', async ({ page })
   for (const name of ['Pomada Matowa', 'Pomada Dry Matt', 'Pomada Cement']) await add(page, name);
   let lost = false;
   const keys: string[] = [];
-  await page.route('**/europe-west1/submitRequest', async (route) => {
-    if (route.request().method() !== 'POST') return route.continue();
-    keys.push(JSON.parse(route.request().postData()!).data.idempotencyKey);
+  await page.route('**/commands', async (route) => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    const { op, input } = JSON.parse(route.request().postData()!).data;
+    if (op !== 'submitRequest') return route.fallback();
+    keys.push(input.idempotencyKey);
     if (!lost) {
       lost = true;
       await route.fetch();
