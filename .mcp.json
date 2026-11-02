@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "angular-cli": {
+      "command": "npx",
+      "args": ["-y", "@angular/cli@22.2.0", "mcp"]
+    },
+    "firebase": {
+      "command": "npx",
+      "args": ["-y", "firebase-tools@15.32.0", "mcp"]
+    },
+    "code-review-graph": {
+      "command": "sh",
+      "args": [
+        "scripts/dev/code-review-graph.sh",
+        "serve",
+        "--tools",
+        "build_or_update_graph_tool,list_graph_stats_tool,get_minimal_context_tool,query_graph_tool,get_impact_radius_tool,get_review_context_tool,detect_changes_tool,get_architecture_overview_tool,semantic_search_nodes_tool,get_affected_flows_tool"
+      ]
+    }
+  }
+}

@@ -16,6 +16,12 @@
 - Full builds index Git-tracked files; newly untracked code may be absent. Check coverage and inspect allowed source directly when missing. Angular templates, DI, GraphQL and runtime links can be incomplete; an empty graph result does not prove there are no dependencies.
 - Setup and usage: `docs/implementation/code-review-graph.md`.
 
+## MCP servers
+
+- Project MCP config: `.mcp.json` (Claude) and `.codex/config.toml` (Codex), kept in sync. Both start `angular-cli` (`@angular/cli@22.2.0 mcp`), `firebase` (`firebase-tools@15.32.0 mcp`) and `code-review-graph`. Pin versions to the ones in `web/package.json` and `package.json`.
+- Angular work: call `list_projects` and `get_best_practices` before writing code; use `search_documentation` for API questions.
+- Firebase MCP acts with your logged-in Firebase CLI account. Read-only calls are fine; anything that writes to `notbad-6be95` follows the Deployment rules below.
+
 ## Project
 
 - BarberHQ: salon stock and replenishment demo for "Not Bad Stuff" (DevFest talk). HQ manages products and stock; salons see inventory, request products, receive deliveries; a RAG assistant answers procedure questions from cited PDFs.
