@@ -1,5 +1,6 @@
 import { DestroyRef, Service, computed, inject, signal } from '@angular/core';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
+import { ClientLog } from '../../../core/client-log';
 import { Language } from '../../../core/language';
 import { runtimeConfig } from '../../../core/public-config';
 import { MicrophoneBlockedError, VoiceRecorder } from '../../../core/voice-recorder';
@@ -8,8 +9,20 @@ import { OrderFacade } from './order.facade';
 import { ReplenishmentAssistantFacade } from './replenishment-assistant.facade';
 
 export const MAX_RECORDING_MS = 30_000;
+export const STOP_TIMEOUT_MS = 5_000;
+export const RECOGNITION_TIMEOUT_MS = 40_000;
 const MAX_LENGTH = 2000;
 type Recording = { blob: Blob; mimeType: string };
+const TIMED_OUT = Symbol('timed out');
+
+/** Settles with `TIMED_OUT` when `work` has not settled within `ms`. */
+function within<T>(work: Promise<T>, ms: number): Promise<T | typeof TIMED_OUT> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<typeof TIMED_OUT>((resolve) => {
+    timer = setTimeout(() => resolve(TIMED_OUT), ms);
+  });
+  return Promise.race([work, limit]).finally(() => clearTimeout(timer));
+}
 
 /** Appends dictated text to the message; the result is capped at the form's maximum length. */
 export function appendDictation(
@@ -39,6 +52,8 @@ export class DictationFacade {
   private readonly language = inject(Language);
   private readonly order = inject(OrderFacade);
   private readonly assistant = inject(ReplenishmentAssistantFacade);
+  private readonly log = inject(ClientLog);
+  private attempt = 0;
   private timer: ReturnType<typeof setInterval> | undefined;
   private startedAt = 0;
   private last: Recording | null = null;
@@ -76,6 +91,8 @@ export class DictationFacade {
       await this.recorder.start();
     } catch (error) {
       if (this.destroyed) return;
+      const blocked = error instanceof MicrophoneBlockedError;
+      this.log.record('dictation.start', 'error', { code: blocked ? 'blocked' : 'failed' });
       this.fail(
         error instanceof MicrophoneBlockedError
           ? 'replenishment.dictation.blocked'
@@ -87,6 +104,7 @@ export class DictationFacade {
       void this.recorder.stop().catch(() => undefined);
       return;
     }
+    this.log.record('dictation.start');
     this.last = null;
     this.state.set('recording');
     this.elapsedMs.set(0);
@@ -100,6 +118,7 @@ export class DictationFacade {
 
   async retry(): Promise<void> {
     if (this.state() !== 'error' || !this.last) return;
+    this.log.record('dictation.retry');
     await this.transcribe(this.last);
   }
 
@@ -108,8 +127,19 @@ export class DictationFacade {
     this.clearTimer();
     this.state.set('recognising');
     try {
-      const { blob, mimeType } = await this.recorder.stop();
+      const stopped = await within(this.recorder.stop(), STOP_TIMEOUT_MS);
       if (this.destroyed) return;
+      if (stopped === TIMED_OUT) {
+        this.recorder.cancel();
+        this.last = null;
+        this.log.record('dictation.stop.timeout', 'error');
+        this.fail('replenishment.dictation.failed');
+        return;
+      }
+      const { blob, mimeType, durationMs } = stopped;
+      this.log.record('dictation.stop', 'ok', {
+        details: { bytes: blob.size, mimeType, durationMs },
+      });
       if (blob.size === 0) {
         this.last = null;
         this.fail('replenishment.dictation.noSpeech');
@@ -118,6 +148,7 @@ export class DictationFacade {
       this.last = { blob, mimeType };
     } catch {
       if (this.destroyed) return;
+      this.log.record('dictation.stop', 'error');
       this.fail('replenishment.dictation.failed');
       return;
     }
@@ -125,16 +156,32 @@ export class DictationFacade {
   }
 
   private async transcribe(recording: Recording): Promise<void> {
+    const attempt = ++this.attempt;
     this.state.set('recognising');
     this.errorKey.set(null);
     try {
-      const text = await this.api.transcribeOrder({
-        salonId: this.order.salonId() ?? '',
-        audio: await toBase64(recording.blob),
-        mimeType: recording.mimeType,
-        language: this.language.current(),
-      });
-      if (this.destroyed) return;
+      const recognised = await within(
+        (async () => {
+          const audio = await toBase64(recording.blob);
+          this.log.record('dictation.encoded', 'ok', { details: { bytes: recording.blob.size } });
+          return this.api.transcribeOrder({
+            salonId: this.order.salonId() ?? '',
+            audio,
+            mimeType: recording.mimeType,
+            language: this.language.current(),
+          });
+        })(),
+        RECOGNITION_TIMEOUT_MS,
+      );
+      if (this.destroyed || attempt !== this.attempt) return;
+      if (recognised === TIMED_OUT) {
+        this.attempt++;
+        this.log.record('dictation.timeout', 'error');
+        this.fail('replenishment.dictation.failed');
+        return;
+      }
+      const text = recognised;
+      this.log.record('dictation.result', 'ok', { details: { chars: [...text.trim()].length } });
       if (this.disabled()) {
         this.state.set('idle');
         return;
@@ -145,8 +192,9 @@ export class DictationFacade {
       this.state.set('idle');
       if (result.capped) this.errorKey.set('replenishment.dictation.tooLong');
     } catch (error) {
-      if (this.destroyed) return;
+      if (this.destroyed || attempt !== this.attempt) return;
       const code = error instanceof AssistantApiError ? error.code : null;
+      this.log.record('dictation.result', 'error', { code: code ?? 'unknown' });
       if (code === 'NO_SPEECH') this.last = null;
       this.fail(
         code === 'NO_SPEECH'

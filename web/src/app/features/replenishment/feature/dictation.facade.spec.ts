@@ -4,13 +4,21 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
 import { Language } from '../../../core/language';
 import { MicrophoneBlockedError, VoiceRecorder } from '../../../core/voice-recorder';
-import { DictationFacade, appendDictation } from './dictation.facade';
+import { ClientLog } from '../../../core/client-log';
+import {
+  DictationFacade,
+  RECOGNITION_TIMEOUT_MS,
+  STOP_TIMEOUT_MS,
+  appendDictation,
+} from './dictation.facade';
 import { OrderFacade } from './order.facade';
 import { ReplenishmentAssistantFacade } from './replenishment-assistant.facade';
 
 let start: ReturnType<typeof vi.fn>;
 let stop: ReturnType<typeof vi.fn>;
+let cancel: ReturnType<typeof vi.fn>;
 let transcribe: ReturnType<typeof vi.fn>;
+let record: ReturnType<typeof vi.fn>;
 let message: ReturnType<typeof signal<string>>;
 let locked: ReturnType<typeof signal<boolean>>;
 let loading: ReturnType<typeof signal<boolean>>;
@@ -23,12 +31,20 @@ function setup() {
       DictationFacade,
       {
         provide: VoiceRecorder,
-        useValue: { supported: () => true, start, stop, level: signal(0) },
+        useValue: { supported: () => true, start, stop, cancel, level: signal(0) },
       },
       { provide: AssistantApi, useValue: { transcribeOrder: transcribe } },
       { provide: Language, useValue: { current: () => 'pl' } },
       { provide: OrderFacade, useValue: { salonId: () => 'salon', locked } },
       { provide: ReplenishmentAssistantFacade, useValue: { message, loading } },
+      {
+        provide: ClientLog,
+        useValue: {
+          get record() {
+            return record;
+          },
+        },
+      },
     ],
   });
   return TestBed.inject(DictationFacade);
@@ -42,6 +58,8 @@ beforeEach(() => {
     durationMs: 1000,
   }));
   transcribe = vi.fn(async () => '2 matowa');
+  record = vi.fn();
+  cancel = vi.fn();
 });
 afterEach(() => vi.useRealTimers());
 
@@ -207,4 +225,89 @@ it('skips the write when the form locks during recognising', async () => {
   await finishing;
   expect(message()).toBe('');
   expect(facade.state()).toBe('idle');
+});
+
+const events = () => record.mock.calls.map((call) => call[0]);
+
+it('uses a 5 s stop limit and a 40 s recognition limit', () => {
+  expect(STOP_TIMEOUT_MS).toBe(5_000);
+  expect(RECOGNITION_TIMEOUT_MS).toBe(40_000);
+});
+
+it('fails without retry when the recorder never stops', async () => {
+  stop.mockImplementation(() => new Promise(() => undefined));
+  const facade = setup();
+  await facade.toggle();
+  void facade.toggle();
+  await vi.advanceTimersByTimeAsync(4_900);
+  expect(facade.state()).toBe('recognising');
+  await vi.advanceTimersByTimeAsync(200);
+  expect(facade.state()).toBe('error');
+  expect(facade.errorKey()).toBe('replenishment.dictation.failed');
+  expect(facade.canRetry()).toBe(false);
+  expect(events()).toContain('dictation.stop.timeout');
+  expect(cancel).toHaveBeenCalled();
+  expect(transcribe).not.toHaveBeenCalled();
+});
+
+it('fails with retry when recognition does not answer in 40 s', async () => {
+  transcribe.mockImplementation(() => new Promise(() => undefined));
+  const facade = setup();
+  await facade.toggle();
+  void facade.toggle();
+  await vi.advanceTimersByTimeAsync(39_000);
+  expect(facade.state()).toBe('recognising');
+  await vi.advanceTimersByTimeAsync(1_100);
+  expect(facade.state()).toBe('error');
+  expect(facade.canRetry()).toBe(true);
+  expect(events()).toContain('dictation.timeout');
+});
+
+it('ignores a transcription that arrives after the time limit', async () => {
+  let answer!: (text: string) => void;
+  transcribe.mockImplementation(() => new Promise<string>((resolve) => (answer = resolve)));
+  const facade = setup();
+  await facade.toggle();
+  void facade.toggle();
+  await vi.advanceTimersByTimeAsync(41_000);
+  expect(facade.state()).toBe('error');
+  answer('late text');
+  await vi.advanceTimersByTimeAsync(0);
+  expect(message()).toBe('');
+  expect(facade.state()).toBe('error');
+});
+
+it('logs the steps of a successful dictation without the transcript', async () => {
+  const facade = setup();
+  await facade.toggle();
+  await vi.advanceTimersByTimeAsync(1_000);
+  await facade.toggle();
+  expect(events()).toEqual([
+    'dictation.start',
+    'dictation.stop',
+    'dictation.encoded',
+    'dictation.result',
+  ]);
+  expect(record.mock.calls[1][2].details).toEqual({
+    bytes: 3,
+    mimeType: 'audio/mp4',
+    durationMs: 1000,
+  });
+  expect(record.mock.calls[3][2].details).toEqual({ chars: 8 });
+  expect(JSON.stringify(record.mock.calls)).not.toContain('matowa');
+});
+
+it('logs a blocked microphone and an API error code', async () => {
+  start.mockRejectedValueOnce(new MicrophoneBlockedError());
+  const facade = setup();
+  await facade.toggle();
+  expect(record).toHaveBeenCalledWith('dictation.start', 'error', { code: 'blocked' });
+  transcribe.mockRejectedValueOnce(new AssistantApiError('NO_SPEECH'));
+  await facade.toggle();
+  await facade.toggle();
+  expect(record).toHaveBeenCalledWith(
+    'dictation.result',
+    'error',
+    expect.objectContaining({ code: 'NO_SPEECH' }),
+  );
 });

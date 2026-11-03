@@ -90,6 +90,17 @@ export class VoiceRecorder {
     });
   }
 
+  /** Drops a recorder whose `stop()` never settled and frees the microphone. */
+  cancel(): void {
+    const recorder = this.recorder;
+    if (recorder) {
+      recorder.onstop = null;
+      recorder.onerror = null;
+      recorder.ondataavailable = null;
+    }
+    this.release();
+  }
+
   private watchLevel(stream: MediaStream): void {
     if (typeof AudioContext === 'undefined') return;
     try {
