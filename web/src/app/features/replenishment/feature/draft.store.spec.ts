@@ -58,3 +58,34 @@ it('assistant_merge_is_atomic_when_there_is_no_room_for_all_lines', () => {
   ).toBe(false);
   expect(store.lines()).toEqual(before);
 });
+const aiMatch = {
+  originalWording: 'matte',
+  reason: 'Closest name',
+  alternatives: [{ productId: 'dry', productName: 'Dry' }],
+};
+it('merging_an_ai_match_into_an_existing_line_does_not_label_that_line', () => {
+  const store = new DraftStore();
+  store.add(line(2));
+  expect(store.mergeProposal([{ ...line(1, 'assistant'), lineId: 'ai', aiMatch }])).toBe(true);
+  expect(store.lines()).toHaveLength(1);
+  expect(store.lines()[0]).toMatchObject({ quantity: 3, origin: 'manual' });
+  expect(store.lines()[0]).not.toHaveProperty('aiMatch');
+});
+it('replace_swaps_one_line_in_place', () => {
+  const store = new DraftStore();
+  store.add(line(2));
+  store.add({ ...line(1), lineId: '2', productId: 'p2' });
+  store.replace('1', {
+    status: 'NEEDS_CLARIFICATION',
+    lineId: '1',
+    originalWording: 'matte',
+    reason: 'CHOOSE_PRODUCT',
+    origin: 'assistant',
+    candidates: [],
+    quantity: 2,
+  });
+  expect(store.lines().map((l) => [l.lineId, l.status])).toEqual([
+    ['1', 'NEEDS_CLARIFICATION'],
+    ['2', 'READY'],
+  ]);
+});

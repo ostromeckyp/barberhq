@@ -182,3 +182,27 @@ it('clears_completed_result_when_ready_identity_changes_directly', async () => {
   expect(h.service.outcome()).toBeUndefined();
   expect(h.service.submittedItems()).toEqual([]);
 });
+it('submits_an_ai_matched_line_as_a_plain_ready_line_without_ai_metadata', async () => {
+  sessionStorage.clear();
+  const sent: StockAction[] = [];
+  const h = setup(async (action) => {
+    sent.push(structuredClone(action));
+    return result;
+  });
+  TestBed.tick();
+  await h.service.submit('salon', [
+    {
+      ...line('matowa'),
+      origin: 'assistant',
+      aiMatch: {
+        originalWording: 'matte paste',
+        reason: 'Closest name',
+        alternatives: [{ productId: 'dry', productName: 'Dry' }],
+        choiceReceiptId: 'receipt-a',
+      },
+    },
+  ]);
+  expect(JSON.stringify(sent)).not.toContain('aiMatch');
+  expect(JSON.stringify(sent)).not.toContain('receipt-a');
+  expect(JSON.stringify(sent)).toContain('{"productId":"matowa","quantity":2}');
+});

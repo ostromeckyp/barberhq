@@ -907,6 +907,12 @@
       "errors": {
         "storage": "Włącz pamięć sesji w przeglądarce przed złożeniem zamówienia. Żadne zamówienie nie zostało złożone.",
         "clearState": "Nie udało się wyczyścić zapisanego stanu. Uzgodnij to samo zamówienie, zanim przejdziesz dalej."
+      },
+      "aiMatch": {
+        "label": "Dopasowane przez AI",
+        "change": "Zmień",
+        "changeFor": "Zmień produkt: {{ name }}",
+        "suggested": "Sugestia"
       }
     },
     "draft": {

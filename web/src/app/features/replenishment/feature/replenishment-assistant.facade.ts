@@ -1,10 +1,12 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
 import type { PrepareInput, ProposalResult } from '../../../../../../shared/contracts/ai/index';
+import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
 import type { TranslatedText } from '../../../core/models/translated-text';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { DraftStore } from './draft.store';
 import { OrderFacade } from './order.facade';
+const withoutAiMatch = ({ aiMatch: _ai, ...line }: ReadyDraftLine): ReadyDraftLine => line;
 type Choice = NonNullable<PrepareInput['clarifications']>[number];
 type Attempt = { message: string; prefix: string; choices: Map<string, Choice> };
 @Service({ autoProvided: false })
@@ -98,6 +100,39 @@ export class ReplenishmentAssistantFacade {
     };
     await this.request(source.attempt, { localId: id, choice });
   }
+  /**
+   * Turns an AI-matched line back into a product choice: its alternatives first, then the
+   * rest of the catalog. Only the user's next pick is sent, as a clarification with the
+   * match's receipt; an untouched AI match never is.
+   */
+  changeMatch(id: string): void {
+    const line = this.draft.lines().find((l) => l.lineId === id);
+    if (
+      this.loading() ||
+      this.order.locked() ||
+      line?.status !== 'READY' ||
+      !line.aiMatch ||
+      !this.sources.has(id)
+    )
+      return;
+    const offered = new Set(line.aiMatch.alternatives.map((a) => a.productId));
+    this.draft.replace(id, {
+      status: 'NEEDS_CLARIFICATION',
+      lineId: id,
+      originalWording: line.aiMatch.originalWording,
+      reason: 'CHOOSE_PRODUCT',
+      reasonCode: 'CHOOSE_PRODUCT',
+      origin: line.origin,
+      quantity: line.quantity,
+      candidates: [
+        ...line.aiMatch.alternatives,
+        ...this.order.inventory
+          .rows()
+          .filter((r) => !offered.has(r.productId))
+          .map(({ productId, productName }) => ({ productId, productName })),
+      ],
+    });
+  }
   private async request(attempt: Attempt, selection?: { localId: string; choice: Choice }) {
     const generation = ++this.generation,
       scope = this.currentScope(),
@@ -129,7 +164,8 @@ export class ReplenishmentAssistantFacade {
         : undefined;
       const verified = selection
         ? result.lines.find(
-            (l) => l.status === 'READY' && l.productId === selection.choice.productId,
+            (l): l is ReadyDraftLine =>
+              l.status === 'READY' && l.productId === selection.choice.productId,
           )
         : undefined;
       const incoming = selection
@@ -138,7 +174,7 @@ export class ReplenishmentAssistantFacade {
           : verified
             ? [
                 {
-                  ...verified,
+                  ...withoutAiMatch(verified),
                   lineId: selection.choice.lineId,
                   quantity: selection.choice.quantity!,
                 },
@@ -161,14 +197,17 @@ export class ReplenishmentAssistantFacade {
       }
       attempt.choices = choices;
       if (selection) this.sources.delete(selection.localId);
-      for (const line of incoming)
-        if (line.status === 'NEEDS_CLARIFICATION')
+      for (const line of incoming) {
+        // An AI match is kept only so a later "Change" can be sent as an explicit choice.
+        const ask = line.status === 'NEEDS_CLARIFICATION' ? line : line.aiMatch;
+        if (ask)
           this.sources.set(`${attempt.prefix}:${line.lineId}`, {
             attempt,
             serverId: line.lineId,
-            wording: line.originalWording,
-            ...(line.choiceReceiptId ? { receiptId: line.choiceReceiptId } : {}),
+            wording: ask.originalWording,
+            ...(ask.choiceReceiptId ? { receiptId: ask.choiceReceiptId } : {}),
           });
+      }
       this.excluded.set(excluded);
       const learned = selection
         ? result.shorthandLearning?.find((l) => l.lineId === selection.choice.lineId)

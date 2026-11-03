@@ -907,6 +907,12 @@
       "errors": {
         "storage": "Enable browser session storage before submitting. No request was sent.",
         "clearState": "Could not clear saved state. Reconcile the same request before continuing."
+      },
+      "aiMatch": {
+        "label": "Matched by AI",
+        "change": "Change",
+        "changeFor": "Change product for {{ name }}",
+        "suggested": "Suggested"
       }
     },
     "draft": {

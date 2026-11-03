@@ -15,6 +15,7 @@ import { ReplenishmentAssistantFacade } from '../feature/replenishment-assistant
 import { AssistantInput } from './assistant-input';
 import { OrderOutcome } from './order-outcome';
 import { ClarificationInput } from './clarification-input';
+import { AiMatchNote } from './ai-match-note';
 import { clarificationReasonKey } from '../feature/clarification-reason';
 import { runtimeConfig } from '../../../core/public-config';
 @Component({
@@ -32,6 +33,7 @@ import { runtimeConfig } from '../../../core/public-config';
     TranslocoPipe,
     AssistantInput,
     ClarificationInput,
+    AiMatchNote,
     OrderOutcome,
   ],
   templateUrl: './order-panel.html',
