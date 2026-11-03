@@ -5,7 +5,7 @@ import { provideTransloco } from '@jsverse/transloco';
 import { DictationFacade } from '../feature/dictation.facade';
 import { DictationButton } from './dictation-button';
 
-function render(visible: boolean, state = 'idle') {
+function render(visible: boolean, state = 'idle', disabled = false) {
   TestBed.configureTestingModule({
     imports: [DictationButton],
     providers: [
@@ -18,6 +18,7 @@ function render(visible: boolean, state = 'idle') {
           elapsedMs: signal(3000),
           errorKey: signal(null),
           canRetry: () => false,
+          disabled: () => disabled,
           toggle: () => undefined,
         },
       },
@@ -36,4 +37,8 @@ it('shows the mic button when available and elapsed seconds while recording', ()
   expect(render(true).querySelector('button')).not.toBeNull();
   TestBed.resetTestingModule();
   expect(render(true, 'recording').textContent).toContain('0:03');
+});
+
+it('disables the button while the form is locked', () => {
+  expect(render(true, 'idle', true).querySelector('button')?.disabled).toBe(true);
 });

@@ -42,6 +42,7 @@ export class DictationFacade {
   private timer: ReturnType<typeof setInterval> | undefined;
   private startedAt = 0;
   private last: Recording | null = null;
+  private destroyed = false;
   readonly state = signal<DictationState>('idle');
   readonly elapsedMs = signal(0);
   readonly errorKey = signal<string | null>(null);
@@ -49,6 +50,7 @@ export class DictationFacade {
     () =>
       (runtimeConfig.publicConfig?.replenishmentAiEnabled ?? false) && this.recorder.supported(),
   );
+  readonly disabled = computed(() => this.assistant.loading() || this.order.locked());
   readonly canRetry = computed(() => this.state() === 'error' && this.last !== null);
   readonly level = this.recorder.level;
   private readonly onHidden = () => {
@@ -58,6 +60,7 @@ export class DictationFacade {
   constructor() {
     document.addEventListener('visibilitychange', this.onHidden);
     inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
       document.removeEventListener('visibilitychange', this.onHidden);
       this.clearTimer();
       if (this.state() === 'recording') void this.recorder.stop().catch(() => undefined);
@@ -66,16 +69,22 @@ export class DictationFacade {
 
   async toggle(): Promise<void> {
     if (this.state() === 'recording') return this.finish();
-    if (this.state() === 'recognising') return;
+    if (this.state() === 'recognising' || this.state() === 'starting' || this.disabled()) return;
     this.errorKey.set(null);
+    this.state.set('starting');
     try {
       await this.recorder.start();
     } catch (error) {
+      if (this.destroyed) return;
       this.fail(
         error instanceof MicrophoneBlockedError
           ? 'replenishment.dictation.blocked'
           : 'replenishment.dictation.failed',
       );
+      return;
+    }
+    if (this.destroyed) {
+      void this.recorder.stop().catch(() => undefined);
       return;
     }
     this.last = null;
@@ -100,8 +109,15 @@ export class DictationFacade {
     this.state.set('recognising');
     try {
       const { blob, mimeType } = await this.recorder.stop();
+      if (this.destroyed) return;
+      if (blob.size === 0) {
+        this.last = null;
+        this.fail('replenishment.dictation.noSpeech');
+        return;
+      }
       this.last = { blob, mimeType };
     } catch {
+      if (this.destroyed) return;
       this.fail('replenishment.dictation.failed');
       return;
     }
@@ -118,12 +134,18 @@ export class DictationFacade {
         mimeType: recording.mimeType,
         language: this.language.current(),
       });
+      if (this.destroyed) return;
+      if (this.disabled()) {
+        this.state.set('idle');
+        return;
+      }
       const result = appendDictation(this.assistant.message(), text.trim());
       this.assistant.message.set(result.value);
       this.last = null;
       this.state.set('idle');
       if (result.capped) this.errorKey.set('replenishment.dictation.tooLong');
     } catch (error) {
+      if (this.destroyed) return;
       const code = error instanceof AssistantApiError ? error.code : null;
       if (code === 'NO_SPEECH') this.last = null;
       this.fail(

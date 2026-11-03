@@ -12,8 +12,12 @@ let start: ReturnType<typeof vi.fn>;
 let stop: ReturnType<typeof vi.fn>;
 let transcribe: ReturnType<typeof vi.fn>;
 let message: ReturnType<typeof signal<string>>;
+let locked: ReturnType<typeof signal<boolean>>;
+let loading: ReturnType<typeof signal<boolean>>;
 function setup() {
   message = signal('');
+  locked = signal(false);
+  loading = signal(false);
   TestBed.configureTestingModule({
     providers: [
       DictationFacade,
@@ -23,8 +27,8 @@ function setup() {
       },
       { provide: AssistantApi, useValue: { transcribeOrder: transcribe } },
       { provide: Language, useValue: { current: () => 'pl' } },
-      { provide: OrderFacade, useValue: { salonId: () => 'salon' } },
-      { provide: ReplenishmentAssistantFacade, useValue: { message } },
+      { provide: OrderFacade, useValue: { salonId: () => 'salon', locked } },
+      { provide: ReplenishmentAssistantFacade, useValue: { message, loading } },
     ],
   });
   return TestBed.inject(DictationFacade);
@@ -127,4 +131,80 @@ it('appends with a comma and caps at 2000', () => {
   expect(appendDictation('', 'a')).toEqual({ value: 'a', capped: false });
   expect(appendDictation('b', 'a')).toEqual({ value: 'b, a', capped: false });
   expect(appendDictation('x'.repeat(2000), 'a').capped).toBe(true);
+});
+
+it('ignores a second tap while the microphone is starting', async () => {
+  let resolve!: () => void;
+  start.mockImplementation(() => new Promise<void>((r) => (resolve = r)));
+  const facade = setup();
+  const first = facade.toggle();
+  await facade.toggle();
+  expect(facade.state()).toBe('starting');
+  resolve();
+  await first;
+  expect(start).toHaveBeenCalledTimes(1);
+  expect(facade.state()).toBe('recording');
+  expect(vi.getTimerCount()).toBe(1);
+});
+
+it('stops the recorder when destroyed while starting', async () => {
+  let resolve!: () => void;
+  start.mockImplementation(() => new Promise<void>((r) => (resolve = r)));
+  const facade = setup();
+  const first = facade.toggle();
+  TestBed.resetTestingModule();
+  resolve();
+  await first;
+  expect(stop).toHaveBeenCalled();
+  expect(vi.getTimerCount()).toBe(0);
+  expect(facade.state()).not.toBe('recording');
+});
+
+it('does not write after destroy during recognising', async () => {
+  let done!: (t: string) => void;
+  transcribe.mockImplementation(() => new Promise<string>((r) => (done = r)));
+  const facade = setup();
+  await facade.toggle();
+  const finishing = facade.toggle();
+  await vi.advanceTimersByTimeAsync(0);
+  TestBed.resetTestingModule();
+  done('late');
+  await finishing;
+  expect(message()).toBe('');
+});
+
+it('reports noSpeech for an empty recording without calling the server', async () => {
+  stop.mockResolvedValue({ blob: new Blob([]), mimeType: 'audio/mp4', durationMs: 10 });
+  const facade = setup();
+  await facade.toggle();
+  await facade.toggle();
+  expect(transcribe).not.toHaveBeenCalled();
+  expect(facade.errorKey()).toBe('replenishment.dictation.noSpeech');
+  expect(facade.canRetry()).toBe(false);
+});
+
+it('does nothing while the form is locked or loading', async () => {
+  const facade = setup();
+  locked.set(true);
+  expect(facade.disabled()).toBe(true);
+  await facade.toggle();
+  expect(start).not.toHaveBeenCalled();
+  locked.set(false);
+  loading.set(true);
+  await facade.toggle();
+  expect(start).not.toHaveBeenCalled();
+});
+
+it('skips the write when the form locks during recognising', async () => {
+  let done!: (t: string) => void;
+  transcribe.mockImplementation(() => new Promise<string>((r) => (done = r)));
+  const facade = setup();
+  await facade.toggle();
+  const finishing = facade.toggle();
+  await vi.advanceTimersByTimeAsync(0);
+  locked.set(true);
+  done('late');
+  await finishing;
+  expect(message()).toBe('');
+  expect(facade.state()).toBe('idle');
 });

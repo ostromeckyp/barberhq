@@ -81,3 +81,14 @@ it('releases tracks when the recorder cannot be created', async () => {
   await expect(TestBed.inject(VoiceRecorder).start()).rejects.toThrow('boom');
   expect(track.stop).toHaveBeenCalled();
 });
+
+it('ignores a second start while the first is pending', async () => {
+  let resolve!: (s: unknown) => void;
+  getUserMedia.mockImplementation(() => new Promise((r) => (resolve = r)));
+  const recorder = TestBed.inject(VoiceRecorder);
+  const first = recorder.start();
+  await recorder.start();
+  resolve({ getTracks: () => [track] });
+  await first;
+  expect(getUserMedia).toHaveBeenCalledTimes(1);
+});

@@ -30,7 +30,7 @@ import { DictationFacade } from '../feature/dictation.facade';
       <button
         mat-stroked-button
         type="button"
-        [disabled]="state === 'recognising'"
+        [disabled]="state === 'recognising' || state === 'starting' || dictation.disabled()"
         [attr.aria-pressed]="state === 'recording'"
         (click)="dictation.toggle()"
       >

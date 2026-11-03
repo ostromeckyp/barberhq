@@ -18,6 +18,7 @@ export class VoiceRecorder {
   private startedAt = 0;
   private audioContext: AudioContext | null = null;
   private frame = 0;
+  private starting = false;
 
   supported(): boolean {
     return (
@@ -28,12 +29,14 @@ export class VoiceRecorder {
   }
 
   async start(): Promise<void> {
-    if (this.recorder) return;
+    if (this.recorder || this.starting) return;
+    this.starting = true;
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: { channelCount: 1 },
       });
     } catch (error) {
+      this.starting = false;
       this.release();
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
         throw new MicrophoneBlockedError();
@@ -53,8 +56,10 @@ export class VoiceRecorder {
       this.recorder = recorder;
       this.startedAt = Date.now();
       recorder.start();
+      this.starting = false;
       this.watchLevel(this.stream);
     } catch (error) {
+      this.starting = false;
       this.release();
       throw error;
     }

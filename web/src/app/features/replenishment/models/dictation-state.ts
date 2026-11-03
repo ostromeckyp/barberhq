@@ -1,1 +1,1 @@
-export type DictationState = 'idle' | 'recording' | 'recognising' | 'error';
+export type DictationState = 'idle' | 'starting' | 'recording' | 'recognising' | 'error';
