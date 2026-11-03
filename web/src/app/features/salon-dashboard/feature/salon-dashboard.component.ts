@@ -30,12 +30,14 @@ import { DraftStore } from '../../replenishment/feature/draft.store';
 import { OrderFacade } from '../../replenishment/feature/order.facade';
 import { ReplenishmentAssistantFacade } from '../../replenishment/feature/replenishment-assistant.facade';
 import { OrderPanel } from '../../replenishment/ui/order-panel';
+import { PushPromptComponent } from '../../salon-settings/ui/push-prompt.component';
 import { StockTable } from '../ui/stock-table/stock-table';
 import { SalonInventoryFacade } from './salon-inventory.facade';
 @Component({
   selector: 'app-salon-dashboard',
   providers: [SalonInventoryFacade, OrderFacade, DraftStore, ReplenishmentAssistantFacade],
   imports: [
+    PushPromptComponent,
     MatButtonModule,
     DelayedLoadingDirective,
     MatIconModule,

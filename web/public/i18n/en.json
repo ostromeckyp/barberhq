@@ -1274,7 +1274,11 @@
       "denied": "Notifications are blocked in browser settings",
       "install": "Add BarberHQ to the Home Screen to get notifications",
       "error": "Could not turn on notifications",
-      "retry": "Try again"
+      "retry": "Try again",
+      "prompt": {
+        "text": "Get a notification when HQ updates your requests.",
+        "later": "Not now"
+      }
     }
   },
   "app": {
