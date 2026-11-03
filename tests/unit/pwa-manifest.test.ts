@@ -15,7 +15,7 @@ describe('PWA manifest', () => {
       start_url: '/',
       scope: '/',
       theme_color: '#171614',
-      background_color: '#f6f5f2',
+      background_color: '#171614',
     });
   });
 
@@ -53,7 +53,17 @@ describe('PWA manifest', () => {
       '<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />',
       '<meta name="apple-mobile-web-app-capable" content="yes" />',
       '<meta name="apple-mobile-web-app-title" content="BarberHQ" />',
+      '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />',
     ])
       expect(html).toContain(tag);
+  });
+
+  it('extends the dark toolbar under the iOS status bar', () => {
+    expect(html).toMatch(/name="viewport"[\s\S]*?viewport-fit=cover/);
+    const shell = readFileSync(
+      join(__dirname, '../../web/src/app/shell/shell.component.scss'),
+      'utf8',
+    );
+    expect(shell.match(/env\(safe-area-inset-top/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
   });
 });
