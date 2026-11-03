@@ -5,13 +5,15 @@
   height: 100dvh;
 }
 .toolbar {
-  height: 60px;
+  /* Installed iOS app: the status bar is translucent, so the ink toolbar extends under it. */
+  height: calc(60px + env(safe-area-inset-top, 0px));
   flex: none;
   background: var(--ink);
   color: var(--surface);
   border-bottom: 2px solid var(--brand);
   gap: 12px;
-  padding: 0 20px;
+  padding: env(safe-area-inset-top, 0px) max(20px, env(safe-area-inset-right, 0px)) 0
+    max(20px, env(safe-area-inset-left, 0px));
 }
 .brand {
   display: flex;
@@ -95,8 +97,9 @@ main {
 }
 @media (max-width: 759px) {
   .toolbar {
-    height: 104px;
-    padding: 0 8px;
+    height: calc(104px + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) max(8px, env(safe-area-inset-right, 0px)) 0
+      max(8px, env(safe-area-inset-left, 0px));
     gap: 4px;
     flex-wrap: wrap;
     align-content: center;
