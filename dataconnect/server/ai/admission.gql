@@ -46,7 +46,7 @@ mutation AdmitAiWindow($uid: String!, $businessId: String!, $role: MemberRole!)
       ))
     ON CONFLICT (uid, hour_start) DO UPDATE
       SET count = ai_usage_window.count + 1
-    WHERE ai_usage_window.count < 10
+    WHERE ai_usage_window.count < 20
     RETURNING count
     """
     params: [$uid, $businessId, $role]

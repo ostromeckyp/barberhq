@@ -32,7 +32,7 @@ HQ document commands: `createDocumentUpload`, `reviewAndPublishDocument`, `retry
 
 AI callables: `prepareReplenishment` returns `PROPOSAL | NEEDS_CLARIFICATION | UNAVAILABLE` with line-level results and excluded active requests; `answerProcedureQuestion` returns `ANSWER | NEEDS_CLARIFICATION | INSUFFICIENT_EVIDENCE`. Shared operational failures use structured errors. Neither flow can invoke stock writes. Server derives business/actor scope from verified identity and SQL membership. Client role claims, route guards and model arguments are never authority.
 
-Limits across both AI endpoints: 2,000 input characters, 25-second flow budget, at most 5 model turns / 8 tool executions, 10 admitted requests per user per hour. No fabricated tool activity. English corpus; Polish answers require separate evaluation.
+Limits across both AI endpoints: 2,000 input characters, 25-second flow budget, at most 5 model turns / 8 tool executions, 20 admitted requests per user per hour. No fabricated tool activity. English corpus; Polish answers require separate evaluation.
 
 ## Knowledge contract
 

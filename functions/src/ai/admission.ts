@@ -65,7 +65,7 @@ export function createAiAdmission(
       return repository.increment(actor.uid, actor.businessId, actor.role);
     });
     if (result === null) throw new AiError('RATE_LIMITED');
-    if (!Number.isSafeInteger(result.count) || result.count < 1 || result.count > 10)
+    if (!Number.isSafeInteger(result.count) || result.count < 1 || result.count > 20)
       throw new AiError('INVALID_CONFIG');
     return budget;
   }

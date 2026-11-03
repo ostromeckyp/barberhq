@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { createAiAdmission } from '../../functions/src/ai/admission.ts';
 import {
@@ -56,11 +57,11 @@ describe('AI admission and caller security', () => {
     expect(charges).toBe(0);
   });
 
-  it('distinguishes the eleventh admission from unauthorized and does not refund failures', async () => {
+  it('distinguishes the twenty-first admission from unauthorized and does not refund failures', async () => {
     let count = 0;
     const admission = createAiAdmission({
       readActor: async () => member,
-      increment: async () => (++count <= 10 ? { count } : null),
+      increment: async () => (++count <= 20 ? { count } : null),
     });
     const actor = await admission.resolveActor('uid-1');
     const first = await admission.admitAiCall(actor, 'procedure', 'input', new Date(0));
@@ -78,7 +79,7 @@ describe('AI admission and caller security', () => {
     await expect(failedProvider(first, 'question')).rejects.toMatchObject({
       code: 'PROVIDER_UNAVAILABLE',
     });
-    for (let i = 1; i < 10; i++)
+    for (let i = 1; i < 20; i++)
       await admission.admitAiCall(
         actor,
         i % 2 ? 'procedure' : 'replenishment',
@@ -88,7 +89,15 @@ describe('AI admission and caller security', () => {
     await expect(
       admission.admitAiCall(actor, 'procedure', 'input', new Date(0)),
     ).rejects.toMatchObject({ code: 'RATE_LIMITED' });
-    expect(count).toBe(11);
+    expect(count).toBe(21);
+  });
+
+  it('caps admissions at 20 per hour in the SQL window', () => {
+    const sql = readFileSync(
+      new URL('../../dataconnect/server/ai/admission.gql', import.meta.url),
+      'utf8',
+    );
+    expect(sql).toContain('ai_usage_window.count < 20');
   });
 
   it('requires revoked-token verification, UID consistency and App Check before operation', async () => {

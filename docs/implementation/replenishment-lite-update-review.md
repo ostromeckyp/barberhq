@@ -4,7 +4,7 @@ Prepared 23 October; **owner-approved publication and hosted checks completed 24
 
 ## Reason and scope
 
-Hosted edge checks after the approved preview publication recorded two 25-second timeouts and one HTTP 503 with upstream Vertex 429 `RESOURCE_EXHAUSTED`. Auth and App Check were valid. These observations do not establish a permanent provider outage. The 429 is distinct from the application's shared ten-calls-per-user hourly admission.
+Hosted edge checks after the approved preview publication recorded two 25-second timeouts and one HTTP 503 with upstream Vertex 429 `RESOURCE_EXHAUSTED`. Auth and App Check were valid. These observations do not establish a permanent provider outage. The 429 is distinct from the application's shared twenty-calls-per-user hourly admission.
 
 The proposed update selects **Gemini 3.5 Flash-Lite in `eu`** for `prepareReplenishment` only. A frozen server configuration is reused by the generator, flow and evaluation. The runtime allowlist adds this exact model alongside Gemini 3.8 Flash; project/provider/EU restrictions remain enforced. RAG continues to select Gemini 3.8 Flash. LOW thinking, output limit, 25-second deadline, one generation turn, shared quota, tools and authorization are unchanged.
 
