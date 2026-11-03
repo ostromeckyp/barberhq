@@ -20,9 +20,12 @@ function endpoint(): string | null {
 }
 
 /** Posts to the `clientLog` function with the ID token only; never waits for App Check. */
-export function createClientLogPort(auth: Auth): ClientLogPort {
+export function createClientLogPort(auth: () => Auth): ClientLogPort {
   return {
-    token: async () => (auth.currentUser ? auth.currentUser.getIdToken() : null),
+    token: async () => {
+      const user = auth().currentUser;
+      return user ? user.getIdToken() : null;
+    },
     online: () => typeof navigator === 'undefined' || navigator.onLine !== false,
     channel: () => channelFor(location.hostname),
     send: async (events, token) => {

@@ -1,9 +1,10 @@
-import { DestroyRef, InjectionToken, Service, inject } from '@angular/core';
+import { DestroyRef, InjectionToken, Injector, Service, inject } from '@angular/core';
 import {
   maxLogBatch,
   sanitizeLogEvent,
   type ClientLogEvent,
 } from '../../../../shared/contracts/logging/index';
+import { setCallObserver } from './call-function';
 import { createClientLogPort, type ClientLogPort } from './client-log-port';
 import { FIREBASE } from './firebase.providers';
 import { runtimeConfig } from './public-config';
@@ -29,7 +30,11 @@ export const CLIENT_LOG_STORAGE = new InjectionToken<Pick<
 });
 export const CLIENT_LOG_PORT = new InjectionToken<ClientLogPort>('Client log port', {
   providedIn: 'root',
-  factory: () => createClientLogPort(inject(FIREBASE).auth),
+  factory: () => {
+    // Firebase is resolved on first send, so logging works (and tests run) without it.
+    const injector = inject(Injector);
+    return createClientLogPort(() => injector.get(FIREBASE).auth);
+  },
 });
 
 const KEY = 'barberhq.clientLog.v1';
@@ -61,7 +66,15 @@ export class ClientLog {
     };
     window.addEventListener('online', onOnline);
     document.addEventListener('visibilitychange', onHidden);
+    setCallObserver((op, outcome, durationMs, code, reason) =>
+      this.record(`call.${op}`, outcome, {
+        durationMs,
+        ...(code ? { code } : {}),
+        ...(reason ? { details: { reason } } : {}),
+      }),
+    );
     inject(DestroyRef).onDestroy(() => {
+      setCallObserver(null);
       clearTimeout(this.timer);
       window.removeEventListener('online', onOnline);
       document.removeEventListener('visibilitychange', onHidden);
