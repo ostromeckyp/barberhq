@@ -3,6 +3,7 @@ import type { ProcessingResult } from '../../../shared/contracts/knowledge/index
 import { z } from 'zod';
 import { KnowledgeError } from './repository.js';
 import { onTaskDispatched } from 'firebase-functions/v2/tasks';
+import { logStep } from '../logging/log-step.js';
 import { createEmbeddingConfig, createVertexEmbeddingAdapter } from './embedding.js';
 import { KnowledgePipeline as RuntimePipeline } from './pipeline.js';
 import { KnowledgeRepository as RuntimeRepository } from './repository.js';
@@ -213,7 +214,10 @@ export function processKnowledgeTaskFunction() {
         }),
       );
       const pipeline = new RuntimePipeline(repo, embedder, businessId, businessId);
-      await processKnowledge(job, { repo, pipeline });
+      await logStep('knowledge.task', () => processKnowledge(job, { repo, pipeline }), {
+        stage: job.stage,
+        versionId: job.versionId,
+      });
     },
   );
 }

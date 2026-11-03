@@ -25,5 +25,5 @@ export const ai = onCall(
     enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== 'true',
     maxInstances: 5,
   },
-  createRouter(aiHandlers),
+  createRouter(aiHandlers, { service: 'ai' }),
 );

@@ -63,5 +63,5 @@ export const commands = onCall(
     enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== 'true',
     maxInstances: 5,
   },
-  createRouter(commandHandlers),
+  createRouter(commandHandlers, { service: 'commands' }),
 );
