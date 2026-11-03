@@ -1,4 +1,5 @@
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClientLog } from '../../../core/client-log';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { pageOffset } from '../../../core/request-navigation';
 import { Service, inject, computed, linkedSignal, resource } from '@angular/core';
@@ -13,6 +14,7 @@ export class HqQueueFacade {
   private readonly activity = inject(BrowserActivity);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly log = inject(ClientLog);
   private readonly query = toSignal(this.route.queryParamMap);
   readonly offset = computed(() => pageOffset(this.query()?.get('offset')));
   private readonly page = resource({
@@ -27,7 +29,10 @@ export class HqQueueFacade {
           }
         : undefined;
     },
-    loader: ({ params }) => this.api.listHQQueue({ offset: params.offset, limit: 50 }),
+    loader: ({ params }) =>
+      this.log.step('hq.queue.load', () =>
+        this.api.listHQQueue({ offset: params.offset, limit: 50 }),
+      ),
   });
   /** Last loaded rows; kept while a reload runs so sections never flash an empty state. */
   readonly rows = linkedSignal<RequestSummary[] | undefined, RequestSummary[]>({

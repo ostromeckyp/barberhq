@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
@@ -176,4 +177,11 @@ it('preserves an unknown HQ action when access is denied before replay lookup', 
   expect(h.facade.pending()).toEqual(frozen);
   await h.facade.retry();
   expect(h.addNote).toHaveBeenCalledTimes(2);
+});
+
+it('logs the load', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  await setup(async () => ({}));
+  expect(record).toHaveBeenCalledWith('delivery.issue.load', 'ok', expect.anything());
+  record.mockRestore();
 });

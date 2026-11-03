@@ -1,4 +1,5 @@
 import { Service, computed, effect, inject, resource, signal, untracked } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import type {
@@ -23,6 +24,7 @@ import { deliveryProcedureQuestion } from '../../procedures/procedure-question';
 @Service({ autoProvided: false })
 export class DeliveryReceiptFacade {
   private readonly api = inject(DeliveryApi);
+  private readonly log = inject(ClientLog);
   private readonly session = inject(SessionFacade);
   private readonly workspace = inject(SalonContext);
   private readonly route = inject(ActivatedRoute);
@@ -43,7 +45,9 @@ export class DeliveryReceiptFacade {
   private readonly record = resource({
     params: () => this.scope(),
     loader: async ({ params }) => {
-      const context = await this.api.getReceiptContext(params.targetId);
+      const context = await this.log.step('delivery.receipt.load', () =>
+        this.api.getReceiptContext(params.targetId),
+      );
       if (context.request.salonId !== params.salonId || context.request.id !== params.targetId)
         throw new Error('Delivery outside this salon.');
       return { key: scopeKey(params), context };

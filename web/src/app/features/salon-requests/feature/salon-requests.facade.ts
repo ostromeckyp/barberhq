@@ -1,4 +1,5 @@
 import { Service, computed, inject, resource } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -9,6 +10,7 @@ import type { RequestFilter } from '../../../../../../shared/contracts/stock/ind
 @Service({ autoProvided: false })
 export class SalonRequestsFacade {
   private readonly route = inject(ActivatedRoute);
+  private readonly log = inject(ClientLog);
   private readonly router = inject(Router);
   private readonly api = inject(ReplenishmentApi);
   private readonly session = inject(SessionFacade);
@@ -35,10 +37,12 @@ export class SalonRequestsFacade {
     },
     loader: async ({ params }) => ({
       scope: params.scope,
-      page: await this.api.listRequests(params.scope.salonId, params.scope.filter, {
-        offset: params.scope.offset,
-        limit: 50,
-      }),
+      page: await this.log.step('request.list.load', () =>
+        this.api.listRequests(params.scope.salonId, params.scope.filter, {
+          offset: params.scope.offset,
+          limit: 50,
+        }),
+      ),
     }),
   });
   private readonly current = computed(() =>

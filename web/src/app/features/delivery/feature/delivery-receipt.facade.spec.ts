@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -351,4 +352,11 @@ it('preserves a committed inspection key when replay is denied before key lookup
   );
   expect(h.facade.pending()).toEqual(frozen);
   expect(h.facade.canSubmit()).toBe(false);
+});
+
+it('logs the load', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  await setup(async () => ({}));
+  expect(record).toHaveBeenCalledWith('delivery.receipt.load', 'ok', expect.anything());
+  record.mockRestore();
 });

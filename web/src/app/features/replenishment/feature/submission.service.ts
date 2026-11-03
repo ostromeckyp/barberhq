@@ -10,11 +10,13 @@ import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../data-access/replenishment-api';
 import { PendingSubmissionStore } from '../data-access/pending-submission.store';
 import { CommandError } from '../data-access/command-error';
+import { ClientLog } from '../../../core/client-log';
 @Service()
 export class SubmissionService {
   private readonly api = inject(ReplenishmentApi);
   private readonly session = inject(SessionFacade);
   private readonly storage = inject(PendingSubmissionStore);
+  private readonly log = inject(ClientLog);
   private readonly working = signal(false);
   private readonly unresolved = signal(false);
   private readonly savedSalon = signal<string | undefined>(undefined);
@@ -88,7 +90,10 @@ export class SubmissionService {
   async submit(salonId: string, lines: ReadyDraftLine[]): Promise<SubmissionOutcome | undefined> {
     if (this.busy()) return;
     this.sync();
-    if (this.storage.load().kind !== 'EMPTY') return;
+    const existing = this.storage.load();
+    if (existing.kind === 'BLOCKED')
+      this.log.record('request.submit.blocked', 'error', { code: existing.reason });
+    if (existing.kind !== 'EMPTY') return;
     const s = this.session.state();
     if (
       s.status !== 'READY' ||
@@ -114,10 +119,14 @@ export class SubmissionService {
     try {
       this.storage.save(batch);
     } catch {
+      this.log.record('request.submit.blocked', 'error', { code: 'STORAGE_WRITE' });
       this.error.set({ key: 'replenishment.order.errors.storage' });
       this.sync();
       return;
     }
+    this.log.record('request.submit.queued', 'ok', {
+      details: { items: batch.payload.items.length },
+    });
     return this.run(batch);
   }
   async resume(salonId: string): Promise<SubmissionOutcome | undefined> {
@@ -125,6 +134,7 @@ export class SubmissionService {
     const stored = this.storage.load();
     if (stored.kind !== 'PENDING' || stored.value.salonId !== salonId || !this.owns(stored.value))
       return;
+    this.log.record('request.submit.resumed');
     return this.run(stored.value);
   }
   private async run(batch: PendingSubmission): Promise<SubmissionOutcome | undefined> {
@@ -149,6 +159,13 @@ export class SubmissionService {
           ? { status: 'UNKNOWN' }
           : { status: 'FAILED', code: e.code, ...(e.conflicts ? { conflicts: e.conflicts } : {}) };
     }
+    this.log.record('request.submit.outcome', outcome.status === 'CREATED' ? 'ok' : 'error', {
+      code: outcome.status,
+      details: {
+        items: batch.payload.items.length,
+        ...(outcome.status === 'FAILED' ? { reason: outcome.code } : {}),
+      },
+    });
     try {
       if (epoch !== this.epoch || !this.owns(batch)) return;
       this.result.set(outcome);

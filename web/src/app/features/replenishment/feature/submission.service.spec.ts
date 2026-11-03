@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { expect, it, vi } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
+import { ClientLog } from '../../../core/client-log';
 import { SubmissionService } from './submission.service';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../data-access/replenishment-api';
@@ -205,4 +206,43 @@ it('submits_an_ai_matched_line_as_a_plain_ready_line_without_ai_metadata', async
   expect(JSON.stringify(sent)).not.toContain('aiMatch');
   expect(JSON.stringify(sent)).not.toContain('receipt-a');
   expect(JSON.stringify(sent)).toContain('{"productId":"matowa","quantity":2}');
+});
+
+afterEach(() => vi.restoreAllMocks());
+
+it('logs a queued submission and its outcome', async () => {
+  sessionStorage.clear();
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const { service } = setup(async () => result);
+  await service.submit('salon', [line('a'), line('b')]);
+  expect(record).toHaveBeenCalledWith('request.submit.queued', 'ok', { details: { items: 2 } });
+  expect(record).toHaveBeenCalledWith('request.submit.outcome', 'ok', {
+    code: 'CREATED',
+    details: { items: 2 },
+  });
+});
+
+it('logs a failed and an unknown outcome with the command code', async () => {
+  sessionStorage.clear();
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const failing = setup(async () => {
+    throw new CommandError('CONFLICT', 'Stock changed.');
+  });
+  await failing.service.submit('salon', [line('a')]);
+  expect(record).toHaveBeenCalledWith('request.submit.outcome', 'error', {
+    code: 'FAILED',
+    details: { items: 1, reason: 'CONFLICT' },
+  });
+  sessionStorage.clear();
+  TestBed.resetTestingModule();
+  const unknown = setup(async () => {
+    throw new Error('network');
+  });
+  await unknown.service.submit('salon', [line('a')]);
+  expect(record).toHaveBeenCalledWith('request.submit.outcome', 'error', {
+    code: 'UNKNOWN',
+    details: { items: 1 },
+  });
+  await unknown.service.resume('salon');
+  expect(record).toHaveBeenCalledWith('request.submit.resumed');
 });

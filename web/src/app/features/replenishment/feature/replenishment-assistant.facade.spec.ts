@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
+import { ClientLog } from '../../../core/client-log';
 import type { ProposalResult } from '../../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -407,4 +408,67 @@ it('answers an AI quantity question with the suggested product and the quantity'
   expect(inputs[1].clarifications).toEqual([
     expect.objectContaining({ lineId: 'line-0-7', productId: 'matowa', quantity: 4 }),
   ]);
+});
+
+afterEach(() => vi.restoreAllMocks());
+
+it('logs the prepare result as counts only', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const { facade } = setup(async () => proposal());
+  facade.message.set('2 matowa please');
+  await facade.prepare();
+  expect(record).toHaveBeenCalledWith('request.prepare.result', 'ok', {
+    details: { ready: 1, clarifications: 0, aiMatched: 0, excluded: 0, followUp: false },
+  });
+  expect(JSON.stringify(record.mock.calls)).not.toContain('matowa please');
+});
+
+it('logs a failed prepare with the controlled code', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const { facade } = setup(async () => {
+    throw new AssistantApiError('RATE_LIMITED');
+  });
+  facade.message.set('2 matowa');
+  await facade.prepare();
+  expect(record).toHaveBeenCalledWith('request.prepare.result', 'error', { code: 'RATE_LIMITED' });
+});
+
+it('logs a chosen clarification and a changed AI match by kind only', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const unresolved = {
+    status: 'NEEDS_CLARIFICATION' as const,
+    lineId: 'line-10-17',
+    originalWording: '2 matte',
+    reason: 'Choose',
+    reasonCode: 'CHOOSE_PRODUCT' as const,
+    origin: 'assistant' as const,
+    quantity: 2,
+    candidates: [{ productId: 'dry', productName: 'Dry Matt' }],
+  };
+  const matched = {
+    ...line('sol', 1),
+    lineId: 'line-20-25',
+    aiMatch: {
+      originalWording: 'sun stuff',
+      reason: 'Similar name',
+      alternatives: [{ productId: 'sol', productName: 'Sol' }],
+    },
+  };
+  let calls = 0;
+  const { facade, draft } = setup(async () =>
+    ++calls === 1
+      ? proposal([unresolved, matched])
+      : proposal([{ ...line('dry'), lineId: unresolved.lineId }]),
+  );
+  facade.message.set('2 matte, sun stuff');
+  await facade.prepare();
+  const ai = draft.lines().find((l) => l.status === 'READY' && l.aiMatch)!.lineId;
+  facade.changeMatch(ai);
+  expect(record).toHaveBeenCalledWith('request.aiMatch.changed');
+  const id = draft.lines().find((l) => l.lineId.endsWith(unresolved.lineId))!.lineId;
+  await facade.clarify(id, 'dry', 2);
+  expect(record).toHaveBeenCalledWith('request.clarification.chosen', 'ok', {
+    details: { kind: 'CHOOSE_PRODUCT' },
+  });
+  expect(JSON.stringify(record.mock.calls)).not.toContain('sun stuff');
 });
