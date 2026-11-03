@@ -183,6 +183,22 @@ npm run functions:instances -- 0   # back to scale-to-zero after the demo
 
 The script runs `gcloud run services update <service> --min-instances <n>` and then prints each service's `minScale`. The next `npm run deploy:functions` (or `deploy:functions:routers`) resets the minimum to 0, so run it again after any Functions deploy.
 
+## Logs
+
+The browser and the backend log to Cloud Logging in `notbad-6be95`. Every entry has `uid`, `event` (dotted, e.g. `dictation.stop`, `call.submitRequest`, `commands.submitRequest`), `outcome` (`ok`/`error`), an error `code` and `durationMs`. Browser entries also have `source: "web"`, `sessionId`, `build` (the commit of `build:prod`) and `channel` (`live`, `preview` or `local`). Preview and live share the backend, so filter by `channel`. No entry holds user content: no transcript, message, answer, audio, note, email or token. Retention is the Cloud Logging default (30 days).
+
+To find one user's case, take the uid (Firebase console → Authentication) and the approximate time:
+
+```sh
+npm run logs -- --uid <uid> --since 2h                 # browser + backend, oldest first, times in UTC
+npm run logs -- --uid <uid> --since 30m --channel preview
+npm run logs -- --uid <uid> --since 1d --source web
+```
+
+It only reads (`gcloud logging read`, with your gcloud login). In Logs Explorer, the same query is `jsonPayload.uid="<uid>"` with a time range. Add `jsonPayload.event=~"^request\."` for the order path, `jsonPayload.event=~"^dictation\."` for voice order, or `severity>=WARNING` for failures only.
+
+The browser keeps events in `localStorage` (at most 500) and sends them in batches to the `clientLog` function, also after coming back online. `clientLog` accepts only signed-in users from the live and preview origins and no App Check, so logs still arrive when App Check is the step that hangs.
+
 ## PWA and push
 
 The installable app and push notifications ship with the production build only. The service worker is off in the emulator and dev builds, so the salon settings "Notifications" section is hidden there. It is also hidden in a production build whose local config has no `messaging.vapidKey`.
