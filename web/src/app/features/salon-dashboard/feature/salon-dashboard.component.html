@@ -14,6 +14,7 @@
     <mat-icon aria-hidden="true">refresh</mat-icon>{{ 'common.actions.refresh' | transloco }}
   </button>
 </app-page-header>
+<app-push-prompt />
 @if (facade.settingsUnavailable()) {
   <p role="status">
     {{ 'salon.dashboard.settingsUnavailable' | transloco }}

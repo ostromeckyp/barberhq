@@ -1274,7 +1274,11 @@
       "denied": "Powiadomienia są zablokowane w ustawieniach przeglądarki",
       "install": "Dodaj BarberHQ do ekranu głównego, żeby dostawać powiadomienia",
       "error": "Nie udało się włączyć powiadomień",
-      "retry": "Spróbuj ponownie"
+      "retry": "Spróbuj ponownie",
+      "prompt": {
+        "text": "Dostawaj powiadomienie, gdy HQ zmieni status zamówienia.",
+        "later": "Nie teraz"
+      }
     }
   },
   "app": {
