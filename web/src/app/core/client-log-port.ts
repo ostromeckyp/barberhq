@@ -5,6 +5,8 @@ import { runtimeConfig } from './public-config';
 
 /** What `ClientLog` needs from the browser and Firebase; replaced in tests. */
 export interface ClientLogPort {
+  /** Signed-in uid now, or null; each stored event is owned by it. */
+  uid(): string | null;
   token(): Promise<string | null>;
   online(): boolean;
   channel(): LogChannel;
@@ -22,6 +24,13 @@ function endpoint(): string | null {
 /** Posts to the `clientLog` function with the ID token only; never waits for App Check. */
 export function createClientLogPort(auth: () => Auth): ClientLogPort {
   return {
+    uid: () => {
+      try {
+        return auth().currentUser?.uid ?? null;
+      } catch {
+        return null;
+      }
+    },
     token: async () => {
       const user = auth().currentUser;
       return user ? user.getIdToken() : null;

@@ -13,7 +13,8 @@ export type { ClientLogPort } from './client-log-port';
 
 type Details = Record<string, string | number | boolean>;
 type Context = Pick<ClientLogEvent, 'role' | 'businessId' | 'salonId'>;
-type Stored = { id: string; event: ClientLogEvent };
+// `owner` is the uid signed in when the event was recorded (null before sign-in).
+type Stored = { id: string; owner: string | null; event: ClientLogEvent };
 
 export const CLIENT_LOG_STORAGE = new InjectionToken<Pick<
   Storage,
@@ -99,9 +100,11 @@ export class ClientLog {
         clientTime: new Date().toISOString(),
       });
       if (!clean) return;
-      const stored = [...this.load(), { id: crypto.randomUUID(), event: clean }];
+      const owner = this.port.uid();
+      const stored = [...this.load(), { id: crypto.randomUUID(), owner, event: clean }];
       this.save(stored.slice(-MAX_STORED));
-      if (stored.length >= SEND_AT) this.schedule(0);
+      // While retrying after a failure, the backoff timer stays in charge.
+      if (stored.length >= SEND_AT && this.failures === 0) this.schedule(0);
       else if (!this.timer) this.schedule(DELAY_MS);
     } catch {
       /* Logging never breaks the app. */
@@ -136,8 +139,15 @@ export class ClientLog {
     clearTimeout(this.timer);
     this.timer = undefined;
     try {
-      const batch = this.load().slice(0, maxLogBatch);
-      if (!batch.length || !this.port.online()) return;
+      if (!this.port.online()) return;
+      const uid = this.port.uid();
+      if (!uid) return;
+      // Events of an earlier user on this device are never sent under this user's uid.
+      const all = this.load();
+      const mine = all.filter((s) => s.owner === null || s.owner === uid);
+      if (mine.length !== all.length) this.save(mine);
+      const batch = mine.slice(0, maxLogBatch);
+      if (!batch.length) return;
       const token = await this.port.token().catch(() => null);
       if (!token) return;
       const status = await this.port

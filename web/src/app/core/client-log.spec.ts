@@ -37,6 +37,7 @@ beforeEach(() => {
   storage = new MemoryStorage();
   sent = [];
   port = {
+    uid: vi.fn(() => 'u1'),
     token: vi.fn(async () => 'id-token'),
     online: vi.fn(() => true),
     channel: vi.fn(() => 'preview'),
@@ -187,4 +188,31 @@ it('keeps working when storage throws', async () => {
   expect(() => log.record('dictation.start')).not.toThrow();
   await vi.advanceTimersByTimeAsync(5_000);
   expect(sent[0][0].event).toBe('dictation.start');
+});
+
+it('never sends stored events of another user and drops them once someone else signs in', async () => {
+  port.online.mockReturnValue(false);
+  const log = setup();
+  log.record('dictation.start');
+  port.uid.mockReturnValue(null);
+  log.record('session.signIn.failed', 'error', { code: 'auth/wrong-password' });
+  port.uid.mockReturnValue('u2');
+  port.online.mockReturnValue(true);
+  await log.flush();
+  expect(sent).toHaveLength(1);
+  expect(sent[0].map((e) => e.event)).toEqual(['session.signIn.failed']);
+  expect(stored()).toHaveLength(0);
+});
+
+it('keeps the retry backoff when the buffer is full', async () => {
+  port.send.mockResolvedValue(500);
+  const log = setup();
+  for (let i = 0; i < 20; i++) log.record('request.list.load');
+  await vi.advanceTimersByTimeAsync(0);
+  expect(port.send).toHaveBeenCalledTimes(1);
+  for (let i = 0; i < 10; i++) log.record('call.submitRequest');
+  await vi.advanceTimersByTimeAsync(1_000);
+  expect(port.send).toHaveBeenCalledTimes(1);
+  await vi.advanceTimersByTimeAsync(30_000);
+  expect(port.send).toHaveBeenCalledTimes(2);
 });

@@ -51,3 +51,33 @@ it('drops a frame line that repeats the message, even with an @', () => {
   expect(JSON.stringify(log.record.mock.calls)).not.toContain('a@b.c');
   expect(log.record.mock.calls[0][2].details).toEqual({ frame1: 'at send (main.js:1:2)' });
 });
+
+it('drops every line of a multi-line message from the frames', () => {
+  const { log, handler } = setup();
+  const error = new Error('first line\nuser@example.com');
+  error.stack = 'Error: first line\nuser@example.com\n    at send (main.js:1:2)';
+  handler.handleError(error);
+  expect(JSON.stringify(log.record.mock.calls)).not.toContain('user@example.com');
+  expect(log.record.mock.calls[0][2].details).toEqual({ frame1: 'at send (main.js:1:2)' });
+});
+
+it('records a repeating error once per 5 s and at most 20 per page', () => {
+  vi.useFakeTimers();
+  try {
+    const { log, handler } = setup();
+    const error = () => {
+      const e = new TypeError('x');
+      e.stack = 'TypeError: x\n    at tick (main.js:9:9)';
+      return e;
+    };
+    for (let i = 0; i < 50; i++) handler.handleError(error());
+    expect(log.record).toHaveBeenCalledTimes(1);
+    for (let i = 0; i < 40; i++) {
+      vi.advanceTimersByTime(5_001);
+      handler.handleError(error());
+    }
+    expect(log.record).toHaveBeenCalledTimes(20);
+  } finally {
+    vi.useRealTimers();
+  }
+});
