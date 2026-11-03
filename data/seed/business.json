@@ -48,6 +48,16 @@
           "phrase": "matte pomade",
           "kind": "TYPE",
           "lang": "en"
+        },
+        {
+          "phrase": "matówka",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matowych",
+          "kind": "PHONETIC",
+          "lang": "pl"
         }
       ],
       "id": "not-bad-stuff-demo:NBS-MATOWA-100",
@@ -120,6 +130,41 @@
           "phrase": "dramat",
           "kind": "PHONETIC",
           "lang": "pl"
+        },
+        {
+          "phrase": "draj matt",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "draimat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "drai mat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "draymat",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "dry met",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "draj met",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "tri mat",
+          "kind": "PHONETIC",
+          "lang": "pl"
         }
       ],
       "id": "not-bad-stuff-demo:NBS-DRYMATT-100",
@@ -156,6 +201,31 @@
           "phrase": "cement pomade",
           "kind": "NAME",
           "lang": "en"
+        },
+        {
+          "phrase": "siment",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sement",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "cemen",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "cemęt",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "cementowa",
+          "kind": "PHONETIC",
+          "lang": "pl"
         }
       ],
       "id": "not-bad-stuff-demo:NBS-CEMENT-100",
@@ -203,6 +273,36 @@
           "phrase": "sea salt spray",
           "kind": "NAME",
           "lang": "en"
+        },
+        {
+          "phrase": "si solt",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sisolt",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sea solt",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "morska sól",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "solka morska",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sól do włosów",
+          "kind": "PHONETIC",
+          "lang": "pl"
         }
       ],
       "id": "not-bad-stuff-demo:NBS-SOL-200",
@@ -260,6 +360,46 @@
           "phrase": "sawidż",
           "kind": "PHONETIC",
           "lang": "pl"
+        },
+        {
+          "phrase": "saważe",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "saaże",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "savaż",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sewedż",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sewydż",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sawicz",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sawage",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "sevage",
+          "kind": "PHONETIC",
+          "lang": "pl"
         }
       ],
       "id": "not-bad-stuff-demo:NBS-SAVAGE-50",
@@ -315,6 +455,36 @@
         },
         {
           "phrase": "matyfajer",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matifier",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matyfier",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "metifajer",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matifaj",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "mati fajer",
+          "kind": "PHONETIC",
+          "lang": "pl"
+        },
+        {
+          "phrase": "matifire",
           "kind": "PHONETIC",
           "lang": "pl"
         }
