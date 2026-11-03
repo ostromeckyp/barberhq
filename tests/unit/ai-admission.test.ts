@@ -36,6 +36,20 @@ describe('AI admission and caller security', () => {
     expect(charges).toBe(1);
   });
 
+  it('admits the transcription endpoint for salon and HQ, counted once, and rejects unknown ones', async () => {
+    let charges = 0;
+    const admission = createAiAdmission({
+      readActor: async () => member,
+      increment: async () => ({ count: ++charges }),
+    });
+    const actor = await admission.resolveActor('uid-1');
+    await admission.admitAiCall(actor, 'transcription', 'audio audio/webm 1200B', new Date(0));
+    expect(charges).toBe(1);
+    await expect(
+      admission.admitAiCall(actor, 'nope' as never, 'x', new Date(0)),
+    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' });
+  });
+
   it('rejects forged actor and mismatched fresh membership before charging', async () => {
     let charges = 0;
     let current = member;

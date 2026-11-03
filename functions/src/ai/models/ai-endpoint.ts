@@ -1,1 +1,1 @@
-export type AiEndpoint = 'replenishment' | 'procedure' | 'product-knowledge';
+export type AiEndpoint = 'replenishment' | 'procedure' | 'product-knowledge' | 'transcription';

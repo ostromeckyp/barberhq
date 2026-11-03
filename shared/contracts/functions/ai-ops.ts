@@ -5,4 +5,5 @@ export const aiOps = [
   'suggestKnowledgeProductLink',
   'generateKnowledgeProductAliases',
   'processProductCard',
+  'transcribeOrder',
 ] as const;

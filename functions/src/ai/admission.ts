@@ -45,7 +45,8 @@ export function createAiAdmission(
     if (
       endpoint !== 'replenishment' &&
       endpoint !== 'procedure' &&
-      endpoint !== 'product-knowledge'
+      endpoint !== 'product-knowledge' &&
+      endpoint !== 'transcription'
     )
       throw new AiError('VALIDATION_ERROR');
     if (endpoint === 'product-knowledge' && actor.role !== 'HQ') throw new AiError('FORBIDDEN');

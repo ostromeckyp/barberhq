@@ -75,6 +75,11 @@ describe('function router', () => {
     ).toBe(thrown);
   });
 
+  it('routes transcribeOrder on the ai callable', () => {
+    expect(aiOps).toContain('transcribeOrder');
+    expect(aiHandlers.transcribeOrder).toBeDefined();
+  });
+
   it('covers the contract exactly', () => {
     expect(Object.keys(commandHandlers).sort()).toEqual([...commandOps].sort());
     expect(Object.keys(aiHandlers).sort()).toEqual([...aiOps].sort());

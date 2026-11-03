@@ -7,3 +7,5 @@ export * from './cited-step.js';
 export * from './procedure-result.js';
 export * from './ai-operational-code.js';
 export type { ProductMatch } from '../product-lookup/product-match.js';
+export * from './transcribe-input.js';
+export * from './transcribe-result.js';

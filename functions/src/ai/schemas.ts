@@ -1,5 +1,9 @@
 import { z } from 'genkit';
-import type { PrepareInput, ProcedureInput } from '../../../shared/contracts/ai/index.js';
+import type {
+  PrepareInput,
+  ProcedureInput,
+  TranscribeInput,
+} from '../../../shared/contracts/ai/index.js';
 import { AiError } from './budget.js';
 import type { ProcedureModelOutput } from './models/procedure-model-output.js';
 
@@ -28,6 +32,29 @@ const prepare = z
 const procedure = z
   .object({ question: boundedText, answerLanguage: z.enum(['en', 'pl']) })
   .strict();
+
+/** Decoded audio limit; base64 text is at most 4/3 of it. */
+export const transcribeAudioMaxBytes = 1_048_576;
+const transcribe = z
+  .object({
+    salonId: identifier,
+    audio: z
+      .string()
+      .min(4)
+      .max(Math.ceil(transcribeAudioMaxBytes / 3) * 4)
+      .regex(/^[A-Za-z0-9+/]+={0,2}$/),
+    mimeType: z
+      .string()
+      .max(100)
+      .regex(/^audio\/[a-z0-9][a-z0-9.+-]*(?:\s*;\s*[a-z0-9._-]+=[^;\s]+)*$/i),
+    language: z.enum(['pl', 'en']),
+  })
+  .strict();
+export function parseTranscribeInput(input: unknown): TranscribeInput {
+  const result = transcribe.safeParse(input);
+  if (!result.success) throw new AiError('VALIDATION_ERROR');
+  return result.data;
+}
 
 export function parsePrepareInput(input: unknown): PrepareInput {
   const result = prepare.safeParse(input);
