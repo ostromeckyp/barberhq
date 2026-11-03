@@ -230,7 +230,7 @@ Use one allowlist: `findProduct`, `getStockContext`, `calculateProposal`. Produc
 
 Tools receive caller scope through server context, not model arguments. Their input schemas restrict identifiers and integer quantities 1–99. Each read tool supports bounded arrays (at most the six active demo products) so one sentence can produce multiple validated lines within the existing tool budget. A final proposal is rebuilt from validated tool results; model prose cannot change its numbers. Follow-up clarification starts another bounded call with explicitly selected fields, not an unbounded conversation history.
 
-Genkit supports model-selected tool calls and a maximum-turn setting. This design adds its own call/time/output budgets: five model turns, eight tool executions, 25-second flow deadline, 2,000 input characters, and ten admitted requests/user/hour across both AI endpoints. Reject before model invocation when the quota is exhausted. Timeouts stop further work where supported; a provider call already underway may still incur cost. [Genkit tool calling](https://genkit.dev/docs/js/tool-calling/)
+Genkit supports model-selected tool calls and a maximum-turn setting. This design adds its own call/time/output budgets: five model turns, eight tool executions, 25-second flow deadline, 2,000 input characters, and twenty admitted requests/user/hour across both AI endpoints. Reject before model invocation when the quota is exhausted. Timeouts stop further work where supported; a provider call already underway may still incur cost. [Genkit tool calling](https://genkit.dev/docs/js/tool-calling/)
 
 ## 8. PDF ingestion — preload and HQ document changes
 

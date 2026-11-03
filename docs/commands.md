@@ -135,6 +135,33 @@ npm run reset:prod -- --dry-run
 npm run reset:prod -- --apply
 ```
 
+## Voice order (dictation) and AI matching
+
+Staff tap the microphone in the salon assistant, speak an order, and the text lands in the input for review before **Prepare proposal**. The `ai` operation `transcribeOrder` sends the recording to Gemini once and returns cleaned text; audio is never stored or logged, only size, language and duration. `prepareReplenishment` then runs a second Gemini turn (`matchProducts`) over the unresolved wordings: confident picks become draft lines labelled "Matched by AI" with a Change action, unsure ones become clarifications with suggested candidates. Every transcription and matching call counts against the shared limit of 20 AI calls per user per hour. The mic is hidden unless `replenishmentAiEnabled` is true and the browser supports `MediaRecorder`.
+
+Owner steps for production, in this order (each is a production write and needs the owner's approval):
+
+1. `npm run deploy:functions` first. The old `admission.ts` rejects counts above 10 as `INVALID_CONFIG`, so the database limit must not be raised before the new Functions are live.
+2. `npm run deploy:db:diff`, then `npm run deploy:db` (hourly limit 20 in `admission.gql`).
+3. Seed the new phonetic aliases (dry run first, then apply; the config file is passed as an argument only):
+
+```sh
+node --import tsx scripts/seed/product-aliases.ts --project notbad-6be95 --business <businessId> --config config/public.local.json --dry-run
+node --import tsx scripts/seed/product-aliases.ts --project notbad-6be95 --business <businessId> --config config/public.local.json --apply
+```
+
+4. `npm run build:prod`, then `npm run deploy:preview`.
+5. Test on an iPhone (Safari and the installed PWA) on the `foundation` channel: allow the microphone, dictate, prepare, change an AI match.
+6. `npm run deploy:promote` only after the owner's OK.
+
+Evaluating dictation quality (read-only Vertex calls with your `gcloud` application-default credentials, no data is written): put the recordings (`*.m4a`, `*.webm`) and a `keyboard.txt` with one typed line per recording, in file name order, in a folder, then run:
+
+```sh
+node --import tsx scripts/dev/evaluate-dictation.ts --dir <folder> --out <report.md> --transcribe-only [--language pl|en]
+```
+
+The Markdown report lists each recording with its keyboard text and cleaned transcript.
+
 ## Demo day
 
 Cold starts make the first call to each function slow. Warm them shortly before going on stage:

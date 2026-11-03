@@ -63,3 +63,7 @@ Właściciel wybrał oddzielny odbiór/sprawę oraz prosty model dosyłki jako n
 - To porządkowanie tekstów i oznaczeń. Nie obejmuje usuwania danych, dokumentów, opcji pochodzenia ani zmiany zapisanego pochodzenia dokumentów.
 
 To zapis docelowego wymagania, bez bieżącej zmiany aplikacji ani publikacji. Zastępuje wcześniejszą, zbyt szeroką interpretację obejmującą usuwanie przykładowych danych i dokumentów.
+
+## Dictation: Cloud Speech-to-Text fallback
+
+3 November 2026 — voice orders are transcribed by Gemini (`transcribeOrder` in the `ai` function). If its accuracy on salon recordings is not good enough, the fallback is Cloud Speech-to-Text V2 behind the same `TranscribeProvider` seam. It needs the `speech.googleapis.com` API enabled and a role that allows recognition (for example `roles/speech.client`) for the runtime account `baberhq-runtime@notbad-6be95.iam.gserviceaccount.com`. Not planned for the demo.

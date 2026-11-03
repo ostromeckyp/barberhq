@@ -2,7 +2,7 @@
 
 Status, 21 October 2026: owner approved; migration and publication completed. Cloud quota checks and exact-fixture cleanup passed, existing demo-data fingerprints matched, and browser/vector connector fingerprints were preserved. See the [completed handoff](handoffs/ai-foundation.md) for results and remaining business-flow checks. The reviewed scope below is retained as the deployment record.
 
-The shared AI runtime prepares the two planned assistants without adding a public AI endpoint yet. Both will share ten admitted requests per user per UTC hour; SQL chooses the hour and increments the counter atomically. Model failures still consume an admitted request.
+The shared AI runtime prepares the two planned assistants without adding a public AI endpoint yet. Both will share twenty admitted requests per user per UTC hour (raised from ten on 2026-11-03); SQL chooses the hour and increments the counter atomically. Model failures still consume an admitted request.
 
 ## Exact proposed change
 
