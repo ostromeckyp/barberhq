@@ -1,6 +1,8 @@
 export type PrepareInput = {
   salonId: string;
   message: string;
+  /** UI language for AI-written text such as match reasons; defaults to English. */
+  language?: 'pl' | 'en';
   clarifications?: {
     lineId: string;
     originalWording: string;

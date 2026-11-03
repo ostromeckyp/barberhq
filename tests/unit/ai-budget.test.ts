@@ -5,6 +5,7 @@ import {
   consumeToolCall,
   assertTimeRemaining,
   runWithinBudget,
+  runWithReservedTime,
 } from '../../functions/src/ai/budget.ts';
 
 describe('AI flow budget', () => {
@@ -52,5 +53,21 @@ describe('AI flow budget', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+  it('runs work against an earlier deadline and keeps the shared counters', async () => {
+    let now = 0;
+    const budget = createAiBudget(0, () => now);
+    const seen = await runWithReservedTime(budget, 3_000, async (child) => {
+      consumeModelTurn(child);
+      return child.deadlineMs;
+    });
+    expect(seen).toBe(22_000);
+    expect(budget.modelTurnsRemaining).toBe(4);
+    expect(budget.deadlineMs).toBe(25_000);
+    now = 22_000;
+    await expect(runWithReservedTime(budget, 3_000, async () => 'late')).rejects.toMatchObject({
+      code: 'TIMEOUT',
+    });
+    expect(budget.modelTurnsRemaining).toBe(4);
   });
 });

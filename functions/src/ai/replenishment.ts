@@ -9,7 +9,7 @@ import type {
   ShorthandLearning,
 } from '../../../shared/contracts/ai/index.js';
 import { createAiAdmission } from './admission.js';
-import { createAiBudget, AiError, runWithinBudget } from './budget.js';
+import { createAiBudget, AiError, runWithinBudget, runWithReservedTime } from './budget.js';
 import {
   aiRuntimeProfileFromEnv,
   createAiAdminDependencies,
@@ -31,8 +31,39 @@ import { publicAiError } from './errors.js';
 import { stockConnectorConfig } from '../stock/runtime.js';
 import { CLOUD } from '../cloud-config.js';
 import type { ReplenishmentDependencies } from './models/replenishment-dependencies.js';
+import type { AiBudget } from './models/ai-budget.js';
+import type { AppliedMatch } from './models/applied-match.js';
+import type { FinalProposal } from './models/final-proposal.js';
+import { createProductMatcher, productMatchingReserveMs } from './product-matching.js';
+import { applyMatches } from './product-matching-rules.js';
+import { info } from 'firebase-functions/logger';
 
 export function createReplenishmentPreparer(dependencies: ReplenishmentDependencies) {
+  /** Auxiliary AI step: any failure or timeout leaves today's deterministic result. */
+  async function matchOpenLines(
+    budget: AiBudget,
+    input: PrepareInput,
+    final: FinalProposal,
+  ): Promise<AppliedMatch[]> {
+    const matcher = dependencies.matchProducts;
+    if (!matcher || !final.unresolved.length) return [];
+    try {
+      const request = {
+        language: input.language ?? 'en',
+        lines: final.unresolved.map(({ quantity, ...line }) => line),
+        catalog: final.catalog,
+      };
+      const matches = await runWithReservedTime(budget, productMatchingReserveMs, (child) =>
+        matcher(child, request),
+      );
+      return applyMatches(final.unresolved, matches, final.catalog);
+    } catch (error) {
+      dependencies.log?.('replenishment.matchProducts.failed', {
+        code: error instanceof AiError ? error.code : 'UNKNOWN',
+      });
+      return [];
+    }
+  }
   return async (uid: string, raw: unknown): Promise<ProposalResult> => {
     const began = Date.now();
     const input = parsePrepareInput(raw);
@@ -60,7 +91,10 @@ export function createReplenishmentPreparer(dependencies: ReplenishmentDependenc
       await runWithinBudget(budget, () => dependencies.generate(budget, input, tools)),
     );
     // Always re-read scope, catalog, active requests and stock after generation.
-    const final = await tools.finalProposal(parsed.items);
+    const deterministic = await tools.finalProposal(parsed.items);
+    const applied = await matchOpenLines(budget, input, deterministic);
+    // Rebuilt from the same snapshot: no extra read, tool call or stock drift.
+    const final = applied.length ? await tools.finalProposal(parsed.items, applied) : deterministic;
     const result = final.result;
     // HQ acting for the salon teaches that salon too; SQL rechecks the actor's scope.
     // Learning is auxiliary: its failures never invalidate a verified draft.
@@ -77,11 +111,14 @@ export function createReplenishmentPreparer(dependencies: ReplenishmentDependenc
           budget,
           final.catalogRevision,
         );
-        result.lines = result.lines.map((l) =>
-          l.status === 'NEEDS_CLARIFICATION' && !l.choiceReceiptId && receipts.has(l.lineId)
-            ? { ...l, choiceReceiptId: receipts.get(l.lineId)! }
-            : l,
-        );
+        result.lines = result.lines.map((l) => {
+          const receipt = receipts.get(l.lineId);
+          if (!receipt) return l;
+          if (l.status === 'NEEDS_CLARIFICATION')
+            return l.choiceReceiptId ? l : { ...l, choiceReceiptId: receipt };
+          // An AI match teaches nothing itself; its receipt lets a later change teach.
+          return l.aiMatch ? { ...l, aiMatch: { ...l.aiMatch, choiceReceiptId: receipt } } : l;
+        });
       } catch {
         /* Clarifications stay usable; they just cannot teach shorthand. */
       }
@@ -123,6 +160,8 @@ export function createReplenishmentService() {
     repository: createReplenishmentRepository(dc),
     generate: generateReplenishment,
     shorthand: createSalonAliasCommands(dc),
+    matchProducts: createProductMatcher(),
+    log: (event, data) => info(event, data),
   });
   const ai = createAiRuntime(replenishmentReasoningConfig);
   const flow = ai.defineFlow(

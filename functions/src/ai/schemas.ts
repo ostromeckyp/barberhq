@@ -26,6 +26,7 @@ const prepare = z
     salonId: identifier,
     message: boundedText,
     clarifications: z.array(clarification).max(6).optional(),
+    language: z.enum(['pl', 'en']).optional(),
   })
   .strict();
 
