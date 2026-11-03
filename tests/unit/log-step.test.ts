@@ -39,7 +39,12 @@ describe('logStep', () => {
 
   it('accepts details computed from the result', async () => {
     const log = vi.fn();
-    await logStep('knowledge.source', async () => 404, (status) => ({ status }), log);
+    await logStep(
+      'knowledge.source',
+      async () => 404,
+      (status) => ({ status }),
+      log,
+    );
     expect(log.mock.calls[0][1].details).toEqual({ status: 404 });
   });
 });
