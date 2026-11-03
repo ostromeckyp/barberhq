@@ -69,6 +69,18 @@ describe('transcribeOrder', () => {
     expect(transcribe).toHaveBeenCalledOnce();
   });
 
+  it('restricts audio types to an allowlist, case-insensitively, with parameters', async () => {
+    const { run, admitAiCall } = setup();
+    for (const mimeType of ['audio/flac', 'audio/x-foo'])
+      await expect(run('staff', { ...valid, mimeType })).rejects.toMatchObject({
+        code: 'VALIDATION_ERROR',
+      });
+    expect(admitAiCall).not.toHaveBeenCalled();
+    for (const mimeType of ['audio/webm;codecs=opus', 'AUDIO/MP4', 'audio/x-m4a'])
+      await run('staff', { ...valid, mimeType });
+    expect(admitAiCall).toHaveBeenCalledTimes(3);
+  });
+
   it('admits exactly once before the provider and passes the decoded audio and language', async () => {
     const { run, calls, transcribe, admitAiCall } = setup('  dwie matowe  ');
     expect(await run('staff', valid)).toEqual({ text: 'dwie matowe' });

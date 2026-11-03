@@ -46,7 +46,7 @@ const transcribe = z
     mimeType: z
       .string()
       .max(100)
-      .regex(/^audio\/[a-z0-9][a-z0-9.+-]*(?:\s*;\s*[a-z0-9._-]+=[^;\s]+)*$/i),
+      .regex(/^(?:audio\/(?:mp4|aac|x-m4a|webm|ogg|mpeg|wav))(?:\s*;\s*[a-z0-9._-]+=[^;\s]+)*$/i),
     language: z.enum(['pl', 'en']),
   })
   .strict();
