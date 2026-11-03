@@ -4,6 +4,7 @@ import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { Subject } from 'rxjs';
 import { expect, it, vi } from 'vitest';
 import { AppUpdate, RELOAD_PAGE } from './app-update';
+import { ClientLog } from './client-log';
 
 function setup(isEnabled = true) {
   const versionUpdates = new Subject<VersionEvent>();
@@ -54,4 +55,18 @@ it('subscribes to nothing when the service worker is disabled', () => {
     latestVersion: { hash: 'b' },
   });
   expect(open).not.toHaveBeenCalled();
+});
+
+it('logs an available version and an applied reload', () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const { versionUpdates, onAction } = setup();
+  versionUpdates.next({
+    type: 'VERSION_READY',
+    currentVersion: { hash: 'a' },
+    latestVersion: { hash: 'b' },
+  });
+  expect(record).toHaveBeenCalledWith('app.update.available');
+  onAction.next();
+  expect(record).toHaveBeenCalledWith('app.update.applied');
+  record.mockRestore();
 });

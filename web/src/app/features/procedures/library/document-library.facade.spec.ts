@@ -6,6 +6,7 @@ import { KnowledgeApi } from '../../../core/knowledge-api';
 import { SalonContext } from '../../../core/salon-context';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { DocumentLibraryFacade } from './document-library.facade';
+import { ClientLog } from '../../../core/client-log';
 
 const row: DocumentRow = {
   businessId: 'business',
@@ -268,4 +269,38 @@ it('describes a confirmed READY retry result without exposing the processing enu
   const facade = TestBed.inject(DocumentLibraryFacade);
   await facade.retry(row);
   expect(facade.notice()).toEqual({ key: 'procedures.library.notices.READY' });
+});
+
+it('logs a failed library load but not every successful poll', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const listDocuments = vi
+    .fn()
+    .mockResolvedValueOnce({ items: [row], nextOffset: null })
+    .mockRejectedValueOnce({ code: 'UNAVAILABLE' });
+  TestBed.configureTestingModule({
+    providers: [
+      DocumentLibraryFacade,
+      { provide: KnowledgeApi, useValue: { listDocuments } },
+      {
+        provide: SessionFacade,
+        useValue: {
+          state: signal({
+            status: 'READY',
+            membership: { userId: 'hq', businessId: 'business', role: 'HQ', salonIds: [] },
+          }),
+        },
+      },
+      { provide: SalonContext, useValue: { workspace: signal({ kind: 'HQ' }) } },
+    ],
+  });
+  const facade = TestBed.inject(DocumentLibraryFacade);
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+  facade.refresh();
+  await settle();
+  expect(listDocuments).toHaveBeenCalled();
+  expect(record).not.toHaveBeenCalledWith('knowledge.library.load', 'ok', expect.anything());
+  facade.refresh();
+  await settle();
+  expect(record).toHaveBeenCalledWith('knowledge.library.load', 'error', { code: 'UNAVAILABLE' });
+  record.mockRestore();
 });

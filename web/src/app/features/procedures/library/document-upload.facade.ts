@@ -1,4 +1,5 @@
 import { DestroyRef, Service, effect, inject, signal } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import type {
   CreateDocumentRequest,
@@ -28,6 +29,7 @@ import {
 export class DocumentUploadFacade {
   readonly data = inject<UploadDialogData>(MAT_DIALOG_DATA);
   private readonly api = inject(KnowledgeApi);
+  private readonly log = inject(ClientLog);
   private readonly ref = inject(MatDialogRef<unknown, VersionStatus>);
   private readonly destroyRef = inject(DestroyRef);
   private readonly session = inject(SessionFacade);
@@ -193,7 +195,13 @@ export class DocumentUploadFacade {
     if (expectedHash && (await this.api.hashPdf(this.file)) !== expectedHash)
       throw new TranslatedError({ key: 'procedures.upload.errors.samePdf' });
     this.uploadAbort = new AbortController();
-    const status = await this.api.uploadPdf(versionId, this.file, this.uploadAbort.signal);
+    const file = this.file,
+      signal = this.uploadAbort.signal;
+    const status = await this.log.step(
+      'knowledge.upload',
+      () => this.api.uploadPdf(versionId, file, signal),
+      { bytes: file.size },
+    );
     if (this.cancelled) return;
     clearPendingUpload(this.storageKey);
     this.clearPendingRegistration();

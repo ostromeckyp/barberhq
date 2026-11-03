@@ -2,6 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { afterEach, expect, it, vi } from 'vitest';
+import { ClientLog } from '../../../core/client-log';
 import type {
   CreateDocumentInput,
   DocumentRow,
@@ -367,4 +368,19 @@ it('retries an unresolved pre-upgrade legacy body exactly without upgrading its 
   await facade.submit({ ...form, kind: 'policy', origin: 'official' });
   expect(sent).toEqual(legacy);
   expect(sent).not.toHaveProperty('kind');
+});
+
+it('logs the PDF upload with its size', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const h = setup({ hashPdf: vi.fn(async () => sha256), uploadPdf: vi.fn(async () => accepted) });
+  const file = new File(['%PDF-original'], 'procedure.pdf', { type: 'application/pdf' });
+  h.facade.selectFiles([file]);
+  await h.facade.submit(form);
+  expect(record).toHaveBeenCalledWith(
+    'knowledge.upload',
+    'ok',
+    expect.objectContaining({ details: { bytes: file.size } }),
+  );
+  expect(JSON.stringify(record.mock.calls)).not.toContain('procedure.pdf');
+  record.mockRestore();
 });

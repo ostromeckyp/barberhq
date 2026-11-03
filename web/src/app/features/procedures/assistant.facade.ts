@@ -1,4 +1,5 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
+import { ClientLog } from '../../core/client-log';
 import type { ProcedureResult } from '../../../../../shared/contracts/ai/index';
 import { AssistantApi, AssistantApiError } from '../../core/assistant-api';
 import { Language } from '../../core/language';
@@ -15,6 +16,7 @@ import { deliveryProcedureQuestion } from './procedure-question';
 @Service()
 export class AssistantFacade {
   private readonly api = inject(AssistantApi);
+  private readonly log = inject(ClientLog);
   private readonly session = inject(SessionFacade);
   private readonly context = inject(SalonContext);
   private readonly language = inject(Language);
@@ -92,8 +94,14 @@ export class AssistantFacade {
         question,
         answerLanguage: this.language.current(),
       });
+      this.log.record('procedure.answer.result', 'ok', {
+        details: { status: result.status, sources: result.sources.length },
+      });
       if (generation === this.generation && scope === this.currentScope()) this.result.set(result);
     } catch (error) {
+      this.log.record('procedure.answer.result', 'error', {
+        code: error instanceof AssistantApiError ? error.code : 'unknown',
+      });
       if (generation === this.generation && scope === this.currentScope()) {
         this.error.set({
           key:

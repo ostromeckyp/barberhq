@@ -7,6 +7,7 @@ import { PushDeniedError, PushMessaging } from '../../../core/push-messaging';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { PushApi } from '../data-access/push-api';
 import { PushFacade } from './push.facade';
+import { ClientLog } from '../../../core/client-log';
 
 beforeEach(() => localStorage.clear());
 
@@ -146,4 +147,15 @@ it('a failing user-initiated enable shows the error', async () => {
   h.messaging.enable.mockRejectedValueOnce(new Error('x'));
   await h.facade.enable();
   expect(h.facade.status()).toBe('error');
+});
+
+it('logs the permission outcome of enable', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const h = setup();
+  await h.facade.enable();
+  expect(record).toHaveBeenCalledWith('push.permission', 'ok', { code: 'granted' });
+  h.messaging.enable.mockRejectedValueOnce(new PushDeniedError());
+  await h.facade.enable();
+  expect(record).toHaveBeenCalledWith('push.permission', 'error', { code: 'denied' });
+  record.mockRestore();
 });

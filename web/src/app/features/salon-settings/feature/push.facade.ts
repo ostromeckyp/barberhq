@@ -1,4 +1,5 @@
 import { Service, computed, effect, inject, signal, untracked } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { Language } from '../../../core/language';
 import type { PushStatus } from '../../../core/models/push-status';
 import { PushDeniedError, PushMessaging } from '../../../core/push-messaging';
@@ -29,6 +30,7 @@ const setOptOut = (value: boolean): void => {
 @Service()
 export class PushFacade {
   private readonly messaging = inject(PushMessaging);
+  private readonly log = inject(ClientLog);
   private readonly api = inject(PushApi);
   private readonly language = inject(Language);
   private readonly session = inject(SessionFacade);
@@ -72,8 +74,11 @@ export class PushFacade {
       await this.api.register(token, this.language.current());
       setOptOut(false);
       this.status.set('granted');
+      this.log.record('push.permission', 'ok', { code: 'granted' });
     } catch (error) {
-      this.status.set(error instanceof PushDeniedError ? 'denied' : 'error');
+      const denied = error instanceof PushDeniedError;
+      this.log.record('push.permission', 'error', { code: denied ? 'denied' : 'error' });
+      this.status.set(denied ? 'denied' : 'error');
     } finally {
       this.busy.set(false);
     }

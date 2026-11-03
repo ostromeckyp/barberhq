@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
 import { TranslocoService } from '@jsverse/transloco';
 import { filter } from 'rxjs';
+import { ClientLog } from './client-log';
 
 /** Seam so tests can observe the reload instead of navigating. */
 export const RELOAD_PAGE = new InjectionToken<() => void>('RELOAD_PAGE', {
@@ -16,6 +17,7 @@ export class AppUpdate {
   private readonly snackBar = inject(MatSnackBar);
   private readonly transloco = inject(TranslocoService);
   private readonly reload = inject(RELOAD_PAGE);
+  private readonly log = inject(ClientLog);
   private started = false;
 
   start(): void {
@@ -24,6 +26,7 @@ export class AppUpdate {
     this.updates.versionUpdates
       .pipe(filter((event) => event.type === 'VERSION_READY'))
       .subscribe(() => {
+        this.log.record('app.update.available');
         this.snackBar
           .open(
             this.transloco.translate('app.update.ready'),
@@ -31,7 +34,11 @@ export class AppUpdate {
             { duration: undefined },
           )
           .onAction()
-          .subscribe(() => this.reload());
+          .subscribe(() => {
+            this.log.record('app.update.applied');
+            // Stored events survive the reload and are sent by the next page.
+            this.reload();
+          });
       });
   }
 }

@@ -1,4 +1,5 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import type { Page } from '../../../../../../shared/contracts/business/index';
 import type {
   DeleteVersionInput,
@@ -16,6 +17,7 @@ const PAGE_SIZE = 20;
 @Service({ autoProvided: false })
 export class DocumentLibraryFacade {
   private readonly api = inject(KnowledgeApi);
+  private readonly log = inject(ClientLog);
   private readonly session = inject(SessionFacade);
   private readonly context = inject(SalonContext);
   private readonly destroyRef = inject(DestroyRef);
@@ -172,6 +174,8 @@ export class DocumentLibraryFacade {
       const current = this.rows();
       if (JSON.stringify(current) !== JSON.stringify(page.items)) this.rows.set(page.items);
     } catch (error) {
+      // Only failures: the library polls while visible, so successes would flood the log.
+      this.log.record('knowledge.library.load', 'error', { code: this.errorCode(error) });
       if (generation === this.generation) this.error.set(this.messageFor(this.errorCode(error)));
     } finally {
       if (generation === this.generation) this.loading.set(false);
