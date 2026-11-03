@@ -171,7 +171,8 @@
         "TIMEOUT": "Generowanie odpowiedzi trwało zbyt długo. Spróbuj ponownie.",
         "UNAVAILABLE": "Asystent jest chwilowo niedostępny. Spróbuj ponownie.",
         "SOURCE_CHANGED": "Źródła uległy zmianie. Zadaj pytanie ponownie.",
-        "INVALID_MODEL_OUTPUT": "Nie udało się zweryfikować odpowiedzi. Zadaj pytanie ponownie."
+        "INVALID_MODEL_OUTPUT": "Nie udało się zweryfikować odpowiedzi. Zadaj pytanie ponownie.",
+        "NO_SPEECH": "Nie usłyszałem zamówienia, spróbuj jeszcze raz"
       }
     },
     "page": {
@@ -906,6 +907,12 @@
       "errors": {
         "storage": "Włącz pamięć sesji w przeglądarce przed złożeniem zamówienia. Żadne zamówienie nie zostało złożone.",
         "clearState": "Nie udało się wyczyścić zapisanego stanu. Uzgodnij to samo zamówienie, zanim przejdziesz dalej."
+      },
+      "aiMatch": {
+        "label": "Dopasowane przez AI",
+        "change": "Zmień",
+        "changeFor": "Zmień produkt: {{ name }}",
+        "suggested": "Sugestia"
       }
     },
     "draft": {
@@ -945,6 +952,16 @@
         "CHOOSE_PRODUCT": "Wybierz produkt z katalogu.",
         "ENTER_QUANTITY": "Wpisz całkowitą ilość od 1 do 99."
       }
+    },
+    "dictation": {
+      "start": "Podyktuj zamówienie",
+      "stop": "Zatrzymaj nagrywanie",
+      "recognising": "Rozpoznaję…",
+      "blocked": "Zezwól BarberHQ na mikrofon w Ustawieniach",
+      "noSpeech": "Nie usłyszałem zamówienia, spróbuj jeszcze raz",
+      "failed": "Nie udało się rozpoznać mowy",
+      "retry": "Spróbuj ponownie",
+      "tooLong": "Tekst zamówienia osiągnął limit długości"
     },
     "clarify": {
       "product": "Produkt dla: {{ wording }}",

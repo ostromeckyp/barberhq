@@ -6,9 +6,12 @@ import type {
   AiOperationalCode,
   PrepareInput,
   ProposalResult,
+  TranscribeInput,
+  TranscribeResult,
 } from '../../../../shared/contracts/ai/index';
 import { callFunction } from './call-function';
 import { FIREBASE } from './firebase.providers';
+import { Language } from './language';
 import { isReplenishmentProposal } from './replenishment-proposal';
 
 export type AssistantErrorCode =
@@ -27,6 +30,7 @@ const messages: Record<AssistantErrorCode, string> = {
   SOURCE_CHANGED: 'procedures.assistant.errors.SOURCE_CHANGED',
   INVALID_MODEL_OUTPUT: 'procedures.assistant.errors.INVALID_MODEL_OUTPUT',
   EMBEDDING_CONFIG_MISMATCH: UNAVAILABLE,
+  NO_SPEECH: 'procedures.assistant.errors.NO_SPEECH',
 };
 
 export class AssistantApiError extends Error {
@@ -123,12 +127,26 @@ function isProcedureResult(value: unknown): value is ProcedureResult {
 @Service()
 export class AssistantApi {
   private readonly firebase = inject(FIREBASE);
+  private readonly language = inject(Language);
+  async transcribeOrder(input: TranscribeInput): Promise<string> {
+    try {
+      const data = await callFunction<TranscribeInput, TranscribeResult>(
+        this.firebase,
+        'transcribeOrder',
+        input,
+      );
+      if (typeof data?.text !== 'string') throw new AssistantApiError('INVALID_MODEL_OUTPUT');
+      return data.text;
+    } catch (error) {
+      throw this.controlledError(error);
+    }
+  }
   async prepareReplenishment(input: PrepareInput): Promise<ProposalResult> {
     try {
       const data = await callFunction<PrepareInput, unknown>(
         this.firebase,
         'prepareReplenishment',
-        input,
+        { ...input, language: this.language.current() },
       );
       if (!isReplenishmentProposal(data)) throw new AssistantApiError('INVALID_MODEL_OUTPUT');
       return data;

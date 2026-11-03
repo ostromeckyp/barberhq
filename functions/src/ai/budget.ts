@@ -66,3 +66,24 @@ export async function runWithinBudget<T>(
     if (timer) clearTimeout(timer);
   }
 }
+
+/**
+ * Run optional work against a child budget that ends `reserveMs` before the parent, so later
+ * steps keep their time. Model-turn and tool-call counters stay shared with the parent.
+ */
+export async function runWithReservedTime<T>(
+  budget: AiBudget,
+  reserveMs: number,
+  work: (child: AiBudget) => Promise<T>,
+): Promise<T> {
+  const clock = clocks.get(budget);
+  if (!clock) throw new AiError('INVALID_CONFIG');
+  const child = { ...budget, deadlineMs: budget.deadlineMs - reserveMs };
+  clocks.set(child, clock);
+  try {
+    return await runWithinBudget(child, () => work(child));
+  } finally {
+    budget.modelTurnsRemaining = Math.min(budget.modelTurnsRemaining, child.modelTurnsRemaining);
+    budget.toolCallsRemaining = Math.min(budget.toolCallsRemaining, child.toolCallsRemaining);
+  }
+}

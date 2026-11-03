@@ -45,7 +45,8 @@ export function createAiAdmission(
     if (
       endpoint !== 'replenishment' &&
       endpoint !== 'procedure' &&
-      endpoint !== 'product-knowledge'
+      endpoint !== 'product-knowledge' &&
+      endpoint !== 'transcription'
     )
       throw new AiError('VALIDATION_ERROR');
     if (endpoint === 'product-knowledge' && actor.role !== 'HQ') throw new AiError('FORBIDDEN');
@@ -65,7 +66,7 @@ export function createAiAdmission(
       return repository.increment(actor.uid, actor.businessId, actor.role);
     });
     if (result === null) throw new AiError('RATE_LIMITED');
-    if (!Number.isSafeInteger(result.count) || result.count < 1 || result.count > 10)
+    if (!Number.isSafeInteger(result.count) || result.count < 1 || result.count > 20)
       throw new AiError('INVALID_CONFIG');
     return budget;
   }

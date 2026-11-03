@@ -22,6 +22,7 @@ export function publicAiError(error: unknown): never {
                   ? 'aborted'
                   : error.code === 'INVALID_CONFIG' ||
                       error.code === 'EMBEDDING_CONFIG_MISMATCH' ||
+                      error.code === 'NO_SPEECH' ||
                       error.code === 'APP_CHECK_REQUIRED'
                     ? 'failed-precondition'
                     : 'unavailable';

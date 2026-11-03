@@ -2,6 +2,7 @@ import { onCall } from 'firebase-functions/v2/https';
 import type { AiOp } from '../../../shared/contracts/functions/index.js';
 import { createAnswerProcedureQuestionFunction } from '../ai/procedure.js';
 import { createPrepareReplenishmentFunction } from '../ai/replenishment.js';
+import { createTranscribeOrderFunction } from '../ai/transcription.js';
 import {
   generateKnowledgeProductAliasesFunction,
   suggestKnowledgeProductLinkFunction,
@@ -15,6 +16,7 @@ export const aiHandlers = {
   suggestKnowledgeProductLink: suggestKnowledgeProductLinkFunction(),
   generateKnowledgeProductAliases: generateKnowledgeProductAliasesFunction(),
   processProductCard: processProductCardFunction(),
+  transcribeOrder: createTranscribeOrderFunction(),
 } satisfies Record<AiOp, unknown>;
 
 export const ai = onCall(

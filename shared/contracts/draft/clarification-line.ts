@@ -7,7 +7,8 @@ export type ClarificationLine = {
   /** Stable code for `reason`, so clients can show it in their own language. */
   reasonCode?: 'BATCH_LIMIT' | 'CHOOSE_PRODUCT' | 'ENTER_QUANTITY';
   origin: LineOrigin;
-  candidates: { productId: string; productName: string }[];
+  /** AI suggestions come first and carry `suggested` plus a short `reason`. */
+  candidates: { productId: string; productName: string; suggested?: true; reason?: string }[];
   quantity?: number;
   /** Server receipt that lets an explicit choice teach salon shorthand. */
   choiceReceiptId?: string;

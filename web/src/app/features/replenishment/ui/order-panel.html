@@ -127,6 +127,14 @@
         </button>
       </div>
       @if (line.status === 'READY') {
+        @if (line.aiMatch; as match) {
+          <app-ai-match-note
+            [match]="match"
+            [productName]="line.productName"
+            [locked]="facade.locked() || assistant.loading()"
+            (change)="assistant.changeMatch(line.lineId)"
+          />
+        }
         <div class="line-controls">
           <div
             class="quantity-stepper"

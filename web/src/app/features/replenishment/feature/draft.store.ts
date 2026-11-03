@@ -18,9 +18,11 @@ export class DraftStore {
           ? next.findIndex((l) => l.status === 'READY' && l.productId === line.productId)
           : -1;
       const existing = next[index];
-      if (existing?.status === 'READY' && line.status === 'READY')
+      if (existing?.status === 'READY' && line.status === 'READY') {
+        // An AI match labels only the line it created, never a line it was merged into.
+        const { aiMatch: _incoming, ...rest } = line;
         next[index] = {
-          ...line,
+          ...rest,
           ...existing,
           quantity: existing.quantity + line.quantity,
           hqAvailable: line.hqAvailable,
@@ -28,7 +30,7 @@ export class DraftStore {
           hqInventoryVersion: line.hqInventoryVersion,
           salonInventoryVersion: line.salonInventoryVersion,
         };
-      else next.push({ ...line });
+      } else next.push({ ...line });
     }
     if (next.length > 6) return false;
     this.value.set(next);
@@ -68,6 +70,10 @@ export class DraftStore {
     this.value.update((lines) =>
       lines.map((line) => (line.lineId === lineId ? { ...line, quantity } : line)),
     );
+  }
+  /** Swaps one line in place, keeping its position in the list. */
+  replace(lineId: string, line: DraftLine) {
+    this.value.update((lines) => lines.map((l) => (l.lineId === lineId ? line : l)));
   }
   remove(lineId: string) {
     this.value.update((lines) => lines.filter((line) => line.lineId !== lineId));

@@ -34,6 +34,11 @@ const proposal = (lines: ProposalResult['lines'] = [line()]): ProposalResult => 
   excluded: [],
   toolEvents: [],
 });
+const catalog = [
+  { productId: 'matowa', productName: 'Matowa' },
+  { productId: 'dry', productName: 'Dry Matt' },
+  { productId: 'sol', productName: 'Sol' },
+];
 function setup(request: (input: unknown) => Promise<ProposalResult>) {
   const session = signal<
     { status: 'READY'; membership: typeof membership } | { status: 'SIGNED_OUT' }
@@ -46,7 +51,10 @@ function setup(request: (input: unknown) => Promise<ProposalResult>) {
       ReplenishmentAssistantFacade,
       { provide: AssistantApi, useValue: { prepareReplenishment: request } },
       { provide: SessionFacade, useValue: { state: session } },
-      { provide: OrderFacade, useValue: { salonId, locked, canOrder: () => true } },
+      {
+        provide: OrderFacade,
+        useValue: { salonId, locked, canOrder: () => true, inventory: { rows: () => catalog } },
+      },
     ],
   });
   const facade = TestBed.inject(ReplenishmentAssistantFacade),
@@ -300,4 +308,103 @@ it('confirms learned shorthand and forgets sources after a role change', async (
   TestBed.flushEffects();
   expect(facade.shorthandNotice()).toBeNull();
   expect(facade.message()).toBe('');
+});
+const aiLine = (choiceReceiptId?: string) => ({
+  ...line('matowa', 3),
+  aiMatch: {
+    originalWording: '3 matte paste',
+    reason: 'Closest name in the catalog',
+    alternatives: [{ productId: 'dry', productName: 'Dry Matt' }],
+    ...(choiceReceiptId ? { choiceReceiptId } : {}),
+  },
+});
+it('never sends an untouched AI-matched line back as a clarification choice', async () => {
+  const inputs: { clarifications?: { lineId: string }[] }[] = [];
+  const { facade, draft } = setup(async (input) => {
+    inputs.push(input as never);
+    return inputs.length === 1
+      ? proposal([aiLine(receiptA), ask('line-9-16', receiptB)])
+      : proposal([{ ...line('dry'), lineId: 'line-9-16' }]);
+  });
+  facade.message.set('3 matte paste, 2 pasta');
+  await facade.prepare();
+  const id = draft.lines().find((l) => l.status === 'NEEDS_CLARIFICATION')!.lineId;
+  await facade.clarify(id, 'dry', 2);
+  expect(inputs[1].clarifications).toEqual([
+    expect.objectContaining({ lineId: 'line-9-16', choiceReceiptId: receiptB }),
+  ]);
+  expect(JSON.stringify(inputs)).not.toContain(receiptA);
+});
+it('change turns an AI match into a choice with alternatives first and sends its receipt', async () => {
+  const inputs: { clarifications?: unknown[] }[] = [];
+  const { facade, draft } = setup(async (input) => {
+    inputs.push(input as never);
+    return inputs.length === 1
+      ? proposal([aiLine(receiptA)])
+      : proposal([{ ...line('sol', 3), lineId: 'line-0-8' }]);
+  });
+  facade.message.set('3 matte paste');
+  await facade.prepare();
+  const id = draft.lines()[0].lineId;
+  facade.changeMatch(id);
+  expect(inputs).toHaveLength(1);
+  expect(draft.lines()[0]).toMatchObject({
+    status: 'NEEDS_CLARIFICATION',
+    lineId: id,
+    originalWording: '3 matte paste',
+    reasonCode: 'CHOOSE_PRODUCT',
+    quantity: 3,
+    origin: 'assistant',
+  });
+  const changed = draft.lines()[0];
+  expect(
+    changed.status === 'NEEDS_CLARIFICATION' && changed.candidates.map((c) => c.productId),
+  ).toEqual(['dry', 'matowa', 'sol']);
+  await facade.clarify(id, 'sol', 3);
+  expect(inputs[1].clarifications).toEqual([
+    {
+      lineId: 'line-0-8',
+      originalWording: '3 matte paste',
+      productId: 'sol',
+      quantity: 3,
+      choiceReceiptId: receiptA,
+    },
+  ]);
+  expect(draft.lines()).toEqual([
+    expect.objectContaining({ status: 'READY', productId: 'sol', quantity: 3 }),
+  ]);
+  expect(draft.lines()[0]).not.toHaveProperty('aiMatch');
+});
+it('change ignores lines without an AI match and is blocked while locked', async () => {
+  const { facade, draft, locked } = setup(async () => proposal([aiLine(receiptA)]));
+  draft.add({ ...line('sol'), lineId: 'manual', origin: 'manual' });
+  facade.message.set('3 matte paste');
+  await facade.prepare();
+  facade.changeMatch('manual');
+  locked.set(true);
+  facade.changeMatch(draft.lines()[1].lineId);
+  expect(draft.lines().every((l) => l.status === 'READY')).toBe(true);
+});
+it('answers an AI quantity question with the suggested product and the quantity', async () => {
+  const inputs: { clarifications?: unknown[] }[] = [];
+  const question = {
+    ...ask('line-0-7'),
+    reasonCode: 'ENTER_QUANTITY' as const,
+    quantity: undefined,
+    candidates: [
+      { productId: 'matowa', productName: 'Matowa', suggested: true as const, reason: 'Closest' },
+    ],
+  };
+  const { facade, draft } = setup(async (input) => {
+    inputs.push(input as never);
+    return inputs.length === 1
+      ? proposal([question])
+      : proposal([{ ...line('matowa', 4), lineId: 'line-0-7' }]);
+  });
+  facade.message.set('some matte paste');
+  await facade.prepare();
+  await facade.clarify(draft.lines()[0].lineId, 'matowa', 4);
+  expect(inputs[1].clarifications).toEqual([
+    expect.objectContaining({ lineId: 'line-0-7', productId: 'matowa', quantity: 4 }),
+  ]);
 });
