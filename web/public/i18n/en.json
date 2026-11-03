@@ -171,7 +171,8 @@
         "TIMEOUT": "The answer took too long. Please try again.",
         "UNAVAILABLE": "The assistant is temporarily unavailable. Please try again.",
         "SOURCE_CHANGED": "The sources changed. Please ask again.",
-        "INVALID_MODEL_OUTPUT": "The answer could not be verified. Please ask again."
+        "INVALID_MODEL_OUTPUT": "The answer could not be verified. Please ask again.",
+        "NO_SPEECH": "Didn't catch an order, try again"
       }
     },
     "page": {

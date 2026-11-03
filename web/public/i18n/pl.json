@@ -171,7 +171,8 @@
         "TIMEOUT": "Generowanie odpowiedzi trwało zbyt długo. Spróbuj ponownie.",
         "UNAVAILABLE": "Asystent jest chwilowo niedostępny. Spróbuj ponownie.",
         "SOURCE_CHANGED": "Źródła uległy zmianie. Zadaj pytanie ponownie.",
-        "INVALID_MODEL_OUTPUT": "Nie udało się zweryfikować odpowiedzi. Zadaj pytanie ponownie."
+        "INVALID_MODEL_OUTPUT": "Nie udało się zweryfikować odpowiedzi. Zadaj pytanie ponownie.",
+        "NO_SPEECH": "Nie usłyszałem zamówienia, spróbuj jeszcze raz"
       }
     },
     "page": {

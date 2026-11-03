@@ -3,6 +3,7 @@ import { httpsCallable } from 'firebase/functions';
 import { beforeEach, expect, it, vi } from 'vitest';
 import { FIREBASE } from './firebase.providers';
 import { AssistantApi, AssistantApiError } from './assistant-api';
+import { Language } from './language';
 
 vi.mock('firebase/functions', () => ({ httpsCallable: vi.fn() }));
 
@@ -137,4 +138,47 @@ it('accepts canonical product-card citations and rejects inconsistent provenance
   await expect(
     api.answerProcedureQuestion({ question: 'What now?', answerLanguage: 'en' }),
   ).rejects.toMatchObject({ code: 'INVALID_MODEL_OUTPUT' });
+});
+
+it('transcribes an order recording and returns the text', async () => {
+  const call = vi.fn().mockResolvedValue({ data: { text: 'two matte clay' } });
+  vi.mocked(httpsCallable).mockReturnValue(Object.assign(call, { stream: vi.fn() }));
+  const api = TestBed.inject(AssistantApi);
+  const input = {
+    salonId: 'salon',
+    audio: 'QUJD',
+    mimeType: 'audio/webm',
+    language: 'en' as const,
+  };
+  await expect(api.transcribeOrder(input)).resolves.toBe('two matte clay');
+  expect(call).toHaveBeenCalledWith({ op: 'transcribeOrder', input });
+});
+
+it('maps NO_SPEECH to its own code and message key', async () => {
+  const call = vi.fn().mockRejectedValue({
+    code: 'functions/failed-precondition',
+    details: { code: 'NO_SPEECH' },
+  });
+  vi.mocked(httpsCallable).mockReturnValue(Object.assign(call, { stream: vi.fn() }));
+  const api = TestBed.inject(AssistantApi);
+  await expect(
+    api.transcribeOrder({
+      salonId: 'salon',
+      audio: 'QUJD',
+      mimeType: 'audio/webm',
+      language: 'pl',
+    }),
+  ).rejects.toMatchObject({ code: 'NO_SPEECH', key: 'procedures.assistant.errors.NO_SPEECH' });
+});
+
+it('sends the UI language with prepareReplenishment', async () => {
+  const call = vi.fn().mockResolvedValue({ data: { status: 'PROPOSAL', lines: 'bad' } });
+  vi.mocked(httpsCallable).mockReturnValue(Object.assign(call, { stream: vi.fn() }));
+  TestBed.inject(Language).set('pl');
+  const api = TestBed.inject(AssistantApi);
+  await api.prepareReplenishment({ salonId: 'salon', message: '2 Matowa' }).catch(() => undefined);
+  expect(call).toHaveBeenCalledWith({
+    op: 'prepareReplenishment',
+    input: { salonId: 'salon', message: '2 Matowa', language: 'pl' },
+  });
 });
