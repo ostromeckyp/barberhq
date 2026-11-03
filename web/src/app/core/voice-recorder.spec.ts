@@ -105,3 +105,15 @@ it('ignores a second start while the first is pending', async () => {
   await first;
   expect(getUserMedia).toHaveBeenCalledTimes(1);
 });
+
+it('cancel releases a recorder that never stopped, so the next start records again', async () => {
+  const recorder = TestBed.inject(VoiceRecorder);
+  await recorder.start();
+  const stuck = FakeRecorder.last;
+  stuck.stop = () => undefined;
+  void recorder.stop();
+  recorder.cancel();
+  expect(track.stop).toHaveBeenCalled();
+  await recorder.start();
+  expect(FakeRecorder.last).not.toBe(stuck);
+});

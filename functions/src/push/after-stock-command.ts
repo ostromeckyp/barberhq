@@ -2,6 +2,7 @@ import { getMessaging } from 'firebase-admin/messaging';
 import type { DataConnect } from 'firebase-admin/data-connect';
 import { warn } from 'firebase-functions/logger';
 import type { CommandResult } from '../../../shared/contracts/stock/index.js';
+import { logStep } from '../logging/log-step.js';
 import { notifyRequestState } from './sender.js';
 
 const NOTIFYING = new Set(['APPROVE', 'REJECT', 'DISPATCH']);
@@ -14,7 +15,11 @@ export async function notifyAfterStockCommand(
 ): Promise<void> {
   if (result.replayed || !NOTIFYING.has(type)) return;
   try {
-    await notifyRequestState({ dc, messaging: getMessaging(), log: warn }, result.requestId);
+    await logStep(
+      'push.notify',
+      () => notifyRequestState({ dc, messaging: getMessaging(), log: warn }, result.requestId),
+      { type },
+    );
   } catch (error) {
     warn('push notification failed', {
       requestId: result.requestId,

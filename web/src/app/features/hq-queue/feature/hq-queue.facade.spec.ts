@@ -6,9 +6,11 @@ import { expect, it, vi } from 'vitest';
 import { BrowserActivity } from '../../../core/browser-activity';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
+import { ClientLog } from '../../../core/client-log';
 import { HqQueueFacade } from './hq-queue.facade';
 
 it('keeps loaded and the last rows across a focus refresh that restarts the load', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
   const tick = signal(0);
   const listHQQueue = vi
     .fn()
@@ -42,6 +44,8 @@ it('keeps loaded and the last rows across a focus refresh that restarts the load
   TestBed.tick();
   expect(f.loaded()).toBe(true);
   expect(f.pending().map((r) => r.id)).toEqual(['r1']);
+  expect(record).toHaveBeenCalledWith('hq.queue.load', 'ok', expect.anything());
+  record.mockRestore();
   tick.set(1);
   TestBed.tick();
   expect(f.loading()).toBe(true);

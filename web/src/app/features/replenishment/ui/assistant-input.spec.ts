@@ -45,8 +45,12 @@ it('prepares an editable draft from the visible form without submitting a reques
       },
       {
         provide: OrderFacade,
-        useValue: { salonId: () => 'salon', locked: () => false, canOrder: () => true,
-          inventory: {rows: signal([{productName:'Matowa'}])} },
+        useValue: {
+          salonId: () => 'salon',
+          locked: () => false,
+          canOrder: () => true,
+          inventory: { rows: signal([{ productName: 'Matowa' }]) },
+        },
       },
     ],
   });

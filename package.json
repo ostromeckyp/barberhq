@@ -34,6 +34,7 @@
     "deploy:functions:routers": "firebase deploy --only functions:stock:commands,functions:stock:ai --project notbad-6be95",
     "functions:warm": "node --import tsx scripts/dev/functions-warm.ts",
     "functions:instances": "node --import tsx scripts/dev/functions-instances.ts",
+    "logs": "node --import tsx scripts/dev/logs.ts",
     "deploy:preview": "firebase hosting:channel:deploy foundation --project notbad-6be95 --expires 7d",
     "deploy:promote": "firebase hosting:clone notbad-6be95:foundation notbad-6be95:live --project notbad-6be95",
     "ingest": "node --import tsx scripts/ingest/cli.ts",

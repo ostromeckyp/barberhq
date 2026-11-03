@@ -6,11 +6,13 @@ import { it, expect, vi } from 'vitest';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { SalonContext } from '../../../core/salon-context';
 import { DeliveryApi } from '../data-access/delivery-api';
+import { ClientLog } from '../../../core/client-log';
 import { DeliveryIssuesFacade } from './delivery-issues.facade';
 it('uses independent authorized open count and bounded URL status and offset', async () => {
   const query = new BehaviorSubject(
     convertToParamMap({ view: 'delivery-issues', issueStatus: 'ALL', issueOffset: '20' }),
   );
+  const record = vi.spyOn(ClientLog.prototype, 'record');
   const listIssues = vi.fn(async () => ({ items: [], openCount: 27, offset: 20, hasMore: true }));
   TestBed.configureTestingModule({
     providers: [
@@ -38,6 +40,8 @@ it('uses independent authorized open count and bounded URL status and offset', a
   expect(f.rows()).toEqual([]);
   expect(f.status()).toBe('ALL');
   expect(listIssues).toHaveBeenCalledWith({ offset: 20, limit: 20, status: 'ALL' });
+  expect(record).toHaveBeenCalledWith('delivery.issues.load', 'ok', expect.anything());
+  record.mockRestore();
   query.next(convertToParamMap({ issueStatus: 'INVALID', issueOffset: '-3' }));
   TestBed.flushEffects();
   expect(f.status()).toBe('OPEN');

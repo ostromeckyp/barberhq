@@ -1,4 +1,5 @@
 import { Service, signal, inject, DestroyRef } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { DELIVERY_JOURNAL } from '../../delivery/feature/delivery-journal';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
@@ -9,6 +10,7 @@ import type { SalonOption } from '../models/salon-option';
 export class SessionFacade {
   private readonly deliveryJournal = inject(DELIVERY_JOURNAL);
   private readonly gateway = inject(SESSION_GATEWAY);
+  private readonly log = inject(ClientLog);
   private readonly current = signal<SessionState>({ status: 'LOADING' });
   readonly state = this.current.asReadonly();
   private readonly availableSalons = signal<SalonOption[]>([]);
@@ -31,24 +33,44 @@ export class SessionFacade {
     this.availableSalons.set([]);
     if (!uid) {
       this.current.set({ status: 'SIGNED_OUT' });
+      this.log.setContext({});
       return;
     }
+    this.log.record('session.signedIn');
     this.current.set({ status: 'LOADING' });
     try {
       const result = await this.gateway.membership();
       if (generation !== this.generation) return;
       if (!result || result.membership.userId !== uid) {
         this.current.set({ status: 'NO_ACCESS' });
+        this.log.record('session.noAccess', 'error');
         return;
       }
+      const { role, businessId, salonIds } = result.membership;
+      this.log.setContext({
+        role,
+        businessId,
+        ...(salonIds.length === 1 ? { salonId: salonIds[0] } : {}),
+      });
+      this.log.record('session.ready', 'ok', { details: { role } });
       this.availableSalons.set(result.salons);
       this.current.set({ status: 'READY', membership: result.membership });
     } catch {
-      if (generation === this.generation) this.current.set({ status: 'ERROR' });
+      if (generation !== this.generation) return;
+      this.current.set({ status: 'ERROR' });
+      this.log.record('session.error', 'error');
     }
   }
-  signIn(email: string, password: string) {
-    return this.gateway.signIn(email, password);
+  async signIn(email: string, password: string) {
+    try {
+      return await this.gateway.signIn(email, password);
+    } catch (error) {
+      const code = (error as { code?: unknown } | null)?.code;
+      this.log.record('session.signIn.failed', 'error', {
+        code: typeof code === 'string' ? code : 'unknown',
+      });
+      throw error;
+    }
   }
   async signOut() {
     if (this.uid) {
@@ -58,6 +80,8 @@ export class SessionFacade {
         /* Browser storage may be blocked; access remains scoped to its original user. */
       }
     }
+    this.log.record('session.signedOut');
+    this.log.setContext({});
     ++this.generation;
     this.uid = null;
     this.availableSalons.set([]);

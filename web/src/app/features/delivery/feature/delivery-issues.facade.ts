@@ -1,4 +1,5 @@
 import { Service, computed, inject, resource } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SessionFacade } from '../../auth/feature/session.facade';
@@ -9,6 +10,7 @@ import { DeliveryApi } from '../data-access/delivery-api';
 @Service({ autoProvided: false })
 export class DeliveryIssuesFacade {
   private readonly api = inject(DeliveryApi);
+  private readonly log = inject(ClientLog);
   private readonly session = inject(SessionFacade);
   private readonly workspace = inject(SalonContext);
   private readonly activity = inject(BrowserActivity);
@@ -42,7 +44,9 @@ export class DeliveryIssuesFacade {
     },
     loader: async ({ params }) => ({
       identity: params.identity,
-      page: await this.api.listIssues({ offset: params.offset, limit: 20, status: params.status }),
+      page: await this.log.step('delivery.issues.load', () =>
+        this.api.listIssues({ offset: params.offset, limit: 20, status: params.status }),
+      ),
     }),
   });
   private readonly page = computed(() =>

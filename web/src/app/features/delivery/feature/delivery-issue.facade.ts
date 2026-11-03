@@ -1,4 +1,5 @@
 import { Service, computed, effect, inject, resource, signal, untracked } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import type { ProcedureReference } from '../../../../../../shared/contracts/delivery/index';
@@ -20,6 +21,7 @@ import type { IssueAction } from '../models/issue-action';
 @Service({ autoProvided: false })
 export class DeliveryIssueFacade {
   private readonly api = inject(DeliveryApi);
+  private readonly log = inject(ClientLog);
   private readonly session = inject(SessionFacade);
   private readonly workspace = inject(SalonContext);
   private readonly route = inject(ActivatedRoute);
@@ -54,10 +56,12 @@ export class DeliveryIssueFacade {
         : undefined;
     },
     loader: async ({ params }) => {
-      const issue = await this.api.getIssue(params.id, {
-        eventOffset: params.eventOffset,
-        replacementOffset: params.replacementOffset,
-      });
+      const issue = await this.log.step('delivery.issue.load', () =>
+        this.api.getIssue(params.id, {
+          eventOffset: params.eventOffset,
+          replacementOffset: params.replacementOffset,
+        }),
+      );
       if (issue.id !== params.id || (params.salonId && issue.salonId !== params.salonId))
         throw new Error('Issue outside this salon.');
       return { key: params.key, issue };

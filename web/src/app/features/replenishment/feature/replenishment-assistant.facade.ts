@@ -1,4 +1,5 @@
 import { DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import type { PrepareInput, ProposalResult } from '../../../../../../shared/contracts/ai/index';
 import type { ReadyDraftLine } from '../../../../../../shared/contracts/draft/index';
 import { AssistantApi, AssistantApiError } from '../../../core/assistant-api';
@@ -12,6 +13,7 @@ type Attempt = { message: string; prefix: string; choices: Map<string, Choice> }
 @Service({ autoProvided: false })
 export class ReplenishmentAssistantFacade {
   private readonly api = inject(AssistantApi);
+  private readonly log = inject(ClientLog);
   private readonly session = inject(SessionFacade);
   private readonly order = inject(OrderFacade);
   private readonly draft = inject(DraftStore);
@@ -98,6 +100,12 @@ export class ReplenishmentAssistantFacade {
       // The opaque receipt is the only way an explicit choice may teach salon shorthand.
       ...(source.receiptId ? { choiceReceiptId: source.receiptId } : {}),
     };
+    const asked = this.draft.lines().find((l) => l.lineId === id);
+    this.log.record('request.clarification.chosen', 'ok', {
+      details: {
+        kind: (asked?.status === 'NEEDS_CLARIFICATION' && asked.reasonCode) || 'UNKNOWN',
+      },
+    });
     await this.request(source.attempt, { localId: id, choice });
   }
   /**
@@ -115,6 +123,7 @@ export class ReplenishmentAssistantFacade {
       !this.sources.has(id)
     )
       return;
+    this.log.record('request.aiMatch.changed');
     const offered = new Set(line.aiMatch.alternatives.map((a) => a.productId));
     this.draft.replace(id, {
       status: 'NEEDS_CLARIFICATION',
@@ -155,6 +164,15 @@ export class ReplenishmentAssistantFacade {
         ...(choices.size ? { clarifications: [...choices.values()] } : {}),
       });
       if (!current()) return;
+      this.log.record('request.prepare.result', 'ok', {
+        details: {
+          ready: result.lines.filter((l) => l.status === 'READY').length,
+          clarifications: result.lines.filter((l) => l.status === 'NEEDS_CLARIFICATION').length,
+          aiMatched: result.lines.filter((l) => l.status === 'READY' && l.aiMatch).length,
+          excluded: result.excluded.length,
+          followUp: !!selection,
+        },
+      });
       // The server combines duplicate products under their first source ID. Apply only
       // this explicit contribution; previous source quantities are already in the draft.
       const unresolved = selection
@@ -231,6 +249,7 @@ export class ReplenishmentAssistantFacade {
     } catch (error) {
       if (current()) {
         const code = error instanceof AssistantApiError ? error.code : '';
+        this.log.record('request.prepare.result', 'error', { code: code || 'unknown' });
         this.error.set({
           key:
             code === 'RATE_LIMITED'

@@ -247,3 +247,9 @@ it('allows the public web app manifest', () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+it('stamps the build before the public configuration', () => {
+  const output = renderPublicConfig(config, 'test-project', false, undefined, 'abc1234');
+  expect(output).toContain('{"build":"abc1234","publicConfig":{');
+  expect(output).toMatch(/"useEmulators":false}/);
+  expect(renderPublicConfig(config, 'test-project', false, undefined)).toContain('"build":"local"');
+});

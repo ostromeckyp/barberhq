@@ -6,6 +6,7 @@ import { AssistantApi, AssistantApiError } from '../../core/assistant-api';
 import { SalonContext } from '../../core/salon-context';
 import { SessionFacade } from '../auth/feature/session.facade';
 import { AssistantFacade } from './assistant.facade';
+import { ClientLog } from '../../core/client-log';
 import { convertToParamMap } from '@angular/router';
 
 const membership = {
@@ -156,4 +157,32 @@ it('sends the current UI language', async () => {
     question: 'Co zrobić z uszkodzonym produktem?',
     answerLanguage: 'pl',
   });
+});
+
+it('logs the answer status and source count, not the question', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const { facade } = setup(async () => ({
+    status: 'ANSWER',
+    steps: [],
+    sources: [{}, {}],
+    missingInformation: [],
+  }));
+  facade.question.set('What if DEMO-DAMAGE-01 is damaged?');
+  await facade.submit();
+  expect(record).toHaveBeenCalledWith('procedure.answer.result', 'ok', {
+    details: { status: 'ANSWER', sources: 2 },
+  });
+  expect(JSON.stringify(record.mock.calls)).not.toContain('DEMO-DAMAGE');
+  record.mockRestore();
+});
+
+it('logs a failed answer with its code', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
+  const { facade } = setup(async () => {
+    throw new AssistantApiError('TIMEOUT');
+  });
+  facade.question.set('Question?');
+  await facade.submit();
+  expect(record).toHaveBeenCalledWith('procedure.answer.result', 'error', { code: 'TIMEOUT' });
+  record.mockRestore();
 });

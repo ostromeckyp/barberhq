@@ -12,6 +12,7 @@ import type { VersionState } from './models/version-state.js';
 import { sourceStorageBucket } from './source-storage.js';
 import { knowledgeDataConnectors, knowledgeRuntimeConfig } from './runtime.js';
 import { CLOUD } from '../cloud-config.js';
+import { logStep } from '../logging/log-step.js';
 import type { UploadRequest } from './models/upload-request.js';
 import type { UploadResponse } from './models/upload-response.js';
 import type { UploadDeps } from './models/upload-deps.js';
@@ -237,27 +238,34 @@ export function uploadKnowledgePdfFunction() {
         getStorage().bucket(bucketName),
       );
       const dispatch = new DispatchService(repo);
-      await createUploadHandler({
-        repo,
-        dispatch,
-        origins,
-        emulator,
-        verifyAuth: async (token) => {
-          try {
-            return (await getAuth().verifyIdToken(token, true)).uid;
-          } catch {
-            return null;
-          }
+      await logStep(
+        'knowledge.upload',
+        async () => {
+          await createUploadHandler({
+            repo,
+            dispatch,
+            origins,
+            emulator,
+            verifyAuth: async (token) => {
+              try {
+                return (await getAuth().verifyIdToken(token, true)).uid;
+              } catch {
+                return null;
+              }
+            },
+            verifyAppCheck: async (token) => {
+              try {
+                await getAppCheck().verifyToken(token);
+                return true;
+              } catch {
+                return false;
+              }
+            },
+          })(request as unknown as UploadRequest, response);
+          return response.statusCode;
         },
-        verifyAppCheck: async (token) => {
-          try {
-            await getAppCheck().verifyToken(token);
-            return true;
-          } catch {
-            return false;
-          }
-        },
-      })(request as unknown as UploadRequest, response);
+        (status) => ({ status }),
+      );
     },
   );
 }

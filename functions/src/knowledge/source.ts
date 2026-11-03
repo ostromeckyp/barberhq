@@ -5,6 +5,7 @@ import type { DataConnect } from 'firebase-admin/data-connect';
 import { getDataConnect } from 'firebase-admin/data-connect';
 import { onRequest } from 'firebase-functions/v2/https';
 import { CLOUD } from '../cloud-config.js';
+import { logStep } from '../logging/log-step.js';
 import type { PdfIdentity } from './models/pdf-identity.js';
 import type { SourceRequest } from './models/source-request.js';
 import type { SourceResponse } from './models/source-response.js';
@@ -200,7 +201,14 @@ export function sourcePdfFunction() {
           });
         },
       };
-      await createSourceHandler(deps)(request as unknown as SourceRequest, response);
+      await logStep(
+        'knowledge.source',
+        async () => {
+          await createSourceHandler(deps)(request as unknown as SourceRequest, response);
+          return response.statusCode;
+        },
+        (status) => ({ status }),
+      );
     },
   );
 }

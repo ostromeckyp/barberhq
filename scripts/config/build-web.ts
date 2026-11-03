@@ -36,11 +36,21 @@ export function selectSdkTarget(
     throw new Error(`Generated browser SDK target is missing or invalid at ${selected}`);
   return target as SdkTarget;
 }
+/** Short commit of the build, so log entries name the exact release. */
+export function gitRevision(): string {
+  const result = spawnSync('git', ['rev-parse', '--short', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  const sha = result.status === 0 ? result.stdout.trim() : '';
+  return /^[0-9a-f]{4,40}$/.test(sha) ? sha : 'unknown';
+}
 export function renderPublicConfig(
   raw: unknown,
   projectId: string,
   useEmulators = false,
   sdkTarget: SdkTarget = connectorConfig,
+  build = 'local',
 ): string {
   const config = parsePublicConfig(raw);
   if (config.projectId !== projectId)
@@ -57,7 +67,7 @@ export function renderPublicConfig(
     config.dataConnect.browserConnectorId !== sdkTarget.connector
   )
     throw new Error('Public configuration and generated SDK target differ');
-  return `// Generated from explicitly selected PUBLIC configuration. Never edit.\nimport type { PublicConfig } from '../../../../scripts/config/public-config';\nexport const runtimeConfig: { publicConfig: PublicConfig | null; useEmulators: boolean } = ${JSON.stringify({ publicConfig: config, useEmulators })};\n`;
+  return `// Generated from explicitly selected PUBLIC configuration. Never edit.\nimport type { PublicConfig } from '../../../../scripts/config/public-config';\nexport const runtimeConfig: { build: string; publicConfig: PublicConfig | null; useEmulators: boolean } = ${JSON.stringify({ build, publicConfig: config, useEmulators })};\n`;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   rmSync(resolve(root, 'artifacts/build-record.json'), { force: true });
@@ -85,6 +95,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     values.project,
     !!values.emulator,
     selectSdkTarget(!!values.emulator),
+    values.emulator ? 'local' : gitRevision(),
   );
   writeFileSync(generated, source);
   if (!values['configure-only']) {

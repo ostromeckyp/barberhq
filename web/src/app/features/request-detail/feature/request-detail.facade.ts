@@ -1,4 +1,5 @@
 import { Service, inject, computed, resource, signal, effect } from '@angular/core';
+import { ClientLog } from '../../../core/client-log';
 import { Location } from '@angular/common';
 import { parseListContext, requestReturnContext } from '../../../core/request-navigation';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,6 +15,7 @@ import type { TransitionType } from '../models/transition-type';
 @Service({ autoProvided: false })
 export class RequestDetailFacade {
   private readonly router = inject(Router);
+  private readonly log = inject(ClientLog);
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   readonly workspace: 'HQ' | 'SALON' | undefined = this.route.snapshot.data['workspace'];
@@ -41,7 +43,9 @@ export class RequestDetailFacade {
         : undefined;
     },
     loader: async ({ params }) => {
-      const request = await this.api.getRequest(params.id);
+      const request = await this.log.step('request.detail.load', () =>
+        this.api.getRequest(params.id),
+      );
       if (params.salonId && request.salonId !== params.salonId)
         throw new Error('Request outside this salon');
       return request;

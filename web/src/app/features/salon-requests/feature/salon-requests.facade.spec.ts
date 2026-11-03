@@ -7,7 +7,9 @@ import { SalonRequestsFacade } from './salon-requests.facade';
 import { ReplenishmentApi } from '../../replenishment/data-access/replenishment-api';
 import { SessionFacade } from '../../auth/feature/session.facade';
 import { BrowserActivity } from '../../../core/browser-activity';
+import { ClientLog } from '../../../core/client-log';
 it('loads_server_filter_and_resets_page_without_leaking_delayed_results', async () => {
+  const record = vi.spyOn(ClientLog.prototype, 'record');
   const params = new BehaviorSubject(convertToParamMap({ salonId: 'a' })),
     query = new BehaviorSubject(convertToParamMap({ filter: 'REJECTED', offset: '50' }));
   let finish!: (v: { items: []; nextOffset: null }) => void;
@@ -48,5 +50,7 @@ it('loads_server_filter_and_resets_page_without_leaking_delayed_results', async 
   await TestBed.inject(ApplicationRef).whenStable();
   TestBed.tick();
   expect(f.context().salonId).toBe('b');
+  expect(record).toHaveBeenCalledWith('request.list.load', 'ok', expect.anything());
+  record.mockRestore();
   expect(f.items()).toEqual([]);
 });

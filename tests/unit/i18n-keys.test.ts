@@ -42,8 +42,13 @@ function sourceFiles(dir: string): string[] {
 }
 
 /** Quoted key literals anywhere, including inside attribute values and inline templates. */
+// First argument of `ClientLog.record(...)` / `.step(...)`: a log event name, not a key.
+const logEventArgument = /\.(?:record|step)\(\s*$/;
+
 function literalKeys(source: string): string[] {
-  return [...source.matchAll(keyLiteralPattern)].map((m) => m[2]);
+  return [...source.matchAll(keyLiteralPattern)]
+    .filter((m) => !logEventArgument.test(source.slice(Math.max(0, m.index - 40), m.index)))
+    .map((m) => m[2]);
 }
 
 /** Inline `template:` strings of a component file. */
@@ -142,6 +147,10 @@ describe('i18n keys', () => {
     const component = "template: `<p>{{ 'login.missing' | transloco }}</p>`, x: `hq.a.b`";
     expect(literalKeys(component)).toEqual(['login.missing', 'hq.a.b']);
     expect(literalKeys(`'shell.nav.' + name, "salon.name.length > 0 ? x : y"`)).toEqual([]);
+    // Log event names share the dotted shape but are not translation keys.
+    expect(
+      literalKeys("this.log.step('hq.stock.load', f); log.record(\n  'delivery.issue.load')"),
+    ).toEqual([]);
   });
 
   it('every literal key used by the web app exists in en.json', () => {

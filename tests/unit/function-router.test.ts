@@ -100,10 +100,112 @@ describe('function router', () => {
     expect(source).not.toMatch(/^export (?!const )/m);
     expect(names.sort()).toEqual([
       'ai',
+      'clientLog',
       'commands',
       'getSourcePdf',
       'processKnowledgeTask',
       'uploadKnowledgePdf',
     ]);
+  });
+
+  describe('operation log', () => {
+    const httpsError = async (code: string, message: string) => {
+      const invalid = await rejected(Promise.resolve().then(() => createRouter({})(request('a'))));
+      const Https = (invalid as Error).constructor as new (code: string, message: string) => Error;
+      return new Https(code, message);
+    };
+
+    it('writes one INFO entry per successful op', async () => {
+      const log = vi.fn();
+      const op = { run: vi.fn(async () => ({ ok: true })) };
+      await createRouter({ a: op }, { service: 'commands', log })(request({ op: 'a', input: 1 }));
+      expect(log).toHaveBeenCalledOnce();
+      const [severity, entry] = log.mock.calls[0];
+      expect(severity).toBe('INFO');
+      expect(entry).toMatchObject({
+        source: 'functions',
+        event: 'commands.a',
+        outcome: 'ok',
+        uid: 'u',
+      });
+      expect(typeof entry.durationMs).toBe('number');
+      expect(entry).not.toHaveProperty('input');
+      expect(entry).not.toHaveProperty('data');
+    });
+
+    it('writes a WARNING with the HttpsError code and rethrows it', async () => {
+      const log = vi.fn();
+      const thrown = await httpsError('resource-exhausted', 'RATE_LIMITED');
+      const op = {
+        run: vi.fn(async () => {
+          throw thrown;
+        }),
+      };
+      const error = await rejected(
+        Promise.resolve(
+          createRouter({ a: op }, { service: 'ai', log })(request({ op: 'a', input: null })),
+        ),
+      );
+      expect(error).toBe(thrown);
+      expect(log).toHaveBeenCalledWith(
+        'WARNING',
+        expect.objectContaining({
+          event: 'ai.a',
+          outcome: 'error',
+          code: 'resource-exhausted',
+          details: { reason: 'RATE_LIMITED' },
+        }),
+      );
+    });
+
+    it('does not copy a free-text HttpsError message', async () => {
+      const log = vi.fn();
+      const thrown = await httpsError('invalid-argument', 'Sign in to continue.');
+      const op = {
+        run: vi.fn(async () => {
+          throw thrown;
+        }),
+      };
+      await rejected(
+        Promise.resolve(
+          createRouter({ a: op }, { service: 'ai', log })(request({ op: 'a', input: null })),
+        ),
+      );
+      expect(log.mock.calls[0][1]).not.toHaveProperty('details');
+    });
+
+    it('writes an ERROR for an unexpected throw and rethrows it unchanged', async () => {
+      const log = vi.fn();
+      const thrown = new Error('boom with user text');
+      const op = {
+        run: vi.fn(async () => {
+          throw thrown;
+        }),
+      };
+      const error = await rejected(
+        Promise.resolve(
+          createRouter({ a: op }, { service: 'commands', log })(request({ op: 'a', input: null })),
+        ),
+      );
+      expect(error).toBe(thrown);
+      expect(log).toHaveBeenCalledWith(
+        'ERROR',
+        expect.objectContaining({ event: 'commands.a', outcome: 'error', code: 'internal' }),
+      );
+      expect(JSON.stringify(log.mock.calls[0][1])).not.toContain('user text');
+    });
+
+    it('logs a rejected routing as <service>.invalid', async () => {
+      const log = vi.fn();
+      await rejected(
+        Promise.resolve().then(() =>
+          createRouter({}, { service: 'commands', log })(request({ op: 'nope', input: {} })),
+        ),
+      );
+      expect(log).toHaveBeenCalledWith(
+        'WARNING',
+        expect.objectContaining({ event: 'commands.invalid', code: 'invalid-argument' }),
+      );
+    });
   });
 });
