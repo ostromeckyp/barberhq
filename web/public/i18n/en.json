@@ -947,6 +947,16 @@
         "ENTER_QUANTITY": "Enter a whole quantity from 1 to 99."
       }
     },
+    "dictation": {
+      "start": "Dictate order",
+      "stop": "Stop recording",
+      "recognising": "Recognising…",
+      "blocked": "Allow the microphone for BarberHQ in Settings",
+      "noSpeech": "Didn't catch an order, try again",
+      "failed": "Couldn't recognise speech",
+      "retry": "Try again",
+      "tooLong": "The order text is at its length limit"
+    },
     "clarify": {
       "product": "Product for {{ wording }}",
       "quantity": "Quantity for {{ wording }}",

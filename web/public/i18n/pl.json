@@ -947,6 +947,16 @@
         "ENTER_QUANTITY": "Wpisz całkowitą ilość od 1 do 99."
       }
     },
+    "dictation": {
+      "start": "Podyktuj zamówienie",
+      "stop": "Zatrzymaj nagrywanie",
+      "recognising": "Rozpoznaję…",
+      "blocked": "Zezwól BarberHQ na mikrofon w Ustawieniach",
+      "noSpeech": "Nie usłyszałem zamówienia, spróbuj jeszcze raz",
+      "failed": "Nie udało się rozpoznać mowy",
+      "retry": "Spróbuj ponownie",
+      "tooLong": "Tekst zamówienia osiągnął limit długości"
+    },
     "clarify": {
       "product": "Produkt dla: {{ wording }}",
       "quantity": "Ilość dla: {{ wording }}",

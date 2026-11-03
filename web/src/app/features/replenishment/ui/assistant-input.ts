@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ReplenishmentAssistantFacade } from '../feature/replenishment-assistant.facade';
 import { OrderFacade } from '../feature/order.facade';
+import { DictationFacade } from '../feature/dictation.facade';
+import { DictationButton } from './dictation-button';
 
 @Component({
   imports: [
@@ -18,7 +20,9 @@ import { OrderFacade } from '../feature/order.facade';
     MatButtonModule,
     MatIconModule,
     TranslocoPipe,
+    DictationButton,
   ],
+  providers: [DictationFacade],
   selector: 'app-assistant-input',
   styles: `
     :host {
@@ -67,6 +71,7 @@ import { OrderFacade } from '../feature/order.facade';
         [placeholder]="'replenishment.assistant.placeholder' | transloco"
       ></textarea>
     </mat-form-field>
+    <app-dictation-button />
     <div
       class="examples"
       role="group"
