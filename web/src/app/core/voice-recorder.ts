@@ -6,7 +6,7 @@ export class MicrophoneBlockedError extends Error {
   }
 }
 
-const MIME_TYPES = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'];
+const MIME_TYPES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
 
 /** The only place that touches `navigator.mediaDevices` and `MediaRecorder`. */
 @Service()

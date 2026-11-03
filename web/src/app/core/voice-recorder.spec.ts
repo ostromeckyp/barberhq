@@ -31,6 +31,7 @@ class FakeRecorder {
 const track = { stop: vi.fn() };
 let getUserMedia: ReturnType<typeof vi.fn>;
 beforeEach(() => {
+  FakeRecorder.types = ['audio/webm'];
   track.stop.mockClear();
   getUserMedia = vi.fn(async () => ({ getTracks: () => [track] }));
   vi.stubGlobal('MediaRecorder', FakeRecorder);
@@ -59,6 +60,18 @@ it('records mono 64 kbps with the first supported type and releases tracks on st
   expect(result.mimeType).toBe('audio/webm');
   expect(result.blob.size).toBe(3);
   expect(track.stop).toHaveBeenCalled();
+});
+
+it('prefers webm opus over audio/mp4 when all are supported', async () => {
+  FakeRecorder.types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'];
+  await TestBed.inject(VoiceRecorder).start();
+  expect(FakeRecorder.last.options.mimeType).toBe('audio/webm;codecs=opus');
+});
+
+it('falls back to audio/mp4 when only mp4 is supported', async () => {
+  FakeRecorder.types = ['audio/mp4'];
+  await TestBed.inject(VoiceRecorder).start();
+  expect(FakeRecorder.last.options.mimeType).toBe('audio/mp4');
 });
 
 it('throws MicrophoneBlockedError when permission is denied', async () => {
