@@ -146,9 +146,11 @@ Owner steps for production, in this order (each is a production write and needs 
 3. Seed the new phonetic aliases (dry run first, then apply; the config file is passed as an argument only):
 
 ```sh
-node --import tsx scripts/seed/product-aliases.ts --project notbad-6be95 --business <businessId> --config config/public.local.json --dry-run
-node --import tsx scripts/seed/product-aliases.ts --project notbad-6be95 --business <businessId> --config config/public.local.json --apply
+node --import tsx scripts/seed/product-aliases.ts --project notbad-6be95 --business not-bad-stuff-demo --config config/public.local.json --dry-run
+node --import tsx scripts/seed/product-aliases.ts --project notbad-6be95 --business not-bad-stuff-demo --config config/public.local.json --apply
 ```
+
+The seed needs Application Default Credentials for the cloud project and refuses to run when `DATA_CONNECT_EMULATOR_HOST` is set.
 
 4. `npm run build:prod`, then `npm run deploy:preview`.
 5. Test on an iPhone (Safari and the installed PWA) on the `foundation` channel: allow the microphone, dictate, prepare, change an AI match.
