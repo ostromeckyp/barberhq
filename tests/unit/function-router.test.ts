@@ -100,6 +100,7 @@ describe('function router', () => {
     expect(source).not.toMatch(/^export (?!const )/m);
     expect(names.sort()).toEqual([
       'ai',
+      'clientLog',
       'commands',
       'getSourcePdf',
       'processKnowledgeTask',

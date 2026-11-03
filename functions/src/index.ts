@@ -2,6 +2,7 @@ import './setup.js';
 import { sourcePdfFunction } from './knowledge/source.js';
 import { uploadKnowledgePdfFunction } from './knowledge/upload.js';
 import { processKnowledgeTaskFunction } from './knowledge/worker.js';
+import { clientLogFunction } from './logging/client-log.js';
 import { ai as aiService } from './routing/ai.js';
 import { commands as commandsService } from './routing/commands.js';
 
@@ -12,3 +13,4 @@ export const ai = aiService;
 export const getSourcePdf = sourcePdfFunction();
 export const uploadKnowledgePdf = uploadKnowledgePdfFunction();
 export const processKnowledgeTask = processKnowledgeTaskFunction();
+export const clientLog = clientLogFunction();
