@@ -89,17 +89,50 @@ mat-form-field {
 .actions p {
   font-size: 14px;
 }
-ol {
-  list-style: none;
-  padding: 0;
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+.card-header h2 {
   margin: 0;
 }
-li {
-  border-top: 1px solid var(--border);
-  padding: 12px 0;
+.inspected-item + .inspected-item {
+  border-top: 1px solid var(--divider);
+  margin-top: 16px;
+  padding-top: 4px;
 }
-.note-text {
+.app-figures > .problem strong {
+  color: #8c1d18;
+}
+.reported-problem {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--ink);
+  background: var(--background);
+  border-radius: 0 8px 8px 0;
+}
+.reported-problem p {
+  margin: 0;
   white-space: pre-wrap;
+}
+.reported-problem p + p {
+  margin-top: 4px;
+}
+.inspection-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider);
+}
+.inspection-footer p {
+  margin: 0;
 }
 nav {
   display: flex;

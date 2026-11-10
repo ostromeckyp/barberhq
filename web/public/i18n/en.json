@@ -1120,7 +1120,8 @@
         "open": "Open original request",
         "batch": "Batch: {{ batch }}",
         "inspectedBy": "Inspected by {{ actor }} · {{ date }}",
-        "noSource": "No procedure source was selected for the original inspection."
+        "noSource": "No procedure source was selected for the original inspection.",
+        "itemLabel": "Inspected quantities · {{ product }}"
       },
       "current": {
         "title": "Current delivery procedures",
@@ -1134,7 +1135,8 @@
       },
       "history": {
         "title": "Issue history",
-        "pages": "Issue history pages"
+        "pages": "Issue history pages",
+        "productQuantities": "{{ product }}: {{ quantities }}"
       },
       "event": {
         "OPENED": "Problem reported",

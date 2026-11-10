@@ -1120,7 +1120,8 @@
         "open": "Otwórz pierwotne zamówienie",
         "batch": "Partia: {{ batch }}",
         "inspectedBy": "Sprawdził(a): {{ actor }} · {{ date }}",
-        "noSource": "Przy pierwotnym sprawdzeniu nie wybrano źródła procedury."
+        "noSource": "Przy pierwotnym sprawdzeniu nie wybrano źródła procedury.",
+        "itemLabel": "Sprawdzone ilości · {{ product }}"
       },
       "current": {
         "title": "Aktualne procedury dostaw",
@@ -1134,7 +1135,8 @@
       },
       "history": {
         "title": "Historia problemu",
-        "pages": "Strony historii problemu"
+        "pages": "Strony historii problemu",
+        "productQuantities": "{{ product }}: {{ quantities }}"
       },
       "event": {
         "OPENED": "Zgłoszono problem",
