@@ -17,6 +17,7 @@ import type { DeliveryScope } from '../models/delivery-scope';
 import { DeliveryIssueDraft } from './delivery-issue-draft';
 import { deliveryIssueIdentity } from './delivery-access';
 import { issueAction, sendIssueAction } from './delivery-issue-command';
+import { issueProcedures } from './issue-procedures';
 import type { IssueAction } from '../models/issue-action';
 @Service({ autoProvided: false })
 export class DeliveryIssueFacade {
@@ -97,11 +98,13 @@ export class DeliveryIssueFacade {
     }),
   });
   readonly procedures = computed(() => {
-    const scope = this.scope();
+    const scope = this.scope(),
+      issue = this.issue();
     return scope &&
+      issue &&
       this.procedureRecord.hasValue() &&
       this.procedureRecord.value().key === scopeKey(scope)
-      ? this.procedureRecord.value().procedures
+      ? issueProcedures(this.procedureRecord.value().procedures, issue.rootReceipt.items)
       : undefined;
   });
   readonly loading = this.record.isLoading;

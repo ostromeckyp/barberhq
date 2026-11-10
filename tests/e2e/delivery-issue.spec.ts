@@ -52,6 +52,13 @@ async function expectInspected(
         .locator('strong'),
     ).toHaveText(value);
 }
+/** Current procedures show only the problem the inspection found (damaged or missing units). */
+async function expectCurrentProcedures(page: Page, only: 'damaged' | 'missing') {
+  const region = page.getByRole('region', { name: 'Current delivery procedures', exact: true });
+  const other = only === 'damaged' ? 'missing' : 'damaged';
+  await expect(region.getByText(new RegExp(`${only} product procedure`, 'i'))).toHaveCount(1);
+  await expect(region.getByText(new RegExp(`${other} product procedure`, 'i'))).toHaveCount(0);
+}
 async function confirm(page: Page, label: string) {
   await page.getByRole('button', { name: label, exact: true }).click();
   const dialog = page.getByRole('dialog');
@@ -216,6 +223,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
     test.describe('When the issue is opened', () => {
       test('Then facts are visible and HQ commands are absent', async ({ page }) => {
         await expectInspected(page, { good: '8' });
+        await expectCurrentProcedures(page, 'damaged');
         await expect(
           page.getByRole('button', { name: 'Create replacement', exact: true }),
         ).toHaveCount(0);
@@ -440,6 +448,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
     test.describe('When the issue facts are opened', () => {
       test('Then zero good units and two missing units are explicit', async ({ page }) => {
         await expectInspected(page, { good: '0', damaged: '0', missing: '2' });
+        await expectCurrentProcedures(page, 'missing');
         await expect(page.getByText(/all received/i)).toHaveCount(0);
       });
     });
