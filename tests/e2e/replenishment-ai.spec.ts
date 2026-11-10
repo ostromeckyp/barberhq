@@ -1,4 +1,4 @@
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { test, expect, type Page, type BrowserContext } from './test.ts';
 import { AxeBuilder } from '@axe-core/playwright';
 import { createCloudHarness } from '../support/cloud.ts';
 import type { ProposalResult } from '../../shared/contracts/ai/index.ts';

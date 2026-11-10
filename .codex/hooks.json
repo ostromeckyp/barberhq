@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/hooks/block-local-json.py\""
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/hooks/block-secret-files.py\""
           }
         ]
       }

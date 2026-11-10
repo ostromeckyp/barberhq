@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './test.ts';
 import { AxeBuilder } from '@axe-core/playwright';
 import { createCloudHarness } from '../support/cloud.ts';
 import { seedPdfViewerSource } from './pdf-viewer.fixture.ts';

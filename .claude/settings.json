@@ -13,7 +13,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.agents/hooks/block-local-json.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.agents/hooks/block-secret-files.py\""
           }
         ]
       }

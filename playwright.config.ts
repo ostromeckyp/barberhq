@@ -1,5 +1,15 @@
 import { defineConfig } from '@playwright/test';
 
+// Optional, git-ignored: BARBERHQ_BASE_URL and BARBERHQ_APPCHECK_DEBUG_TOKEN for preview or live runs.
+// Skipped in emulator mode so local runs stay local. Variables already set in the shell win.
+if (process.env['BARBERHQ_TEST_MODE'] !== 'emulator') {
+  try {
+    process.loadEnvFile('.env.e2e');
+  } catch {
+    /* No file: use the shell environment. */
+  }
+}
+
 // In local emulator mode, start (or reuse) the emulators and the web dev server.
 const startLocalStack =
   process.env['BARBERHQ_TEST_MODE'] === 'emulator' &&

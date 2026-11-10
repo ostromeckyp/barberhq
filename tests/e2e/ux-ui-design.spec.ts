@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './test.ts';
 import { createCloudHarness } from '../support/cloud.ts';
 
 let h: Awaited<ReturnType<typeof createCloudHarness>>;

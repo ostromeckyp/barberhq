@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './test.ts';
 import { AxeBuilder } from '@axe-core/playwright';
 import { randomUUID } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';

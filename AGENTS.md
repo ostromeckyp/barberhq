@@ -3,10 +3,10 @@
 ## Secrets and local config
 
 - Never read, print, grep, copy or edit `*.local.json` files (`config/public.local.json`, `config/memberships.local.json`, `config/demo-accounts.local.json`). They hold per-environment config, personal data and demo passwords.
-- Never read `.env` files; `.env.example` / `.env.sample` are fine.
+- Never read, print, grep, copy or edit `.env` files (`.env`, `.env.e2e`, `functions/.env.<project>`); `.env.example` / `.env.sample` are fine. To check a key, use `grep -q '^NAME=' <file>`.
 - For structure, read `config/public.example.json` or `config/emulator.example.json`.
 - To check that a file exists, use `test -f <file>`; repo scripts may still take these files as `--config` / `--memberships` arguments.
-- Enforced by `.agents/hooks/block-local-json.py` (Claude: `.claude/settings.json`, Codex: `.codex/hooks.json`).
+- Enforced by `.agents/hooks/block-secret-files.py` (Claude: `.claude/settings.json`, Codex: `.codex/hooks.json`), tested in `tests/unit/secret-files-hook.test.ts`. The hook is a guard, not a sandbox: a recursive `grep -r` or a script can still reach these files, so the rules above apply regardless.
 
 ## Code Review Graph
 
