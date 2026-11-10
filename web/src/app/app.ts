@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -11,7 +11,6 @@ import {
 import { TranslocoPipe } from '@jsverse/transloco';
 import { filter, map, take } from 'rxjs';
 import { AppUpdate } from './core/app-update';
-import { FIREBASE } from './core/firebase.providers';
 import { runtimeConfig } from './core/public-config';
 import { BootSplash } from './shared/ui/boot-splash/boot-splash';
 
@@ -41,7 +40,6 @@ import { BootSplash } from './shared/ui/boot-splash/boot-splash';
 })
 export class App {
   readonly configured = runtimeConfig.publicConfig !== null;
-  private readonly firebase = this.configured ? inject(FIREBASE) : null;
   private readonly firstNavigation = inject(Router).events.pipe(
     filter(
       (event) =>
@@ -59,15 +57,5 @@ export class App {
 
   constructor() {
     inject(AppUpdate).start();
-    const firebase = this.firebase;
-    if (!firebase) return;
-    this.firstNavigation.pipe(takeUntilDestroyed()).subscribe(() => {
-      const start = () =>
-        void firebase
-          .appCheck()
-          .catch((error: unknown) => console.error('App Check failed to start', error));
-      if (typeof requestIdleCallback === 'function') requestIdleCallback(start, { timeout: 2000 });
-      else setTimeout(start, 0);
-    });
   }
 }

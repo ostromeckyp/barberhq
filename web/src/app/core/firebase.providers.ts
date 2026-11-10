@@ -24,19 +24,16 @@ export function createFirebase() {
   const auth = initializeAuth(app, {
     persistence: [indexedDBLocalPersistence, browserLocalPersistence],
   });
+  // Before Data Connect: its SDK sends a query without a token when App Check is not yet set up.
+  const appCheckInstance: AppCheck | null = runtimeConfig.useEmulators
+    ? null
+    : initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider(c.appCheck.siteKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+  const appCheck = async (): Promise<AppCheck | null> => appCheckInstance;
   const functions = getFunctions(app, c.functionsRegion);
   const data = getDataConnect(app, connectorConfig);
-  let appCheckInstance: AppCheck | null | undefined;
-  const appCheck = async (): Promise<AppCheck | null> => {
-    if (appCheckInstance === undefined)
-      appCheckInstance = runtimeConfig.useEmulators
-        ? null
-        : initializeAppCheck(app, {
-            provider: new ReCaptchaEnterpriseProvider(c.appCheck.siteKey),
-            isTokenAutoRefreshEnabled: true,
-          });
-    return appCheckInstance;
-  };
   if (runtimeConfig.useEmulators) {
     if (!c.projectId.startsWith('demo-') || !['localhost', '127.0.0.1'].includes(location.hostname))
       throw new Error('Emulators require an explicit local demo project.');

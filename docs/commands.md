@@ -226,4 +226,17 @@ iOS delivers push only to the app opened from the Home Screen. Notifications and
 
 - The browser API key only works from the prod, preview and `localhost:4200` origins. Node scripts that use the client SDK against prod (`tests/support/cloud.ts`, enabled with `BARBERHQ_TEST_CONFIG`) are refused.
 - Self sign-up is disabled; accounts are created by the seed scripts (Admin SDK).
-- App Check is enforced on all callable Functions, not yet on Data Connect.
+- App Check is enforced in code on all callable Functions and both PDF endpoints. Storage and Data Connect are enforced from the console (below).
+
+## App Check
+
+The web app initialises App Check (reCAPTCHA Enterprise) when Firebase is created, before Data Connect, so every query carries a token. The browser never uses the Storage SDK (rules deny all; PDFs go through `uploadKnowledgePdf` and `getSourcePdf`), so Storage enforcement has no effect on the app.
+
+Turning enforcement on is a production change. In the Firebase console → App Check → APIs:
+
+1. Check the metrics: verified requests should be close to 100% for the release you are testing.
+2. **Cloud Storage** → Enforce.
+3. **Data Connect** → Enforce, only after the web release with early App Check is live. Test the `foundation` preview first (sign in, salon inventory, HQ lists, assistant).
+4. Undo: the same screen → Unenforce. It takes effect within minutes, no deploy.
+
+Enforcement applies only to client SDK traffic. The console, Cloud SQL Studio, `gcloud`, the Admin SDK (seed scripts, Functions) and the Firebase MCP keep working. A client SDK script or a hand-written request against prod needs a debug token from App Check → Apps → Manage debug tokens; never commit it.

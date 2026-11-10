@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="e2e (emulator)" type="JavaScriptTestRunnerPlaywright">
+    <node-interpreter value="project" />
+    <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+    <working-dir value="$PROJECT_DIR$" />
+    <playwright-options value="--workers=1" />
+    <envs>
+      <env name="BARBERHQ_TEST_MODE" value="emulator" />
+    </envs>
+    <scope-kind value="ALL" />
+    <method v="2" />
+  </configuration>
+</component>
