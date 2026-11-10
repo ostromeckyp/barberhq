@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test.ts';
 
 // Executable scenario for the controller-owned local adapter only. CUA is the
 // recorded browser execution surface; this file is not evidence of a cloud run.

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './test.ts';
 import { createCloudHarness } from '../support/cloud.ts';
 import type { ClientLogEvent } from '../../shared/contracts/logging/index.ts';
 import type { ProposalResult } from '../../shared/contracts/ai/index.ts';

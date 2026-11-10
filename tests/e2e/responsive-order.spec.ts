@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test.ts';
 import { AxeBuilder } from '@axe-core/playwright';
 import { createCloudHarness } from '../support/cloud.ts';
 

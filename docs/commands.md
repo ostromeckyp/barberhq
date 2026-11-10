@@ -52,11 +52,20 @@ npm run typecheck
 npm run test:unit
 npm run test:web                                  # Angular unit tests
 BARBERHQ_TEST_MODE=emulator npm run test:integration
-BARBERHQ_TEST_MODE=emulator npm run test:e2e      # needs the dev server on 4200
+BARBERHQ_TEST_MODE=emulator npm run test:e2e      # starts or reuses emulators and the dev server
 npm run format:check
 ```
 
 Integration tests need emulators; the isolated stack used for SQL-heavy suites is described in [full demo reset](implementation/full-demo-reset.md#verification-local-isolated).
+
+E2E against preview or live: App Check is enforced, and headless Chromium may not get a reCAPTCHA token. Register a debug token (Firebase console → App Check → Apps → web app → Manage debug tokens) and put it in the git-ignored `.env.e2e` at the repo root; `playwright.config.ts` loads it unless `BARBERHQ_TEST_MODE=emulator`, and shell variables win:
+
+```sh
+BARBERHQ_BASE_URL=https://notbad-6be95--foundation-<id>.web.app
+BARBERHQ_APPCHECK_DEBUG_TOKEN=<debug token>
+```
+
+Every browser context then starts with that token (`tests/e2e/test.ts`; specs import `test` from there). The token bypasses App Check for whoever holds it: never commit it, and revoke it in the console when you no longer need it.
 
 After changing any `.gql` file or the schema, regenerate the SDKs and commit them:
 

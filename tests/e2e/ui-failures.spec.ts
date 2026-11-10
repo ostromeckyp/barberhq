@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './test.ts';
 import { randomUUID } from 'node:crypto';
 import { createCloudHarness } from '../support/cloud.ts';
 import { StockRepository } from '../../functions/src/stock/repository.ts';

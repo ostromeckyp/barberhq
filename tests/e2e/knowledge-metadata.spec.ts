@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './test.ts';
 import { resolve } from 'node:path';
 
 // Controller-owned local UI domain adapter: SQL/extraction are real; Storage/vectors are fixtures.

@@ -1,4 +1,4 @@
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { test, expect, type Page, type BrowserContext } from './test.ts';
 import { createCloudHarness } from '../support/cloud.ts';
 import { resetRecords } from '../../scripts/seed/reset.ts';
 import { seedProcedureCitation } from './procedure-rag.fixture.ts';
