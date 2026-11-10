@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { runtimeConfig } from './public-config';
 import { createFirebase } from './firebase.providers';
+import { getDataConnect } from 'firebase/data-connect';
 import { connectorConfig } from './generated';
 import type { PublicConfig } from '../../../../scripts/config/public-config';
 
@@ -49,16 +50,23 @@ describe('createFirebase', () => {
     runtimeConfig.useEmulators = false;
   });
 
-  it('does not initialise App Check or the popup resolver at creation', () => {
+  it('creates auth without the popup resolver', () => {
     createFirebase();
-    expect(initializeAppCheck).not.toHaveBeenCalled();
     expect(getAuth).not.toHaveBeenCalled();
     const args = vi.mocked(initializeAuth).mock.calls[0];
     expect(args[1]).toEqual({ persistence: [indexedDBLocalPersistence, browserLocalPersistence] });
     expect(args[1]).not.toHaveProperty('popupRedirectResolver');
   });
 
-  it('initialises App Check once on first use and memoises it', async () => {
+  it('initialises App Check before Data Connect, so no query goes out without a token', () => {
+    createFirebase();
+    expect(initializeAppCheck).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(initializeAppCheck).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(getDataConnect).mock.invocationCallOrder[0],
+    );
+  });
+
+  it('returns the same App Check instance on every use', async () => {
     const firebase = createFirebase();
     const first = await firebase.appCheck();
     const second = await firebase.appCheck();
