@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="integration (emulator)" type="JavaScriptTestRunnerVitest">
+    <node-interpreter value="project" />
+    <vitest-package value="$PROJECT_DIR$/node_modules/vitest" />
+    <working-dir value="$PROJECT_DIR$" />
+    <vitest-options value="--run --project integration" />
+    <envs>
+      <env name="BARBERHQ_TEST_MODE" value="emulator" />
+    </envs>
+    <scope-kind value="ALL" />
+    <method v="2" />
+  </configuration>
+</component>
