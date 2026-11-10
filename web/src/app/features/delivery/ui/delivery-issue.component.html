@@ -70,50 +70,70 @@
         }
       </section>
       <section class="card" [attr.aria-label]="'delivery.issue.original.title' | transloco">
-        <h2>{{ 'delivery.issue.original.title' | transloco }}</h2>
-        <a mat-button [routerLink]="facade.requestLink(issue.rootRequestId)">{{
-          'delivery.issue.original.open' | transloco
-        }}</a>
+        <div class="card-header">
+          <h2>{{ 'delivery.issue.original.title' | transloco }}</h2>
+          <a mat-button [routerLink]="facade.requestLink(issue.rootRequestId)">{{
+            'delivery.issue.original.open' | transloco
+          }}</a>
+        </div>
         @for (item of issue.rootReceipt.items; track item.productId) {
-          <h3>{{ item.productName }}</h3>
-          <p>
+          <div class="inspected-item">
+            @if (issue.rootReceipt.items.length > 1) {
+              <h3>{{ item.productName }}</h3>
+            }
+            <div
+              class="app-figures"
+              [attr.aria-label]="
+                issue.rootReceipt.items.length > 1
+                  ? ('delivery.issue.original.itemLabel' | transloco: { product: item.productName })
+                  : null
+              "
+            >
+              <div>
+                <span>{{ 'delivery.receipt.field.good' | transloco }}</span
+                ><strong class="qty">{{ item.goodQuantity }}</strong>
+              </div>
+              <div [class.problem]="item.damagedQuantity > 0">
+                <span>{{ 'delivery.receipt.field.damaged' | transloco }}</span
+                ><strong class="qty">{{ item.damagedQuantity }}</strong>
+              </div>
+              <div [class.problem]="item.missingQuantity > 0">
+                <span>{{ 'delivery.receipt.field.missing' | transloco }}</span
+                ><strong class="qty">{{ item.missingQuantity }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+        @if (issue.rootReceipt.report; as report) {
+          <blockquote class="reported-problem">
+            <p>{{ report.description }}</p>
+            @if (report.batchIdentifier) {
+              <p class="muted">
+                {{ 'delivery.issue.original.batch' | transloco: { batch: report.batchIdentifier } }}
+              </p>
+            }
+          </blockquote>
+        }
+        <footer class="inspection-footer">
+          <p class="muted inspected-by">
             {{
-              'delivery.quantities'
+              'delivery.issue.original.inspectedBy'
                 | transloco
                   : {
-                      good: item.goodQuantity,
-                      damaged: item.damagedQuantity,
-                      missing: item.missingQuantity,
+                      actor: issue.rootReceipt.actorLabel | transloco,
+                      date: issue.rootReceipt.recordedAt | appDate: 'd MMM, HH:mm',
                     }
             }}
           </p>
-        }
-        @if (issue.rootReceipt.report; as report) {
-          <p>{{ report.description }}</p>
-          @if (report.batchIdentifier) {
-            <p>
-              {{ 'delivery.issue.original.batch' | transloco: { batch: report.batchIdentifier } }}
-            </p>
+          @for (ref of issue.rootReceipt.procedureReferences; track ref.kind) {
+            <button mat-stroked-button type="button" (click)="facade.openProcedure(ref)">
+              {{ openProcedureLabels[ref.kind] | transloco }}
+            </button>
           }
-        }
-        <p class="muted">
-          {{
-            'delivery.issue.original.inspectedBy'
-              | transloco
-                : {
-                    actor: issue.rootReceipt.actorLabel | transloco,
-                    date: issue.rootReceipt.recordedAt | appDate: 'd MMM, HH:mm',
-                  }
-          }}
-        </p>
-        @for (ref of issue.rootReceipt.procedureReferences; track ref.kind) {
-          <button mat-stroked-button type="button" (click)="facade.openProcedure(ref)">
-            {{ openProcedureLabels[ref.kind] | transloco }}
-          </button>
-        }
-        @if (!issue.rootReceipt.procedureReferences.length) {
-          <p class="muted">{{ 'delivery.issue.original.noSource' | transloco }}</p>
-        }
+          @if (!issue.rootReceipt.procedureReferences.length) {
+            <p class="muted">{{ 'delivery.issue.original.noSource' | transloco }}</p>
+          }
+        </footer>
       </section>
       <section class="card" [attr.aria-label]="'delivery.issue.current.title' | transloco">
         <h2>{{ 'delivery.issue.current.title' | transloco }}</h2>
@@ -179,30 +199,51 @@
       </section>
       <section class="card" aria-labelledby="history-title">
         <h2 id="history-title">{{ 'delivery.issue.history.title' | transloco }}</h2>
-        <ol>
+        <ol class="app-timeline" role="list">
           @for (event of issue.events; track event.id) {
-            <li>
-              <h3>{{ eventLabels[event.type] | transloco }}</h3>
-              <p class="muted">
-                {{ event.actorLabel | transloco }} ·
-                {{ event.recordedAt | appDate: 'd MMM, HH:mm' }}
-              </p>
-              @if (event.note) {
-                <p class="note-text">{{ event.note }}</p>
-              }
-              @for (row of event.quantities; track row.productId) {
+            <li class="recorded" [class.rejected]="event.type === 'REPLACEMENT_REJECTED'">
+              <div class="app-timeline-marker" aria-hidden="true">
+                <mat-icon>{{
+                  event.type === 'REPLACEMENT_REJECTED' ? 'cancel' : 'check_circle'
+                }}</mat-icon>
+                @if (!$last) {
+                  <span class="app-timeline-line complete"></span>
+                }
+              </div>
+              <div class="app-timeline-copy">
+                <strong>{{ eventLabels[event.type] | transloco }}</strong>
                 <p>
-                  {{
+                  {{ event.actorLabel | transloco }} ·
+                  {{ event.recordedAt | appDate: 'd MMM, HH:mm' }}
+                </p>
+                @if (event.note) {
+                  <p class="app-timeline-note">{{ event.note }}</p>
+                }
+                @for (row of event.quantities; track row.productId) {
+                  @let counts =
                     'delivery.quantities'
                       | transloco
                         : {
                             good: row.goodQuantity,
                             damaged: row.damagedQuantity,
                             missing: row.missingQuantity,
-                          }
-                  }}
-                </p>
-              }
+                          };
+                  <p class="qty">
+                    @if (event.quantities.length > 1) {
+                      {{
+                        'delivery.issue.history.productQuantities'
+                          | transloco
+                            : {
+                                product: productNames().get(row.productId) ?? '',
+                                quantities: counts,
+                              }
+                      }}
+                    } @else {
+                      {{ counts }}
+                    }
+                  </p>
+                }
+              </div>
             </li>
           }
         </ol>

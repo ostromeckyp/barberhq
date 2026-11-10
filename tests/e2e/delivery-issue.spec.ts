@@ -38,6 +38,20 @@ async function open(page: Page, role: 'hq' | 'legnicka' = 'hq') {
   await page.getByRole('heading', { name: 'Delivery issue', exact: true }).waitFor();
   await page.getByRole('region', { name: 'Outstanding units', exact: true }).waitFor();
 }
+/** Original inspection figures, e.g. { good: '8' } checks the "Good units" value. */
+async function expectInspected(
+  page: Page,
+  values: Partial<Record<'good' | 'damaged' | 'missing', string>>,
+) {
+  const region = page.getByRole('region', { name: 'Original inspection' });
+  const labels = { good: 'Good units', damaged: 'Damaged units', missing: 'Missing units' };
+  for (const [key, value] of Object.entries(values))
+    await expect(
+      region
+        .locator('.app-figures > div', { hasText: labels[key as keyof typeof labels] })
+        .locator('strong'),
+    ).toHaveText(value);
+}
 async function confirm(page: Page, label: string) {
   await page.getByRole('button', { name: label, exact: true }).click();
   const dialog = page.getByRole('dialog');
@@ -201,9 +215,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
     });
     test.describe('When the issue is opened', () => {
       test('Then facts are visible and HQ commands are absent', async ({ page }) => {
-        await expect(page.getByRole('region', { name: 'Original inspection' })).toContainText(
-          '8 good',
-        );
+        await expectInspected(page, { good: '8' });
         await expect(
           page.getByRole('button', { name: 'Create replacement', exact: true }),
         ).toHaveCount(0);
@@ -371,9 +383,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
         page,
       }) => {
         await expect(page.getByText('Resolved', { exact: true })).toBeVisible();
-        await expect(page.getByRole('region', { name: 'Original inspection' })).toContainText(
-          '8 good',
-        );
+        await expectInspected(page, { good: '8' });
         await expect(page.getByRole('region', { name: 'Outstanding units' })).toContainText(
           '0 units remaining',
         );
@@ -429,9 +439,7 @@ test.describe('Feature: HQ resolves a delivery issue through linked replacements
     });
     test.describe('When the issue facts are opened', () => {
       test('Then zero good units and two missing units are explicit', async ({ page }) => {
-        await expect(page.getByRole('region', { name: 'Original inspection' })).toContainText(
-          '0 good · 0 damaged · 2 missing',
-        );
+        await expectInspected(page, { good: '0', damaged: '0', missing: '2' });
         await expect(page.getByText(/all received/i)).toHaveCount(0);
       });
     });

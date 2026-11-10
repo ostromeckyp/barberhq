@@ -198,7 +198,7 @@ test.describe('Feature: original request detail layout', () => {
           );
           if (state === 'REJECTED')
             await expect(history).toContainText('Check the salon count before requesting again.');
-          await expect(page.locator('.figures')).toHaveCount(1);
+          await expect(page.locator('.app-figures')).toHaveCount(1);
           expect(metrics.every((m) => m.overflow <= 0 && m.statusWithTitle)).toBe(true);
           expect(metrics.find((m) => m.width === 1280)!.backHeight).toBe(40);
           expect(metrics.find((m) => m.width === 320)!.backHeight).toBeGreaterThanOrEqual(48);

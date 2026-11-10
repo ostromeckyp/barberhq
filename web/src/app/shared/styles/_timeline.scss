@@ -1,0 +1,71 @@
+// Vertical history: a marker icon and connecting line per step, then label, meta and optional note.
+// Markup: ol.app-timeline > li[.recorded|.pending|.unavailable|.rejected]
+//   > .app-timeline-marker (mat-icon, .app-timeline-line[.complete]) + .app-timeline-copy
+.app-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.app-timeline > li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+}
+.app-timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #9a948a;
+}
+.app-timeline .recorded .app-timeline-marker {
+  color: var(--ink);
+}
+.app-timeline .recorded .app-timeline-marker mat-icon {
+  font-variation-settings: 'FILL' 1;
+}
+.app-timeline .rejected .app-timeline-marker {
+  color: #8c1d18;
+}
+.app-timeline-line {
+  flex: 1;
+  width: 2px;
+  min-height: 14px;
+  margin: 3px 0;
+  background: #d9d4cb;
+}
+.app-timeline-line.complete {
+  background: var(--ink);
+}
+.app-timeline-copy {
+  padding: 1px 0 18px;
+  min-width: 0;
+}
+.app-timeline > li:last-child .app-timeline-copy {
+  padding-bottom: 0;
+}
+.app-timeline-copy strong {
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.app-timeline .pending .app-timeline-copy,
+.app-timeline .unavailable .app-timeline-copy {
+  color: var(--muted);
+}
+.app-timeline-copy p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.app-timeline-copy .app-timeline-note {
+  color: var(--ink);
+  font-size: 14px;
+  margin-top: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.app-timeline-copy .rejection-reason {
+  color: #8c1d18;
+  margin-top: 6px;
+}

@@ -98,16 +98,16 @@ test.describe('Feature: honest failure and recovery states', () => {
         const resume = await holdRead(page, 'GetRequestDetail');
         await page.goto(`/hq/requests/${request.requestId}`);
         await expect(page.getByRole('progressbar', { name: 'Loading request' })).toBeVisible();
-        await expect(page.locator('.figures')).toHaveCount(0);
+        await expect(page.locator('.app-figures')).toHaveCount(0);
         await capture(page, 'detail-loading-320');
         resume('fail');
         await expect(page.getByRole('heading', { name: 'Request unavailable' })).toBeVisible();
-        await expect(page.locator('.figures')).toHaveCount(0);
+        await expect(page.locator('.app-figures')).toHaveCount(0);
         await capture(page, 'detail-error-320');
         resume('pass');
         await page.getByRole('button', { name: 'Retry', exact: true }).click();
         await expect(page.getByRole('heading', { name: /^Pomada Matowa/, level: 1 })).toBeVisible();
-        await expect(page.locator('.figures strong').first()).toHaveText('2');
+        await expect(page.locator('.app-figures strong').first()).toHaveText('2');
       });
     });
 

@@ -3,6 +3,8 @@
 @use './app/shared/styles/navigation';
 @use './app/shared/styles/quantity';
 @use './app/shared/styles/filters';
+@use './app/shared/styles/figures';
+@use './app/shared/styles/timeline';
 :root {
   @include tokens.properties;
   color-scheme: light;

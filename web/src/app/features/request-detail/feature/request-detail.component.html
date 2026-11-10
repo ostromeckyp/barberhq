@@ -120,7 +120,7 @@
             @if (request.items.length > 1) {
               <h3>{{ item.productName }}</h3>
             }
-            <div class="figures">
+            <div class="app-figures">
               <div>
                 <span>{{ 'requests.detail.delivery.ordered' | transloco }}</span
                 ><strong class="qty">{{ item.quantity }}</strong
@@ -189,7 +189,7 @@
       <section class="card history-card" aria-labelledby="history-title">
         <h2 id="history-title">{{ 'requests.detail.history.title' | transloco }}</h2>
         <ol
-          class="status-history"
+          class="app-timeline"
           [attr.aria-label]="'requests.detail.history.label' | transloco"
           role="list"
         >
@@ -200,7 +200,7 @@
               [class.unavailable]="step.kind === 'UNAVAILABLE'"
               [class.rejected]="step.state === 'REJECTED'"
             >
-              <div class="history-marker" aria-hidden="true">
+              <div class="app-timeline-marker" aria-hidden="true">
                 <mat-icon>{{
                   step.kind === 'RECORDED'
                     ? step.state === 'REJECTED'
@@ -210,14 +210,14 @@
                 }}</mat-icon>
                 @if (!$last) {
                   <span
-                    class="history-line"
+                    class="app-timeline-line"
                     [class.complete]="
                       step.kind === 'RECORDED' && history()[$index + 1].kind === 'RECORDED'
                     "
                   ></span>
                 }
               </div>
-              <div class="history-copy">
+              <div class="app-timeline-copy">
                 <strong>{{ step.label.key | transloco: step.label.params }}</strong>
                 @if (step.event; as event) {
                   <p>

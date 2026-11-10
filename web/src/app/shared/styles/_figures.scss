@@ -1,0 +1,44 @@
+// A row of labelled quantities: label, large number, optional unit or hint.
+// Markup: .app-figures > div > span (label) + strong.qty (value) + small (unit)
+.app-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.app-figures > div {
+  padding: 12px 14px;
+  color: var(--muted);
+  font-size: 13px;
+  min-width: 0;
+}
+.app-figures > div + div {
+  border-left: 1px solid var(--divider);
+}
+.app-figures > div > span {
+  display: block;
+}
+.app-figures strong {
+  display: inline-block;
+  color: var(--ink);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 4px 0;
+}
+.app-figures strong.pending-value {
+  color: #9a948a;
+}
+.app-figures small {
+  margin-left: 4px;
+  font-size: 12px;
+}
+@media (max-width: 759px) {
+  .app-figures > div {
+    padding: 12px 8px;
+  }
+  .app-figures strong {
+    font-size: 28px;
+  }
+}

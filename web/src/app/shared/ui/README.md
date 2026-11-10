@@ -17,6 +17,10 @@ Standalone Angular/Material components with no Firebase, router or feature-state
 
 Global class `.qty` (`../styles/_quantity.scss`): quantities in the body font with tabular numerals; no monospace. Show the unit once (column header or one suffix).
 
+Global class `.app-figures` (`../styles/_figures.scss`): a bordered row of labelled quantities (`div > span` label, `strong.qty` value, optional `small` unit), used for delivery quantities and the original inspection.
+
+Global class `.app-timeline` (`../styles/_timeline.scss`): vertical history with a marker icon and connecting line per step (`li.recorded|pending|unavailable|rejected`, `.app-timeline-marker`, `.app-timeline-line.complete`, `.app-timeline-copy`, `.app-timeline-note`), used for request status history and issue history.
+
 Colors and shared shapes are in `../styles/_tokens.scss`; Material defaults in `../theme.scss`. Use Material buttons, fields, tables and dialogs directly. Add custom components when they express repeated visual meaning, not just to rename a Material control.
 
 Feature-specific presentation stays in the feature's `ui/` folder. See [architecture](../../../../../docs/implementation/angular-architecture.md) for state and data-access boundaries.

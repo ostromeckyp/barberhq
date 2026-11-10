@@ -108,101 +108,6 @@ p {
   margin-top: 16px;
   padding-top: 16px;
 }
-.figures {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border: 1px solid var(--divider);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.figures > div {
-  padding: 12px 14px;
-  color: var(--muted);
-  font-size: 13px;
-  min-width: 0;
-}
-.figures > div + div {
-  border-left: 1px solid var(--divider);
-}
-.figures > div > span {
-  display: block;
-}
-.figures strong {
-  display: inline-block;
-  color: var(--ink);
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 1.1;
-  margin: 4px 0;
-}
-.figures strong.pending-value {
-  color: #9a948a;
-}
-.figures small {
-  margin-left: 4px;
-  font-size: 12px;
-}
-.status-history {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.status-history li {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 12px;
-}
-.history-marker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #9a948a;
-}
-.recorded .history-marker {
-  color: var(--ink);
-}
-.recorded .history-marker mat-icon {
-  font-variation-settings: 'FILL' 1;
-}
-.rejected .history-marker {
-  color: #8c1d18;
-}
-.history-line {
-  flex: 1;
-  width: 2px;
-  min-height: 14px;
-  margin: 3px 0;
-  background: #d9d4cb;
-}
-.history-line.complete {
-  background: var(--ink);
-}
-.history-copy {
-  padding: 1px 0 18px;
-  min-width: 0;
-}
-.status-history li:last-child .history-copy {
-  padding-bottom: 0;
-}
-.history-copy strong {
-  font-size: 15px;
-  line-height: 1.4;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-.pending .history-copy,
-.unavailable .history-copy {
-  color: var(--muted);
-}
-.history-copy p {
-  margin: 2px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-}
-.history-copy .rejection-reason {
-  color: #8c1d18;
-  margin-top: 6px;
-}
 .stock {
   container: stock-card / inline-size;
 }
@@ -267,14 +172,6 @@ p {
 @media (max-width: 950px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-@media (max-width: 759px) {
-  .figures > div {
-    padding: 12px 8px;
-  }
-  .figures strong {
-    font-size: 28px;
   }
 }
 

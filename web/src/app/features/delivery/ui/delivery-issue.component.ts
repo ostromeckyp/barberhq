@@ -1,5 +1,5 @@
 import { BackLink } from '../../../shared/ui/back-link/back-link';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppDatePipe } from '../../../shared/ui/app-date.pipe';
 import { RouterLink } from '@angular/router';
@@ -61,6 +61,12 @@ export class DeliveryIssueComponent {
       UNAVAILABLE: 'delivery.procedure.unavailable.MISSING',
     },
   } as const;
+  /** History quantities carry only product IDs; names come from the issue's own rows. */
+  readonly productNames = computed(() => {
+    const issue = this.facade.issue();
+    const rows = [...(issue?.rootReceipt.items ?? []), ...(issue?.items ?? [])];
+    return new Map(rows.map((row) => [row.productId, row.productName]));
+  });
   private readonly language = inject(Language);
   remainingKey(count: number): string {
     return pluralKey('delivery.count.remaining', count, this.language.current());
