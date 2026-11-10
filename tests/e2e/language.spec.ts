@@ -58,3 +58,26 @@ test('switch keeps a typed order draft', async ({ page }) => {
     'We need two more matte pomades',
   );
 });
+for (const [width, role] of [
+  [1280, 'hq'],
+  [390, 'hq'],
+  [1280, 'legnicka'],
+] as const) {
+  test(`Polish side navigation shows whole labels · ${role} · ${width}px`, async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('barberhq.language', 'pl'));
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/login');
+    const credentials = h.loginCredentials(role);
+    await page.getByLabel('Adres e-mail').fill(credentials.email);
+    await page.locator('input[type=password]').fill(credentials.password);
+    await page.locator('button[type=submit]').click();
+    if (width < 760) await page.getByRole('button', { name: 'Otwórz nawigację' }).click();
+    const links = page.getByRole('navigation').locator('mat-nav-list a');
+    await expect(links.first()).toBeVisible();
+    // A wrapped label must grow its row, never be cut off by a fixed height.
+    const clipped = await links.evaluateAll((items) =>
+      items.filter((a) => a.scrollHeight > a.clientHeight + 1).map((a) => a.textContent?.trim()),
+    );
+    expect(clipped).toEqual([]);
+  });
+}
