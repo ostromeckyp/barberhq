@@ -13,9 +13,12 @@
   margin-left: auto;
 }
 
-// Side nav labels wrap to two lines instead of truncating.
+// Side nav labels wrap to two lines instead of truncating. Material sets the row height from
+// this token in its component styles, which load after ours, so a plain `height` loses.
+.mat-mdc-nav-list {
+  --mat-list-list-item-one-line-container-height: auto;
+}
 .mat-mdc-nav-list .mat-mdc-list-item {
-  height: auto;
   min-height: 48px;
   padding-block: 6px;
 }
